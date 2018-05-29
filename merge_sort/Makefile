@@ -1,4 +1,4 @@
-CC = clang-5.0
+CC = clang-6.0
 CFLAGS = -g -Wall -Wextra -Werror -std=c11 -fsanitize=undefined
 
 default: test
