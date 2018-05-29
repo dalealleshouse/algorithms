@@ -33,22 +33,24 @@ int sort(void* arr, void* output, size_t length, size_t item_size,
         size_t b_pos = 0;
         for (size_t i = 0; i < length; i++) {
             if (a_pos >= a_size) {
-                copy_bytes(&output[i * item_size], &b[b_pos], item_size);
+                copy_bytes(output, &b[b_pos], item_size);
                 b_pos += item_size;
             } else if (b_pos >= b_size) {
-                copy_bytes(&output[i * item_size], &a[a_pos], item_size);
+                copy_bytes(output, &a[a_pos], item_size);
                 a_pos += item_size;
             } else {
                 int result = comparator(&a[a_pos], &b[b_pos]);
 
                 if (result < 0) {
-                    copy_bytes(&output[i * item_size], &a[a_pos], item_size);
+                    copy_bytes(output, &a[a_pos], item_size);
                     a_pos += item_size;
                 } else {
-                    copy_bytes(&output[i * item_size], &b[b_pos], item_size);
+                    copy_bytes(output, &b[b_pos], item_size);
                     b_pos += item_size;
                 }
             }
+
+            output += item_size;
         }
     } else {
         copy_bytes(output, arr, item_size);

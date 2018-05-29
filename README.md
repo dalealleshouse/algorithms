@@ -5,4 +5,6 @@ Examples of popular algorithms
 cunit - required for running tests
 Use the following to install on ubuntu
 
-```sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
+```
+sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
+```

@@ -33,28 +33,44 @@ void null_does_not_throw_test(void)
 
 void sorts_even_size_array(void)
 {
+    const int size = 6;
     int arr[] = { 6, 5, 4, 3, 2, 1 };
-    int sorted[6];
+    int sorted[size];
 
-    int result = sort(arr, sorted, 6, sizeof(int), int_comparator);
+    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < size; i++)
         CU_ASSERT_EQUAL(sorted[i], i + 1);
 
     CU_ASSERT_EQUAL(result, 0);
 }
 
-void test_case_sample(void)
+void sorts_pre_sorted_array(void)
 {
-    CU_ASSERT(CU_TRUE);
-    CU_ASSERT_NOT_EQUAL(2, -1);
-    CU_ASSERT_STRING_EQUAL("string #1", "string #1");
-    CU_ASSERT_STRING_NOT_EQUAL("string #1", "string #2");
+    const int size = 6;
+    int arr[] = { 1, 2, 3, 4, 5, 6 };
+    int sorted[size];
 
-    CU_ASSERT(CU_TRUE);
-    CU_ASSERT_EQUAL(2, 2);
-    CU_ASSERT_STRING_NOT_EQUAL("string #1", "string #2");
-    CU_ASSERT_STRING_EQUAL("string #1", "string #1");
+    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
+
+    for (int i = 0; i < size; i++)
+        CU_ASSERT_EQUAL(sorted[i], i + 1);
+
+    CU_ASSERT_EQUAL(result, 0);
+}
+
+void sorts_odd_size_array(void)
+{
+    const int size = 7;
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7 };
+    int sorted[size];
+
+    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
+
+    for (int i = 0; i < size; i++)
+        CU_ASSERT_EQUAL(sorted[i], i + 1);
+
+    CU_ASSERT_EQUAL(result, 0);
 }
 
 /************* Test Runner Code goes here **************/
@@ -79,8 +95,14 @@ int main(void)
             == CU_add_test(pSuite, "null input does not cause error",
                    null_does_not_throw_test))
         || (NULL
-               == CU_add_test(pSuite, "sort of even sized array invalid",
-                      sorts_even_size_array))) {
+               == CU_add_test(pSuite, "sort of even sized array",
+                      sorts_even_size_array))
+        || (NULL
+               == CU_add_test(pSuite, "sorts an array that is already sorted",
+                      sorts_pre_sorted_array))
+        || (NULL
+               == CU_add_test(pSuite, "sorts an odd sized array",
+                      sorts_odd_size_array))) {
         CU_cleanup_registry();
         return CU_get_error();
     }
@@ -88,9 +110,6 @@ int main(void)
     // Run all tests using the basic interface
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
-    /* printf("\n"); */
-    /* CU_basic_show_failures(CU_get_failure_list()); */
-    /* printf("\n\n"); */
 
     /* Clean up registry and return */
     CU_cleanup_registry();
