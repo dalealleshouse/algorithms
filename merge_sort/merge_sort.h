@@ -11,7 +11,7 @@
  */
 typedef int (*comparator)(const void* x, const void* y);
 
-int sort(void* arr, void* output, size_t length, size_t item_size,
-    comparator comparator);
+int sort(const void* arr, void* output, const size_t length,
+    const size_t item_size, comparator comparator);
 
 #endif

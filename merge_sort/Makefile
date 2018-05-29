@@ -1,5 +1,5 @@
 CC = clang-5.0
-CFLAGS = -g -Wall -Wextra -Werror -std=c11
+CFLAGS = -g -Wall -Wextra -Werror -std=c11 -fsanitize=undefined
 
 default: test
 
@@ -11,4 +11,4 @@ test: clean merge_sort.o
 	./test
 
 clean:
-	rm -f *~ *.o
+	rm -f *~ *.o test

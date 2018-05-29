@@ -10,7 +10,11 @@
 int init_suite(void) { return 0; }
 int clean_suite(void) { return 0; }
 
-/************* Test case functions ****************/
+typedef struct test_struct {
+    int foo;
+    int bar;
+    char sorter;
+} test_struct_t;
 
 int int_comparator(const void* x, const void* y)
 {
@@ -25,6 +29,42 @@ int int_comparator(const void* x, const void* y)
 
     return 1;
 }
+
+int struct_comparator(const void* x, const void* y)
+{
+    if (x == y)
+        return 0;
+
+    if (x == NULL && y != NULL)
+        return 0;
+
+    if (y == NULL && x != NULL)
+        return 1;
+
+    test_struct_t* _x = (test_struct_t*)x;
+    test_struct_t* _y = (test_struct_t*)y;
+
+    return int_comparator(&_x->sorter, &_y->sorter);
+}
+
+int pointer_comparator(const void* x, const void* y)
+{
+    if (x == y)
+        return 0;
+
+    if (x == NULL && y != NULL)
+        return 0;
+
+    if (y == NULL && x != NULL)
+        return 1;
+
+    test_struct_t* _x = *(test_struct_t**)x;
+    test_struct_t* _y = *(test_struct_t**)y;
+
+    return int_comparator(&_x->sorter, &_y->sorter);
+}
+
+/************* Test case functions ****************/
 
 void null_does_not_throw_test(void)
 {
@@ -73,6 +113,63 @@ void sorts_odd_size_array(void)
     CU_ASSERT_EQUAL(result, 0);
 }
 
+void sorts_structs(void)
+{
+    const int size = 6;
+    test_struct_t arr[6] = { { 0, 0, 6 }, { 0, 0, 5 }, { 0, 0, 4 },
+        { 0, 0, 3 }, { 0, 0, 2 }, { 0, 0, 1 } };
+    test_struct_t sorted[6];
+
+    int result
+        = sort(arr, sorted, size, sizeof(test_struct_t), struct_comparator);
+
+    CU_ASSERT_EQUAL(result, 0);
+
+    for (int i = 0; i < size; i++)
+        CU_ASSERT_EQUAL(sorted[i].sorter, i + 1);
+}
+
+void sorts_pointers(void)
+{
+    const int size = 6;
+    test_struct_t* arr[6];
+    test_struct_t* sorted[6];
+
+    for (int i = 0; i < size; i++) {
+        arr[i] = malloc(sizeof(test_struct_t));
+        arr[i]->sorter = i + 1;
+    }
+
+    int result
+        = sort(arr, sorted, size, sizeof(test_struct_t*), pointer_comparator);
+
+    CU_ASSERT_EQUAL(result, 0);
+
+    for (int i = 0; i < size; i++) {
+        CU_ASSERT_EQUAL(sorted[i]->sorter, i + 1);
+        free(sorted[i]);
+    }
+}
+
+void sorts_large_array(void)
+{
+    const int size = 100000;
+    int arr[size];
+    int sorted[size];
+
+    for (int i = 0; i < size; i++)
+        arr[i] = rand();
+
+    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
+    CU_ASSERT_EQUAL(result, 0);
+
+    int prev = -1;
+    for (int i = 0; i < size; i++) {
+        CU_ASSERT(prev <= sorted[i]);
+        prev = sorted[i];
+    }
+}
+
 /************* Test Runner Code goes here **************/
 
 int main(void)
@@ -102,7 +199,13 @@ int main(void)
                       sorts_pre_sorted_array))
         || (NULL
                == CU_add_test(pSuite, "sorts an odd sized array",
-                      sorts_odd_size_array))) {
+                      sorts_odd_size_array))
+        || (NULL == CU_add_test(pSuite, "sorts a struct array", sorts_structs))
+        || (NULL
+               == CU_add_test(pSuite, "sorts a pointer array", sorts_pointers))
+        || (NULL
+               == CU_add_test(
+                      pSuite, "sorts a large array", sorts_large_array))) {
         CU_cleanup_registry();
         return CU_get_error();
     }

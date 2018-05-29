@@ -1,6 +1,6 @@
 #include "merge_sort.h"
 
-void copy_bytes(char* dest, char* source, size_t num_bytes)
+void copy_bytes(char* dest, const char* source, const size_t num_bytes)
 {
     for (size_t i = 0; i < num_bytes; i++) {
         *dest = *source;
@@ -9,8 +9,8 @@ void copy_bytes(char* dest, char* source, size_t num_bytes)
     }
 }
 
-int sort(void* arr, void* output, size_t length, size_t item_size,
-    comparator comparator)
+int sort(const void* arr, void* output, const size_t length,
+    const size_t item_size, comparator comparator)
 {
     if (arr == NULL || output == NULL)
         return -1;
