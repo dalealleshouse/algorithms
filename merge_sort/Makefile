@@ -1,5 +1,5 @@
 CC = clang-6.0
-CFLAGS = -g -Wall -Wextra -Werror -std=c11 -fsanitize=undefined
+CFLAGS = -O3 -Wall -Wextra -Werror -std=c11 -fsanitize=undefined -pedantic-errors
 
 default: test
 

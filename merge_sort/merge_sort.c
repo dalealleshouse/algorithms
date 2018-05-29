@@ -1,12 +1,10 @@
+#include <string.h>
+
 #include "merge_sort.h"
 
 void copy_bytes(char* dest, const char* source, const size_t num_bytes)
 {
-    for (size_t i = 0; i < num_bytes; i++) {
-        *dest = *source;
-        dest++;
-        source++;
-    }
+    memcpy(dest, source, num_bytes);
 }
 
 int sort(const void* arr, void* output, const size_t length,
@@ -27,7 +25,7 @@ int sort(const void* arr, void* output, const size_t length,
         char b[b_size];
 
         sort(arr, a, a_length, item_size, comparator);
-        sort(arr + a_size, b, b_length, item_size, comparator);
+        sort((char*)arr + a_size, b, b_length, item_size, comparator);
 
         size_t a_pos = 0;
         size_t b_pos = 0;
@@ -50,7 +48,7 @@ int sort(const void* arr, void* output, const size_t length,
                 }
             }
 
-            output += item_size;
+            output = (char*)output + item_size;
         }
     } else {
         copy_bytes(output, arr, item_size);
