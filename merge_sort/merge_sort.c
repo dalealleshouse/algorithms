@@ -31,11 +31,11 @@ int sort(const void* arr, void* output, const size_t length,
         size_t b_pos = 0;
         for (size_t i = 0; i < length; i++) {
             if (a_pos >= a_size) {
-                copy_bytes(output, &b[b_pos], item_size);
-                b_pos += item_size;
+                copy_bytes(output, &b[b_pos], b_size - b_pos);
+                break;
             } else if (b_pos >= b_size) {
-                copy_bytes(output, &a[a_pos], item_size);
-                a_pos += item_size;
+                copy_bytes(output, &a[a_pos], a_size - a_pos);
+                break;
             } else {
                 int result = comparator(&a[a_pos], &b[b_pos]);
 
