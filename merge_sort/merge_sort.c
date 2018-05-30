@@ -1,11 +1,12 @@
+/*
+ * NOTE: I added a special case to sort for when length == 2 so that it didn't
+ * need to recurse. This made absolutly NO differance in the performance and
+ * increased complexity so I took it out.
+ */
+#include <stdio.h>
 #include <string.h>
 
 #include "merge_sort.h"
-
-void copy_bytes(char* dest, const char* source, const size_t num_bytes)
-{
-    memcpy(dest, source, num_bytes);
-}
 
 int sort(const void* arr, void* output, const size_t length,
     const size_t item_size, comparator comparator)
@@ -13,7 +14,9 @@ int sort(const void* arr, void* output, const size_t length,
     if (arr == NULL || output == NULL)
         return -1;
 
-    if (length > 1) {
+    if (length == 1) {
+        memcpy(output, arr, item_size);
+    } else {
         // If length is odd, this will assign the larger half to b.
         size_t a_length = length / 2;
         size_t b_length = length - a_length;
@@ -31,27 +34,25 @@ int sort(const void* arr, void* output, const size_t length,
         size_t b_pos = 0;
         for (size_t i = 0; i < length; i++) {
             if (a_pos >= a_size) {
-                copy_bytes(output, &b[b_pos], b_size - b_pos);
+                memcpy(output, &b[b_pos], b_size - b_pos);
                 break;
             } else if (b_pos >= b_size) {
-                copy_bytes(output, &a[a_pos], a_size - a_pos);
+                memcpy(output, &a[a_pos], a_size - a_pos);
                 break;
             } else {
                 int result = comparator(&a[a_pos], &b[b_pos]);
 
                 if (result < 0) {
-                    copy_bytes(output, &a[a_pos], item_size);
+                    memcpy(output, &a[a_pos], item_size);
                     a_pos += item_size;
                 } else {
-                    copy_bytes(output, &b[b_pos], item_size);
+                    memcpy(output, &b[b_pos], item_size);
                     b_pos += item_size;
                 }
             }
 
             output = (char*)output + item_size;
         }
-    } else {
-        copy_bytes(output, arr, item_size);
     }
 
     return 0;

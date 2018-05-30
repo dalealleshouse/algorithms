@@ -153,7 +153,7 @@ void sorts_pointers(void)
 
 void sorts_large_array(void)
 {
-    const int size = 100000;
+    const int size = 500000;
     int arr[size];
     int sorted[size];
 
@@ -195,7 +195,7 @@ int main(void)
                == CU_add_test(pSuite, "sort of even sized array",
                       sorts_even_size_array))
         || (NULL
-               == CU_add_test(pSuite, "sorts an array that is already sorted",
+               == CU_add_test(pSuite, "sorts an array that is already sorted ",
                       sorts_pre_sorted_array))
         || (NULL
                == CU_add_test(pSuite, "sorts an odd sized array",
