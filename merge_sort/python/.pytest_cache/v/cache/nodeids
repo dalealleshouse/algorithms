@@ -1,0 +1,7 @@
+[
+  "merge_sort_test.py::test_null_does_not_throw",
+  "merge_sort_test.py::test_sorts_even_size_array",
+  "merge_sort_test.py::test_sorts_pre_sorted_array",
+  "merge_sort_test.py::test_sorts_odd_sized_array",
+  "merge_sort_test.py::test_sorts_large_array"
+]
