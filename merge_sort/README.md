@@ -4,7 +4,6 @@ Merge sort is a classic divide and conquer algorithm for sorting an array.
 
 ## Runtime
 O(n log(n))
-r latexImg('a = O(n log(2,n)))
 
 ## Input
 - Unsorted array of items
@@ -14,3 +13,30 @@ r latexImg('a = O(n log(2,n)))
 
 ## Output
 Sorted array
+
+## Pseudo Code
+
+```
+A = input array
+
+C = recursively sort first half of A
+D = recursively sort second half of A
+
+return merge(C, D)
+
+merge:
+    i = 1
+    j = 1
+
+    for k = 1 to n
+        if C[i] < D[j]
+            B[k] = C[i]
+            i++
+        else
+            B[k] = D[j]
+            j++
+            
+```
+
+
+
