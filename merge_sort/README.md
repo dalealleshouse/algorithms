@@ -19,22 +19,25 @@ Sorted array
 ```
 A = input array
 
-C = recursively sort first half of A
-D = recursively sort second half of A
+sort:
+    A1 = recursively sort first half of A
+    A2 = recursively sort second half of A
 
-return merge(C, D)
+    return merge(A1, A2)
 
 merge:
     i = 1
     j = 1
 
     for k = 1 to n
-        if C[i] < D[j]
-            B[k] = C[i]
+        if A1[i] < A2[j]
+            B[k] = A1[i]
             i++
         else
-            B[k] = D[j]
+            B[k] = A2[j]
             j++
+
+    return B
             
 ```
 
