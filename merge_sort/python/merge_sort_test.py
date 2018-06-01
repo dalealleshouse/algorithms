@@ -1,5 +1,3 @@
-import pytest
-
 import random
 from merge_sort import sort
 
