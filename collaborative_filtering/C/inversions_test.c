@@ -1,9 +1,7 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-#include "merge_sort.h"
-
-#include <stdio.h> // for printf
+#include "inversions.h"
 
 /* Test Suite setup and cleanup functions: */
 
@@ -71,106 +69,95 @@ int pointer_comparator(const void* x, const void* y)
 
 void null_does_not_throw_test(void)
 {
-    sort(NULL, NULL, 0, sizeof(int), int_comparator);
+    count_inversions(NULL, 0, sizeof(int), int_comparator);
 }
 
-void sorts_even_size_array(void)
+void count_single_inversion(void)
+{
+    const int size = 4;
+    int arr[] = { 1, 2, 4, 3 };
+
+    int result = count_inversions(arr, size, sizeof(int), int_comparator);
+
+    CU_ASSERT_EQUAL(result, 1);
+}
+
+void count_two_inversion(void)
+{
+    const int size = 4;
+    int arr[] = { 2, 1, 4, 3 };
+
+    int result = count_inversions(arr, size, sizeof(int), int_comparator);
+
+    CU_ASSERT_EQUAL(result, 2);
+}
+
+void count_reverse_sorted_array()
 {
     const int size = 6;
     int arr[] = { 6, 5, 4, 3, 2, 1 };
-    int sorted[size];
 
-    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
+    int result = count_inversions(arr, size, sizeof(int), int_comparator);
 
-    for (int i = 0; i < size; i++)
-        CU_ASSERT_EQUAL(sorted[i], i + 1);
-
-    CU_ASSERT_EQUAL(result, 0);
+    CU_ASSERT_EQUAL(result, 15);
 }
 
-void sorts_pre_sorted_array(void)
+void count_odd_sized_array()
+{
+    const int size = 5;
+    int arr[] = { 5, 4, 3, 2, 1 };
+
+    int result = count_inversions(arr, size, sizeof(int), int_comparator);
+
+    CU_ASSERT_EQUAL(result, 10);
+}
+
+void count_sorted_array()
 {
     const int size = 6;
     int arr[] = { 1, 2, 3, 4, 5, 6 };
-    int sorted[size];
 
-    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
-
-    for (int i = 0; i < size; i++)
-        CU_ASSERT_EQUAL(sorted[i], i + 1);
+    int result = count_inversions(arr, size, sizeof(int), int_comparator);
 
     CU_ASSERT_EQUAL(result, 0);
 }
 
-void sorts_odd_size_array(void)
-{
-    const int size = 7;
-    int arr[] = { 1, 2, 3, 4, 5, 6, 7 };
-    int sorted[size];
-
-    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
-
-    for (int i = 0; i < size; i++)
-        CU_ASSERT_EQUAL(sorted[i], i + 1);
-
-    CU_ASSERT_EQUAL(result, 0);
-}
-
-void sorts_structs(void)
+void counts_structs(void)
 {
     const int size = 6;
     test_struct_t arr[6] = { { 0, 0, 6 }, { 0, 0, 5 }, { 0, 0, 4 },
         { 0, 0, 3 }, { 0, 0, 2 }, { 0, 0, 1 } };
-    test_struct_t sorted[6];
 
-    int result
-        = sort(arr, sorted, size, sizeof(test_struct_t), struct_comparator);
+    int result = count_inversions(
+        arr, size, sizeof(test_struct_t), struct_comparator);
 
-    CU_ASSERT_EQUAL(result, 0);
-
-    for (int i = 0; i < size; i++)
-        CU_ASSERT_EQUAL(sorted[i].sorter, i + 1);
+    CU_ASSERT_EQUAL(result, 15);
 }
 
 void sorts_pointers(void)
 {
     const int size = 6;
     test_struct_t* arr[6];
-    test_struct_t* sorted[6];
 
     for (int i = 0; i < size; i++) {
         arr[i] = malloc(sizeof(test_struct_t));
-        arr[i]->sorter = i + 1;
+        arr[i]->sorter = size - i;
     }
 
-    int result
-        = sort(arr, sorted, size, sizeof(test_struct_t*), pointer_comparator);
+    int result = count_inversions(
+        arr, size, sizeof(test_struct_t*), *pointer_comparator);
 
-    CU_ASSERT_EQUAL(result, 0);
-
-    for (int i = 0; i < size; i++) {
-        CU_ASSERT_EQUAL(sorted[i]->sorter, i + 1);
-        free(sorted[i]);
-    }
+    CU_ASSERT_EQUAL(result, 15);
 }
 
-void sorts_large_array(void)
+void does_not_count_equal_items()
 {
-    const int size = 500000;
-    int arr[size];
-    int sorted[size];
+    const int size = 5;
+    int arr[] = { 1, 3, 3, 3, 5 };
 
-    for (int i = 0; i < size; i++)
-        arr[i] = rand();
+    int result = count_inversions(arr, size, sizeof(int), int_comparator);
 
-    int result = sort(arr, sorted, size, sizeof(int), int_comparator);
     CU_ASSERT_EQUAL(result, 0);
-
-    int prev = -1;
-    for (int i = 0; i < size; i++) {
-        CU_ASSERT(prev <= sorted[i]);
-        prev = sorted[i];
-    }
 }
 
 /************* Test Runner Code goes here **************/
@@ -195,20 +182,26 @@ int main(void)
             == CU_add_test(pSuite, "null input does not cause error",
                    null_does_not_throw_test))
         || (NULL
-               == CU_add_test(pSuite, "sort of even sized array",
-                      sorts_even_size_array))
+               == CU_add_test(pSuite, "counts a single inversion",
+                      count_single_inversion))
         || (NULL
-               == CU_add_test(pSuite, "sorts an array that is already sorted ",
-                      sorts_pre_sorted_array))
+               == CU_add_test(
+                      pSuite, "count two inversions", count_two_inversion))
         || (NULL
-               == CU_add_test(pSuite, "sorts an odd sized array",
-                      sorts_odd_size_array))
-        || (NULL == CU_add_test(pSuite, "sorts a struct array", sorts_structs))
+               == CU_add_test(pSuite, "counts reverse sorted array",
+                      count_reverse_sorted_array))
+        || (NULL
+               == CU_add_test(
+                      pSuite, "counts odd sized array", count_odd_sized_array))
+        || (NULL
+               == CU_add_test(
+                      pSuite, "count sorted array", count_sorted_array))
+        || (NULL == CU_add_test(pSuite, "counts structs", counts_structs))
         || (NULL
                == CU_add_test(pSuite, "sorts a pointer array", sorts_pointers))
         || (NULL
-               == CU_add_test(
-                      pSuite, "sorts a large array", sorts_large_array))) {
+               == CU_add_test(pSuite, "does not count equal items",
+                      does_not_count_equal_items))) {
         CU_cleanup_registry();
         return CU_get_error();
     }
