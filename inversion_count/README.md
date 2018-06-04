@@ -1,4 +1,4 @@
-# Collaborative Filtering
+# Inversion Counting
 
 Count the number of inversions in an array. An inversion is two items that are
 out of order. For instance, in the array:
