@@ -1,0 +1,37 @@
+[
+    {
+        "arguments": [
+            "cc", 
+            "-c", 
+            "-O3", 
+            "-Wall", 
+            "-Wextra", 
+            "-Werror", 
+            "-std=c11", 
+            "-fsanitize=undefined", 
+            "-pedantic-errors", 
+            "strassen.c"
+        ], 
+        "directory": "/mnt/c/SEI/Tools/src/algorithms/strassen_matrix_multiplication/C", 
+        "file": "strassen.c"
+    }, 
+    {
+        "arguments": [
+            "cc", 
+            "-c", 
+            "-O3", 
+            "-Wall", 
+            "-Wextra", 
+            "-Werror", 
+            "-std=c11", 
+            "-fsanitize=undefined", 
+            "-pedantic-errors", 
+            "strassen.o", 
+            "-o", 
+            "test", 
+            "strassen_test.c"
+        ], 
+        "directory": "/mnt/c/SEI/Tools/src/algorithms/strassen_matrix_multiplication/C", 
+        "file": "strassen_test.c"
+    }
+]
