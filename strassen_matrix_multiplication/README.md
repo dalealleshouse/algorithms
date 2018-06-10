@@ -16,15 +16,16 @@ refresher on matrix multiplication.
 O(n^2)
 
 ## Input
-- Matrix A and Matrix B
+- Matrix A
+- Matrix B
 
 ## Output
 Product of A and B
 
 ## Pseudo Code
 Assumptions
-    - matrices are square
-    - size of matrices is a power of 2
+- matrices are square
+- size of matrices is a power of 2
 
 
 ```
