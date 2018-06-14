@@ -1,5 +1,5 @@
 # Algorithms
-Examples of popular algorithms in C
+Examples of popular algorithms in several different languages.
 
 All the algorithms have unit tests and an associated test runner docker
 container.
@@ -15,4 +15,4 @@ docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c
 
 The command above will download the docker container from docker hub. You can
 build the container locally with the Docker file located int
-[docker/docker/c](docker/c).
+[docker/c](docker/c).

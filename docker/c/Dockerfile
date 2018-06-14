@@ -13,4 +13,4 @@ WORKDIR /
 
 COPY Makefile /Makefile
 
-CMD ["make"]
+CMD ["make", "-B"]
