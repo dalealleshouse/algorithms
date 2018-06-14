@@ -105,7 +105,7 @@ void multiply_square_matrix_n_equal_8(void)
 
 void return_error_for_non_power_of_2()
 {
-    const int n = 8;
+    int n = 8;
     const int expected[8][8] = { { 36, 36, 36, 36, 36, 36, 36, 36 },
         { 72, 72, 72, 72, 72, 72, 72, 72 },
         { 108, 108, 108, 108, 108, 108, 108, 108 },
