@@ -1,0 +1,33 @@
+[
+    {
+        "arguments": [
+            "cc", 
+            "-c", 
+            "-g", 
+            "-Wall", 
+            "-Wextra", 
+            "-Werror", 
+            "-std=c11", 
+            "merge_sort.o", 
+            "-o", 
+            "test", 
+            "merge_sort_test.c"
+        ], 
+        "directory": "/mnt/c/SEI/Tools/src/algorithms/merge_sort", 
+        "file": "merge_sort_test.c"
+    }, 
+    {
+        "arguments": [
+            "cc", 
+            "-c", 
+            "-g", 
+            "-Wall", 
+            "-Wextra", 
+            "-Werror", 
+            "-std=c11", 
+            "merge_sort.c"
+        ], 
+        "directory": "/mnt/c/SEI/Tools/src/algorithms/merge_sort", 
+        "file": "merge_sort.c"
+    }
+]
