@@ -7,7 +7,7 @@ DEBUGFLAGS   = -O0 -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBU
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 LINKFLAGS 	 = -lcunit -flto
 
-TARGET	= test_runner
+TARGET	= src/test_runner
 SOURCES	= $(shell echo /src/*.c)
 OBJECTS	= $(SOURCES:.c=.o)
 
