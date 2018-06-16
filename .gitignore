@@ -52,6 +52,8 @@ Mkfile.old
 dkms.conf
 
 test_runner
+compile_commands.json
+
 
 # Pyhon
 
