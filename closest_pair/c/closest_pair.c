@@ -1,5 +1,4 @@
 #include <math.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,7 +107,7 @@ point_dist_t* min(point_dist_t* x, point_dist_t* y)
 }
 
 int _closest_split(const int n, const point_t by_x[n], const point_t by_y[n],
-    const point_dist_t* l_delta, point_dist_t* result)
+    const point_dist_t* delta, point_dist_t* result)
 {
     if (by_x == NULL || by_y == NULL || result == NULL) {
         print_error("null pointer passed to _closest_split");
@@ -120,25 +119,30 @@ int _closest_split(const int n, const point_t by_x[n], const point_t by_y[n],
         return -2;
     }
 
-    double x_bar = by_x[n / 2 - 1].x;
-    double high_x = x_bar + l_delta->dist;
-    double low_x = x_bar - l_delta->dist;
+    // Find the median x point
+    const double x_bar = by_x[n / 2 - 1].x;
+
+    // Find the point that are less than delta away from the x_bar
+    const double high_x = x_bar + delta->dist;
+    const double low_x = x_bar - delta->dist;
     int length = 0;
     point_t strip[n];
-
-    // Find the point that are less than little_delta away from the x_bar
     for (int i = 0; i < n; i++)
         if (by_y[i].x < high_x && by_y[i].x > low_x)
             strip[length++] = by_y[i];
 
-    *result = *l_delta;
+    *result = *delta;
     for (int i = 0; i < length - 1; i++) {
+        // This is crazy, but the closest pair in the split set is guaranteed
+        // to be no more then 7 places away when the set of points is sorted by
+        // y. This inner loop is considered constant time b/c there is a finite
+        // number of iterations regardless of the size of the input
         for (int j = i + 1; j < i + 7 && i + j < length; j++) {
             double dist;
             if (euclid_dist(&strip[i], &strip[i + j], &dist) < 0)
                 return -3;
 
-            if (dist < l_delta->dist) {
+            if (dist < result->dist) {
                 result->dist = dist;
                 result->p1 = strip[i];
                 result->p2 = strip[i + j];
@@ -149,10 +153,10 @@ int _closest_split(const int n, const point_t by_x[n], const point_t by_y[n],
     return 0;
 }
 
-int _closest_distance(const int n, const point_t sorted_by_x[n],
-    const point_t sorted_by_y[n], point_dist_t* result)
+int _closest_distance(const int n, const point_t by_x[n],
+    const point_t by_y[n], point_dist_t* result)
 {
-    if (sorted_by_x == NULL || sorted_by_y == NULL || result == NULL) {
+    if (by_x == NULL || by_y == NULL || result == NULL) {
         print_error("null pointer passed to _closest_distance");
         return -1;
     }
@@ -165,15 +169,15 @@ int _closest_distance(const int n, const point_t sorted_by_x[n],
 
     // Base case
     if (n <= 3)
-        return closest_slow(n, sorted_by_x, result);
+        return closest_slow(n, by_x, result);
 
     // Split the array up into right and left halves
     int left_half = n / 2;
     int right_half = n - left_half;
 
     // left and right halves sorted by x
-    const point_t* left_x = sorted_by_x;
-    const point_t* right_x = &sorted_by_x[left_half];
+    const point_t* left_x = by_x;
+    const point_t* right_x = &by_x[left_half];
 
     // We need left and right halves sorted by y. These halves need to contain
     // the same points as the sorted by x halves. It would be possible to
@@ -184,16 +188,16 @@ int _closest_distance(const int n, const point_t sorted_by_x[n],
     //
     // WARNING: If there are identical x values, this will fail. I'll come back
     // and fix this shortcoming later
-    double mid_point = sorted_by_x[left_half].x;
+    double mid_point = by_x[left_half].x;
     point_t left_y[left_half];
     point_t right_y[right_half];
 
     int left = 0, right = 0;
     for (int i = 0; i < n; i++)
-        if (sorted_by_y[i].x < mid_point)
-            left_y[left++] = sorted_by_y[i];
+        if (by_y[i].x < mid_point)
+            left_y[left++] = by_y[i];
         else
-            right_y[right++] = sorted_by_y[i];
+            right_y[right++] = by_y[i];
 
     point_dist_t left_closest = { .dist = 0 };
     point_dist_t right_closest = { .dist = 0 };
@@ -210,9 +214,7 @@ int _closest_distance(const int n, const point_t sorted_by_x[n],
         return result_r;
 
     point_dist_t l_delta = *min(&left_closest, &right_closest);
-    if ((result_r
-            = _closest_split(n, sorted_by_x, sorted_by_y, &l_delta, result))
-        != 0)
+    if ((result_r = _closest_split(n, by_x, by_y, &l_delta, result)) != 0)
         return result_r;
 
     return 0;
@@ -221,10 +223,10 @@ int _closest_distance(const int n, const point_t sorted_by_x[n],
 int closest_distance(
     const int n, const point_t points[n], point_dist_t* result)
 {
-    if (points == NULL || result == NULL)
+    if (points == NULL || result == NULL || n < 1)
         return -1;
 
-    size_t p_size = sizeof(point_t);
+    size_t p_size = sizeof(points[0]);
     size_t arr_size = p_size * n;
 
     point_t by_x[n];

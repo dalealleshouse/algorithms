@@ -1,4 +1,4 @@
-#Closest Pair
+# Closest Pair
 
 Given an array of points in a plane, find the pair of points that are the
 closest. This is a very useful algorithm for robotics, computer vision, and
