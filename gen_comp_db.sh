@@ -13,6 +13,7 @@
 #
 ###############################################################################
 
+mkdir src
 # copy the Makefile used by the docker container
 cp ../../docker/c/Makefile ./
 
@@ -24,3 +25,4 @@ bear make -B
 
 # remove the Makefile
 rm Makefile
+rm -rf src

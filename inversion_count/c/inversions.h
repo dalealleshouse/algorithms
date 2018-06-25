@@ -1,5 +1,5 @@
-#ifndef __MERGE_SORT_H
-#define __MERGE_SORT_H
+#ifndef __INVERSIONS_H
+#define __INVERSIONS_H
 
 #include <stdlib.h>
 

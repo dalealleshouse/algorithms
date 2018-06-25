@@ -3,7 +3,7 @@ CC 		= clang-6.0
 
 FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden 
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
-DEBUGFLAGS   = -O0 -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
+DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 LINKFLAGS 	 = -lcunit -flto
 
