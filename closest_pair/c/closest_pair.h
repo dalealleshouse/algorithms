@@ -1,6 +1,8 @@
 #ifndef __CLOSEST_PAIR_H
 #define __CLOSEST_PAIR_H
 
+#include <stddef.h>
+
 typedef struct point {
     double x;
     double y;
@@ -30,10 +32,11 @@ int euclid_dist(const point_t* p1, const point_t* p2, double* result);
  * returns: 0 on success, negative value on failure
  */
 int closest_distance(
-    const int n, const point_t points[n], point_dist_t* result);
+    const size_t n, const point_t points[n], point_dist_t* result);
 
-int closest_slow(const int n, const point_t points[n], point_dist_t* result);
+int closest_slow(const size_t n, const point_t points[n], point_dist_t* result);
 
-void Closest_slow(const int n, const point_t points[n], point_dist_t* result);
+void Closest_slow(
+    const size_t n, const point_t points[n], point_dist_t* result);
 
 #endif

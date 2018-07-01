@@ -1,5 +1,6 @@
 #include <float.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
@@ -123,7 +124,7 @@ void closest_distance_standard2()
 
 void closest_distance_matches_slow()
 {
-    size_t n = 100;
+    size_t n = 10000;
     point_t points[n];
 
     for (size_t i = 0; i < n; i++) {
@@ -147,6 +148,53 @@ void closest_distance_matches_slow()
 
     CU_ASSERT(memcmp(&slow.p2, &fast.p1, sizeof(point_t)) == 0
         || memcmp(&slow.p2, &fast.p2, sizeof(point_t)) == 0);
+}
+
+void print_run_times(size_t n)
+{
+    point_t points[n];
+
+    for (size_t i = 0; i < n; i++) {
+        points[i].x = drand(-50, 50);
+        points[i].y = drand(-50, 50);
+    }
+
+    point_dist_t slow = { .dist = 0 };
+    point_dist_t fast = { .dist = 0 };
+
+    printf("\nPrinting run times for n = %zu", n);
+
+    clock_t begin = clock();
+    int result = closest_slow(n, points, &slow);
+    clock_t end = clock();
+
+    double slow_run_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("\nclosest_slow run time = %f", slow_run_time);
+
+    begin = clock();
+    result = closest_distance(n, points, &fast);
+    end = clock();
+
+    double fast_run_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("\nclosest_distance run time = %f\ntime diff =", fast_run_time);
+
+    double diff = slow_run_time - fast_run_time;
+
+    if (diff < 0)
+        printf("\x1b[31m");
+    else
+        printf("\x1b[32m");
+
+    printf(" %f secs \n \x1b[0m", diff);
+}
+
+void closest_time()
+{
+    print_run_times(10);
+    print_run_times(100);
+    print_run_times(1000);
+    print_run_times(10000);
+    print_run_times(100000);
 }
 // point array has null values
 // matching points
@@ -172,9 +220,10 @@ int closest_distance_suite()
                 == CU_add_test(
                        pSuite, "standard case 2", closest_distance_standard2)
             || NULL
-                == CU_add_test(pSuite,
-                       "large random array matches slow result",
-                       closest_distance_matches_slow))
+                == CU_add_test(pSuite, "large random array matches slow result",
+                       closest_distance_matches_slow)
+
+            || NULL == CU_add_test(pSuite, "compare times", closest_time))
 
     ) {
         return CU_get_error();

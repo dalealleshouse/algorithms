@@ -69,7 +69,7 @@ int _point_y_comparator(const void* x, const void* y)
     return _point_comparator(x, y, _y_comparator);
 }
 
-int closest_slow(const int n, const point_t points[n], point_dist_t* result)
+int closest_slow(const size_t n, const point_t points[n], point_dist_t* result)
 {
     if (points == NULL || result == NULL) {
         print_error("null pointer passed to closest_slow");
@@ -81,8 +81,8 @@ int closest_slow(const int n, const point_t points[n], point_dist_t* result)
         return -2;
     }
 
-    for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) {
+    for (size_t i = 0; i < n; i++) {
+        for (size_t j = i + 1; j < n; j++) {
             double dist;
             if (euclid_dist(&points[i], &points[j], &dist) != 0)
                 return -3;
@@ -106,7 +106,7 @@ point_dist_t* min(point_dist_t* x, point_dist_t* y)
     return (x->dist < y->dist) ? x : y;
 }
 
-int _closest_split(const int n, const point_t by_x[n], const point_t by_y[n],
+int _closest_split(const size_t n, const point_t by_x[n], const point_t by_y[n],
     const point_dist_t* delta, point_dist_t* result)
 {
     if (by_x == NULL || by_y == NULL || result == NULL) {
@@ -127,7 +127,7 @@ int _closest_split(const int n, const point_t by_x[n], const point_t by_y[n],
     const double low_x = x_bar - delta->dist;
     int length = 0;
     point_t strip[n];
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
         if (by_y[i].x < high_x && by_y[i].x > low_x)
             strip[length++] = by_y[i];
 
@@ -153,7 +153,7 @@ int _closest_split(const int n, const point_t by_x[n], const point_t by_y[n],
     return 0;
 }
 
-int _closest_distance(const int n, const point_t by_x[n],
+int _closest_distance(const size_t n, const point_t by_x[n],
     const point_t by_y[n], point_dist_t* result)
 {
     if (by_x == NULL || by_y == NULL || result == NULL) {
@@ -193,7 +193,7 @@ int _closest_distance(const int n, const point_t by_x[n],
     point_t right_y[right_half];
 
     int left = 0, right = 0;
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
         if (by_y[i].x < mid_point)
             left_y[left++] = by_y[i];
         else
@@ -221,7 +221,7 @@ int _closest_distance(const int n, const point_t by_x[n],
 }
 
 int closest_distance(
-    const int n, const point_t points[n], point_dist_t* result)
+    const size_t n, const point_t points[n], point_dist_t* result)
 {
     if (points == NULL || result == NULL || n < 1)
         return -1;
