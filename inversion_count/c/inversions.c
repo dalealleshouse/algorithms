@@ -2,10 +2,10 @@
 
 #include "inversions.h"
 
-int _count_inversions(const void* arr, void* output, const size_t length,
-    const size_t item_size, comparator comparator)
+unsigned long _count_inversions(const void* arr, void* output,
+    const size_t length, const size_t item_size, comparator comparator)
 {
-    int inversions = 0;
+    unsigned long inversions = 0;
 
     if (arr == NULL || output == NULL)
         return -1;
@@ -59,7 +59,7 @@ int _count_inversions(const void* arr, void* output, const size_t length,
     return inversions;
 }
 
-int count_inversions(const void* arr, const size_t length,
+unsigned long count_inversions(const void* arr, const size_t length,
     const size_t item_size, comparator comparator)
 {
     char sorted[length * item_size];

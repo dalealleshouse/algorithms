@@ -51,8 +51,8 @@ if n <= 3:
 // Split the points into right and left halves
 L_x = first half of P_x
 R_x = last half of P_x
-L_y = nothing
-R_y = nothing
+L_y = empty array
+R_y = empty array
 
 // In order to get the left and right arrays sorted by y coordinate, do a linear scan of the already sorted array.
 // It would be possible to simply sort L_x and R_x, but that would raise the overall algorithmic complexity

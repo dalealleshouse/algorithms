@@ -1,19 +1,20 @@
 # Strassen Matrix Multiplication
 
-Matrix multiplication algorithm. The simple and obvious implementation is
-O(n^3). Strassen improves on this by eliminating a recursive call.
+Matrix multiplication algorithm. The simple and obvious implementation is O(n^3). Strassen improves on this by
+eliminating a recursive call.
 
-Although this is more efficient in terms of algorithmic complexity, it's
-actually less performant for anything expect extremely large matrices because
-of the high number of constant operations.
+Although this is more efficient in terms of algorithmic complexity, it's actually less performant for anything expect
+extremely large matrices because of the high number of constant operations.
 
-This is an example of a divide and conquer algorithm.
+Using C, the largest matrix that can be multiplied using the recursive Strassen algorithm without a stack overflow is
+256 X 256. Strassen runs slower than the standard brute force implementation for all practical test cases. Therefore
+the utility of this algorithm isn't immediately obvious. Further tests using either a loop or tail call optimized
+language are required.
 
-Click [here](https://en.wikipedia.org/wiki/Matrix_multiplication) for a
-refresher on matrix multiplication.
+Click [here](https://en.wikipedia.org/wiki/Matrix_multiplication) for a refresher on matrix multiplication.
 
 ## Runtime
-O(n^2)
+O(n^2.81)
 
 ## Input
 - Matrix A
@@ -28,7 +29,7 @@ Assumptions
 - size of matrices is a power of 2
 
 
-```
+``` psudo
 n = size of matrices
 A = matrix 1
 B = matrix 2
@@ -40,7 +41,7 @@ split matrices in quadrants and recursively multiply
 
     a | b       e | f
 A = -----   B = -----
-    c | c       g | h
+    c | d       g | h
 
 p1 = a(f-h)
 p2 = (a+b)h

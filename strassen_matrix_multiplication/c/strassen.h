@@ -7,10 +7,10 @@
 bool ispowerof2(unsigned int x);
 
 int add_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n]);
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n]);
 
 int subtract_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n]);
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n]);
 
 int print_matrix(const char* name, const int n, const int x[n][n]);
 
@@ -20,6 +20,9 @@ int print_matrix(const char* name, const int n, const int x[n][n]);
  * constraints: n must be a power of 2
  */
 int multiply_square_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n]);
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n]);
+
+int brute_force(
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n]);
 
 #endif

@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
@@ -125,11 +127,11 @@ void count_sorted_array()
 void counts_structs(void)
 {
     const int size = 6;
-    test_struct_t arr[6] = { { 0, 0, 6 }, { 0, 0, 5 }, { 0, 0, 4 },
-        { 0, 0, 3 }, { 0, 0, 2 }, { 0, 0, 1 } };
+    test_struct_t arr[6] = { { 0, 0, 6 }, { 0, 0, 5 }, { 0, 0, 4 }, { 0, 0, 3 },
+        { 0, 0, 2 }, { 0, 0, 1 } };
 
-    int result = count_inversions(
-        arr, size, sizeof(test_struct_t), struct_comparator);
+    int result
+        = count_inversions(arr, size, sizeof(test_struct_t), struct_comparator);
 
     CU_ASSERT_EQUAL(result, 15);
 }
@@ -158,6 +160,29 @@ void does_not_count_equal_items()
     int result = count_inversions(arr, size, sizeof(int), int_comparator);
 
     CU_ASSERT_EQUAL(result, 0);
+}
+
+void massive_array()
+{
+    // Very little error checking here b/c this is just a test and I know what's
+    // in the input file
+    size_t n = 100000;
+    size_t tracker = 0;
+    int arr[n];
+    char line[256];
+    FILE* file = fopen("/src/IntegerArray.txt", "r");
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        arr[tracker] = atoi(line);
+        tracker++;
+    }
+
+    fclose(file);
+
+    unsigned long result
+        = count_inversions(arr, n, sizeof(int), int_comparator);
+
+    CU_ASSERT_EQUAL(result, 2407905288);
 }
 
 /************* Test Runner Code goes here **************/
@@ -194,11 +219,11 @@ int main(void)
                == CU_add_test(
                       pSuite, "counts odd sized array", count_odd_sized_array))
         || (NULL
-               == CU_add_test(
-                      pSuite, "count sorted array", count_sorted_array))
+               == CU_add_test(pSuite, "count sorted array", count_sorted_array))
         || (NULL == CU_add_test(pSuite, "counts structs", counts_structs))
         || (NULL
                == CU_add_test(pSuite, "sorts a pointer array", sorts_pointers))
+        || (NULL == CU_add_test(pSuite, "massive array", massive_array))
         || (NULL
                == CU_add_test(pSuite, "does not count equal items",
                       does_not_count_equal_items))) {

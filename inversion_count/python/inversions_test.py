@@ -61,3 +61,14 @@ def test_does_not_count_equal_items():
 
     result = count_inversions(arr, int_comparator)
     assert expected == result
+
+
+def test_count_massive_inversions():
+    expected = 2407905288
+
+    with open("IntegerArray.txt") as ints:
+        vals = [int(line.strip()) for line in ints.readlines()]
+
+    result, count = count_inversions(vals, int_comparator)
+
+    assert expected == count

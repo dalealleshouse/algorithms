@@ -4,10 +4,10 @@
 bool ispowerof2(unsigned int x) { return x && !(x & (x - 1)); }
 
 int add_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n])
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n])
 {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (size_t i = 0; i < n; i++) {
+        for (size_t j = 0; j < n; j++) {
             output[i][j] = x[i][j] + y[i][j];
         }
     }
@@ -16,7 +16,7 @@ int add_matrices(
 }
 
 void _add_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n])
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n])
 {
     int result = add_matrices(n, x, y, output);
 
@@ -27,17 +27,17 @@ void _add_matrices(
 }
 
 int subtract_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n])
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n])
 {
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
+    for (size_t i = 0; i < n; i++)
+        for (size_t j = 0; j < n; j++)
             output[i][j] = x[i][j] - y[i][j];
 
     return 0;
 }
 
 void _subtract_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n])
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n])
 {
     int result = subtract_matrices(n, x, y, output);
     if (result != 0) {
@@ -46,7 +46,7 @@ void _subtract_matrices(
     }
 }
 
-int split(const int n, const int row_start, const int column_start,
+int split(const size_t n, const int row_start, const int column_start,
     const int count, const int x[n][n], int output[count][count])
 {
     for (int i = 0; i < count; i++) {
@@ -58,7 +58,7 @@ int split(const int n, const int row_start, const int column_start,
     return 0;
 }
 
-void _split(const int n, const int row_start, const int column_start,
+void _split(const size_t n, const int row_start, const int column_start,
     const int count, const int x[n][n], int output[count][count])
 {
     int result = split(n, row_start, column_start, count, x, output);
@@ -69,7 +69,7 @@ void _split(const int n, const int row_start, const int column_start,
     }
 }
 
-int copy_quadrent(const int n, const int row_start, const int column_start,
+int copy_quadrent(const size_t n, const int row_start, const int column_start,
     const int count, const int x[count][count], int output[n][n])
 {
     for (int i = 0; i < count; i++) {
@@ -81,7 +81,7 @@ int copy_quadrent(const int n, const int row_start, const int column_start,
     return 0;
 }
 
-void _copy_quadrent(const int n, const int row_start, const int column_start,
+void _copy_quadrent(const size_t n, const int row_start, const int column_start,
     const int count, const int x[count][count], int output[n][n])
 {
     int result = copy_quadrent(n, row_start, column_start, count, x, output);
@@ -106,7 +106,7 @@ int print_matrix(const char* name, const int n, const int x[n][n])
     return 0;
 }
 
-int sub_matrices(const int n, const int source[n][n], int a[n / 2][n / 2],
+int sub_matrices(const size_t n, const int source[n][n], int a[n / 2][n / 2],
     int b[n / 2][n / 2], int c[n / 2][n / 2], int d[n / 2][n / 2])
 {
     int _n = n / 2;
@@ -118,7 +118,7 @@ int sub_matrices(const int n, const int source[n][n], int a[n / 2][n / 2],
     return 0;
 }
 
-void _sub_matrices(const int n, const int source[n][n], int a[n / 2][n / 2],
+void _sub_matrices(const size_t n, const int source[n][n], int a[n / 2][n / 2],
     int b[n / 2][n / 2], int c[n / 2][n / 2], int d[n / 2][n / 2])
 {
     int result = sub_matrices(n, source, a, b, c, d);
@@ -141,7 +141,7 @@ void _multiply_square_matrices(
 }
 
 int multiply_square_matrices(
-    const int n, const int x[n][n], const int y[n][n], int output[n][n])
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n])
 {
     if (x == NULL || y == NULL || output == NULL)
         return -1;
@@ -221,6 +221,23 @@ int multiply_square_matrices(
     _subtract_matrices(_n, temp, p3, temp2);
     _subtract_matrices(_n, temp2, p7, temp);
     _copy_quadrent(n, _n, _n, _n, temp, output);
+
+    return 0;
+}
+
+int brute_force(
+    const size_t n, const int x[n][n], const int y[n][n], int output[n][n])
+{
+    if (x == NULL || y == NULL || output == NULL)
+        return -1;
+
+    for (size_t i = 0; i < n; i++) {
+        for (size_t j = 0; j < n; j++) {
+            output[i][j] = 0;
+            for (size_t k = 0; k < n; k++)
+                output[i][j] += x[i][k] * y[k][j];
+        }
+    }
 
     return 0;
 }

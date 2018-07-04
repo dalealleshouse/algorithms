@@ -1,5 +1,6 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include <time.h>
 
 #include "strassen.h"
 
@@ -103,7 +104,7 @@ void multiply_square_matrix_n_equal_8(void)
     compare_matrices(2, 2, expected, output);
 }
 
-void return_error_for_non_power_of_2()
+void return_error_for_non_power_of_2(void)
 {
     int n = 8;
     const int expected[8][8] = { { 36, 36, 36, 36, 36, 36, 36, 36 },
@@ -130,6 +131,83 @@ void return_error_for_non_power_of_2()
     compare_matrices(2, 2, expected, output);
 }
 
+void print_run_times(size_t n)
+{
+    int output[n][n];
+    int a[n][n];
+    int b[n][n];
+
+    for (size_t i = 0; i < n; i++) {
+        for (size_t j = 0; j < n; j++) {
+            a[i][j] = rand() % 100 + 1;
+            b[i][j] = rand() % 100 + 1;
+        }
+    }
+
+    printf("\nPrinting run times for n = %zu", n);
+
+    clock_t begin = clock();
+    int result = brute_force(n, a, b, output);
+    clock_t end = clock();
+
+    double slow_run_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("\nbrute_force run time = %f", slow_run_time);
+
+    begin = clock();
+    result = multiply_square_matrices(n, a, b, output);
+    end = clock();
+
+    double fast_run_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf(
+        "\nmultiply_square_matrices run time = %f\ntime diff =", fast_run_time);
+
+    double diff = slow_run_time - fast_run_time;
+
+    if (diff < 0)
+        printf("\x1b[31m");
+    else
+        printf("\x1b[32m");
+
+    printf(" %f secs \n \x1b[0m", diff);
+}
+
+void print_times()
+{
+    print_run_times(2);
+    print_run_times(4);
+    print_run_times(8);
+    print_run_times(16);
+    print_run_times(32);
+    print_run_times(64);
+    print_run_times(128);
+    print_run_times(256);
+}
+
+void matches_brute_force(void)
+{
+    const int n = 32;
+
+    int bf[n][n];
+    int st[n][n];
+    int a[n][n];
+    int b[n][n];
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            a[i][j] = rand() % 100 + 1;
+            b[i][j] = rand() % 100 + 1;
+        }
+    }
+
+    int result = multiply_square_matrices(n, a, b, st);
+    CU_ASSERT_EQUAL_FATAL(result, 0);
+
+    result = brute_force(n, a, b, bf);
+    CU_ASSERT_EQUAL_FATAL(result, 0);
+
+    compare_matrices(n, n, bf, st);
+}
+
 int multiply_square_matrices_suite()
 {
     CU_pSuite pSuite = NULL;
@@ -152,6 +230,10 @@ int multiply_square_matrices_suite()
         || (NULL
                == CU_add_test(pSuite, "multply square matrix of size 8",
                       multiply_square_matrix_n_equal_8))
+        || (NULL
+               == CU_add_test(pSuite, "strassen matches brute force",
+                      matches_brute_force))
+        || (NULL == CU_add_test(pSuite, "time comparisons", print_times))
         || (NULL
                == CU_add_test(pSuite, "return error for non power of 2",
                       return_error_for_non_power_of_2))) {
