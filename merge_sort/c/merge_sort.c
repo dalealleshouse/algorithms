@@ -1,6 +1,6 @@
 /*
  * NOTE: I added a special case to sort for when length == 2 so that it didn't
- * need to recurse. This made absolutly NO differance in the performance and
+ * need to recurse. This made absolutely NO difference in the performance and
  * increased complexity so I took it out.
  */
 #include <stdio.h>
