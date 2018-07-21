@@ -6,12 +6,6 @@ it will execute faster due to reduced memory requirements.
 ## Runtime
 O(n log(2, n)) _on average_
 
-## Input
-Unsorted array
-
-## Output
-Sorted array
-
 ## Pseudo Code
 
 Assumptions:
