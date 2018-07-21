@@ -23,7 +23,7 @@ Side Effects:
 
 ``` pseudo
 if n <= 1:
-return
+    return
 
 pivot = ChoosePivot(n)
 swap A[0] and A[pivot]
@@ -55,12 +55,12 @@ Side Effects:
 ``` pseudo
 index = 1
 for i = 1 to n:
-if A[i] < A[0]:
-swap A[i] and A[index]
-increment index
+    if A[i] < A[0]:
+        swap A[i] and A[index]
+        increment index
 
 if index - 1 > 0:
-swap A[0] and A[index]
+    swap A[0] and A[index]
 
 return index
 ```
