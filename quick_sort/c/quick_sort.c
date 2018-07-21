@@ -1,14 +1,22 @@
+#include <stdlib.h>
 #include <string.h>
 
 #include "quick_sort.h"
 
-int _choose_pivot(const size_t n, const size_t size, void* arr)
+int pivot_on_zero(const size_t n)
 {
     (void)n;
-    (void)size;
-    (void)arr;
-
     return 0;
+}
+
+/*
+ * This is a flawed implementation because it should be returning a uniformly
+ * random number and it's not. However, for the purposes of this project, it's
+ * no that important
+ */
+int pivot_on_random(const size_t n)
+{
+    return rand() % n;
 }
 
 int _swap(const size_t size, void* x, void* y)
@@ -39,12 +47,10 @@ int partition(const size_t n, const size_t size, void* arr,
     *pivot_index = 0;
 
     for (size_t i = 1; i < n; i++) {
-        int result = comparator(t_arr, pivot_value);
-
-        if (result < 0) {
-            int result = _swap(size, t_arr, pivot_pos);
-            if (result < 0)
-                return result;
+        // If the item is less, swap it, otherwise do nothing
+        if (comparator(t_arr, pivot_value) < 0) {
+            if (_swap(size, t_arr, pivot_pos) < 0)
+                return -1;
 
             pivot_pos += size;
             (*pivot_index)++;
@@ -53,19 +59,21 @@ int partition(const size_t n, const size_t size, void* arr,
         t_arr += size;
     }
 
-    if (*pivot_index > 0) {
-        int result
-            = _swap(size, pivot_value, pivot_value + *pivot_index * size);
-
-        if (result < 0)
-            return result;
-    }
+    if (*pivot_index > 0)
+        if (_swap(size, pivot_value, pivot_value + *pivot_index * size) < 0)
+            return -1;
 
     return 0;
 }
 
 int quick_sort(
     const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    return quick_sort_pivot(n, size, arr, comparator, pivot_on_random);
+}
+
+int quick_sort_pivot(const size_t n, const size_t size, void* arr,
+    const comparator comparator, const choose_pivot choose_pivot)
 {
     if (arr == NULL || comparator == NULL)
         return -1;
@@ -76,7 +84,7 @@ int quick_sort(
     size_t pivot_index;
     int pivot;
 
-    if ((pivot = _choose_pivot(n, size, arr)) < 0)
+    if ((pivot = choose_pivot(n)) < 0)
         return -1;
 
     // move the partition value to the first position
