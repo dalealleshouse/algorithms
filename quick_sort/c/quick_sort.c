@@ -4,6 +4,7 @@
 
 int _choose_pivot(const size_t n, const size_t size, void* arr)
 {
+    (void)n;
     (void)size;
     (void)arr;
 
