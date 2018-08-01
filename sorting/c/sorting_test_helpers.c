@@ -133,6 +133,15 @@ void* rand_ptr_arr(size_t n)
     return arr;
 }
 
+void* dup_val_arr(size_t n)
+{
+    int* arr = malloc(sizeof(int) * n);
+    for (size_t i = 0; i < n; i++)
+        arr[i] = rand() % 10;
+
+    return arr;
+}
+
 void free_ptr_arr(size_t n, void** arr)
 {
     for (size_t i = 0; i < n; i++)

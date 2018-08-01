@@ -8,7 +8,7 @@
 typedef struct test_struct {
     int foo;
     int bar;
-    char sorter;
+    int sorter;
 } test_struct_t;
 
 int int_comparator(const void* x, const void* y);
@@ -29,6 +29,7 @@ void* rev_arr(size_t n);
 void* rand_arr(size_t n);
 void* rand_st_arr(size_t n);
 void* rand_ptr_arr(size_t n);
+void* dup_val_arr(size_t n);
 
 void free_ptr_arr(size_t n, void** arr);
 

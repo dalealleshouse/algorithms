@@ -48,6 +48,8 @@ static void pre_sorted() { test_int_array(n, seq_arr); }
 
 static void reversed() { test_int_array(n, rev_arr); }
 
+static void dup_items() { test_int_array(n, dup_val_arr); }
+
 static void struct_array()
 {
     free(test_array(n, sizeof(test_struct_t), rand_st_arr, struct_comparator));
@@ -77,6 +79,7 @@ int bubble_sort_suite()
             || NULL == CU_add_test(pSuite, "reversed", reversed)
             || NULL == CU_add_test(pSuite, "struct", struct_array)
             || NULL == CU_add_test(pSuite, "pointers", ptr_array)
+            || NULL == CU_add_test(pSuite, "duplicate items", dup_items)
             /* del this comment */
             )
 
