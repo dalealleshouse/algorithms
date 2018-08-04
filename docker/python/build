@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [[ $# -eq 0 ]] ; then
+    echo 'please provide a version number e.g.:'
+    echo './build 1.1'
+    exit 0
+fi
+
+case "$1" in
+    push) docker.exe push dalealleshouse/algo_test_runner_py ;;
+    *) docker.exe build -t dalealleshouse/algo_test_runner_py:$1 \
+        -t dalealleshouse/algo_test_runner_py \
+        ./ ;;
+esac

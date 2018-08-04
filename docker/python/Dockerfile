@@ -1,8 +1,9 @@
-FROM ubuntu:18.10
+# Downgraded from ubuntu:18.10 b/c of clang bug
+FROM ubuntu:18.04
 LABEL maintainer="Dale Alleshouse dalealleshouse@gmail.com"
 
 RUN apt-get -y update && apt-get install -y \
-    python3 python3-pip && \
+    libcunit1 python3 python3-pip && \
     apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 

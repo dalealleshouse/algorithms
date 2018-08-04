@@ -18,10 +18,10 @@ mkdir src
 cp ../../docker/c/Makefile ./
 
 # change the build directory
-sed -i '' -e 's#/src/##g' Makefile
+sed -i '' -e 's#src/##g' Makefile
 
 # generate the file with bear
-bear make -B
+bear make -B release
 
 # remove the Makefile
 rm Makefile

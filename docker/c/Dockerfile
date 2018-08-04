@@ -1,4 +1,5 @@
-FROM ubuntu:18.10
+# Downgraded from ubuntu:18.10 b/c of clang bug
+FROM ubuntu:18.04
 LABEL maintainer="Dale Alleshouse dalealleshouse@gmail.com"
 
 RUN apt-get -y update && apt-get install -y \
