@@ -3,8 +3,11 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-#include "quick_sort_test.h"
-#include "bubble_sort_test.h"
+extern int quick_sort_suite();
+extern int partition_suite();
+extern int bubble_sort_suite();
+extern int insertion_sort_suite();
+extern int selection_sort_suite();
 
 int main(void)
 {
@@ -12,22 +15,14 @@ int main(void)
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
 
-    int result = quick_sort_suite();
-    if (result != 0) {
+    int result;
+    if ((result = bubble_sort_suite()) != 0
+        || (result = insertion_sort_suite() != 0)
+        || (result = quick_sort_suite()) != 0
+        || (result = selection_sort_suite() != 0)
+        || (result = partition_suite() != 0)) {
         CU_cleanup_registry();
-        return result;
-    }
-
-    result = partition_suite();
-    if (result != 0) {
-        CU_cleanup_registry();
-        return result;
-    }
-
-    result = bubble_sort_suite();
-    if (result != 0) {
-        CU_cleanup_registry();
-        return result;
+        return -1;
     }
 
     // Run all tests using the basic interface

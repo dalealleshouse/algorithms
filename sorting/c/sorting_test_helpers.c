@@ -70,7 +70,7 @@ void arrays_are_equal(
     char* t_actual = (char*)actual;
 
     for (size_t i = 0; i < n; i++)
-        CU_ASSERT_EQUAL(
+        CU_ASSERT_EQUAL_FATAL(
             0, memcmp(t_expected + i * size, t_actual + i * size, size));
 }
 
@@ -94,8 +94,8 @@ void* seq_arr(size_t n)
 void* rev_arr(size_t n)
 {
     int* arr = malloc(sizeof(int) * n);
-    for (size_t i = n; i > 0; i--)
-        arr[i - 1] = i;
+    for (size_t i = 0; i < n; i++)
+        arr[i] = n - i;
 
     return arr;
 }

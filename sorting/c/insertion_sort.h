@@ -4,5 +4,5 @@
 
 #include "sorting.h"
 
-int bubble_sort(
+int insertion_sort(
     const size_t n, const size_t size, void* arr, const comparator comparator);

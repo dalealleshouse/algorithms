@@ -1,5 +1,4 @@
-#ifndef __QUICK_SORT_H
-#define __QUICK_SORT_H
+#pragma once
 
 #include <stddef.h>
 
@@ -28,5 +27,3 @@ int quick_sort_pivot(const size_t n, const size_t size, void* arr,
 
 int quick_sort(
     const size_t n, const size_t size, void* arr, const comparator comparator);
-
-#endif

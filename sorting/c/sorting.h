@@ -1,6 +1,3 @@
-#ifndef __SORTING_H
-#define __SORTING_H
+#pragma once
 
 typedef int (*comparator)(const void* x, const void* y);
-
-#endif
