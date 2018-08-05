@@ -2,8 +2,10 @@
 FROM ubuntu:18.04
 LABEL maintainer="Dale Alleshouse dalealleshouse@gmail.com"
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get -y update && apt-get install -y \
-    libcunit1 python3 python3-pip && \
+    libcunit1 python3 python3-pip python3-matplotlib && \
     apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
@@ -13,6 +15,6 @@ WORKDIR /src
 
 COPY requirements.txt /src/requirements.txt
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt 
 
 CMD ["pytest", "-v"]

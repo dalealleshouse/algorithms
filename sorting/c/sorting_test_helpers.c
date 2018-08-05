@@ -5,6 +5,15 @@
 
 #include "sorting_test_helpers.h"
 
+void* Malloc(size_t size)
+{
+    void* result = malloc(size);
+    if (result == NULL)
+        fprintf(stderr, "malloc failed");
+
+    return result;
+}
+
 int int_comparator(const void* x, const void* y)
 {
     if (x == y)
@@ -58,7 +67,7 @@ int pointer_comparator(const void* x, const void* y)
 
 void* dup(const void* ptr, const size_t size)
 {
-    void* new_ptr = malloc(size);
+    void* new_ptr = Malloc(size);
     memcpy(new_ptr, ptr, size);
     return new_ptr;
 }
@@ -84,7 +93,7 @@ void* sort_with_c(const size_t n, const size_t size, const void* arr,
 
 void* seq_arr(size_t n)
 {
-    int* arr = malloc(sizeof(int) * n);
+    int* arr = Malloc(sizeof(int) * n);
     for (size_t i = 0; i < n; i++)
         arr[i] = i;
 
@@ -93,7 +102,7 @@ void* seq_arr(size_t n)
 
 void* rev_arr(size_t n)
 {
-    int* arr = malloc(sizeof(int) * n);
+    int* arr = Malloc(sizeof(int) * n);
     for (size_t i = 0; i < n; i++)
         arr[i] = n - i;
 
@@ -102,7 +111,7 @@ void* rev_arr(size_t n)
 
 void* rand_arr(size_t n)
 {
-    int* arr = malloc(sizeof(int) * n);
+    int* arr = Malloc(sizeof(int) * n);
     for (size_t i = 0; i < n; i++)
         arr[i] = rand();
 
@@ -111,7 +120,7 @@ void* rand_arr(size_t n)
 
 void* rand_st_arr(size_t n)
 {
-    test_struct_t* arr = malloc(sizeof(test_struct_t) * n);
+    test_struct_t* arr = Malloc(sizeof(test_struct_t) * n);
 
     for (size_t i = 0; i < n; i++)
         arr[i] = (test_struct_t){ i, i + 1, rand() };
@@ -121,10 +130,10 @@ void* rand_st_arr(size_t n)
 
 void* rand_ptr_arr(size_t n)
 {
-    test_struct_t** arr = malloc(sizeof(void*) * n);
+    test_struct_t** arr = Malloc(sizeof(void*) * n);
 
     for (size_t i = 0; i < n; i++) {
-        test_struct_t* tmp = malloc(sizeof(test_struct_t));
+        test_struct_t* tmp = Malloc(sizeof(test_struct_t));
         *tmp = (test_struct_t){ i, i + 1, rand() };
 
         arr[i] = tmp;
@@ -135,7 +144,7 @@ void* rand_ptr_arr(size_t n)
 
 void* dup_val_arr(size_t n)
 {
-    int* arr = malloc(sizeof(int) * n);
+    int* arr = Malloc(sizeof(int) * n);
     for (size_t i = 0; i < n; i++)
         arr[i] = rand() % 10;
 

@@ -1,16 +1,12 @@
-# Sorting
-
-## Run Times
-The actual run times for sorting various size integer arrays using the C
-implementation of the algorithms is shown below. All data was collected using a
-docker container running on a Surface Book 2 Laptop (Intel Core i7, 16GB RAM).
-Each time value represents the median of 3 separate executions.
-
-### Arrays w/ Random Integer Values
-
-![alt text](RANDOM.png "RANDOM ARRAY VALUES") 
-
-
+clang-6.0 -pedantic-errors -Wall -Wextra -Werror -Wthread-safety -std=c11 -O3 -D NDEBUG -fPIC -shared -o src/algo.so src/algo_timer.c src/bubble_sort.c src/bubble_sort_test.c src/insertion_sort.c src/insertion_sort_test.c src/merge_sort.c src/merge_sort_test.c src/quick_sort.c src/quick_sort_test.c src/selection_sort.c src/selection_sort_test.c src/sorting_test_helpers.c src/test_runner.c -lcunit -flto
+generating RANDOM
+running  C_QSORT
+running  BUBBLE
+running  INSERTION
+running  SELECTION
+running  QUICK
+running  MERGE
+chart created
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |
 --|--|--|--|--|
 |C_QSORT |0.000014 sec|0.000168 sec|0.002225 sec|0.025716 sec|
@@ -19,11 +15,14 @@ Each time value represents the median of 3 separate executions.
 |SELECTION |0.000012 sec|0.000871 sec|0.076891 sec|7.618721 sec|
 |QUICK |0.000010 sec|0.000226 sec|0.001607 sec|0.019639 sec|
 |MERGE |0.000007 sec|0.000161 sec|0.001128 sec|0.013671 sec|
-
-### Arrays w/ Pre-Sorted Values
-
-![alt text](SORTED.png "SORTED ARRAY VALUES") 
-
+generating SORTED
+running  C_QSORT
+running  BUBBLE
+running  INSERTION
+running  SELECTION
+running  QUICK
+running  MERGE
+chart created
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |
 --|--|--|--|--|
 |C_QSORT |0.000002 sec|0.000018 sec|0.000451 sec|0.004470 sec|
@@ -32,11 +31,14 @@ Each time value represents the median of 3 separate executions.
 |SELECTION |0.000010 sec|0.001810 sec|0.074741 sec|7.511977 sec|
 |QUICK |0.000008 sec|0.000127 sec|0.001200 sec|0.015383 sec|
 |MERGE |0.000004 sec|0.000000 sec|0.000429 sec|0.004537 sec|
-
-### Arrays w/ Reverse Sorted Values
-
-![alt text](REVERSED.png "REVERSED ARRAY VALUES") 
-
+generating REVERSED
+running  C_QSORT
+running  BUBBLE
+running  INSERTION
+running  SELECTION
+running  QUICK
+running  MERGE
+chart created
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |
 --|--|--|--|--|
 |C_QSORT |0.000002 sec|0.000017 sec|0.000246 sec|0.004992 sec|

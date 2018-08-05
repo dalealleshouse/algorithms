@@ -8,6 +8,7 @@ extern int partition_suite();
 extern int bubble_sort_suite();
 extern int insertion_sort_suite();
 extern int selection_sort_suite();
+extern int merge_sort_test_suite();
 
 int main(void)
 {
@@ -18,6 +19,7 @@ int main(void)
     int result;
     if ((result = bubble_sort_suite()) != 0
         || (result = insertion_sort_suite() != 0)
+        || (result = merge_sort_test_suite() != 0)
         || (result = quick_sort_suite()) != 0
         || (result = selection_sort_suite() != 0)
         || (result = partition_suite() != 0)) {

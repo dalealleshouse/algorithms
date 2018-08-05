@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "algo_timer.h"
 #include "bubble_sort.h"
 #include "insertion_sort.h"
+#include "merge_sort.h"
 #include "quick_sort.h"
 #include "selection_sort.h"
 #include "sorting_test_helpers.h"
@@ -17,6 +19,15 @@ static int qsort_adapter(
 {
     qsort(arr, n, size, comparator);
     return 0;
+}
+
+static int merge_sort_adapter(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    char* tmp[n * size];
+    int result = merge_sort(arr, tmp, n, size, comparator);
+
+    return result;
 }
 
 static sorter get_sorter(const sort_algo algo)
@@ -32,6 +43,8 @@ static sorter get_sorter(const sort_algo algo)
         return selection_sort;
     case QUICK:
         return quick_sort;
+    case MERGE:
+        return merge_sort_adapter;
     default:
         fprintf(stderr, "Invalid sorting algorithm\n");
         return NULL;
