@@ -17,7 +17,11 @@ algorithms:
 The actual run times for sorting various size integer arrays using the C
 implementation of the algorithms is shown below. All data was collected using a
 docker container running on a Surface Book 2 Laptop (Intel Core i7, 16GB RAM).
-Each time value represents the median of 3 separate executions.
+Each time value represents the median of 3 separate executions. For details
+about how the calculations were run, see [compare_times.py](c/compare_times.py)
+and [algo_timer.c](c/algo_timer.c). To recreate the data on your machine,
+navigate to the c directory and execute the [time_charts.sh](c/time_charts.sh)
+bash file.
 
 ### Arrays w/ Random Integer Values
 
@@ -218,7 +222,7 @@ One important consideration is the implementation of Choose Pivot. Choosing a
 pivot element that represents the median value in the array is ideal. However,
 the overhead associated with calculating the median renders the approach
 ineffective. There are mathematical proofs that demonstrate choosing a pivot
-point at random will ensure a O(n log(2, n)) on average.
+point at random will ensure O(n log(2, n)) on average.
 
 ### Asymptotic Time Complexity
 O(n log(2, n)) _on average_
