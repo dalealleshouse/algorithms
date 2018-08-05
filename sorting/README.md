@@ -79,14 +79,93 @@ Key Takeaways of reverse arrays:
 
 ## Bubble Sort
 
+Bubble sort is the easiest to implement but is typically a poor performer when
+the values in the input array are randomly sorted. At the extremes, bubble sort
+performs better than all other sorting algorithms when the input is pre-sorted
+and worst than all others when the input is reverse sorted.
+
+### Asymptotic Time Complexity
+O(n^2)
+
+``` pseudo
+sort:
+    // side effect: rearranges the values in A
+    A = input array
+    
+    unsorted_to = num items in A - 1
+    sorted = false
+    
+    while sort is false:
+        sorted = true
+
+        for i = 0 to unsorted_to:
+            if (A[i] > A[i + 1]:
+                swap A[i] and A[i+1]
+                sorted = false
+
+         usorted_to -= 1
+```
+
 ## Insertion Sort
+Like bubble sort, insertion sort performs very well when the input is
+pre-sorted. However, it performs considerably better than bubble sort when the
+input is either randomly or reverse sorted. Although considerably better than
+bubble sort, it's performance is still abysmal compared to quick and merge sort
+for large inputs.
+
+### Asymptotic Time Complexity
+O(n^2)
+
+``` pseudo
+sort:
+    // side effect: rearranges the values in A
+    A = input array
+
+    for i = 0 to num of items in A:
+        open_index = i
+        temp = A[i]
+
+        for j = i - 1 to 0:
+            if temp > A[j]:
+                shift A[j] to the right one position
+                open_index += 1
+            else:
+                end inner loop
+                
+        A[open_index] = temp
+```
 
 ## Selection Sort
+Selection sort is essentially the opposite of insertion sort in the way it
+works. Insertion starts at the left side of the array and selection starts at
+the right. It performs best when the array is reverse sorted. However, it does
+not perform well compared to any other algorithm case.
+
+### Asymptotic Time Complexity
+O(n^2)
+
+``` pseudo
+sort:
+    // side effect: rearranges the values in A
+    A = input array
+
+    for i = 0 to num of items in A - 1:
+        lowest = A[i]
+
+        for j = i + 1 to num of items in A:
+            if lowest > A[j]:
+                lowest = A[j]
+
+        swap lowest and A[i]
+```
 
 ## Merge Sort
 
 Merge sort is a classic divide and conquer algorithm. It splits an array in
-half, recursively sorts each half, and finally merges the halves together.
+half, recursively sorts each half, and finally merges them together. This
+algorithm has excellent performance but has higher memory usage requirements
+because it generates an entirely new array instead of rearranging existing
+values.
 
 ### Asymptotic Time Complexity
 O(n log(2, n))
@@ -129,9 +208,6 @@ merge:
             
 ```
 
-
-
-
 ## Quick Sort
 
 Sorting algorithm that is prevalent in practice. Although it has the same
@@ -173,6 +249,7 @@ partition:
     // - All items in A that are less than the value at A[0] are before A[return value]
     // - All items in A that are greater than the value at A[0] are moved after A[return value]
     // - The value at A[0] is moved to A[return value]
+    // Assumption: A[0] is the value to partition aroundk
     returns: new position of the value at A[0] after the partition
     A = input array
     n = number of elements to partition around
