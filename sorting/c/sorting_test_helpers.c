@@ -50,7 +50,7 @@ int struct_comparator(const void* x, const void* y)
 
 int pointer_comparator(const void* x, const void* y)
 {
-    if (x == y)
+    if (x == y || (x == NULL && y == NULL))
         return 0;
 
     if (x == NULL && y != NULL)
@@ -75,12 +75,7 @@ void* dup(const void* ptr, const size_t size)
 void arrays_are_equal(
     const size_t n, const size_t size, const void* expected, const void* actual)
 {
-    char* t_expected = (char*)expected;
-    char* t_actual = (char*)actual;
-
-    for (size_t i = 0; i < n; i++)
-        CU_ASSERT_EQUAL_FATAL(
-            0, memcmp(t_expected + i * size, t_actual + i * size, size));
+    CU_ASSERT_EQUAL(memcmp(expected, actual, n * size), 0);
 }
 
 void* sort_with_c(const size_t n, const size_t size, const void* arr,

@@ -14,10 +14,7 @@ int pivot_on_zero(const size_t n)
  * random number and it's not. However, for the purposes of this project, it's
  * no that important
  */
-int pivot_on_random(const size_t n)
-{
-    return rand() % n;
-}
+int pivot_on_random(const size_t n) { return rand() % n; }
 
 int _swap(const size_t size, void* x, void* y)
 {
@@ -97,14 +94,16 @@ int quick_sort_pivot(const size_t n, const size_t size, void* arr,
     int result;
     // items to the left of the partition
     if (pivot_index > 0)
-        if ((result = quick_sort(pivot_index, size, arr, comparator)) != 0)
+        if ((result = quick_sort_pivot(
+                 pivot_index, size, arr, comparator, choose_pivot))
+            != 0)
             return result;
 
     // items to the right of the partition
     pivot_index++;
     if (pivot_index < n)
-        if ((result = quick_sort(n - pivot_index, size,
-                 (char*)arr + pivot_index * size, comparator))
+        if ((result = quick_sort_pivot(n - pivot_index, size,
+                 (char*)arr + pivot_index * size, comparator, choose_pivot))
             != 0)
             return result;
 
