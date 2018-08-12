@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -87,6 +86,9 @@ void* quick_select_pivot(const size_t nth, const size_t n, const size_t size,
     if ((pivot_index = partition(n, size, arr, comparator)) < 0)
         return NULL;
 
+    // Normally, it is not a good idea to cast from int to size_t. However, in
+    // this case we know pivot_index is positive b/c of the check above, so we
+    // can do so without compunction
     if ((size_t)pivot_index == nth)
         return (char*)arr + pivot_index * size;
     else if ((size_t)pivot_index < nth)
@@ -97,10 +99,9 @@ void* quick_select_pivot(const size_t nth, const size_t n, const size_t size,
             nth, pivot_index, size, arr, comparator, choose_pivot);
 }
 
-void* sort_select(const size_t nth, const size_t n, const size_t size, void* arr,
-    const comparator comparator)
+void* sort_select(const size_t nth, const size_t n, const size_t size,
+    void* arr, const comparator comparator)
 {
-    fflush(stdout);
     if (arr == NULL || comparator == NULL)
         return NULL;
 
@@ -109,4 +110,38 @@ void* sort_select(const size_t nth, const size_t n, const size_t size, void* arr
 
     qsort(arr, n, size, comparator);
     return (char*)arr + nth * size;
+}
+
+void* max(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    if (arr == NULL || comparator == NULL || size == 0 || n == 0)
+        return NULL;
+
+    void* max = arr;
+
+    for (size_t i = 1; i < n; i++) {
+        void* ith = (char*)arr + i * size;
+        if (comparator(max, ith) < 0)
+            max = ith;
+    }
+
+    return max;
+}
+
+void* min(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    if (arr == NULL || comparator == NULL || size == 0 || n == 0)
+        return NULL;
+
+    void* min = arr;
+
+    for (size_t i = 1; i < n; i++) {
+        void* ith = (char*)arr + i * size;
+        if (comparator(min, ith) < 0)
+            min = ith;
+    }
+
+    return min;
 }

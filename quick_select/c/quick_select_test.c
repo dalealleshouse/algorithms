@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <time.h>
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
@@ -146,7 +147,7 @@ static void quick_select_nth_out_of_bounds()
 
     void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_EQUAL_FATAL(NULL, result);
+    CU_ASSERT_PTR_NULL_FATAL(result);
 }
 
 static void quick_select_matches_select()
@@ -301,14 +302,43 @@ static int partition_suite()
     return CU_register_suites(suites);
 }
 
+/************* partition ****************/
+static void max_test() {
+    const size_t n = 6;
+    const int expected = 6;
+    int arr[] = { 6, 5, 4, 3, 2, 1 };
+
+    void* result = max(n, sizeof(arr[0]), arr, int_comparator);
+
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
+
+}
+
+static void min_test() {}
+
+static int min_max_suite()
+{
+    CU_TestInfo min_max_tests[]
+        = { CU_TEST_INFO(max_test), CU_TEST_INFO(min_test), CU_TEST_INFO_NULL };
+
+    CU_SuiteInfo suites[] = { { .pName = "min max suite",
+                                  .pInitFunc = init_suite,
+                                  .pCleanupFunc = clean_suite,
+                                  .pTests = min_max_tests },
+        CU_SUITE_INFO_NULL };
+
+    return CU_register_suites(suites);
+}
+
 int main(void)
 {
-    /* initialize the CUnit test registry */
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
 
     int result;
     if ((result = select_suite()) != 0 || (result = quick_select_suite()) != 0
+        || (result = min_max_suite()) != 0
         || (result = partition_suite() != 0)) {
         CU_cleanup_registry();
         return -1;

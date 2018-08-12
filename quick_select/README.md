@@ -1,33 +1,45 @@
 # Quick Select
 
-Quick select determines the nth ranked item in an array without sorting the
-array. This is accomplished by recursively partitioning halves of the array
-until the nth item is placed in the correct position. A typical use is finding
-the nth highest grade in an array.
-
-In the case of finding the highest/lowest value in an array, a simple liner
-array scan will be slightly more efficient.
+Quick select determines the n<sup>th</sup> ranked item in an array without
+sorting the array. This is accomplished by recursively partitioning halves of
+the array until the n<sup>th</sup> item is placed in the correct position. A
+typical use is finding the n<sup>th</sup> highest score in an array.
 
 ## Actual Run Times
 
-The actual run times for finding the 5th highest value in an integer arrays
-using the C implementation of the quick sort algorithm and C's qsort built in
-sorting function are shown below.
+The actual run times for finding the 5<sup>th</sup> highest value in an integer
+array using the C implementation of the quick select algorithm and C's qsort
+built in sorting function are shown below.
 
-All data was collected using a docker container running on a Surface Book 2
-Laptop (Intel Core i7, 16GB RAM).  Each time value represents the median of 3
-separate executions. For details about how the calculations were run, see
-[compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
-recreate the data on your machine, navigate to the c directory and execute the
-[time_charts.sh](c/time_charts.sh) bash file.
-
-![alt text](c/QUICK_SELECT.png "RANDOM ARRAY VALUES") 
+![alt text](c/QUICK_SELECT-5.png "RANDOM ARRAY VALUES") 
 
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |n=1000000 |
 --|--|--|--|--|--|
-|QUICK_SELECT |0.000003 sec|0.000028 sec|0.000073 sec|0.002056 sec|0.011387 sec|
-|SORT_SELECT |0.000007 sec|0.000060 sec|0.000740 sec|0.009913 sec|0.105244 sec|
+|QUICK_SELECT |0.000006 sec|0.000026 sec|0.000196 sec|0.003316 sec|0.015870 sec|
+|SORT_SELECT |0.000008 sec|0.000159 sec|0.001267 sec|0.015303 sec|0.197968 sec|
 
+For the maximum/minimum value in an array, it's possible to do a simple linear
+scan while keeping track of the highest/lowest value. The result is shown below.
+
+![alt text](c/QUICK_SELECT-1.png "RANDOM ARRAY VALUES") 
+
+|ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |n=1000000 |
+--|--|--|--|--|--|
+|QUICK_SELECT |0.000005 sec|0.000018 sec|0.000492 sec|0.002872 sec|0.020482 sec|
+|SORT_SELECT |0.000009 sec|0.000113 sec|0.001254 sec|0.015291 sec|0.179286 sec|
+|LINEAR_SCAN_MIN |0.000001 sec|0.000003 sec|0.000027 sec|0.000256 sec|0.002649 sec|
+
+Key Takeaway: 
+- *Quick Select* and *Linear Scan* are both O(n) algorithms. Obviously, they do
+not have the same actual run times. It's important to understand that the
+purpose of asymptotic time complexity is to demonstrate how the run time of an
+algorithm increases as the input size increases.  It is not the only run time
+consideration.
+
+For details about how the calculations were run, see
+[compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
+recreate the data on your machine, navigate to the c directory and execute the
+[time_charts.sh](c/time_charts.sh) bash file.
 
 ### Asymptotic Time Complexity
 O(n) *on average*

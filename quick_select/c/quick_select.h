@@ -40,3 +40,9 @@ void* quick_select(const size_t nth, const size_t n, const size_t size,
  */
 void* sort_select(const size_t nth, const size_t n, const size_t size,
     void* arr, const comparator comparator);
+
+void* max(
+    const size_t n, const size_t size, void* arr, const comparator comparator);
+
+void* min(
+    const size_t n, const size_t size, void* arr, const comparator comparator);

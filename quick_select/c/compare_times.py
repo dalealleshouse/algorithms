@@ -24,15 +24,22 @@ class Algo(CtypesEnum):
     SORT_SELECT = 2,
 
 
+class LinearAlgo(CtypesEnum):
+    LINEAR_SCAN_MAX = 1,
+    LINEAR_SCAN_MIN = 2
+
+
 lib.select_time.argtypes = [ctypes.c_size_t, Algo]
 lib.select_time.restype = ctypes.c_double
+lib.linear_time.argtypes = [ctypes.c_size_t, LinearAlgo]
+lib.linear_time.restype = ctypes.c_double
 
 
-def median_run_time(n, algo):
+def median_run_time(func):
     times = []
 
     for i in range(NUM_TIME_RUNS):
-        times.append(lib.select_time(n, algo))
+        times.append(func())
 
     return statistics.median(times)
 
@@ -58,10 +65,18 @@ def generate_md_table(ns, data):
     sys.stdout.flush()
 
 
-def generate_chart():
+def get_title(nth):
+    if nth == 1:
+        return 'Find the Minimum Value'
+    else:
+        return 'Find the {}th Value'.format(nth)
+
+
+def generate_chart(nth):
     full_data = []
     plt.figure(figsize=(8, 6))
-    plt.title('Quick Select vs. Sort Select')
+
+    plt.title(get_title(nth))
     plt.ylabel('sec')
     plt.xlabel('n')
 
@@ -71,16 +86,27 @@ def generate_chart():
 
         data = []
         for n in TEST_FOR_Ns:
-            sys.stdout.flush()
-
-            time = median_run_time(n, algo)
+            time = median_run_time(lambda: lib.select_time(n, nth, algo))
             data.append(time)
 
         plt.plot(TEST_FOR_Ns, data, label=algo.name)
         full_data.append((algo, data))
 
+    if nth == 1:
+        print('running ', LinearAlgo.LINEAR_SCAN_MIN.name)
+        sys.stdout.flush()
+        min_algo = LinearAlgo.LINEAR_SCAN_MIN
+
+        data = []
+        for n in TEST_FOR_Ns:
+            time = median_run_time(lambda: lib.linear_time(n, min_algo))
+            data.append(time)
+
+        plt.plot(TEST_FOR_Ns, data, label=min_algo.name)
+        full_data.append((min_algo, data))
+
     plt.legend()
-    plt.savefig('QUICK_SELECT.png')
+    plt.savefig('QUICK_SELECT-' + str(nth) + '.png')
     plt.clf()
 
     print('chart created')
@@ -89,4 +115,5 @@ def generate_chart():
 
 
 if __name__ == "__main__":
-    generate_chart()
+    generate_chart(5)
+    generate_chart(1)
