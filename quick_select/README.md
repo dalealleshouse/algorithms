@@ -32,14 +32,20 @@ recreate the data on your machine, navigate to the c directory and execute the
 ### Asymptotic Time Complexity
 O(n) *on average*
 
+
+### Pseudo Code
 ``` pseudo
 select:
-    // side effect: rearranges the values in A
+    // side effect: rearranges the values in A, the correct value will be in the
+    // nth position of the array
     A = input array
-    nth = the nth highest value in find
+    nth = the nth highest value to find
 
     if length of A <= 1:
         return A[0]
+
+    pivot_on = choose_pivot(n)
+    swap A[0] with A[pivot_on]
 
     pivot = partition(nth, A)
 
@@ -49,9 +55,35 @@ select:
     if pivot < nth:
         return select(nth - pivot, A[pivot thru len of A])
 
-    return select(nth, A[0 thru pivot]
+    return select(nth, A[0 thru pivot])
     
 partition:
+    A = input array with the pivot value at position 0
+
+    pivot_pointer = A[0]
+    left_pointer = A[1]
+    right_pointer = A[last item]
+
+    infinite loop:
+        while
+            left_pointer < right_pointer and
+            left_pointer value < pivot_pointer value:
+
+                left_pointer + 1
+
+        while
+            right_pointer is not the begining of the array and
+            right_pointer value >= pivot_pointer value:
+
+                right_pointer + 1
+
+        if left_pointer >= right_pointer:
+            break out of infinite loop
+        else
+            swap left_pointer value with right_pointer value
+
+    swap pivot_pointer value with right_pointer value
+    return right_pointer
 
 choose_pivot:
     returns: ideal index to partition on

@@ -47,8 +47,8 @@ static void select_pre_sorted()
 
     void* result = sort_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_NOT_EQUAL_FATAL(NULL, result);
-    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
 }
 
 static void select_reversed()
@@ -60,8 +60,8 @@ static void select_reversed()
 
     void* result = sort_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_NOT_EQUAL_FATAL(NULL, result);
-    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
 }
 
 static int select_suite()
@@ -95,8 +95,8 @@ static void quick_select_pre_sorted()
 
     void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_NOT_EQUAL_FATAL(NULL, result);
-    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
 }
 
 static void quick_select_reversed()
@@ -108,8 +108,8 @@ static void quick_select_reversed()
 
     void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_NOT_EQUAL_FATAL(NULL, result);
-    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
 }
 
 static void quick_nth_equals_zero()
@@ -121,8 +121,8 @@ static void quick_nth_equals_zero()
 
     void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_NOT_EQUAL_FATAL(NULL, result);
-    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
 }
 
 static void quick_nth_equals_n()
@@ -134,8 +134,8 @@ static void quick_nth_equals_n()
 
     void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
 
-    CU_ASSERT_NOT_EQUAL_FATAL(NULL, result);
-    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
 }
 
 static void quick_select_nth_out_of_bounds()

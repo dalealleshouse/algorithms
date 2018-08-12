@@ -91,6 +91,8 @@ and worst than all others when the input is reverse sorted.
 ### Asymptotic Time Complexity
 O(n^2)
 
+### Pseudo Code
+
 ``` pseudo
 sort:
     // side effect: rearranges the values in A
@@ -120,6 +122,8 @@ for large inputs.
 ### Asymptotic Time Complexity
 O(n^2)
 
+### Pseudo Code
+
 ``` pseudo
 sort:
     // side effect: rearranges the values in A
@@ -147,6 +151,8 @@ not perform well compared to any other algorithm case.
 
 ### Asymptotic Time Complexity
 O(n^2)
+
+### Pseudo Code
 
 ``` pseudo
 sort:
