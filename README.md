@@ -1,10 +1,13 @@
 # Algorithms
 Examples of popular algorithms in several different languages. The purpose is to
-demonstrate algorithm design and analysis fundamentals. A few things to note:
+demonstrate algorithm design and analysis fundamentals.
 
-The project in general
-- This project is part of a book I'm planning to write. I'd be happy to accept
-    any pull requests. Obviously, contributors will be recognized in the book.
+This project is part of a book I'm planning to write. I'd be happy to accept any
+pull requests. Contributors will be recognized in the book.
+
+## A few things to note about..
+
+Build environments
 - The build and test environments are captured in docker containers. The
     examples demonstrate how to use the containers as stored on [Docker
     Hub](https://hub.docker.com). However, the [docker](docker/) folder has all
@@ -16,7 +19,7 @@ Implementation Quality
     exceptions when the input is sufficiently large (in non-tail call optimized
     languages). For many purposes, this is not an issue; however, use in
     production scenarios should be thoroughly scrutinized.
-- Every attempt was made to ensure the accuracy of the implementations. For
+- Every attempt was made to ensure the quality of the implementations. For
     instance, each has associated unit tests. The C code is subjected to several
     clang sanitizers as well as clang tidy. However, this is not production
     hardened code.
@@ -35,16 +38,15 @@ Actual run time data
 - All run time data was collected using a docker container running on a Surface
     Book 2 Laptop (Intel Core i7, 16GB RAM). Each time value represents the
     median of 3 separate executions.
-- You can recreate the data using your own
-    hardware by running the time_charts.sh bash script located in each c
-    directory.
+- You can recreate the data using your own hardware by running the
+    time_charts.sh bash script located in each c directory.
 
 ## Index
 * [Sorting](sorting/)
-..-[C](sorting/c/)
-..-[Python](sorting/python/)
+..- [C](sorting/c/)
+..- [Python](sorting/python/)
 * [Quick Select](quick_select/)
-..-[C](quick_select/c/)
+..- [C](quick_select/c/)
 
 ## Build/Tests
 ### C
