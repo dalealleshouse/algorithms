@@ -1,11 +1,16 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "quick_sort.h"
 
-int pivot_on_zero(const size_t n)
+int pivot_on_zero(const size_t n, const size_t size, const void* arr,
+    const comparator comparator)
 {
     (void)n;
+    (void)size;
+    (void)arr;
+    (void)comparator;
     return 0;
 }
 
@@ -14,7 +19,57 @@ int pivot_on_zero(const size_t n)
  * random number and it's not. However, for the purposes of this project, it's
  * no that important
  */
-int pivot_on_random(const size_t n) { return rand() % n; }
+int pivot_on_random(const size_t n, const size_t size, const void* arr,
+    const comparator comparator)
+{
+    (void)size;
+    (void)arr;
+    (void)comparator;
+    return rand() % n;
+}
+
+int pivot_on_last(const size_t n, const size_t size, const void* arr,
+    const comparator comparator)
+{
+    (void)size;
+    (void)arr;
+    (void)comparator;
+    if (n <= 1)
+        return 0;
+
+    return n - 1;
+}
+
+int pivot_on_median(const size_t n, const size_t size, const void* arr,
+    const comparator comparator)
+{
+    if (n <= 2)
+        return 0;
+
+    size_t mid_point = 0;
+
+    if (n % 2 == 0)
+        mid_point = n / 2 - 1;
+    else
+        mid_point = n / 2;
+
+    const void* first = arr;
+    const void* last = (char*)arr + size * (n - 1);
+    const void* middle = (char*)arr + size * mid_point;
+
+    // first
+    if ((comparator(first, last) >= 0 && comparator(first, middle) <= 0)
+        || (comparator(first, last) <= 0 && comparator(first, middle) >= 0))
+        return 0;
+
+    // middle
+    if ((comparator(middle, first) >= 0 && comparator(middle, last) <= 0)
+        || (comparator(middle, first) <= 0 && comparator(middle, last) >= 0))
+        return mid_point;
+
+    // the only choice left is last
+    return n - 1;
+}
 
 int _swap(const size_t size, void* x, void* y)
 {
@@ -81,7 +136,7 @@ int quick_sort_pivot(const size_t n, const size_t size, void* arr,
     size_t pivot_index;
     int pivot;
 
-    if ((pivot = choose_pivot(n)) < 0)
+    if ((pivot = choose_pivot(n, size, arr, comparator)) < 0)
         return -1;
 
     // move the partition value to the first position

@@ -27,14 +27,14 @@ bash file.
 
 ![alt text](c/RANDOM.png "RANDOM ARRAY VALUES") 
 
-|ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |
---|--|--|--|--|
-|C_QSORT |0.000005 sec|0.000060 sec|0.000799 sec|0.009573 sec|
-|BUBBLE |0.000094 sec|0.003827 sec|0.453658 sec|41.579646 sec|
-|INSERTION |0.000023 sec|0.001044 sec|0.080031 sec|8.820152 sec|
-|SELECTION |0.000038 sec|0.000939 sec|0.082957 sec|9.374885 sec|
-|QUICK |0.000010 sec|0.000124 sec|0.001693 sec|0.020595 sec|
-|MERGE |0.000007 sec|0.000118 sec|0.001249 sec|0.015185 sec|
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|C_QSORT |0.000012 sec|0.000156 sec|0.000924 sec|0.010486 sec|
+|BUBBLE |0.000048 sec|0.003869 sec|0.379764 sec|38.650331 sec|
+|INSERTION |0.000011 sec|0.000831 sec|0.086706 sec|8.700342 sec|
+|SELECTION |0.000013 sec|0.000846 sec|0.082433 sec|7.896328 sec|
+|QUICK |0.000024 sec|0.000114 sec|0.001562 sec|0.019407 sec|
+|MERGE |0.000007 sec|0.000088 sec|0.001222 sec|0.015161 sec|
 
 Key Takeaways: 
 - *Quick*, *Merge*, and *C's qsort* all perform fairly consistently regardless of
@@ -49,14 +49,14 @@ Key Takeaways:
 
 ![alt text](c/SORTED.png "SORTED ARRAY VALUES") 
 
-|ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |
---|--|--|--|--|
-|C_QSORT |0.000001 sec|0.000016 sec|0.000178 sec|0.002445 sec|
-|BUBBLE |0.000000 sec|0.000002 sec|0.000016 sec|0.000158 sec|
-|INSERTION |0.000002 sec|0.000013 sec|0.000129 sec|0.001444 sec|
-|SELECTION |0.000009 sec|0.000848 sec|0.082737 sec|9.032020 sec|
-|QUICK |0.000027 sec|0.000093 sec|0.001232 sec|0.015116 sec|
-|MERGE |0.000003 sec|0.000068 sec|0.000369 sec|0.004767 sec|
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|C_QSORT |0.000004 sec|0.000038 sec|0.000471 sec|0.004750 sec|
+|BUBBLE |0.000001 sec|0.000004 sec|0.000030 sec|0.000331 sec|
+|INSERTION |0.000003 sec|0.000026 sec|0.000255 sec|0.002702 sec|
+|SELECTION |0.000019 sec|0.002178 sec|0.080545 sec|7.738967 sec|
+|QUICK |0.000008 sec|0.000095 sec|0.001212 sec|0.014143 sec|
+|MERGE |0.000004 sec|0.000036 sec|0.000431 sec|0.004937 sec|
 
 Key Takeaways of pre-sorted arrays: 
 - *Bubble* clearly performs best
@@ -67,14 +67,14 @@ Key Takeaways of pre-sorted arrays:
 
 ![alt text](c/REVERSED.png "REVERSED ARRAY VALUES") 
 
-|ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |
---|--|--|--|--|
-|C_QSORT |0.000002 sec|0.000019 sec|0.000223 sec|0.002760 sec|
-|BUBBLE |0.000044 sec|0.004318 sec|0.429120 sec|48.229245 sec|
-|INSERTION |0.000031 sec|0.002819 sec|0.169636 sec|17.977106 sec|
-|SELECTION |0.000013 sec|0.000995 sec|0.094138 sec|10.214144 sec|
-|QUICK |0.000008 sec|0.000107 sec|0.001442 sec|0.017348 sec|
-|MERGE |0.000004 sec|0.000040 sec|0.000475 sec|0.005245 sec|
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|C_QSORT |0.000004 sec|0.000036 sec|0.000420 sec|0.004646 sec|
+|BUBBLE |0.000085 sec|0.008056 sec|0.439852 sec|43.008788 sec|
+|INSERTION |0.000019 sec|0.001764 sec|0.178411 sec|17.768902 sec|
+|SELECTION |0.000010 sec|0.000900 sec|0.079589 sec|8.197930 sec|
+|QUICK |0.000008 sec|0.000100 sec|0.001345 sec|0.016872 sec|
+|MERGE |0.000004 sec|0.000041 sec|0.000500 sec|0.005606 sec|
 
 Key Takeaways of reverse arrays: 
 - *Bubble* is clearly the worst performer
@@ -231,7 +231,7 @@ ineffective. There are mathematical proofs that demonstrate choosing a pivot
 point at random will ensure O(n log(2, n)) on average.
 
 ### Asymptotic Time Complexity
-O(n log(2, n)) _on average_
+O(n log(n)) _on average_
 
 ### Pseudo Code
 
@@ -281,3 +281,65 @@ choose_pivot:
 
     return uniformly random number between 0 and n inclusive
 ```
+
+### Quick Sort Actual Run Times
+
+One important consideration when implementing quick sort is the choose pivot
+algorithm because it has considerable influence on the actual run time. The
+charts below show the run times for four different implementations of choose
+pivot.
+
+* QUICK_PIVOT_LAST: Always pivot on the last element
+* QUICK_PIVOT_FIRST: Always pivot on the first element
+* QUICK_PIVOT_RANDOM: Pivot on a random number between 0 and n - 1
+* QUICK_PIVOT_MEDIAN: Pivot on the median of the first, last, and middle element
+
+#### Arrays w/ Random Integer Values
+
+![alt text](c/PIVOT-RANDOM.png "RANDOM ARRAY VALUES") 
+
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|QUICK_PIVOT_LAST |0.000018 sec|0.000278 sec|0.003496 sec|0.039498 sec|
+|QUICK_PIVOT_FIRST |0.000015 sec|0.000221 sec|0.002966 sec|0.019478 sec|
+|QUICK_PIVOT_RANDOM |0.000009 sec|0.000131 sec|0.001513 sec|0.019836 sec|
+|QUICK_PIVOT_MEDIAN |0.000008 sec|0.000105 sec|0.001408 sec|0.018257 sec|
+
+Key Takeaways: 
+- Their is very little difference but *MEDIAN* wins by a slight margin. The
+    difference is small enough that a slightly different arrangement could
+    change the result.
+- The run time characteristics of *RANDOM* are consistent for all types of
+    arrays
+    
+#### Arrays w/ Pre-Sorted Values
+
+![alt text](c/PIVOT-SORTED.png "SORTED ARRAY VALUES") 
+
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|QUICK_PIVOT_LAST |0.000100 sec|0.010064 sec|0.521035 sec|51.889364 sec|
+|QUICK_PIVOT_FIRST |0.000010 sec|0.000734 sec|0.067155 sec|6.826175 sec|
+|QUICK_PIVOT_RANDOM |0.000008 sec|0.000126 sec|0.001223 sec|0.015780 sec|
+|QUICK_PIVOT_MEDIAN |0.000006 sec|0.000067 sec|0.000931 sec|0.010826 sec|
+
+Key Takeaways of pre-sorted arrays: 
+- *LAST* takes a whopping 51 seconds.
+
+#### Arrays w/ Reverse Sorted Values
+
+![alt text](c/PIVOT-REVERSED.png "REVERSED ARRAY VALUES") 
+
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|QUICK_PIVOT_LAST |0.000064 sec|0.006450 sec|0.294811 sec|29.853370 sec|
+|QUICK_PIVOT_FIRST |0.000031 sec|0.002881 sec|0.294002 sec|29.855214 sec|
+|QUICK_PIVOT_RANDOM |0.000008 sec|0.000101 sec|0.001344 sec|0.015160 sec|
+|QUICK_PIVOT_MEDIAN |0.000011 sec|0.000773 sec|0.076374 sec|7.544084 sec|
+
+Key Takeaways of reverse arrays: 
+- *LAST* and *FIRST* are equally bad
+- *MEDIAN* is clearly unacceptable
+
+From this analysis, we can conclude that although *MEDIAN* has a slight edge for
+random and sorted arrays, *RANDOM* is the best general purpose option.

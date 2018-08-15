@@ -26,6 +26,10 @@ class SortingAlgo(CtypesEnum):
     SELECTION = 4,
     QUICK = 5,
     MERGE = 6
+    QUICK_PIVOT_RANDOM = 7,
+    QUICK_PIVOT_MEDIAN = 8,
+    QUICK_PIVOT_FIRST = 9,
+    QUICK_PIVOT_LAST = 10
 
 
 class ArrayType(CtypesEnum):
@@ -48,28 +52,34 @@ def median_run_time(n, array_type, algo):
     return statistics.median(times)
 
 
-def generate_md_table(ns, data):
+def generate_md_table(ns, data, arr_type):
+    f = open("run_results.txt", "a+")
+    f.write(arr_type.name)
+    f.write("\n")
+
     n_headers = ""
-    header_sep = "--|"
+    header_sep = "|--|"
 
     for n in ns:
         n_headers += 'n={:d} |'.format(n)
         header_sep += "--|"
 
-    print("|ALGORITHM|", n_headers)
-    print(header_sep)
+    f.write("|ALGORITHM|")
+    f.write(n_headers)
+    f.write("\n")
+    f.write(header_sep)
+    f.write("\n")
 
     for d in data:
         times = ""
         for v in d[1]:
             times += '{:.6f} sec|'.format(v)
 
-        print('|{} |{}'.format(d[0].name, times))
+        f.write('|{} |{}'.format(d[0].name, times))
+        f.write("\n")
 
-    sys.stdout.flush()
 
-
-def generate_chart(arr_type):
+def generate_chart(arr_type, algos, save_as):
     print("generating " + arr_type.name)
     sys.stdout.flush()
 
@@ -79,9 +89,7 @@ def generate_chart(arr_type):
     plt.ylabel('sec')
     plt.xlabel('n')
 
-    for algo in SortingAlgo:
-        print('running ', algo.name)
-        sys.stdout.flush()
+    for algo in algos:
         data = []
         for n in TEST_FOR_Ns:
             time = median_run_time(n, arr_type, algo)
@@ -91,14 +99,23 @@ def generate_chart(arr_type):
         full_data.append((algo, data))
 
     plt.legend()
-    plt.savefig(arr_type.name + '.png')
+    plt.savefig('{}{}.png'.format(save_as, arr_type.name))
     plt.clf()
 
     print('chart created')
 
-    generate_md_table(TEST_FOR_Ns, full_data)
+    generate_md_table(TEST_FOR_Ns, full_data, arr_type)
 
 
 if __name__ == "__main__":
     for arr_type in ArrayType:
-        generate_chart(arr_type)
+        generate_chart(arr_type, [SortingAlgo.C_QSORT, SortingAlgo.BUBBLE,
+                                  SortingAlgo.INSERTION, SortingAlgo.SELECTION,
+                                  SortingAlgo.QUICK, SortingAlgo.MERGE],
+                       "")
+
+        generate_chart(arr_type, [SortingAlgo.QUICK_PIVOT_LAST,
+                                  SortingAlgo.QUICK_PIVOT_FIRST,
+                                  SortingAlgo.QUICK_PIVOT_RANDOM,
+                                  SortingAlgo.QUICK_PIVOT_MEDIAN],
+                       "PIVOT-")

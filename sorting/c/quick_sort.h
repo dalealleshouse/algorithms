@@ -17,10 +17,17 @@
 int partition(const size_t n, const size_t size, void* arr,
     const comparator comparator, size_t* pivot_index);
 
-typedef int (*choose_pivot)(const size_t n);
+typedef int (*choose_pivot)(const size_t n, const size_t size, const void* arr,
+    const comparator comparator);
 
-int pivot_on_zero(const size_t n);
-int pivot_on_random(const size_t n);
+int pivot_on_zero(const size_t n, const size_t size, const void* arr,
+    const comparator comparator);
+int pivot_on_random(const size_t n, const size_t size, const void* arr,
+    const comparator comparator);
+int pivot_on_last(const size_t n, const size_t size, const void* arr,
+    const comparator comparator);
+int pivot_on_median(const size_t n, const size_t size, const void* arr,
+    const comparator comparator);
 
 int quick_sort_pivot(const size_t n, const size_t size, void* arr,
     const comparator comparator, choose_pivot choose_pivot);

@@ -30,6 +30,30 @@ static int merge_sort_adapter(
     return result;
 }
 
+static int quick_random_adapter(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    return quick_sort_pivot(n, size, arr, comparator, pivot_on_random);
+}
+
+static int quick_first_adapter(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    return quick_sort_pivot(n, size, arr, comparator, pivot_on_zero);
+}
+
+static int quick_last_adapter(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    return quick_sort_pivot(n, size, arr, comparator, pivot_on_last);
+}
+
+static int quick_median_adapter(
+    const size_t n, const size_t size, void* arr, const comparator comparator)
+{
+    return quick_sort_pivot(n, size, arr, comparator, pivot_on_median);
+}
+
 static sorter get_sorter(const sort_algo algo)
 {
     switch (algo) {
@@ -45,6 +69,14 @@ static sorter get_sorter(const sort_algo algo)
         return quick_sort;
     case MERGE:
         return merge_sort_adapter;
+    case QUICK_PIVOT_RANDOM:
+        return quick_random_adapter;
+    case QUICK_PIVOT_MEDIAN:
+        return quick_median_adapter;
+    case QUICK_PIVOT_FIRST:
+        return quick_first_adapter;
+    case QUICK_PIVOT_LAST:
+        return quick_last_adapter;
     default:
         fprintf(stderr, "Invalid sorting algorithm\n");
         return NULL;
