@@ -15,8 +15,8 @@ algorithm and C's qsort are shown below.
 
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |n=1000000 |
 --|--|--|--|--|--|
-|QUICK_SELECT |0.000006 sec|0.000026 sec|0.000196 sec|0.003316 sec|0.015870 sec|
-|SORT_SELECT |0.000008 sec|0.000159 sec|0.001267 sec|0.015303 sec|0.197968 sec|
+|QUICK_SELECT |0.000002 sec|0.000038 sec|0.000443 sec|0.002946 sec|0.042520 sec|
+|SORT_SELECT |0.000006 sec|0.000096 sec|0.000704 sec|0.008697 sec|0.104405 sec|
 
 &ast; For the purposes of this project, median is defined as simply the
 n/2<sup>th</sup> element.  Technically, if the array is odd sized, it should be
@@ -27,8 +27,8 @@ important in some contexts.
 
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |n=1000000 |
 --|--|--|--|--|--|
-|QUICK_SELECT |0.000006 sec|0.000026 sec|0.000196 sec|0.003316 sec|0.015870 sec|
-|SORT_SELECT |0.000008 sec|0.000159 sec|0.001267 sec|0.015303 sec|0.197968 sec|
+|QUICK_SELECT |0.000006 sec|0.000011 sec|0.000074 sec|0.001099 sec|0.009004 sec|
+|SORT_SELECT |0.000004 sec|0.000082 sec|0.000707 sec|0.008884 sec|0.104003 sec|
 
 For the maximum/minimum value in an array, it's possible to do a simple linear
 scan while keeping track of the highest/lowest value. The result is shown below.
@@ -37,9 +37,9 @@ scan while keeping track of the highest/lowest value. The result is shown below.
 
 |ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |n=1000000 |
 --|--|--|--|--|--|
-|QUICK_SELECT |0.000005 sec|0.000018 sec|0.000492 sec|0.002872 sec|0.020482 sec|
-|SORT_SELECT |0.000009 sec|0.000113 sec|0.001254 sec|0.015291 sec|0.179286 sec|
-|LINEAR_SCAN_MIN |0.000001 sec|0.000003 sec|0.000027 sec|0.000256 sec|0.002649 sec|
+|QUICK_SELECT |0.000003 sec|0.000010 sec|0.000468 sec|0.002036 sec|0.023628 sec|
+|SORT_SELECT |0.000005 sec|0.000056 sec|0.000814 sec|0.008738 sec|0.103920 sec|
+|LINEAR_SCAN_MIN |0.000001 sec|0.000002 sec|0.000030 sec|0.000143 sec|0.001475 sec|
 
 Key Takeaway: 
 - *Quick Select* and *Linear Scan* are both O(n) algorithms. Obviously, they do

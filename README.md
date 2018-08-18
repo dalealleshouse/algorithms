@@ -14,38 +14,41 @@ Build environments
 
 Implementation Quality
 * Several of the implementations utilize recursion. Recursion provides an
-elegant means of demonstrating algorithms; however, it causes stack overflow
-exceptions when the input is sufficiently large (in non-tail call optimized
-languages). For many purposes, this is not an issue; however, use in production
-scenarios should be thoroughly scrutinized.
-* Every attempt was made to ensure the quality of the implementations. For
-instance, each has associated unit tests. The C code is subjected to several
-clang sanitizers as well as clang tidy. However, this is not production
-hardened code.
-* Many of the tests and algorithms make use of the C's rand() function. For
-many reasons, this is not ideal. [Eternally
-Confused](http://www.eternallyconfuzzled.com/arts/jsw_art_rand.aspx) has a
-great article about what this is true. However, for the purposes of this
-project, it is sufficient.
+    elegant means of demonstrating algorithms; however, it causes stack overflow
+    exceptions when the input is sufficiently large (in non-tail call optimized
+    languages). For many purposes, this is not an issue; however, use in
+    production scenarios should be thoroughly scrutinized.
+* Every attempt was made to ensure the quality of the implementations. For 
+    instance, each has associated unit tests. The C code is subjected to several
+    clang sanitizers as well as clang tidy. However, this is not production
+    hardened code.
+* The C code makes extensive use of the `rand()` function. For many
+    reasons, this is not ideal. [Eternally
+    Confused](http://www.eternallyconfuzzled.com/arts/jsw_art_rand.aspx) has a
+    great article about what this is true. Furthermore, `rand()` is never
+    seeded. This ensures that the actual run time comparisons between algorithms
+    accepting randomly sorted arrays are using the exact same inputs.  For the
+    purposes of this project, `rand()` it is sufficient. However, a different
+    solution is required for production scenarios.
 
 Actual run time data
-* Actual run time data for the C implementations is included in each section. C
-was chosen as the language for showcasing run times because it executes
-"closest to the metal" and therefore provides the most accurate representation
-of an algorithm's run time. However, even though the actual run time will be
-different, the comparative difference between the run times should be
-commiserate in your language of choice.
-* Millisecond are close to non-consequential for most scenarios. Remember the
-words of the great Donald Knuth - "pre-mature optimization is the root of all
-evil."
+* Actual run time data for the C implementation of the algorithms is included 
+    in each section. C was chosen as the language for showcasing run times
+    because it executes "closest to the metal" and therefore provides the most
+    accurate representation of an algorithm's run time. However, even though the
+    actual run time wont be the same, the comparative difference between the run
+    times should be commiserate in your language of choice.
+* Milliseconds are close to non-consequential for most applications. Remember
+    the words of the great Donald Knuth - "pre-mature optimization is the root
+    of all evil."
 * The actual run-time is of little importance because it applies only to the
-machine on which the test was run. The intended purpose of providing the run
-time data is for comparison between algorithms.
+    machine on which the test was run. The intended purpose of providing the run
+    time data is for comparison between algorithms.
 * All run time data was collected using a docker container running on a Surface
-Book 2 Laptop (Intel Core i7, 16GB RAM).
+    Book 2 Laptop (Intel Core i7, 16GB RAM).
 * Each time value represents the median of 3 separate executions.
 * You can recreate the data using your own hardware by running the
-time_charts.sh bash script located in each c directory.
+    time_charts.sh bash script located in each c directory.
 
 ## Index
 

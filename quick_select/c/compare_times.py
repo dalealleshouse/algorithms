@@ -83,7 +83,7 @@ def generate_chart(nth):
     plt.xlabel('n')
 
     for algo in Algo:
-        print('running ', algo.name)
+        print('running {} {}'.format(algo.name, nth))
         sys.stdout.flush()
 
         data = []

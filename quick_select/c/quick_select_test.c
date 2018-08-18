@@ -303,7 +303,8 @@ static int partition_suite()
 }
 
 /************* partition ****************/
-static void max_test() {
+static void max_test()
+{
     const size_t n = 6;
     const int expected = 6;
     int arr[] = { 6, 5, 4, 3, 2, 1 };
@@ -312,10 +313,19 @@ static void max_test() {
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(result);
     CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
-
 }
 
-static void min_test() {}
+static void min_test()
+{
+    const size_t n = 6;
+    const int expected = 1;
+    int arr[] = { 6, 5, 4, 3, 2, 1 };
+
+    void* result = min(n, sizeof(arr[0]), arr, int_comparator);
+
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0]))); // NOLINT
+}
 
 static int min_max_suite()
 {

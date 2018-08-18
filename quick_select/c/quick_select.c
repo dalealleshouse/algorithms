@@ -139,7 +139,7 @@ void* min(
 
     for (size_t i = 1; i < n; i++) {
         void* ith = (char*)arr + i * size;
-        if (comparator(min, ith) < 0)
+        if (comparator(min, ith) > 0)
             min = ith;
     }
 
