@@ -68,6 +68,8 @@ def generate_md_table(ns, data):
 def get_title(nth):
     if nth == 1:
         return 'Find the Minimum Value'
+    if nth == -1:
+        return 'Find the Median Value'
     else:
         return 'Find the {}th Value'.format(nth)
 
@@ -86,7 +88,12 @@ def generate_chart(nth):
 
         data = []
         for n in TEST_FOR_Ns:
-            time = median_run_time(lambda: lib.select_time(n, nth, algo))
+            this_nth = nth
+
+            if nth == -1:
+                this_nth = n / 2
+
+            time = median_run_time(lambda: lib.select_time(n, this_nth, algo))
             data.append(time)
 
         plt.plot(TEST_FOR_Ns, data, label=algo.name)
@@ -117,3 +124,4 @@ def generate_chart(nth):
 if __name__ == "__main__":
     generate_chart(5)
     generate_chart(1)
+    generate_chart(-1)

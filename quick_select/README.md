@@ -7,9 +7,21 @@ typical use is finding the n<sup>th</sup> highest score in an array.
 
 ## Actual Run Times
 
-The actual run times for finding the 5<sup>th</sup> highest value in an integer
-array using the C implementation of the quick select algorithm and C's qsort
-built in sorting function are shown below.
+The actual run times for finding the &ast;median and 5<sup>th</sup> highest
+value in an integer array using the C implementation of the quick select
+algorithm and C's qsort are shown below.
+
+![alt text](c/QUICK_SELECT--1.png "RANDOM ARRAY VALUES") 
+
+|ALGORITHM| n=100 |n=1000 |n=10000 |n=100000 |n=1000000 |
+--|--|--|--|--|--|
+|QUICK_SELECT |0.000006 sec|0.000026 sec|0.000196 sec|0.003316 sec|0.015870 sec|
+|SORT_SELECT |0.000008 sec|0.000159 sec|0.001267 sec|0.015303 sec|0.197968 sec|
+
+&ast; For the purposes of this project, median is defined as simply the
+n/2<sup>th</sup> element.  Technically, if the array is odd sized, it should be
+the average of the middle two elements. A somewhat pedantic point, but it may be
+important in some contexts.
 
 ![alt text](c/QUICK_SELECT-5.png "RANDOM ARRAY VALUES") 
 
