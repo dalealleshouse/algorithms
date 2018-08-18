@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <stdlib.h>
 
 #include "CUnit/Basic.h"
@@ -7,8 +8,14 @@
 #include "sorting_test_helpers.h"
 
 /* Test Suite setup and cleanup functions: */
-static int init_suite(void) { return 0; }
-static int clean_suite(void) { return 0; }
+static int init_suite(void)
+{
+    return 0;
+}
+static int clean_suite(void)
+{
+    return 0;
+}
 
 /************* quick sort ****************/
 
@@ -19,17 +26,29 @@ size_t comparisons = 0;
 
 STANDARD_SORTING_TESTS(quick_sort)
 
-static void large() { test_int_array(100000, rev_arr); }
+static void large()
+{
+    test_int_array(100000, rev_arr);
+}
 
 static int* gen_test_data()
 {
     int* arr = malloc(sizeof(int) * test_data_n);
-    FILE* file = fopen("src/QuickSortTestData.txt", "r");
+    FILE* file;
+
+    // If running locally, the file will be in the current directroy
+    // If running inside the container, it will be in the src directroy
+    if (access("QuickSortTestData.txt", F_OK) ==  0)
+        file = fopen("QuickSortTestData.txt", "r");
+    else
+        file = fopen("src/QuickSortTestData.txt", "r");
+
     size_t index = 0;
     int i = 0;
 
     fscanf(file, "%d", &i);
-    while (!feof(file)) {
+    while (!feof(file))
+    {
         arr[index] = i;
         index++;
         fscanf(file, "%d", &i);
@@ -45,21 +64,35 @@ static void _test_pivot(choose_pivot choose_pivot)
     int* arr_cpy = gen_test_data();
 
     int result = quick_sort_pivot(
-        test_data_n, sizeof(int), arr, int_comparator, choose_pivot);
+                     test_data_n, sizeof(int), arr, int_comparator, choose_pivot);
 
     qsort(arr_cpy, test_data_n, sizeof(int), int_comparator);
 
     CU_ASSERT_EQUAL_FATAL(0, result);
     arrays_are_equal(test_data_n, sizeof(int), arr_cpy, arr);
+    free(arr);
+    free(arr_cpy);
 }
 
-static void piviot_on_zero_matches_c() { _test_pivot(pivot_on_zero); }
+static void piviot_on_zero_matches_c()
+{
+    _test_pivot(pivot_on_zero);
+}
 
-static void piviot_on_random_matches_c() { _test_pivot(pivot_on_random); }
+static void piviot_on_random_matches_c()
+{
+    _test_pivot(pivot_on_random);
+}
 
-static void piviot_on_last_matches_c() { _test_pivot(pivot_on_last); }
+static void piviot_on_last_matches_c()
+{
+    _test_pivot(pivot_on_last);
+}
 
-static void piviot_on_median_matches_c() { _test_pivot(pivot_on_median); }
+static void piviot_on_median_matches_c()
+{
+    _test_pivot(pivot_on_median);
+}
 
 static void pivot_on_median_finds_first()
 {
@@ -98,31 +131,32 @@ int quick_sort_suite()
 {
     CU_pSuite pSuite = NULL;
     pSuite = CU_add_suite("quick sort suite", init_suite, clean_suite);
-    if (NULL == pSuite) {
+    if (NULL == pSuite)
+    {
         return -1;
     }
 
     if (ADD_STANDARD_TESTS(pSuite)
-        || NULL == CU_add_test(pSuite, "large", large)
-        || NULL
+            || NULL == CU_add_test(pSuite, "large", large)
+            || NULL
             == CU_add_test(pSuite, "pivot on zero", piviot_on_zero_matches_c)
-        || NULL
+            || NULL
             == CU_add_test(
-                   pSuite, "pivot on random", piviot_on_random_matches_c)
-        || NULL
+                pSuite, "pivot on random", piviot_on_random_matches_c)
+            || NULL
             == CU_add_test(pSuite, "pivot on last", piviot_on_last_matches_c)
-        || NULL
+            || NULL
             == CU_add_test(
-                   pSuite, "pivot on median", piviot_on_median_matches_c)
-        || NULL
+                pSuite, "pivot on median", piviot_on_median_matches_c)
+            || NULL
             == CU_add_test(pSuite, "pivot on median finds first",
-                   pivot_on_median_finds_first)
-        || NULL
+                           pivot_on_median_finds_first)
+            || NULL
             == CU_add_test(pSuite, "pivot on median finds last",
-                   pivot_on_median_finds_last)
-        || NULL
+                           pivot_on_median_finds_last)
+            || NULL
             == CU_add_test(pSuite, "pivot on median finds middle",
-                   pivot_on_median_finds_middle))
+                           pivot_on_median_finds_middle))
         return CU_get_error();
 
     return 0;
@@ -197,32 +231,34 @@ int partition_suite()
 {
     CU_pSuite pSuite = NULL;
     pSuite = CU_add_suite("partition suite", init_suite, clean_suite);
-    if (NULL == pSuite) {
+    if (NULL == pSuite)
+    {
         return -1;
     }
 
     /* add the tests to the suite */
     if ((NULL == CU_add_test(pSuite, "null does not throw", partition_null)
             || NULL
-                == CU_add_test(pSuite,
-                       "partition does not modify pre sorted array",
-                       partition_does_not_chage_sorted)
+            == CU_add_test(pSuite,
+                           "partition does not modify pre sorted array",
+                           partition_does_not_chage_sorted)
             || NULL
-                == CU_add_test(pSuite, "partition pivot on center item",
-                       partition_pivot_on_center)
+            == CU_add_test(pSuite, "partition pivot on center item",
+                           partition_pivot_on_center)
             || NULL
-                == CU_add_test(pSuite,
-                       "partition pivot on reverse sorted array",
-                       partition_reverse_sorted)
+            == CU_add_test(pSuite,
+                           "partition pivot on reverse sorted array",
+                           partition_reverse_sorted)
             || NULL
-                == CU_add_test(pSuite,
-                       "partition does not change when first item is in "
-                       "correct posoition",
-                       partition_first_in_correct_position)
+            == CU_add_test(pSuite,
+                           "partition does not change when first item is in "
+                           "correct posoition",
+                           partition_first_in_correct_position)
             /* del this comment */
-            )
+        )
 
-    ) {
+       )
+    {
         return CU_get_error();
     }
 

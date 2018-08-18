@@ -65,7 +65,7 @@ int pointer_comparator(const void* x, const void* y)
     return int_comparator(&_x->sorter, &_y->sorter);
 }
 
-void* dup(const void* ptr, const size_t size)
+void* duplicate(const void* ptr, const size_t size)
 {
     void* new_ptr = Malloc(size);
     memcpy(new_ptr, ptr, size);
@@ -81,7 +81,7 @@ void arrays_are_equal(
 void* sort_with_c(const size_t n, const size_t size, const void* arr,
     const comparator comparator)
 {
-    void* new = dup(arr, n * size);
+    void* new = duplicate(arr, n * size);
     qsort(new, n, size, comparator);
     return new;
 }

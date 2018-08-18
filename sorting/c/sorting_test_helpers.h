@@ -14,7 +14,7 @@ int int_comparator(const void* x, const void* y);
 int struct_comparator(const void* x, const void* y);
 int pointer_comparator(const void* x, const void* y);
 
-void* dup(const void* ptr, const size_t size);
+void* duplicate(const void* ptr, const size_t size);
 
 void arrays_are_equal(const size_t n, const size_t size, const void* expected,
     const void* actual);

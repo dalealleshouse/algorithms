@@ -4,7 +4,7 @@
 
 #include "insertion_sort.h"
 
-static void* dup(const size_t size, void* ptr)
+static void* duplicate(const size_t size, void* ptr)
 {
     void* tmp = malloc(size);
     memcpy(tmp, ptr, size);
@@ -24,7 +24,7 @@ int insertion_sort(
 
     for (size_t i = 1; i < n; i++) {
         int open_index = i;
-        void* ith = dup(size, (char*)arr + (i * size));
+        void* ith = duplicate(size, (char*)arr + (i * size));
 
         for (int j = i - 1; j >= 0; j--) {
             void* jth = (char*)arr + (j * size);
