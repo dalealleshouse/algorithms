@@ -61,7 +61,7 @@ static int* gen_test_data()
 static void _test_pivot(choose_pivot choose_pivot)
 {
     int* arr = gen_test_data();
-    int* arr_cpy = gen_test_data();
+    int* arr_cpy = duplicate(arr, sizeof(int) * test_data_n);
 
     int result = quick_sort_pivot(
                      test_data_n, sizeof(int), arr, int_comparator, choose_pivot);
