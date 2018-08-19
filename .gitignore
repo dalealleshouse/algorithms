@@ -53,6 +53,7 @@ dkms.conf
 
 test_runner
 compile_commands.json
+run_result.txt
 
 
 # Pyhon

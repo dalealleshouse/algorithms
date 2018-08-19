@@ -5,7 +5,6 @@ language: c
 services:
   - docker
 
-before_install:
-  - docker pull dalealleshouse/algo_test_runner_c:latest
+install: docker pull dalealleshouse/algo_test_runner_c:latest
 
 script: ./ci_validate.sh
