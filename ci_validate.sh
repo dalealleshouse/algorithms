@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 ls
 # cd dalealleshouse/algorithms/sorting/c
