@@ -18,17 +18,13 @@ void _print_point(const point_t* p) { printf("x=%f, y=%f\n", p->x, p->y); }
 
 int euclid_dist(const point_t* p1, const point_t* p2, double* result)
 {
-    if (p1 == NULL || p2 == NULL || result == NULL) {
-        print_error("null pointer passed to euclid_dist");
+    if (p1 == NULL || p2 == NULL || result == NULL)
         return -1;
-    }
 
     *result = sqrt(pow(p1->x - p2->x, 2) + pow(p1->y - p2->y, 2));
 
-    if (!isfinite(*result)) {
-        print_error("non finite result returned from euclid_dist");
+    if (!isfinite(*result))
         return -2;
-    }
 
     return 0;
 }
@@ -71,10 +67,8 @@ int _point_y_comparator(const void* x, const void* y)
 
 int closest_slow(const size_t n, const point_t points[n], point_dist_t* result)
 {
-    if (points == NULL || result == NULL) {
-        print_error("null pointer passed to closest_slow");
+    if (points == NULL || result == NULL)
         return -1;
-    }
 
     if (n <= 1) {
         print_error("when calling closest_slow, n must be greater than 1");
@@ -109,10 +103,8 @@ point_dist_t* min(point_dist_t* x, point_dist_t* y)
 int _closest_split(const size_t n, const point_t by_x[n], const point_t by_y[n],
     const point_dist_t* delta, point_dist_t* result)
 {
-    if (by_x == NULL || by_y == NULL || result == NULL) {
-        print_error("null pointer passed to _closest_split");
+    if (by_x == NULL || by_y == NULL || result == NULL)
         return -1;
-    }
 
     if (n <= 1) {
         print_error("when calling _closest_split, n must be greater than 1");

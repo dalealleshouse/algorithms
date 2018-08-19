@@ -78,6 +78,13 @@ use the following command.
 docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c ./validate
 ```
 
+To validate the C code for all algorithms, navigate to the root of the project
+and run the following command.
+
+``` bash
+./ci_validate.sh
+```
+
 ### Python
 All units tests are written with [pytest](https://docs.pytest.org/en/latest/).
 To run the tests, navigate to the folder containing the python code and run the
