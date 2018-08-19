@@ -7,8 +7,8 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 case "$1" in
-    push) docker.exe push dalealleshouse/algo_test_runner_c ;;
-    *) docker.exe build -t dalealleshouse/algo_test_runner_c:$1 \
+    push) docker push dalealleshouse/algo_test_runner_c ;;
+    *) docker build -t dalealleshouse/algo_test_runner_c:$1 \
         -t dalealleshouse/algo_test_runner_c \
         ./ ;;
 esac

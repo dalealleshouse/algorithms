@@ -13,5 +13,6 @@ VOLUME ["/src"]
 WORKDIR /
 
 COPY Makefile /Makefile
+COPY validate.sh /validate.sh
 
 CMD ["make", "-B"]

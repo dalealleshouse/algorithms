@@ -7,13 +7,20 @@
 
 /* Test Suite setup and cleanup functions: */
 
-int init_suite(void) { return 0; }
-int clean_suite(void) { return 0; }
+int init_suite(void)
+{
+    return 0;
+}
+int clean_suite(void)
+{
+    return 0;
+}
 
-typedef struct test_struct {
+typedef struct test_struct
+{
     int foo;
     int bar;
-    char sorter;
+    int sorter;
 } test_struct_t;
 
 int int_comparator(const void* x, const void* y)
@@ -128,7 +135,8 @@ void counts_structs(void)
 {
     const int size = 6;
     test_struct_t arr[6] = { { 0, 0, 6 }, { 0, 0, 5 }, { 0, 0, 4 }, { 0, 0, 3 },
-        { 0, 0, 2 }, { 0, 0, 1 } };
+        { 0, 0, 2 }, { 0, 0, 1 }
+    };
 
     int result
         = count_inversions(arr, size, sizeof(test_struct_t), struct_comparator);
@@ -139,17 +147,21 @@ void counts_structs(void)
 void sorts_pointers(void)
 {
     const int size = 6;
-    test_struct_t* arr[6];
+    test_struct_t* arr[size];
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++)
+    {
         arr[i] = malloc(sizeof(test_struct_t));
         arr[i]->sorter = size - i;
     }
 
     int result = count_inversions(
-        arr, size, sizeof(test_struct_t*), *pointer_comparator);
+                     arr, size, sizeof(test_struct_t*), pointer_comparator);
 
     CU_ASSERT_EQUAL(result, 15);
+
+    for (int i = 0; i < size; i++)
+        free(arr[i]);
 }
 
 void does_not_count_equal_items()
@@ -172,7 +184,8 @@ void massive_array()
     char line[256];
     FILE* file = fopen("/src/IntegerArray.txt", "r");
 
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while (fgets(line, sizeof(line), file) != NULL)
+    {
         arr[tracker] = atoi(line);
         tracker++;
     }
@@ -197,7 +210,8 @@ int main(void)
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("merge_sort_test_suite", init_suite, clean_suite);
-    if (NULL == pSuite) {
+    if (NULL == pSuite)
+    {
         CU_cleanup_registry();
         return CU_get_error();
     }
@@ -205,28 +219,29 @@ int main(void)
     /* add the tests to the suite */
     if ((NULL
             == CU_add_test(pSuite, "null input does not cause error",
-                   null_does_not_throw_test))
-        || (NULL
-               == CU_add_test(pSuite, "counts a single inversion",
-                      count_single_inversion))
-        || (NULL
-               == CU_add_test(
-                      pSuite, "count two inversions", count_two_inversion))
-        || (NULL
-               == CU_add_test(pSuite, "counts reverse sorted array",
-                      count_reverse_sorted_array))
-        || (NULL
-               == CU_add_test(
-                      pSuite, "counts odd sized array", count_odd_sized_array))
-        || (NULL
-               == CU_add_test(pSuite, "count sorted array", count_sorted_array))
-        || (NULL == CU_add_test(pSuite, "counts structs", counts_structs))
-        || (NULL
-               == CU_add_test(pSuite, "sorts a pointer array", sorts_pointers))
-        || (NULL == CU_add_test(pSuite, "massive array", massive_array))
-        || (NULL
-               == CU_add_test(pSuite, "does not count equal items",
-                      does_not_count_equal_items))) {
+                           null_does_not_throw_test))
+            || (NULL
+                == CU_add_test(pSuite, "counts a single inversion",
+                               count_single_inversion))
+            || (NULL
+                == CU_add_test(
+                    pSuite, "count two inversions", count_two_inversion))
+            || (NULL
+                == CU_add_test(pSuite, "counts reverse sorted array",
+                               count_reverse_sorted_array))
+            || (NULL
+                == CU_add_test(
+                    pSuite, "counts odd sized array", count_odd_sized_array))
+            || (NULL
+                == CU_add_test(pSuite, "count sorted array", count_sorted_array))
+            || (NULL == CU_add_test(pSuite, "counts structs", counts_structs))
+            || (NULL
+                == CU_add_test(pSuite, "sorts a pointer array", sorts_pointers))
+            || (NULL == CU_add_test(pSuite, "massive array", massive_array))
+            || (NULL
+                == CU_add_test(pSuite, "does not count equal items",
+                               does_not_count_equal_items)))
+    {
         CU_cleanup_registry();
         return CU_get_error();
     }
@@ -235,7 +250,11 @@ int main(void)
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
 
+    // You must get this value before CU_cleanup_registry() or it will revert to
+    // zero
+    int ret = (CU_get_number_of_failure_records() != 0);
+
     /* Clean up registry and return */
     CU_cleanup_registry();
-    return CU_get_error();
+    return ret;
 }
