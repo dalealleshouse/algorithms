@@ -67,6 +67,14 @@ navigate to the folder containing the C code and run the following command:
 ``` bash
 docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c
 ```
+
+The C builds are configured to use several clang sanitizers. To run them all,
+use the following command.
+
+``` bash
+docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c ./validate
+```
+
 ### Python
 All units tests are written with [pytest](https://docs.pytest.org/en/latest/).
 To run the tests, navigate to the folder containing the python code and run the
