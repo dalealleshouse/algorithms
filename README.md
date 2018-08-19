@@ -1,3 +1,6 @@
+[![Build
+Status](https://travis-ci.com/dalealleshouse/algorithms.svg?branch=master)](https://travis-ci.com/dalealleshouse/algorithms)
+
 # Algorithms
 Examples of popular algorithms in several different languages. The purpose is to
 demonstrate algorithm design and analysis fundamentals. This project is part of
