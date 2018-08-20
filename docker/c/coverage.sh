@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-make -B code-coverage > /dev/null
+make -B code-coverage
 
 for F in `find ./ -name "*.c" ! -name "*test*" ! -name "algo*"`
 do
