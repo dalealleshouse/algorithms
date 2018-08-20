@@ -82,6 +82,7 @@ Key Takeaways of reverse arrays:
     pre-sorted results)
 
 ## Bubble Sort
+#sorting
 
 Bubble sort is the easiest to implement but is typically a poor performer when
 the values in the input array are randomly sorted. At the extremes, bubble sort
@@ -113,6 +114,8 @@ sort:
 ```
 
 ## Insertion Sort
+#sorting
+
 Like bubble sort, insertion sort performs very well when the input is
 pre-sorted. However, it performs considerably better than bubble sort when the
 input is either randomly or reverse sorted. Although considerably better than
@@ -144,6 +147,8 @@ sort:
 ```
 
 ## Selection Sort
+#sorting
+
 Selection sort is essentially the opposite of insertion sort in the way it
 works. Insertion starts at the left side of the array and selection starts at
 the right. It performs best when the array is reverse sorted. However, it does
@@ -170,6 +175,7 @@ sort:
 ```
 
 ## Merge Sort
+#sorting, #divide-and-conquer
 
 Merge sort is a classic divide and conquer algorithm. It splits an array in
 half, recursively sorts each half, and finally merges them together. This
@@ -219,6 +225,7 @@ merge:
 ```
 
 ## Quick Sort
+#sorting, #divide-and-conquer, #randomized
 
 Sorting algorithm that is prevalent in practice. Although it has the same
 runtime on average as merge sort, it will execute faster due to reduced memory

@@ -1,4 +1,5 @@
 # Quick Select
+#divide-and-conquer, #randomized
 
 Quick select determines the n<sup>th</sup> ranked item in an array without
 sorting the array. This is accomplished by recursively partitioning halves of
