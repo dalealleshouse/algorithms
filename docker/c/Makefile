@@ -30,7 +30,7 @@ shared: $(SOURCES)
 profile: CFLAGS += -pg
 profile: $(TARGET)
 
-code-coverage: CFLAGS += -coverage
+code-coverage: CFLAGS += -coverage -fprofile-arcs -ftest-coverage
 code-coverage: $(TARGET)
 
 memory-san: CFLAGS += -fsanitize=memory,undefined

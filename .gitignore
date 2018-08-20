@@ -54,6 +54,8 @@ dkms.conf
 *.gcov
 *.gcda
 *.gcno
+cov.info
+output/
 test_runner
 compile_commands.json
 run_result.txt
