@@ -30,7 +30,7 @@ shared: $(SOURCES)
 profile: CFLAGS += -pg
 profile: $(TARGET)
 
-code-coverage: CFLAGS += -coverage -fprofile-arcs -ftest-coverage
+code-coverage: CFLAGS += -fprofile-arcs -ftest-coverage
 code-coverage: $(TARGET)
 
 memory-san: CFLAGS += -fsanitize=memory,undefined
@@ -46,7 +46,11 @@ clean:
 	-rm -f $(OBJECTS)
 	-rm -f $(TARGET)
 	-rm -f $(SHARED_TARGET)
-	-rm -f gmon.out
+	-rm -f src/gmon.out
+	-rm -rf src/output
+	-rm -f src/*.gcda
+	-rm -f src/*.gcov
+	-rm -f src/*.gcno
 
 %.o: %.c
 	  $(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $< -flto
