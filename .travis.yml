@@ -7,11 +7,9 @@ compiler: clang
 services:
   - docker
 
-install:
-  - sudo pip install codecov
-  - docker pull dalealleshouse/algo_test_runner_c:latest
+install: docker pull dalealleshouse/algo_test_runner_c:latest
 
 script: ./ci_validate.sh
 
 after_success:
-  - codecov -X gcov
+  - bash <(curl -s https://codecov.io/bash)
