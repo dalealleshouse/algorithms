@@ -15,11 +15,17 @@ function run_c_tests() {
     fi
 }
 
+function run_c_code_coverage() {
+    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c \
+        ./coverage.sh
+}
+
 # Run the dockerized tests inside every subdirectory named c
 for D in `find . -type d -name 'c' ! -path './docker/c'`
 do
     cd $D
     run_c_tests
+    run_c_code_coverage
     cd ../../
 done
 

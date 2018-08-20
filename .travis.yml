@@ -8,3 +8,6 @@ services:
 install: docker pull dalealleshouse/algo_test_runner_c:latest
 
 script: ./ci_validate.sh
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
