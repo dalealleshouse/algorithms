@@ -25,7 +25,6 @@ for D in `find . -type d -name 'c' ! -path './docker/c'`
 do
     cd $D
     run_c_tests
-    run_c_code_coverage
     cd ../../
 done
 

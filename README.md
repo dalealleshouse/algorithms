@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.com/dalealleshouse/algorithms.svg?branch=master)](https://travis-ci.com/dalealleshouse/algorithms)
-[![codecov](https://codecov.io/gh/dalealleshouse/algorithms/branch/master/graph/badge.svg)](https://codecov.io/gh/dalealleshouse/algorithms)
 
 # Algorithms
 Examples of popular algorithms in several different languages. The purpose is to
@@ -75,7 +74,14 @@ The C builds are configured to use several clang sanitizers. To run them all,
 use the following command.
 
 ``` bash
-docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c ./validate
+docker run --rm --privileged -v $(pwd):/src dalealleshouse/algo_test_runner_c ./validate.sh
+```
+
+To generate a code coverage report, use the following command. This will
+generate a subdirectory named output with full html report.
+
+``` bash
+docker run --rm --privileged -v $(pwd):/src dalealleshouse/algo_test_runner_c ./coverage.sh
 ```
 
 To validate the C code for all algorithms, navigate to the root of the project
