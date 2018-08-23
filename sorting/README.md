@@ -90,7 +90,7 @@ performs better than all other sorting algorithms when the input is pre-sorted
 and worst than all others when the input is reverse sorted.
 
 ### Asymptotic Time Complexity
-O(n^2)
+![O(n^2)](https://latex.codecogs.com/gif.latex?O(n^2) "O(n^2)")
 
 ### Pseudo Code
 
@@ -123,7 +123,7 @@ bubble sort, it's performance is still abysmal compared to quick and merge sort
 for large inputs.
 
 ### Asymptotic Time Complexity
-O(n^2)
+![O(n^2)](https://latex.codecogs.com/gif.latex?O(n^2) "O(n^2)")
 
 ### Pseudo Code
 
@@ -155,7 +155,7 @@ the right. It performs best when the array is reverse sorted. However, it does
 not perform well compared to any other algorithm case.
 
 ### Asymptotic Time Complexity
-O(n^2)
+![O(n^2)](https://latex.codecogs.com/gif.latex?O(n^2) "O(n^2)")
 
 ### Pseudo Code
 
@@ -184,7 +184,7 @@ because it generates an entirely new array instead of rearranging existing
 values.
 
 ### Asymptotic Time Complexity
-O(n log(2, n))
+![O(n lg_{2}n)](https://latex.codecogs.com/gif.latex?O(n&space;\lg_{2}n))
 
 ### Pseudo Code
 
@@ -238,7 +238,7 @@ ineffective. There are mathematical proofs that demonstrate choosing a pivot
 point at random will ensure O(n log(2, n)) on average.
 
 ### Asymptotic Time Complexity
-O(n log(n)) _on average_
+![O(n lg_{2}n)](https://latex.codecogs.com/gif.latex?O(n&space;\lg_{2}n)) _on average_
 
 ### Pseudo Code
 

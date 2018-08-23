@@ -70,18 +70,19 @@ navigate to the folder containing the C code and run the following command:
 docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c
 ```
 
-The C builds are configured to use several clang sanitizers. To run them all,
-use the following command.
+In order to pass the CI build, the C code is subjected to several clang
+sanitizers which are configured in different build configurations. Use the
+following command to run all configured builds.
 
 ``` bash
 docker run --rm --privileged -v $(pwd):/src dalealleshouse/algo_test_runner_c ./validate.sh
 ```
 
 To generate a code coverage report, use the following command. This will
-generate a subdirectory named output with full html report.
+generate a subdirectory named output with a full html report.
 
 ``` bash
-docker run --rm --privileged -v $(pwd):/src dalealleshouse/algo_test_runner_c ./coverage.sh
+docker run --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c ./coverage.sh
 ```
 
 To validate the C code for all algorithms, navigate to the root of the project
