@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "linked_list.h"
@@ -210,4 +211,43 @@ int list_delete_at(list* list, const size_t index)
 
     list->size--;
     return 0;
+}
+
+void* list_get_at(list* list, const size_t index)
+{
+    if (list == NULL || index >= list->size)
+        return NULL;
+
+    if (index == 0)
+        return list->head->payload;
+
+    if (index == list->size - 1)
+        return list->tail->payload;
+
+    list_item* item;
+
+    // Count forward if the item is in the first half
+    if (index < list->size / 2) {
+        item = list->head;
+        for (size_t i = 0; i < index; i++)
+            item = item->next;
+    } else {
+        // Count backward if the item is in the second half
+        item = list->tail;
+        size_t rev_index = list->size - index;
+        for (size_t i = 1; i < rev_index; i++)
+            item = item->prev;
+    }
+
+    return item->payload;
+}
+
+void* array_insert(void* arr, const size_t n, const size_t size)
+{
+    if (arr == NULL)
+        return NULL;
+
+    void* new_arr = Malloc((n + 1) * size);
+    memcpy((char*)new_arr + size, arr, n * size);
+    return new_arr;
 }

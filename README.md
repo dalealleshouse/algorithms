@@ -54,6 +54,8 @@ Actual run time data
 
 ## Index
 
+* [Linked Lists](linked_list/)
+    * [C](linked_list/c)
 * [Sorting](sorting/)
 	* [C](sorting/c/)
 	* [Python](sorting/python/)

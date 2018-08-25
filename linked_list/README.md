@@ -51,7 +51,7 @@ Index 3 address = 0x001 + (3 * 4) = 0x010 (16 in decimal)
 
 ## Linked Lists
 
-Must like an array, a linked list is simply a collection of items. The
+Much like an array, a linked list is simply a collection of items. The
 difference is that linked list items are not stored contiguously. Each item
 maintains a pointer to the next item in the list. This is depicted graphically
 below.
@@ -134,6 +134,99 @@ Linked lists are especially helpful for things like [Stack](../stack/)s,
 
 ## Actual Run Times
 
-1. Insertion
-2. Sequential Access
-3. Random Access
+The actual run times for performing operations on arrays and linked list are
+shown below.  For details about how the calculations were run, see
+[compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
+recreate the data on your machine, navigate to the c directory and execute the
+[time_charts.sh](c/time_charts.sh) bash file.
+
+### Insertions
+
+All insertions were made to the head of the data structure. Each array insertion
+results in a reallocation and copy.
+
+![INSERTION RUN TIMES](c/INSERTION.png "INSERTION RUN TIMES") 
+
+|STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|LINKED_LIST |0.000003 sec|0.000032 sec|0.000315 sec|0.002879 sec|
+|ARRAY |0.000003 sec|0.000080 sec|0.005127 sec|0.584865 sec|
+
+Key Takeaways:
+- Inserting 100,000 items into a array is approximately a half second slower
+    than inserting the same items into a linked list.
+- The extra time is due to the array needed to be resized on each insertion.
+
+### Random Access
+
+The times below are for accessing an item at a random index inside a loop. The
+code below show the actual code that is being timed.
+
+```
+// Array Random Access Code
+for (size_t i = 0; i < n; i++)
+    val += arr[rand() % (n - 1)];
+
+// Linked List Random Access Code
+for (size_t i = 0; i < n; i++) {
+    void* item = list_get_at(&list, rand() % (n - 1));
+    val += (uintptr_t)item;
+}
+```
+
+![RANDOM ACCESS RUN TIMES](c/RANDOM_ACCESS.png "RANDOM ACCESS RUN TIMES") 
+
+|STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|LINKED_LIST |0.000009 sec|0.000995 sec|0.084897 sec|4.125063 sec|
+|ARRAY |0.000002 sec|0.000015 sec|0.000145 sec|0.001475 sec|
+
+Key Takeaways:
+- 100,000 random access operations are a whopping 4 seconds slower with a linked
+    list than with an array.
+
+### Sequential Access
+
+Sequential access refers to reading all items in a data structure by starting at
+the head and reading each item in order until the tail is reached. The actual
+code is shown below.
+
+```
+// Array Sequential Access Code
+for (size_t i = 0; i < n; i++)
+    val += arr[i];
+
+
+// Linked List Sequential Access Code
+list_item* item = list.head;
+while (item != NULL) {
+    val += (uintptr_t)item->payload;
+    item = item->next;
+}
+```
+
+The *DISPERSED LINKED LIST* data point shows a linked list in which the items
+are distributed across a large area of memory. Conversely, the *LINKED_LIST*'s
+items are stored adjacent to each other in memory.
+
+As a side note, there is a fair amount of minutia involved with allocating
+memory using `malloc`. The individual items in the linked list will not be 100%
+distributed as advertised.  However, this distinction holds no real bearing on
+the validity of the results.
+
+
+![SEQUENTIAL ACCESS RUN TIMES](c/SEQUENTIAL_ACCESS.png "SEQUENTIAL ACCESS RUN
+TIMES") 
+
+|STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|LINKED_LIST |0.000002 sec|0.000007 sec|0.000089 sec|0.001177 sec|
+|ARRAY |0.000001 sec|0.000001 sec|0.000005 sec|0.000043 sec|
+|DISPERSED_LINKED_LIST |0.000002 sec|0.000011 sec|0.000108 sec|0.003723 sec|
+
+Key Takeaways:
+- The time differences over 100,000 operations is around .003 seconds.
+- The results demonstrate the importance [spatial
+    locality](https://en.wikipedia.org/wiki/Locality_of_reference). Poor
+    locality, as demonstrated by the dispersed linked list, can have performance
+    penalties due to cache misses.

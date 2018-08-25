@@ -63,3 +63,16 @@ int list_insert_at_free(
  * returns: 0 on success, less than 0 on failure
  */
 int list_delete_at(list* list, const size_t index);
+
+/*
+ * Get the payload stored in the <index>th position.
+ *
+ * returns: payload on success, null on failure
+ */
+void* list_get_at(list* list, const size_t index);
+
+/*
+ * Reallocates a new larger array,
+ * into the array.
+ */
+void* array_insert(void* arr, const size_t n, const size_t size);

@@ -363,6 +363,115 @@ static void delete_invalid_index()
     CU_ASSERT_EQUAL(-1, result);
 }
 
+/*************************** list_get_at **************************************/
+static void get_null()
+{
+    void* result = list_get_at(NULL, 0);
+    CU_ASSERT_PTR_NULL(result);
+}
+
+static void get_retrieves_head()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    list list;
+    list_init(&list);
+
+    for (size_t i = 0; i < n; i++)
+        list_insert_at(&list, &payload[i], i);
+
+    void* result = list_get_at(&list, 0);
+    CU_ASSERT_PTR_EQUAL(&payload[0], result);
+
+    list_free(&list);
+}
+
+static void get_retrieves_tail()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    list list;
+    list_init(&list);
+
+    for (size_t i = 0; i < n; i++)
+        list_insert_at(&list, &payload[i], i);
+
+    void* result = list_get_at(&list, n - 1);
+    CU_ASSERT_PTR_EQUAL(&payload[n - 1], result);
+
+    list_free(&list);
+}
+
+static void get_retrieves_first_half()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    list list;
+    list_init(&list);
+
+    for (size_t i = 0; i < n; i++)
+        list_insert_at(&list, &payload[i], i);
+
+    void* result = list_get_at(&list, 2);
+    CU_ASSERT_PTR_EQUAL(&payload[2], result);
+
+    list_free(&list);
+}
+
+static void get_retrieves_last_half()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    list list;
+    list_init(&list);
+
+    for (size_t i = 0; i < n; i++)
+        list_insert_at(&list, &payload[i], i);
+
+    void* result = list_get_at(&list, 5);
+    CU_ASSERT_PTR_EQUAL(&payload[5], result);
+
+    list_free(&list);
+}
+
+static void get_invalid_index()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    list list;
+    list_init(&list);
+
+    for (size_t i = 0; i < n; i++)
+        list_insert_at(&list, &payload[i], i);
+
+    void* result = list_get_at(&list, 7);
+    CU_ASSERT_PTR_NULL(result);
+
+    list_free(&list);
+}
+
+/*************************** array_insert *************************************/
+static void array_insert_null()
+{
+    void* result = array_insert(NULL, 0, 0);
+    CU_ASSERT_PTR_NULL(result);
+}
+
+static void array_insert_item()
+{
+    size_t n = 2;
+    int arr[] = { 1, 2 };
+    int expected[] = { 0, 1, 2 };
+
+    int* result = (int*)array_insert(arr, n, sizeof(arr[0]));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+
+    *result = 0;
+    for (size_t i = 0; i < n + 1; i++)
+        CU_ASSERT_EQUAL(expected[i], result[i]);
+    free(result);
+}
+
 static int register_test_suites()
 {
     CU_TestInfo init_tests[] = { CU_TEST_INFO(init_null),
@@ -387,6 +496,15 @@ static int register_test_suites()
               CU_TEST_INFO(delete_mid_modifies_links),
               CU_TEST_INFO(delete_invalid_index), CU_TEST_INFO_NULL };
 
+    CU_TestInfo get_at_tests[] = { CU_TEST_INFO(get_null),
+        CU_TEST_INFO(get_retrieves_head), CU_TEST_INFO(get_retrieves_tail),
+        CU_TEST_INFO(get_retrieves_first_half),
+        CU_TEST_INFO(get_retrieves_last_half), CU_TEST_INFO(get_invalid_index),
+        CU_TEST_INFO_NULL };
+
+    CU_TestInfo array_insert_tests[] = { CU_TEST_INFO(array_insert_null),
+        CU_TEST_INFO(array_insert_item), CU_TEST_INFO_NULL };
+
     CU_SuiteInfo suites[] = { { .pName = "list_init suite",
                                   .pInitFunc = noop,
                                   .pCleanupFunc = noop,
@@ -403,6 +521,14 @@ static int register_test_suites()
             .pInitFunc = free_suite_init,
             .pCleanupFunc = noop,
             .pTests = delete_at_tests },
+        { .pName = "list_get_at suite",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = get_at_tests },
+        { .pName = "array_insert suite",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = array_insert_tests },
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
