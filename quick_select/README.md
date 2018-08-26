@@ -6,6 +6,9 @@ sorting the array. This is accomplished by recursively partitioning halves of
 the array until the n<sup>th</sup> item is placed in the correct position. A
 typical use is finding the n<sup>th</sup> highest score in an array.
 
+### Asymptotic Time Complexity
+![O(n)](https://latex.codecogs.com/gif.latex?O(n)) *on average*
+
 ## Actual Run Times
 
 The actual run times for finding the &ast;median and 5<sup>th</sup> highest
@@ -53,10 +56,6 @@ For details about how the calculations were run, see
 [compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
 recreate the data on your machine, navigate to the c directory and execute the
 [time_charts.sh](c/time_charts.sh) bash file.
-
-### Asymptotic Time Complexity
-O(n) *on average*
-
 
 ### Pseudo Code
 ``` pseudo

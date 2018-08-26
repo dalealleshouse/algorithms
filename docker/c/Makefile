@@ -6,7 +6,7 @@ CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 SHAREDFLAGS	 = -std=c11 -O3 -D NDEBUG -fPIC -shared
-LINKFLAGS 	 = -lcunit -flto
+LINKFLAGS 	 = -lcunit -flto -lm
 
 TARGET			= src/test_runner
 SHARED_TARGET	= src/algo.so
@@ -30,6 +30,9 @@ shared: $(SOURCES)
 profile: CFLAGS += -pg
 profile: $(TARGET)
 
+code-coverage: CFLAGS += -fprofile-arcs -ftest-coverage
+code-coverage: $(TARGET)
+
 memory-san: CFLAGS += -fsanitize=memory,undefined
 memory-san: $(TARGET)
 
@@ -43,7 +46,11 @@ clean:
 	-rm -f $(OBJECTS)
 	-rm -f $(TARGET)
 	-rm -f $(SHARED_TARGET)
-	-rm -f gmon.out
+	-rm -f src/gmon.out
+	-rm -rf src/output
+	-rm -f src/*.gcda
+	-rm -f src/*.gcov
+	-rm -f src/*.gcno
 
 %.o: %.c
 	  $(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $< -flto
