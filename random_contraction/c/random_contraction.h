@@ -2,14 +2,17 @@
 
 #include <stddef.h>
 
-typedef struct {
+typedef struct edge {
+    struct vertex* tail;
+    struct vertex* head;
+} edge;
+
+typedef struct vertex {
     unsigned node_id;
+    size_t edge_count;
+    edge* edges;
 } vertex;
 
-typedef struct {
-    vertex* tail;
-    vertex* head;
-} edge;
 
 typedef struct {
     vertex* verticies;
@@ -18,4 +21,5 @@ typedef struct {
     size_t edge_count;
 } graph;
 
+int collapse_edge(graph* graph, size_t edge_index);
 int min_cut(graph* graph);

@@ -86,6 +86,9 @@ static double random_access_time(structure st, size_t n)
     clock_t t;
     uintptr_t val = 0;
 
+    if (n <= 1)
+        return -1;
+
     switch (st) {
     case LINKED_LIST: {
         list list;

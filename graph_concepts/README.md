@@ -11,8 +11,8 @@ vertices are *edges*. To make the concept a bit more concrete, consider modeling
 one's family as a graph. The people in the family would be vertices, and the
 relationships between them (mother, daughter, father, brother, etc..) would be
 edges. Edges are typically denoted by a pair. If Dick is Jane's brother, the
-relationship would be denoted as (Dick, Jane). The set of all vertices is
-denoted as `V` and `E` denotes the set of all edges.
+relationship is be denoted as (Dick, Jane). The set of all vertices is denoted
+as `V` and `E` denotes the set of all edges.
 
 There are two types of graphs: *undirected* and *directed*. The edges of an
 undirected graph indicate a bi-directional relationship. (A, B) and (B, A) are
@@ -69,8 +69,8 @@ number of edges.
 
 Graph density is important when determining the best way to represent a graph in
 memory. Consider a graph with no parallel edges, the lower bound of `m` is
-[n-1](https://latex.codecogs.com/gif.latex?n-1). The upper bound of `m` is
-[n(n-1)/2](https://latex.codecogs.com/gif.latex?n(n-1)/2). Roughly defined, a
+![n-1](https://latex.codecogs.com/gif.latex?n-1). The upper bound of `m` is
+![n(n-1)/2](https://latex.codecogs.com/gif.latex?n(n-1)/2). Roughly defined, a
 *sparse* graph is closer to the lower bound and a *dense* graph is closer to the
 upper bound.
 
@@ -93,28 +93,44 @@ graph in question is shown below.
 ![adjacency matrix](adj-matrix.png) 
 
 The amount of space required to store an adjacency matrix is
-[n^2](https://latex.codecogs.com/gif.latex?n^2).
+![n^2](https://latex.codecogs.com/gif.latex?n^2).
 
 ### Adjacency List
 
 There are several different ways to create an adjacency list. However, the
-general concept is to have two components:
+general concept is to have four components:
 
-* Array of vertices with each vertex pointing to 0+ edges
-* Array of edges with each edge pointing to a vertex
+* Array of Vertices
+* Array of Edges
+* Edges have two pointers, one for the tail and one for the head
+* Vertices have one pointer for each of its edges
 
-One possible adjacency lists for the graph in question is shown below.
+One common adjacency list representation is an array of linked lists. Each item
+in the array is a vertex. Each edge is represented as a link.
 
 ```
--> is a pointer
-
-Vertices                    Edges
-[                           [
-    {A ->0}                    [0][->C, ->D]
-    {B ->1}                    [1][->A, ->D]
-    {C ->NULL}                 [2][->C, ->A]
-    {D ->3}                 ]
+Vertices
+[
+    { A -> C -> D -> NULL }
+    { B -> A -> D -> NULL }
+    { C -> NULL }
+    { D -> C -> A -> NULL }
 ]
+```
+
+Depending on the application's needs, keeping the vertices and edges in separate
+arrays may be more appropriate as show below.
+
+```
+Vertices                Edges
+[                       [
+    { A, [0, 1] }           [0]{ A, C }
+    { B, [2, 3] }           [1]{ A, D }
+    { C, NULL }             [2]{ B, A }
+    { D, [4, 5] }           [3]{ B, D }
+]                           [4]{ D, C }
+                            [5]{ D, A }
+                        ]
 ```
 
 Adjacency lists have lower space requirements than matrices. Additionally, they
