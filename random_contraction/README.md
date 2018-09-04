@@ -3,18 +3,32 @@
 
 Prerequisite: [Graph Concepts](../graph_concepts)
 
-The random contraction algorithm finds the *minimum cut* of a graph. The minimum
-cut is the grouping of vertices into two non-empty groups having the fewest
-number of crossing edges. Consider the graph in the graphic below.  There is no
-other way of dividing the vertices that world result in fewer crossing edges.
+The random contraction algorithm finds the [minimum
+cut](../graph_concepts/README.md#minimum-cut) of a graph. It accomplishes this
+by randomly contracting edges until only two vertices remain (see pseudo code).
+Because a minimum cut has fewer edges than a non-minimum cut, the algorithm has
+a higher probability of producing a minimum cut than a non-minimum cut. The key
+concept here is that it has a *higher probability* of producing a minimum cut:
+it is not guaranteed to produce one.
 
-### Minimum Cut
+The probability that random contraction produces a minimum cut is
+![2/n(n-1)](https://latex.codecogs.com/gif.latex?\frac{2}{n(n-1)}). In order to
+ensure that a minimum cut is produced, the algorithm should be run ![n^2 log
+n](https://latex.codecogs.com/gif.latex?n^2&space;\log&space;n) times. The
+smallest minimum cut found over all executions  has a high probability of being
+an actual minimum cut.
 
-![minimum cut](min-cut.png "Minimum Cut")
+## Asymptotic Time Complexity
 
-In an undirected graph, a crossing edge is considered any edge that has an end
-point in both groups. A crossing edge in a directed graph is when an edge has a
-tail in group 1 and a head in group 2.
+![O(n^2m](https://latex.codecogs.com/gif.latex?O(n^2m)) per single execution.
+![O(n^4 log n](https://latex.codecogs.com/gif.latex?O(n^4&space;\log&space;n))
+total for finding a minimum cut with a high probability of being correct.
+
+
+
+
+-----------------------------------
+Everything below this line is a work in progress
 
 I don't understand this...
 Watch counting minimum cuts again
@@ -50,9 +64,9 @@ Output: Minimum Cut
 
 
 while n > 2:
-    pick edge at random
-    merge end into single vertex
-    remove self loops
+pick edge at random
+merge end into single vertex
+remove self loops
 
 return cut represented by final 2 vertices
 

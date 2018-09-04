@@ -12,14 +12,6 @@
 
 static int noop(void) { return 0; }
 
-/*************************** graph ********************************************/
-
-// Create graph
-// Insert vertex
-// Insert edge
-// delete vertex
-// delete edge
-
 /*************************** min_cut ******************************************/
 static void min_cut_null()
 {
@@ -27,56 +19,43 @@ static void min_cut_null()
     CU_ASSERT_EQUAL(-1, result);
 }
 
-static void init_initalizes_values()
+static void min_cut_small_graph()
 {
-    /* list list; */
-    /* list_item dummy; */
+    graph* graph = graph_read_from_file("src/SmallGraph.txt");
 
-    /* // put some values in just make sure the test isn't passing just b/c the
-     */
-    /* // list just happens to be all 0 on creation */
-    /* list.size = 5; */
-    /* list.head = &dummy; */
-    /* list.tail = &dummy; */
+    int result = min_cut(graph);
+    CU_ASSERT_EQUAL(2, result);
 
-    /* int result = list_init(&list); */
-
-    /* CU_ASSERT_EQUAL(0, result); */
-    /* CU_ASSERT_EQUAL(0, list.size); */
-    /* CU_ASSERT_PTR_NULL(list.head); */
-    /* CU_ASSERT_PTR_NULL(list.tail); */
+    graph_destroy(graph);
 }
 
-/*************************** collapse_edge ************************************/
-static void collapse_edge_null()
+static void min_cut_standard()
 {
-    int result = collapse_edge(NULL, 0);
-    CU_ASSERT_EQUAL(-1, result);
+    graph* graph = graph_read_from_file("src/GraphMedium.txt");
+
+    int result = min_cut(graph);
+    CU_ASSERT_EQUAL(2, result);
+
+    graph_destroy(graph);
 }
 
-/* static void collaspe_edge_two_vertices() */
-/* { */
-/*     vertex vertices[] = { { 0, 0, NULL }, { 1, 0, NULL } }; */
-/*     edge edges[] = { { &vertices[0], &vertices[1] } }; */
-/*     vertices[0].edges = &edges[0]; */
-/*     vertices[0].edge_count = 1; */
+static void min_cut_large()
+{
+    graph* graph = graph_read_from_file("src/input_random_10_25.txt");
 
-/*     graph graph = { &vertices[0], 2, &edges[0], 1 }; */
-/*     (void)graph; */
-/* } */
+    int result = min_cut(graph);
+    CU_ASSERT_EQUAL(10, result);
 
-// Pick and edge at random
-// fuse the two ends into a single vertex
-// keep parallel edges
-// delete self-referencing edges
+    graph_destroy(graph);
+}
 
 int register_min_cut_test_suites()
 {
     CU_TestInfo min_cut_tests[] = { CU_TEST_INFO(min_cut_null),
-        CU_TEST_INFO(init_initalizes_values), CU_TEST_INFO_NULL };
+        CU_TEST_INFO(min_cut_small_graph), CU_TEST_INFO(min_cut_standard),
+        CU_TEST_INFO(min_cut_large), CU_TEST_INFO_NULL };
 
-    CU_TestInfo collapse_edge_tests[]
-        = { CU_TEST_INFO(collapse_edge_null), CU_TEST_INFO_NULL };
+    CU_TestInfo collapse_edge_tests[] = { CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "min_cut suite",
                                   .pInitFunc = noop,

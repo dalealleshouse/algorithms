@@ -32,6 +32,8 @@ Implementation Quality
     accepting randomly sorted arrays are using the exact same inputs.  For the
     purposes of this project, `rand()` it is sufficient. However, a different
     solution is required for production scenarios.
+* The C code simply returns negative values for errors. This is no means of
+    reporting error conditions.
 
 Actual run time data
 * Actual run time data for the C implementation of the algorithms is included 

@@ -2,7 +2,7 @@
 #graph
 
 This project contains many graph algorithms. This section provides a brief
-overview of graph concepts. Consider comprehension of this material as a
+overview of graph concepts. Consider comprehension of this material a
 pre-requisite for graph algorithms.
 
 Graphs represent pair wise relationships among objects. In graph jargon, the
@@ -12,7 +12,8 @@ one's family as a graph. The people in the family would be vertices, and the
 relationships between them (mother, daughter, father, brother, etc..) would be
 edges. Edges are typically denoted by a pair. If Dick is Jane's brother, the
 relationship is be denoted as (Dick, Jane). The set of all vertices is denoted
-as `V` and `E` denotes the set of all edges.
+as `V` and `E` denotes the set of all edges. The *degree* of a vertex is the
+number of edges connected to it.
 
 There are two types of graphs: *undirected* and *directed*. The edges of an
 undirected graph indicate a bi-directional relationship. (A, B) and (B, A) are
@@ -135,6 +136,23 @@ Vertices                Edges
 
 Adjacency lists have lower space requirements than matrices. Additionally, they
 are optimized for graph search algorithms.
+
+## Minimum Cut
+
+The *minimum cut* is the grouping of vertices into two non-empty groups having
+the fewest number of crossing edges. Consider the graph in the graphic below.
+There is no other way of dividing the vertices that would result in fewer
+crossing edges.
+
+### Minimum Cut
+
+![minimum cut](min-cut.png "Minimum Cut")
+
+In an undirected graph, a crossing edge is considered any edge that has an end
+point in both groups. A crossing edge in a directed graph is when an edge has a
+tail in group 1 and a head in group 2.  The *minimum cut size* is the number of
+crossing edges. Logically, the size cannot exceed the minimum degree of the
+graph.
 
 ## Common Uses 
 

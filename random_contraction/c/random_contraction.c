@@ -1,25 +1,42 @@
+#include <math.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "random_contraction.h"
 
-static bool graph_is_invalid(graph* graph)
+static bool graph_is_invalid(const graph* graph)
 {
-    return graph == NULL || graph->vertex_count == 0 || graph->verticies == NULL
-        || graph->edge_count == 0 || graph->edges == NULL;
+    return graph == NULL || graph->n < 2 || graph->V == NULL || graph->m < 1
+        || graph->E == NULL;
 }
 
-int collapse_edge(graph* graph, size_t edge_index){
-    (void)graph;
-    (void)edge_index;
-
-
-    return -1;
-}
-
-int min_cut(graph* graph)
+int min_cut(const graph* input)
 {
-    if (graph_is_invalid(graph))
+    if (graph_is_invalid(input))
         return -1;
 
-    return 0;
+    graph* min = NULL;
+    int iterations = (input->n * input->n) * log(input->n);
+
+    for (int i = 0; i < iterations; i++) {
+        printf("iteration %d of %d\n", i, iterations);
+        graph* graph = graph_clone(input);
+
+        while (graph->n > 2 && graph->m > 1) {
+            int edge_index = rand() % (graph->m - 1);
+            graph_collapse_edge(graph, edge_index);
+        }
+
+        if (min == NULL || graph->m < min->m) {
+            graph_destroy(min);
+            min = graph;
+        } else
+            graph_destroy(graph);
+    }
+
+    int result = min->m;
+    graph_print(min);
+    graph_destroy(min);
+    return result;
 }

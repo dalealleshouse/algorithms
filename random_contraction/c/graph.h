@@ -1,31 +1,35 @@
 #pragma once
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
-// Initial size of vertex and edge allocation 
+// Initial size of vertex and edge allocation
 const size_t INITIAL_ALLOC;
 
-// Factor by when to increase allocation size when more space is required 
+// Factor by when to increase allocation size when more space is required
 const size_t REALLOC_FACTOR;
 
 typedef void* (*allocator)(const size_t size);
 typedef void* (*reallocator)(void* ptr, const size_t size);
 
-typedef struct
-{
+typedef struct {
+    // Indicates if the vertex is initialized and valid
+    bool initalized;
+
     // Id of the vertex
     unsigned vertex_id;
 
     // Number of edges connected to the vertex
     size_t degree;
 
-    // Indicates if the vertex is initialized and valid
-    bool initalized;
+    // The number of vertices that have been combined with this vertex
+    size_t consumed_size;
+
+    // All vertices that have been combined into this v
+    unsigned* consumed;
 } vertex;
 
-typedef struct
-{
+typedef struct {
     // Id of the vertex at the tail of the edge
     unsigned tail;
 
@@ -33,8 +37,7 @@ typedef struct
     unsigned head;
 } edge;
 
-typedef struct
-{
+typedef struct {
     // Number of vertices
     size_t n;
 
@@ -71,10 +74,10 @@ void set_reallocator(reallocator reallocator);
 void* standard_realloc(void* prt, const size_t size);
 
 graph* graph_init();
-int add_vertex(graph* graph, const unsigned id);
-int add_edge(graph* graph, const unsigned tail, const unsigned head);
+int graph_add_vertex(graph* graph, const unsigned id);
+int graph_add_edge(graph* graph, const unsigned tail, const unsigned head);
+graph* graph_read_from_file(const char* path);
+int graph_collapse_edge(graph* graph, size_t edge_index);
 void graph_destroy(graph* graph);
-
-
-graph* read_graph(const char* path);
-
+void graph_print(const graph* graph);
+graph* graph_clone(const graph* graph);
