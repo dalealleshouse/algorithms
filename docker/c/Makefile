@@ -51,6 +51,7 @@ clean:
 	-rm -f src/*.gcda
 	-rm -f src/*.gcov
 	-rm -f src/*.gcno
+	-rm -f src/*.info
 
 %.o: %.c
 	  $(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $< -flto

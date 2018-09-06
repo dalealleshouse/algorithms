@@ -12,6 +12,16 @@ const size_t REALLOC_FACTOR;
 typedef void* (*allocator)(const size_t size);
 typedef void* (*reallocator)(void* ptr, const size_t size);
 
+typedef enum {
+    Graph_InvalidEdgeIndex = -6,
+    Graph_InvalidVertex = -5,
+    Graph_EdgeIsSelfLoop = -4,
+    Graph_DuplicateVertex = -3,
+    Graph_FailedMemoryAllocation = -2,
+    Graph_NullParameter = -1,
+    Graph_Success = 0
+} GraphResult;
+
 typedef struct {
     // Indicates if the vertex is initialized and valid
     bool initalized;
@@ -57,7 +67,7 @@ typedef struct {
     // The number of edges that can be accommodated before reallocation.
     // This starts at 100 and doubles on every time more space is required
     size_t m_allocated;
-} graph;
+} Graph;
 
 /*
  * Allows swapping out malloc with a different allocator
@@ -73,11 +83,13 @@ void* zero_allocator(const size_t size);
 void set_reallocator(reallocator reallocator);
 void* standard_realloc(void* prt, const size_t size);
 
-graph* graph_init();
-int graph_add_vertex(graph* graph, const unsigned id);
-int graph_add_edge(graph* graph, const unsigned tail, const unsigned head);
-graph* graph_read_from_file(const char* path);
-int graph_collapse_edge(graph* graph, size_t edge_index);
-void graph_destroy(graph* graph);
-void graph_print(const graph* graph);
-graph* graph_clone(const graph* graph);
+Graph* Graph_Create();
+
+GraphResult Graph_AddVertex(Graph*, const unsigned id);
+GraphResult Graph_AddEdge(Graph*, const unsigned tail, const unsigned head);
+Graph* Graph_FromFile(const char* path);
+GraphResult Graph_CollapseEdge(Graph*, size_t edge_index);
+void Graph_Print(const Graph*);
+Graph* Graph_Clone(const Graph*);
+
+void Graph_Destroy(Graph*);

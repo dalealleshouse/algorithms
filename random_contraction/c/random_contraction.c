@@ -5,38 +5,38 @@
 
 #include "random_contraction.h"
 
-static bool graph_is_invalid(const graph* graph)
+static bool graph_is_invalid(const Graph* graph)
 {
     return graph == NULL || graph->n < 2 || graph->V == NULL || graph->m < 1
         || graph->E == NULL;
 }
 
-int min_cut(const graph* input)
+int min_cut(const Graph* input)
 {
     if (graph_is_invalid(input))
         return -1;
 
-    graph* min = NULL;
+    Graph* min = NULL;
     int iterations = (input->n * input->n) * log(input->n);
 
     for (int i = 0; i < iterations; i++) {
         printf("iteration %d of %d\n", i, iterations);
-        graph* graph = graph_clone(input);
+        Graph* graph = Graph_Clone(input);
 
         while (graph->n > 2 && graph->m > 1) {
             int edge_index = rand() % (graph->m - 1);
-            graph_collapse_edge(graph, edge_index);
+            Graph_CollapseEdge(graph, edge_index);
         }
 
         if (min == NULL || graph->m < min->m) {
-            graph_destroy(min);
+            Graph_Destroy(min);
             min = graph;
         } else
-            graph_destroy(graph);
+            Graph_Destroy(graph);
     }
 
     int result = min->m;
-    graph_print(min);
-    graph_destroy(min);
+    Graph_Print(min);
+    Graph_Destroy(min);
     return result;
 }

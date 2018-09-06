@@ -4,4 +4,4 @@
 
 #include "graph.h"
 
-int min_cut(const graph* input);
+int min_cut(const Graph*);
