@@ -58,6 +58,10 @@ Actual run time data
 
 * [Linked Lists](linked_list/)
     * [C](linked_list/c)
+* [Quick Select](quick_select/)
+	* [C](quick_select/c/)
+* [Random Contraction](random_contraction/)
+    * [C](random_contraction/c)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
@@ -66,8 +70,6 @@ Actual run time data
     * [Quick Sort](sorting/README.md#quick-sort)
 	* [C](sorting/c/)
 	* [Python](sorting/python/)
-* [Quick Select](quick_select/)
-	* [C](quick_select/c/)
 
 ## Build/Tests
 ### C

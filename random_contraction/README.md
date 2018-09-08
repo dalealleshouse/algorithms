@@ -1,15 +1,15 @@
 # Random Contraction
-#graph, #randomized
+#graph, #randomized, #divide-and-conquer
 
 Prerequisite: [Graph Concepts](../graph_concepts)
 
 The random contraction algorithm finds the [minimum
-cut](../graph_concepts/README.md#minimum-cut) of a graph. It accomplishes this
-by randomly contracting edges until only two vertices remain (see pseudo code).
-Because a minimum cut has fewer edges than a non-minimum cut, the algorithm has
-a higher probability of producing a minimum cut than a non-minimum cut. The key
-concept here is that it has a *higher probability* of producing a minimum cut:
-it is not guaranteed to produce one.
+cut](../graph_concepts/README.md#minimum-cut) of a graph by randomly contracting
+edges until only two vertices remain (see pseudo code).  Because a minimum cut
+has fewer edges than a non-minimum cut, the algorithm has a higher probability
+of producing a minimum cut than a non-minimum cut. The key concept here is that
+it has a *higher probability* of producing a minimum cut: it is not guaranteed
+to produce one.
 
 The probability that random contraction produces a minimum cut is
 ![2/n(n-1)](https://latex.codecogs.com/gif.latex?\frac{2}{n(n-1)}). In order to
@@ -18,11 +18,64 @@ n](https://latex.codecogs.com/gif.latex?n^2&space;\log&space;n) times. The
 smallest minimum cut found over all executions  has a high probability of being
 an actual minimum cut.
 
+The algorithm as described above is known as the Karger random contraction
+algorithm. The Karger-Stein random contraction algorithm significantly improves
+the runtime by decreasing the number of iterations required to produce a minimum
+cut with a high probability of correctness. The basic concept is that the
+probability of collapsing an incorrect edge gets higher as the number of edges
+decreases. Thus reducing the number of edges to ![n-1/sqrt
+2](https://latex.codecogs.com/gif.latex?\frac{n&plus;1}{\sqrt&space;2}) and
+reusing the pre-reduced result greatly reduces the number of required
+iterations. This is much easier to graph by examining the pseudo code.
+
 ## Asymptotic Time Complexity
 
-![O(n^2m](https://latex.codecogs.com/gif.latex?O(n^2m)) per single execution.
-![O(n^4 log n](https://latex.codecogs.com/gif.latex?O(n^4&space;\log&space;n))
-total for finding a minimum cut with a high probability of being correct.
+* Karger: ![O(n^4 log n](https://latex.codecogs.com/gif.latex?O(n^4&space;\log&space;n))
+* Karger-Stein: ![O(n^2 log n](https://latex.codecogs.com/gif.latex?O(n^2&space;\log&space;n))
+
+## Pseudo Code
+
+``` pseudo
+karger:
+    G = input graph
+    returns: minimum cut
+
+    min_cut = G
+
+    repeat n^2 log (n) times:
+        temp = copy of G
+
+        while temp->n > 2
+            collapse random edge
+
+        if min_cut < temp
+            min_cut = temp
+
+   return min_cut
+
+karger-stein-recursive:
+    G = input graph
+    returns: minimum cut
+
+    if n <= 6:
+        return karger(G)
+
+    t = n + 1 / square root 2
+
+karger-stein:
+    G = input graph
+    returns: minimum cut
+
+    min_cut = G
+
+    repeat n*log n / n-1  times:
+        temp = karger-stein-recursive(G)
+
+        if min_cut < temp
+            min_cut = temp
+
+   return min_cut
+```
 
 
 
@@ -30,23 +83,6 @@ total for finding a minimum cut with a high probability of being correct.
 -----------------------------------
 Everything below this line is a work in progress
 
-I don't understand this...
-Watch counting minimum cuts again
-what is the largest number of min cuts that a graph with n vertices can have The
-lower bound is ![n choose 2](https://latex.codecogs.com/gif.latex?\binom{n}{2})
-or ![n(n-1)/2](https://latex.codecogs.com/gif.latex?\frac{n(n-1)}{2}) minimum
-cuts in a graph.
-
-
-Probability of success is ![1/n^2](https://latex.codecogs.com/gif.latex?1/n^2)
-
-Must run multiple times to get a resonable proablity of success
-
-N = number of trails needed
-
-n^2 trails produces ~1/3 probablity of failure
-
-n^2 lnn = 1/n failures proablabity
 
 
 
