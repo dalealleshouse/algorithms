@@ -1,7 +1,5 @@
 #include <math.h>
-#include <stdbool.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include "random_contraction.h"
 
@@ -80,7 +78,6 @@ Graph* RC_KargerSteinMinCut(const Graph* input)
     for (int i = 0; i < iterations; i++) {
         Graph* result = _RC_KargerSteinMinCut(input);
 
-        srand(time(0));
         if (min == NULL || result->m < min->m) {
             Graph_Destroy(min);
             min = result;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdio.h>
 
 // Initial size of vertex and edge allocation

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdlib.h>
 
 void MemAllocMock_InterceptMalloc(void*);
 unsigned MemAllocMock_MallocInterceptCount();
