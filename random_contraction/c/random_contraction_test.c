@@ -52,16 +52,6 @@ static void RC_KargerMinCut_medium_graph()
     Graph_Destroy(graph);
 }
 
-static void RC_KargerMinCut_large()
-{
-    /* Graph* graph = Graph_FromFile("src/Graph.txt"); */
-
-    /* int result = RC_KargerMinCut(graph); */
-    /* CU_ASSERT_EQUAL(6, result); */
-
-    /* Graph_Destroy(graph); */
-}
-
 /*************************** RC_KargerSteinMinCut *****************************/
 static void RC_KargerSteinMinCut_null()
 {
@@ -72,17 +62,6 @@ static void RC_KargerSteinMinCut_null()
 static void RC_KargerSteinMinCut_small_graph()
 {
     Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
-
-    Graph* result = RC_KargerSteinMinCut(graph);
-    CU_ASSERT_EQUAL(2, result->m);
-
-    Graph_Destroy(result);
-    Graph_Destroy(graph);
-}
-
-static void RC_KargerSteinMinCut_slightly_larger_graph()
-{
-    Graph* graph = Graph_FromFile("src/graphs/Graph-8-2.txt");
 
     Graph* result = RC_KargerSteinMinCut(graph);
     CU_ASSERT_EQUAL(2, result->m);
@@ -104,12 +83,13 @@ static void RC_KargerSteinMinCut_medium_graph()
 
 static void RC_KargerSteinMinCut_large()
 {
-    /* Graph* graph = Graph_FromFile("src/Graph.txt"); */
+    Graph* graph = Graph_FromFile("src/graphs/Graph-200-17.txt");
 
-    /* int result = RC_KargerSteinMinCut(graph); */
-    /* CU_ASSERT_EQUAL(6, result); */
+    Graph* result = RC_KargerSteinMinCut(graph);
+    CU_ASSERT_EQUAL(17, result->m);
 
-    /* Graph_Destroy(graph); */
+    Graph_Destroy(graph);
+    Graph_Destroy(result);
 }
 
 int register_min_cut_test_suites()
@@ -117,13 +97,11 @@ int register_min_cut_test_suites()
     CU_TestInfo RC_KargerMinCut_tests[] = { CU_TEST_INFO(RC_KargerMinCut_null),
         CU_TEST_INFO(RC_KargerMinCut_small_graph),
         CU_TEST_INFO(RC_KargerMinCut_slightly_larger_graph),
-        CU_TEST_INFO(RC_KargerMinCut_medium_graph),
-        CU_TEST_INFO(RC_KargerMinCut_large), CU_TEST_INFO_NULL };
+        CU_TEST_INFO(RC_KargerMinCut_medium_graph), CU_TEST_INFO_NULL };
 
     CU_TestInfo RC_KargerSteinMinCut_tests[]
         = { CU_TEST_INFO(RC_KargerSteinMinCut_null),
               CU_TEST_INFO(RC_KargerSteinMinCut_small_graph),
-              CU_TEST_INFO(RC_KargerSteinMinCut_slightly_larger_graph),
               CU_TEST_INFO(RC_KargerSteinMinCut_medium_graph),
               CU_TEST_INFO(RC_KargerSteinMinCut_large), CU_TEST_INFO_NULL };
 

@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "random_contraction.h"
 
@@ -57,29 +58,34 @@ Graph* _RC_KargerSteinMinCut(const Graph* input)
     Graph* n_g1 = _RC_KargerSteinMinCut(g1);
     Graph* n_g2 = _RC_KargerSteinMinCut(g2);
 
-    if (n_g1->m < n_g2->m)
-        return n_g1;
+    Graph_Destroy(g1);
+    Graph_Destroy(g2);
 
+    if (n_g1->m < n_g2->m) {
+        Graph_Destroy(n_g2);
+        return n_g1;
+    }
+
+    Graph_Destroy(n_g1);
     return n_g2;
 }
 
 Graph* RC_KargerSteinMinCut(const Graph* input)
 {
-    return RC_KargerMinCut(input);
     if (graph_is_invalid(input))
         return NULL;
 
     Graph* min = NULL;
     int iterations = input->n * log(input->n) / (input->n - 1);
     for (int i = 0; i < iterations; i++) {
-        Graph* graph = Graph_Clone(input);
-        graph = _RC_KargerSteinMinCut(graph);
+        Graph* result = _RC_KargerSteinMinCut(input);
 
-        if (min == NULL || graph->m < min->m) {
+        srand(time(0));
+        if (min == NULL || result->m < min->m) {
             Graph_Destroy(min);
-            min = graph;
+            min = result;
         } else
-            Graph_Destroy(graph);
+            Graph_Destroy(result);
     }
 
     return min;
