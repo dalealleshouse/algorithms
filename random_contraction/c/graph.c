@@ -4,31 +4,16 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "MemAllocMock.h"
 #include "graph.h"
 
 const size_t INITIAL_ALLOC = 100;
 const size_t REALLOC_FACTOR = 2;
 const static size_t BUFFER_SIZE = 1024;
-const static char* TOKEN_DELIM = "\t";
 
-static allocator _malloc = zero_allocator;
-static reallocator _realloc = standard_realloc;
+Graph* Graph_Create() { return calloc(sizeof(Graph), 1); }
 
-void set_allocator(allocator allocator) { _malloc = allocator; }
-void set_reallocator(reallocator reallocator) { _realloc = reallocator; }
-
-void* zero_allocator(const size_t size) { return calloc(size, 1); }
-
-void* standard_realloc(void* ptr, const size_t size)
-{
-    // we should be checking for arithmetic overflow, but it may be overkill for
-    // this application...
-    return realloc(ptr, size);
-}
-
-Graph* Graph_Create() { return _malloc(sizeof(Graph)); }
-
-static size_t calc_next_alloc_size(unsigned id)
+static size_t _NextAllocSize(unsigned id)
 {
     if (id < INITIAL_ALLOC)
         return INITIAL_ALLOC;
@@ -36,79 +21,72 @@ static size_t calc_next_alloc_size(unsigned id)
     return id * REALLOC_FACTOR;
 }
 
-GraphResult Graph_AddVertex(Graph* graph, const unsigned id)
+GraphResult Graph_AddVertex(Graph* self, const unsigned id)
 {
-    if (graph == NULL)
+    if (self == NULL)
         return Graph_NullParameter;
 
-    if (graph->n_allocated <= id) {
-        size_t next_size = calc_next_alloc_size(id);
-        if (graph->V == NULL)
-            graph->V = _malloc(sizeof(vertex) * next_size);
-        else
-            graph->V = _realloc(graph->V, sizeof(vertex) * next_size);
+    if (self->n_allocated <= id) {
+        size_t next_size = _NextAllocSize(id);
+        vertex* temp = realloc(self->V, sizeof(vertex) * next_size);
 
-        if (graph->V == NULL)
+        if (temp == NULL)
             return Graph_FailedMemoryAllocation;
 
-        memset(&graph->V[graph->n_allocated], 0,
-            sizeof(graph->V[0]) * (next_size - graph->n_allocated));
-
-        graph->n_allocated = next_size;
+        self->V = temp;
+        memset(&self->V[self->n_allocated], 0,
+            sizeof(self->V[0]) * (next_size - self->n_allocated));
+        self->n_allocated = next_size;
     }
 
-    if (graph->V[id].initalized == true)
+    if (self->V[id].initalized == true)
         return Graph_DuplicateVertex;
 
-    graph->n++;
-    graph->V[id].vertex_id = id;
-    graph->V[id].degree = 0;
-    graph->V[id].initalized = true;
-    graph->V[id].consumed_size = 0;
-    graph->V[id].consumed = NULL;
+    self->n++;
+    self->V[id].vertex_id = id;
+    self->V[id].degree = 0;
+    self->V[id].initalized = true;
 
     return Graph_Success;
 }
 
-GraphResult Graph_AddEdge(Graph* graph, const unsigned tail, const unsigned head)
+GraphResult Graph_AddEdge(Graph* self, const unsigned tail, const unsigned head)
 {
-    if (graph == NULL)
+    if (self == NULL)
         return Graph_NullParameter;
 
-    if(tail == head)
+    if (tail == head)
         return Graph_EdgeIsSelfLoop;
 
-    if (tail >= graph->n_allocated || head >= graph->n_allocated
-        || graph->V[tail].initalized == false
-        || graph->V[head].initalized == false)
+    if (tail >= self->n_allocated || head >= self->n_allocated
+        || self->V[tail].initalized == false
+        || self->V[head].initalized == false)
         return Graph_InvalidVertex;
 
-    graph->m++;
+    self->m++;
 
-    if (graph->m_allocated < graph->m) {
-        size_t next_size = calc_next_alloc_size(graph->m);
-        if (graph->E == NULL)
-            graph->E = _malloc(sizeof(edge) * next_size);
-        else
-            graph->E = _realloc(graph->E, sizeof(edge) * next_size);
+    if (self->m_allocated < self->m) {
+        size_t next_size = _NextAllocSize(self->m);
+        edge* temp = realloc(self->E, sizeof(edge) * next_size);
 
-        graph->m_allocated = next_size;
+        if (temp == NULL)
+            return Graph_FailedMemoryAllocation;
+
+        self->E = temp;
+        self->m_allocated = next_size;
     }
 
-    if (graph->E == NULL)
-        return Graph_FailedMemoryAllocation;
-
-    edge* e = &graph->E[graph->m - 1];
+    edge* e = &self->E[self->m - 1];
 
     e->tail = tail;
     e->head = head;
-    graph->V[tail].degree++;
-    graph->V[head].degree++;
+    self->V[tail].degree++;
+    self->V[head].degree++;
 
     return Graph_Success;
 }
 
-static void shift_edges(edge* edges, size_t size, size_t edge_index)
+static void _ShiftEdges(edge* edges, size_t size, size_t edge_index)
 {
     // size = 4
     // if index = 0 shift = 4 - 0 - 1 = 3
@@ -120,72 +98,48 @@ static void shift_edges(edge* edges, size_t size, size_t edge_index)
         sizeof(edge) * (size - edge_index - 1));
 }
 
-static void delete_edge(Graph* graph, const size_t edge_index)
+static void _DeleteEdge(Graph* self, const size_t edge_index)
 {
-    graph->V[graph->E[edge_index].head].degree--;
-    graph->V[graph->E[edge_index].tail].degree--;
-    shift_edges(graph->E, graph->m, edge_index);
-    graph->m--;
+    self->V[self->E[edge_index].head].degree--;
+    self->V[self->E[edge_index].tail].degree--;
+    _ShiftEdges(self->E, self->m, edge_index);
+    self->m--;
 }
 
-static void delete_vertex(Graph* graph, const unsigned id)
+static void _DeleteVertex(Graph* self, const unsigned id)
 {
-    graph->V[id].initalized = false;
-    graph->n--;
+    self->V[id].initalized = false;
+    self->n--;
 }
 
-static int make_super_vertex(vertex* ver, const vertex* doomed)
+GraphResult Graph_CollapseEdge(Graph* self, size_t edge_index)
 {
-    size_t old_size = ver->consumed_size;
-    ver->consumed_size += doomed->consumed_size + 1;
-
-    if (ver->consumed == NULL)
-        ver->consumed = _malloc(sizeof(unsigned) * ver->consumed_size);
-    else
-        ver->consumed
-            = _realloc(ver->consumed, sizeof(unsigned) * ver->consumed_size);
-
-    if (ver->consumed == NULL)
-        return -1;
-
-    ver->consumed[old_size] = doomed->vertex_id;
-
-    if (doomed->consumed != NULL)
-        memcpy(&ver->consumed[old_size + 1], doomed->consumed,
-            sizeof(unsigned) * doomed->consumed_size);
-
-    return 0;
-}
-
-GraphResult Graph_CollapseEdge(Graph* graph, size_t edge_index)
-{
-    if (graph == NULL)
+    if (self == NULL)
         return Graph_NullParameter;
 
-    if (edge_index >= graph->m)
+    if (edge_index >= self->m)
         return Graph_InvalidEdgeIndex;
 
-    edge* edge = &graph->E[edge_index];
-    vertex* tail = &graph->V[edge->tail];
-    vertex* head = &graph->V[edge->head];
+    edge* edge = &self->E[edge_index];
+    vertex* tail = &self->V[edge->tail];
+    vertex* head = &self->V[edge->head];
 
-    delete_vertex(graph, edge->tail);
-    make_super_vertex(head, tail);
-    delete_edge(graph, edge_index);
+    _DeleteVertex(self, edge->tail);
+    _DeleteEdge(self, edge_index);
 
-    for (size_t i = 0; i < graph->m; i++) {
-        if (graph->E[i].tail == tail->vertex_id) {
-            graph->E[i].tail = head->vertex_id;
+    for (size_t i = 0; i < self->m; i++) {
+        if (self->E[i].tail == tail->vertex_id) {
+            self->E[i].tail = head->vertex_id;
             head->degree++;
         }
 
-        if (graph->E[i].head == tail->vertex_id) {
-            graph->E[i].head = head->vertex_id;
+        if (self->E[i].head == tail->vertex_id) {
+            self->E[i].head = head->vertex_id;
             head->degree++;
         }
 
-        if (graph->E[i].head == graph->E[i].tail) {
-            delete_edge(graph, i);
+        if (self->E[i].head == self->E[i].tail) {
+            _DeleteEdge(self, i);
             i -= 1;
         }
     }
@@ -193,10 +147,10 @@ GraphResult Graph_CollapseEdge(Graph* graph, size_t edge_index)
     return Graph_Success;
 }
 
-static void Graph_AddVertex_if_missing(Graph* graph, unsigned vertex)
+static void _AddVertexIfMissing(Graph* self, unsigned vertex)
 {
-    if (vertex > graph->n_allocated || !graph->V[vertex].initalized)
-        Graph_AddVertex(graph, vertex);
+    if (vertex > self->n_allocated || !self->V[vertex].initalized)
+        Graph_AddVertex(self, vertex);
 }
 
 Graph* Graph_FromFile(const char* path)
@@ -211,8 +165,8 @@ Graph* Graph_FromFile(const char* path)
     if (file == NULL)
         return NULL;
 
-    Graph* graph = Graph_Create();
-    if (graph == NULL)
+    Graph* self = Graph_Create();
+    if (self == NULL)
         return NULL;
 
     char line[BUFFER_SIZE];
@@ -223,45 +177,37 @@ Graph* Graph_FromFile(const char* path)
         if (vertex == 0)
             continue;
 
-        Graph_AddVertex_if_missing(graph, vertex);
+        _AddVertexIfMissing(self, vertex);
 
         unsigned edge = strtoul(remaining, &remaining, 10);
         while (edge > 0) {
-            Graph_AddVertex_if_missing(graph, edge);
+            _AddVertexIfMissing(self, edge);
 
-            Graph_AddEdge(graph, vertex, edge);
+            if (edge > vertex)
+                Graph_AddEdge(self, vertex, edge);
+
             edge = strtoul(remaining, &remaining, 10);
         }
     }
 
     fclose(file);
 
-    return graph;
+    return self;
 }
 
-void Graph_Print(const Graph* graph)
+void Graph_Print(const Graph* self, FILE* file)
 {
-    for (size_t i = 0; i < graph->n_allocated; i++) {
-        if (!graph->V[i].initalized)
+    for (size_t i = 0; i < self->n_allocated; i++) {
+        if (!self->V[i].initalized)
             continue;
 
-        vertex* v = &graph->V[i];
-
-        if (v->consumed_size > 0) {
-            printf("Super Vertex = %u (", v->vertex_id);
-
-            for (size_t j = 0; j < v->consumed_size; j++)
-                printf("%u-", v->consumed[j]);
-
-            printf("), degree=%zu\n", v->degree);
-        } else {
-            printf("Vertex %u, degree=%zu\n", v->vertex_id, v->degree);
-        }
+        vertex* v = &self->V[i];
+        fprintf(file, "Vertex %u, degree=%zu\n", v->vertex_id, v->degree);
     }
 
-    for (size_t i = 0; i < graph->m; i++) {
-        printf(
-            "%zu = tail %u, head=%u\n", i, graph->E[i].tail, graph->E[i].head);
+    for (size_t i = 0; i < self->m; i++) {
+        fprintf(file, "%zu = tail %u, head=%u\n", i, self->E[i].tail,
+            self->E[i].head);
     }
 }
 
@@ -281,7 +227,7 @@ Graph* Graph_Clone(const Graph* source)
 
     if (source->V != NULL) {
         size_t v_size = sizeof(vertex) * source->n_allocated;
-        clone->V = _malloc(v_size);
+        clone->V = calloc(v_size, 1);
 
         if (clone->V != NULL)
             memcpy(clone->V, source->V, v_size);
@@ -289,7 +235,7 @@ Graph* Graph_Clone(const Graph* source)
 
     if (source->E != NULL) {
         size_t e_size = sizeof(edge) * source->m_allocated;
-        clone->E = _malloc(e_size);
+        clone->E = calloc(e_size, 1);
 
         if (clone->E != NULL)
             memcpy(clone->E, source->E, e_size);
@@ -298,16 +244,12 @@ Graph* Graph_Clone(const Graph* source)
     return clone;
 }
 
-void Graph_Destroy(Graph* graph)
+void Graph_Destroy(Graph* self)
 {
-    if (graph == NULL)
+    if (self == NULL)
         return;
 
-    if (graph->V != NULL)
-        for (size_t i = 0; i < graph->n_allocated; i++)
-            free(graph->V[i].consumed);
-
-    free(graph->V);
-    free(graph->E);
-    free(graph);
+    free(self->V);
+    free(self->E);
+    free(self);
 }

@@ -1,9 +1,11 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
+#include "MemAllocMock.h"
 #include "graph.h"
 
 #define CU_TEST_INFO(test_func)                                                \
@@ -13,47 +15,15 @@
 
 static int noop(void) { return 0; }
 
-static bool bad_malloc_run = false;
-static void* bad_malloc(size_t size)
-{
-    (void)size;
-    bad_malloc_run = true;
-    return NULL;
-}
-static void intercept_malloc()
-{
-    bad_malloc_run = false;
-    set_allocator(bad_malloc);
-}
+static void intercept_malloc() { MemAllocMock_InterceptMalloc(NULL); }
 static void malloc_intercepted()
 {
-    CU_ASSERT_EQUAL(true, bad_malloc_run);
-    bad_malloc_run = false;
-    set_allocator(zero_allocator);
+    CU_ASSERT_EQUAL(1, MemAllocMock_MallocInterceptCount());
+    MemAllocMock_ResetMalloc();
 }
 
-static bool bad_realloc_run = false;
-static void* bad_realloc(void* ptr, const size_t size)
-{
-    (void)size;
-
-    bad_realloc_run = true;
-    free(ptr);
-    return NULL;
-}
-static void intercept_realloc()
-{
-    bad_realloc_run = false;
-    set_reallocator(bad_realloc);
-}
-static void realloc_intercepted()
-{
-    CU_ASSERT_EQUAL(true, bad_realloc_run);
-    bad_realloc_run = false;
-    set_reallocator(standard_realloc);
-}
-
-/*************************** Graph_Create ***************************************/
+/*************************** Graph_Create
+ * ***************************************/
 static void Graph_Create_bad_malloc()
 {
     intercept_malloc();
@@ -111,8 +81,6 @@ static void Graph_AddVertex_first()
 
     CU_ASSERT_EQUAL(1, graph->V[1].vertex_id);
     CU_ASSERT_EQUAL(0, graph->V[1].degree);
-    CU_ASSERT_EQUAL(0, graph->V[1].consumed_size);
-    CU_ASSERT_PTR_NULL(graph->V[1].consumed);
 
     Graph_Destroy(graph);
 }
@@ -141,14 +109,14 @@ static void Graph_AddVertex_bad_realloc()
 {
     Graph* graph = Graph_Create();
 
-    intercept_realloc();
     int result = Graph_AddVertex(graph, 1);
     CU_ASSERT_EQUAL(Graph_Success, result);
 
+    intercept_malloc();
     result = Graph_AddVertex(graph, INITIAL_ALLOC + 1);
     CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
     CU_ASSERT_EQUAL(1, graph->n);
-    realloc_intercepted();
+    malloc_intercepted();
 
     Graph_Destroy(graph);
 }
@@ -276,10 +244,10 @@ static void Graph_AddEdge_bad_realloc()
     for (size_t i = 0; i < INITIAL_ALLOC; i++)
         Graph_AddEdge(graph, i, i + 1);
 
-    intercept_realloc();
+    intercept_malloc();
     int result = Graph_AddEdge(graph, 2, 1);
     CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
-    realloc_intercepted();
+    malloc_intercepted();
 
     Graph_Destroy(graph);
 }
@@ -338,9 +306,19 @@ static void Graph_FromFile_bad_path()
     Graph_Destroy(graph);
 }
 
+static void Graph_FromFile_bad_malloc()
+{
+    intercept_malloc();
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
+    CU_ASSERT_PTR_NULL(graph);
+    malloc_intercepted();
+
+    Graph_Destroy(graph);
+}
+
 static void Graph_FromFile_small()
 {
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(graph);
     CU_ASSERT_EQUAL(5, graph->n);
@@ -357,7 +335,7 @@ static void Graph_FromFile_small()
 
 static void Graph_FromFile_medium()
 {
-    Graph* graph = Graph_FromFile("src/GraphMedium.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-8-2.txt");
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(graph);
     CU_ASSERT_EQUAL(8, graph->n);
@@ -368,7 +346,7 @@ static void Graph_FromFile_medium()
 
 static void Graph_FromFile_standard()
 {
-    Graph* graph = Graph_FromFile("src/Graph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-200-17.txt");
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(graph);
     CU_ASSERT_EQUAL(200, graph->n);
@@ -376,9 +354,9 @@ static void Graph_FromFile_standard()
     Graph_Destroy(graph);
 }
 
-static void graph_read_invalid()
+static void Graph_FromFile_invalid()
 {
-    Graph* graph = Graph_FromFile("src/BadGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/BadGraph.txt");
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(graph);
     CU_ASSERT_EQUAL(1, graph->n);
@@ -396,7 +374,7 @@ static void Graph_CollapseEdge_null()
 
 static void Graph_CollapseEdge_invalid_index()
 {
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
 
     int result = Graph_CollapseEdge(graph, graph->m);
     CU_ASSERT_EQUAL(Graph_InvalidEdgeIndex, result);
@@ -406,7 +384,7 @@ static void Graph_CollapseEdge_invalid_index()
 
 static void Graph_CollapseEdge_tail()
 {
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
     size_t m = graph->m;
     size_t n = graph->n;
 
@@ -430,7 +408,7 @@ static void Graph_CollapseEdge_tail()
 
 static void Graph_CollapseEdge_head()
 {
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
     size_t m = graph->m;
     size_t n = graph->n;
 
@@ -453,7 +431,7 @@ static void Graph_CollapseEdge_head()
 
 static void Graph_CollapseEdge_self_loop()
 {
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
     size_t m = graph->m;
     size_t n = graph->n;
 
@@ -478,7 +456,7 @@ static void Graph_CollapseEdge_self_loop()
 
 static void Graph_CollapseEdge_three_consecutive()
 {
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-4-2.txt");
 
     Graph_CollapseEdge(graph, 1);
     Graph_CollapseEdge(graph, 4);
@@ -492,51 +470,21 @@ static void Graph_CollapseEdge_three_consecutive()
 
 static void Graph_CollapseEdge_large()
 {
-    Graph* graph = Graph_FromFile("src/Graph.txt");
+    Graph* graph = Graph_FromFile("src/graphs/Graph-200-17.txt");
     size_t m = graph->m;
     size_t n = graph->n;
 
-    int result = Graph_CollapseEdge(graph, 4180);
+    int result = Graph_CollapseEdge(graph, m - 1);
     CU_ASSERT_EQUAL(Graph_Success, result);
 
     CU_ASSERT_EQUAL(n - 1, graph->n);
-    CU_ASSERT_EQUAL(m - 2, graph->m);
-
-    Graph_Destroy(graph);
-}
-
-static void Graph_CollapseEdge_creates_super_vertex()
-{
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
-
-    Graph_CollapseEdge(graph, 1);
-
-    CU_ASSERT_EQUAL(1, graph->V[4].consumed_size);
-    CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V[4].consumed);
-    CU_ASSERT_EQUAL(1, graph->V[4].consumed[0]);
-
-    Graph_Destroy(graph);
-}
-
-static void Graph_CollapseEdge_updates_super_vertex()
-{
-    Graph* graph = Graph_FromFile("src/SmallGraph.txt");
-
-    Graph_CollapseEdge(graph, 1);
-    Graph_CollapseEdge(graph, 2);
-    Graph_CollapseEdge(graph, 4);
-
-    CU_ASSERT_EQUAL(3, graph->V[5].consumed_size);
-    CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V[5].consumed);
-    CU_ASSERT_EQUAL(4, graph->V[5].consumed[0]);
-    CU_ASSERT_EQUAL(1, graph->V[5].consumed[1]);
-    CU_ASSERT_EQUAL(2, graph->V[5].consumed[2]);
+    CU_ASSERT_EQUAL(m - 1, graph->m);
 
     Graph_Destroy(graph);
 }
 
 /*************************** Graph_Clone **************************************/
-static void graphs_are_identical(Graph* x, Graph* y)
+static void GraphAreIdentical(Graph* x, Graph* y)
 {
     CU_ASSERT_PTR_NOT_NULL_FATAL(x);
     CU_ASSERT_PTR_NOT_NULL_FATAL(y);
@@ -561,7 +509,7 @@ static void graphs_are_identical(Graph* x, Graph* y)
     } else {
         CU_ASSERT_PTR_NOT_NULL_FATAL(y->E);
         CU_ASSERT_PTR_NOT_EQUAL(x->E, y->E);
-        CU_ASSERT_EQUAL(0, memcmp(x->E, y->E, sizeof(edge) * x->m_allocated));
+        CU_ASSERT_EQUAL(0, memcmp(x->E, y->E, sizeof(edge) * x->m));
     }
 }
 
@@ -573,10 +521,10 @@ static void Graph_Clone_null()
 
 static void Graph_Clone_standard()
 {
-    Graph* source = Graph_FromFile("src/SmallGraph.txt");
+    Graph* source = Graph_FromFile("src/graphs/Graph-4-2.txt");
 
     Graph* clone = Graph_Clone(source);
-    graphs_are_identical(source, clone);
+    GraphAreIdentical(source, clone);
 
     Graph_Destroy(source);
     Graph_Destroy(clone);
@@ -587,7 +535,7 @@ static void Graph_Clone_empty()
     Graph* source = Graph_Create();
     Graph* clone = Graph_Clone(source);
 
-    graphs_are_identical(source, clone);
+    GraphAreIdentical(source, clone);
 
     Graph_Destroy(source);
     Graph_Destroy(clone);
@@ -608,10 +556,24 @@ static void Graph_Clone_bad_malloc()
 
 static void Graph_Clone_large()
 {
-    Graph* source = Graph_FromFile("src/Graph.txt");
+    Graph* source = Graph_FromFile("src/graphs/Graph-200-17.txt");
 
     Graph* clone = Graph_Clone(source);
-    graphs_are_identical(source, clone);
+    GraphAreIdentical(source, clone);
+
+    Graph_Destroy(source);
+    Graph_Destroy(clone);
+}
+
+static void Graph_Clone_super_vertex()
+{
+    Graph* source = Graph_FromFile("src/graphs/Graph-4-2.txt");
+
+    while (source->n > 2)
+        Graph_CollapseEdge(source, 0);
+
+    Graph* clone = Graph_Clone(source);
+    GraphAreIdentical(source, clone);
 
     Graph_Destroy(source);
     Graph_Destroy(clone);
@@ -622,15 +584,14 @@ int register_graph_suites()
     CU_TestInfo Graph_Create_tests[] = { CU_TEST_INFO(Graph_Create_bad_malloc),
         CU_TEST_INFO(Graph_Create_intializes_graph), CU_TEST_INFO_NULL };
 
-    CU_TestInfo Graph_AddVertex_tests[]
-        = { CU_TEST_INFO(Graph_AddVertex_null),
-              CU_TEST_INFO(Graph_AddVertex_bad_malloc),
-              CU_TEST_INFO(Graph_AddVertex_first),
-              CU_TEST_INFO(Graph_AddVertex_adds_five),
-              CU_TEST_INFO(Graph_AddVertex_bad_realloc),
-              CU_TEST_INFO(Graph_AddVertex_intializes_empty_slots),
-              CU_TEST_INFO(Graph_AddVertex_pre_allocated),
-              CU_TEST_INFO(Graph_AddVertex_duplicate), CU_TEST_INFO_NULL };
+    CU_TestInfo Graph_AddVertex_tests[] = { CU_TEST_INFO(Graph_AddVertex_null),
+        CU_TEST_INFO(Graph_AddVertex_bad_malloc),
+        CU_TEST_INFO(Graph_AddVertex_first),
+        CU_TEST_INFO(Graph_AddVertex_adds_five),
+        CU_TEST_INFO(Graph_AddVertex_bad_realloc),
+        CU_TEST_INFO(Graph_AddVertex_intializes_empty_slots),
+        CU_TEST_INFO(Graph_AddVertex_pre_allocated),
+        CU_TEST_INFO(Graph_AddVertex_duplicate), CU_TEST_INFO_NULL };
 
     CU_TestInfo Graph_AddEdge_tests[] = { CU_TEST_INFO(Graph_AddEdge_null),
         CU_TEST_INFO(Graph_AddEdge_bad_malloc),
@@ -641,13 +602,13 @@ int register_graph_suites()
         CU_TEST_INFO(Graph_AddEdge_self_loop),
         CU_TEST_INFO(Graph_AddEdge_invalid_vertex), CU_TEST_INFO_NULL };
 
-    CU_TestInfo Graph_FromFile_tests[]
-        = { CU_TEST_INFO(Graph_FromFile_null),
-              CU_TEST_INFO(Graph_FromFile_bad_path),
-              CU_TEST_INFO(Graph_FromFile_small),
-              CU_TEST_INFO(Graph_FromFile_standard),
-              CU_TEST_INFO(graph_read_invalid),
-              CU_TEST_INFO(Graph_FromFile_medium), CU_TEST_INFO_NULL };
+    CU_TestInfo Graph_FromFile_tests[] = { CU_TEST_INFO(Graph_FromFile_null),
+        CU_TEST_INFO(Graph_FromFile_bad_path),
+        CU_TEST_INFO(Graph_FromFile_bad_malloc),
+        CU_TEST_INFO(Graph_FromFile_small),
+        CU_TEST_INFO(Graph_FromFile_standard),
+        CU_TEST_INFO(Graph_FromFile_invalid),
+        CU_TEST_INFO(Graph_FromFile_medium), CU_TEST_INFO_NULL };
 
     CU_TestInfo Graph_CollapseEdge_tests[]
         = { CU_TEST_INFO(Graph_CollapseEdge_null),
@@ -657,14 +618,12 @@ int register_graph_suites()
               CU_TEST_INFO(Graph_CollapseEdge_self_loop),
               CU_TEST_INFO(Graph_CollapseEdge_three_consecutive),
               CU_TEST_INFO(Graph_CollapseEdge_large),
-              CU_TEST_INFO(Graph_CollapseEdge_creates_super_vertex),
-              CU_TEST_INFO(Graph_CollapseEdge_updates_super_vertex),
               CU_TEST_INFO_NULL };
 
     CU_TestInfo Graph_Clone_tests[] = { CU_TEST_INFO(Graph_Clone_null),
         CU_TEST_INFO(Graph_Clone_standard), CU_TEST_INFO(Graph_Clone_empty),
         CU_TEST_INFO(Graph_Clone_bad_malloc), CU_TEST_INFO(Graph_Clone_large),
-        CU_TEST_INFO_NULL };
+        CU_TEST_INFO(Graph_Clone_super_vertex), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Graph_Create suite",
                                   .pInitFunc = noop,

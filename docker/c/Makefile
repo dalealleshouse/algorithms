@@ -1,7 +1,7 @@
 SHELL 	= /bin/sh
 CC 		= clang-6.0
 
-FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden 
+FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
@@ -17,7 +17,7 @@ all: $(TARGET)
 all: CFLAGS += -fsanitize=safe-stack,undefined
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -o $(TARGET) $(OBJECTS) $(LINKFLAGS)
+	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) -o $(TARGET) 
 	ASAN_OPTIONS=detect_leaks=1 ./$(TARGET)
 
 release: $(SOURCES)
@@ -33,7 +33,7 @@ profile: $(TARGET)
 code-coverage: CFLAGS += -fprofile-arcs -ftest-coverage
 code-coverage: $(TARGET)
 
-memory-san: CFLAGS += -fsanitize=memory,undefined
+memory-san: CFLAGS += -fsanitize=memory,undefined -fsanitize-memory-track-origins
 memory-san: $(TARGET)
 
 thread-san: CFLAGS += -fsanitize=thread,undefined

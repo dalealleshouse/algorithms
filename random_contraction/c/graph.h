@@ -2,15 +2,13 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 // Initial size of vertex and edge allocation
 const size_t INITIAL_ALLOC;
 
 // Factor by when to increase allocation size when more space is required
 const size_t REALLOC_FACTOR;
-
-typedef void* (*allocator)(const size_t size);
-typedef void* (*reallocator)(void* ptr, const size_t size);
 
 typedef enum {
     Graph_InvalidEdgeIndex = -6,
@@ -31,12 +29,6 @@ typedef struct {
 
     // Number of edges connected to the vertex
     size_t degree;
-
-    // The number of vertices that have been combined with this vertex
-    size_t consumed_size;
-
-    // All vertices that have been combined into this v
-    unsigned* consumed;
 } vertex;
 
 typedef struct {
@@ -69,27 +61,13 @@ typedef struct {
     size_t m_allocated;
 } Graph;
 
-/*
- * Allows swapping out malloc with a different allocator
- * This was mainly used for testing
- */
-void set_allocator(allocator allocator);
-void* zero_allocator(const size_t size);
-
-/*
- * Allows swapping out realloc with a different allocator
- * This was mainly used for testing
- */
-void set_reallocator(reallocator reallocator);
-void* standard_realloc(void* prt, const size_t size);
-
 Graph* Graph_Create();
 
 GraphResult Graph_AddVertex(Graph*, const unsigned id);
 GraphResult Graph_AddEdge(Graph*, const unsigned tail, const unsigned head);
 Graph* Graph_FromFile(const char* path);
 GraphResult Graph_CollapseEdge(Graph*, size_t edge_index);
-void Graph_Print(const Graph*);
+void Graph_Print(const Graph*, FILE* file);
 Graph* Graph_Clone(const Graph*);
 
 void Graph_Destroy(Graph*);

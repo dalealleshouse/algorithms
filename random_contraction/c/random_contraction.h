@@ -4,4 +4,6 @@
 
 #include "graph.h"
 
-int min_cut(const Graph*);
+Graph* RC_KargerMinCut(const Graph*);
+
+Graph* RC_KargerSteinMinCut(const Graph*);

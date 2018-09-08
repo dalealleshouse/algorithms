@@ -15,6 +15,6 @@ WORKDIR /
 COPY Makefile /Makefile
 COPY validate.sh /validate.sh
 COPY coverage.sh /coverage.sh
-COPY llvm-gcov.sh /llvm-gcov.sh
+COPY llvm-gcov.sh /usr/bin/llvm-gcov.sh
 
 CMD ["make", "-B"]
