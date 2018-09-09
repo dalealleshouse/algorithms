@@ -103,5 +103,5 @@ Key Takeaways:
 - A probabilistic algorithm can be run multiple times to achieve a higher
     probability of success.
 - By increasing the probability of producing the correct answer on each
-    iteration, the total number of iterations is decreased. This results in HUGH
+    iteration, the total number of iterations is decreased. This results in HUGE
     overall run time savings.
