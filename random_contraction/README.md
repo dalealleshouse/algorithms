@@ -26,7 +26,7 @@ probability of collapsing an incorrect edge gets higher as the number of edges
 decreases. Thus reducing the number of edges to ![n-1/sqrt
 2](https://latex.codecogs.com/gif.latex?\frac{n&plus;1}{\sqrt&space;2}) and
 reusing the pre-reduced result greatly reduces the number of required
-iterations. This is much easier to graph by examining the pseudo code.
+iterations. This is much easier to grasp by examining the pseudo code.
 
 ## Asymptotic Time Complexity
 
@@ -38,17 +38,17 @@ iterations. This is much easier to graph by examining the pseudo code.
 ``` pseudo
 karger:
     G = input graph
-    returns: minimum cut
+    returns: minimum cut found over n^2 log n iterations
 
     min_cut = G
 
     repeat n^2 log (n) times:
         temp = copy of G
 
-        while temp->n > 2
+        while temp->n > 2:
             collapse random edge
 
-        if min_cut < temp
+        if min_cut < temp:
             min_cut = temp
 
    return min_cut
@@ -61,59 +61,25 @@ karger-stein-recursive:
         return karger(G)
 
     t = n + 1 / square root 2
+    while n > t:
+        collapse random edge
+
+    G1 = karger-stein-recursive(G)
+    G2 = karger-stein-recursive(G)
+
+    return the min of G1 and G2
 
 karger-stein:
     G = input graph
-    returns: minimum cut
+    returns: minimum cut found over n*log n / n - 1 iterations
 
     min_cut = G
 
     repeat n*log n / n-1  times:
         temp = karger-stein-recursive(G)
 
-        if min_cut < temp
+        if min_cut < temp:
             min_cut = temp
 
    return min_cut
 ```
-
-
-
-
------------------------------------
-Everything below this line is a work in progress
-
-
-
-
-## Asymptotic Time Complexity
-
-![O(n^2m](https://latex.codecogs.com/gif.latex?O(n^2m))
-
-## Pseudo Code
-
-Inputs: [Adjacency List](../graph_concepts/README.md#adjacency-list)
-representing an undirected graph (parallel edges allowed)
-
-Output: Minimum Cut
-
-
-
-while n > 2:
-pick edge at random
-merge end into single vertex
-remove self loops
-
-return cut represented by final 2 vertices
-
-I'm code
-
-## Common Uses
-
-* Reliability Analysis: Consider a network graph. The minimum cut represents the
-    minimum number of failures that will cause a outage.
-* Social Networking: Identify sub-cultures by finding portions of the graph that
-    are highly interconnected yet weakly connected to the graph as a whole
-* Image Segmentation: Pixels are vertices and edges are defined by adjacency.
-    Edge weight is the difference between pixel colors. Minimum cuts should be
-    able to isolate individual objects in the picture.

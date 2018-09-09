@@ -49,9 +49,8 @@ Graph* _RC_KargerSteinMinCut(const Graph* input)
 
     int t = (input->n + 1) / sqrt(2);
     Graph* g1 = Graph_Clone(input);
-    Graph* g2 = Graph_Clone(input);
     _CollaspeTo(g1, t);
-    _CollaspeTo(g2, t);
+    Graph* g2 = Graph_Clone(g1);
 
     Graph* n_g1 = _RC_KargerSteinMinCut(g1);
     Graph* n_g2 = _RC_KargerSteinMinCut(g2);
