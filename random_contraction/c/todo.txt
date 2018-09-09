@@ -1,0 +1,14 @@
+Add error handling/checking into random_contraction.c
+
+Graph_FromFile assumes the graph is undirected, but it does so in a rather hacky
+way. While adding edges, it ignores edges with a vertex higher than the current
+vertex. It would be a good idea to rethink this code
+
+        while (edge > 0) {
+            _AddVertexIfMissing(self, edge);
+
+            if (edge > vertex)
+                Graph_AddEdge(self, vertex, edge);
+
+            edge = strtoul(remaining, &remaining, 10);
+        }

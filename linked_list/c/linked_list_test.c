@@ -6,9 +6,9 @@
 #include "linked_list.h"
 
 #define CU_TEST_INFO(test_func)                                                \
-    {                                                                          \
+{                                                                          \
 #test_func, test_func                                                  \
-    }
+}
 
 static int is_free = 0;
 static int noop(void) { return 0; }
@@ -27,18 +27,26 @@ static void _list_is_valid(const list* list, const size_t n, void* expected[n])
     for (size_t i = 0; i < n; i++) {
         /* printf("%zu - %d - %d\n", i, *(int*)item->payload,
          * *(int*)expected[i]); */
-        CU_ASSERT_PTR_EQUAL(item->payload, expected[i]);
-        item = item->next;
+        if (item == NULL || item->payload == NULL)
+            CU_FAIL("null item")
+        else{
+            CU_ASSERT_PTR_EQUAL(item->payload, expected[i]);
+            item = item->next;
+        }
     }
     CU_ASSERT_PTR_NULL(item);
 
     item = list->tail;
     for (size_t i = 1; i <= n; i++) {
         /* printf(
-            "%zu - %d - %d\n", i, *(int*)item->payload, *(int*)expected[n -
+           "%zu - %d - %d\n", i, *(int*)item->payload, *(int*)expected[n -
            i]);*/
-        CU_ASSERT_PTR_EQUAL(item->payload, expected[n - i]);
-        item = item->prev;
+        if (item == NULL || item->payload == NULL)
+            CU_FAIL("null item")
+        else{
+            CU_ASSERT_PTR_EQUAL(item->payload, expected[n - i]);
+            item = item->prev;
+        }
     }
     CU_ASSERT_PTR_NULL(item);
 }
@@ -466,7 +474,7 @@ static void array_insert_item()
     int* result = (int*)array_insert(arr, n, sizeof(arr[0]));
     CU_ASSERT_PTR_NOT_NULL_FATAL(result);
 
-    *result = 0;
+    *result = 0; // NOLINT
     for (size_t i = 0; i < n + 1; i++)
         CU_ASSERT_EQUAL(expected[i], result[i]);
     free(result);
@@ -486,15 +494,15 @@ static int register_test_suites()
 
     CU_TestInfo free_tests[]
         = { CU_TEST_INFO(free_null), CU_TEST_INFO(free_calls_freeme),
-              CU_TEST_INFO(free_null_freeme), CU_TEST_INFO_NULL };
+            CU_TEST_INFO(free_null_freeme), CU_TEST_INFO_NULL };
 
     CU_TestInfo delete_at_tests[]
         = { CU_TEST_INFO(delete_null), CU_TEST_INFO(delete_calls_freeme),
-              CU_TEST_INFO(delete_head_modifies_links),
-              CU_TEST_INFO(delete_all_items),
-              CU_TEST_INFO(delete_tail_modifies_links),
-              CU_TEST_INFO(delete_mid_modifies_links),
-              CU_TEST_INFO(delete_invalid_index), CU_TEST_INFO_NULL };
+            CU_TEST_INFO(delete_head_modifies_links),
+            CU_TEST_INFO(delete_all_items),
+            CU_TEST_INFO(delete_tail_modifies_links),
+            CU_TEST_INFO(delete_mid_modifies_links),
+            CU_TEST_INFO(delete_invalid_index), CU_TEST_INFO_NULL };
 
     CU_TestInfo get_at_tests[] = { CU_TEST_INFO(get_null),
         CU_TEST_INFO(get_retrieves_head), CU_TEST_INFO(get_retrieves_tail),
@@ -506,30 +514,30 @@ static int register_test_suites()
         CU_TEST_INFO(array_insert_item), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "list_init suite",
-                                  .pInitFunc = noop,
-                                  .pCleanupFunc = noop,
-                                  .pTests = init_tests },
-        { .pName = "list_insert_at suite",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = insert_at_tests },
-        { .pName = "list_free suite",
-            .pInitFunc = free_suite_init,
-            .pCleanupFunc = noop,
-            .pTests = free_tests },
-        { .pName = "list_delete_at suite",
-            .pInitFunc = free_suite_init,
-            .pCleanupFunc = noop,
-            .pTests = delete_at_tests },
-        { .pName = "list_get_at suite",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = get_at_tests },
-        { .pName = "array_insert suite",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = array_insert_tests },
-        CU_SUITE_INFO_NULL };
+        .pInitFunc = noop,
+        .pCleanupFunc = noop,
+        .pTests = init_tests },
+                 { .pName = "list_insert_at suite",
+                     .pInitFunc = noop,
+                     .pCleanupFunc = noop,
+                     .pTests = insert_at_tests },
+                 { .pName = "list_free suite",
+                     .pInitFunc = free_suite_init,
+                     .pCleanupFunc = noop,
+                     .pTests = free_tests },
+                 { .pName = "list_delete_at suite",
+                     .pInitFunc = free_suite_init,
+                     .pCleanupFunc = noop,
+                     .pTests = delete_at_tests },
+                 { .pName = "list_get_at suite",
+                     .pInitFunc = noop,
+                     .pCleanupFunc = noop,
+                     .pTests = get_at_tests },
+                 { .pName = "array_insert suite",
+                     .pInitFunc = noop,
+                     .pCleanupFunc = noop,
+                     .pTests = array_insert_tests },
+                 CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
 }
