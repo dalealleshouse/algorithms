@@ -4,12 +4,12 @@ from enum import IntEnum
 import statistics
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib import pyplot as plt #noqa
+from matplotlib import pyplot as plt  # noqa
 
 lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
-TEST_FOR_Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5, 10 ** 6]
+TEST_FOR_Ns = [25, 50, 75, 100, 125]
 
 
 class CtypesEnum(IntEnum):
@@ -20,19 +20,12 @@ class CtypesEnum(IntEnum):
 
 
 class Algo(CtypesEnum):
-    QUICK_SELECT = 1,
-    SORT_SELECT = 2,
+    KARGER = 1,
+    KARGER_STEIN = 2
 
 
-class LinearAlgo(CtypesEnum):
-    LINEAR_SCAN_MAX = 1,
-    LINEAR_SCAN_MIN = 2
-
-
-lib.select_time.argtypes = [ctypes.c_size_t, Algo]
-lib.select_time.restype = ctypes.c_double
-lib.linear_time.argtypes = [ctypes.c_size_t, LinearAlgo]
-lib.linear_time.restype = ctypes.c_double
+lib.AlgoTime.restype = ctypes.c_double
+lib.AlgoTime.argtypes = [ctypes.c_size_t, ctypes.c_size_t, Algo]
 
 
 def median_run_time(func):
@@ -49,7 +42,7 @@ def generate_md_table(ns, data):
     header_sep = "--|"
 
     for n in ns:
-        n_headers += 'n={:d} |'.format(n)
+        n_headers += 'n={:d},m={:d} |'.format(n, n * 10)
         header_sep += "--|"
 
     print("|ALGORITHM|", n_headers)
@@ -65,55 +58,30 @@ def generate_md_table(ns, data):
     sys.stdout.flush()
 
 
-def get_title(nth):
-    if nth == 1:
-        return 'Find the Minimum Value'
-    if nth == -1:
-        return 'Find the Median Value'
-    else:
-        return 'Find the {}th Value'.format(nth)
-
-
-def generate_chart(nth):
+def generate_chart():
     full_data = []
     plt.figure(figsize=(8, 6))
 
-    plt.title(get_title(nth))
+    plt.title("Random Contraction")
     plt.ylabel('sec')
     plt.xlabel('n')
 
     for algo in Algo:
-        print('running {} {}'.format(algo.name, nth))
+        print('running {}'.format(algo.name))
         sys.stdout.flush()
 
         data = []
         for n in TEST_FOR_Ns:
-            this_nth = nth
-
-            if nth == -1:
-                this_nth = n / 2
-
-            time = median_run_time(lambda: lib.select_time(n, this_nth, algo))
+            print('running {} {}'.format(algo.name, n))
+            sys.stdout.flush()
+            time = median_run_time(lambda: lib.AlgoTime(n, n * 10, algo))
             data.append(time)
 
         plt.plot(TEST_FOR_Ns, data, label=algo.name)
         full_data.append((algo, data))
 
-    if nth == 1:
-        print('running ', LinearAlgo.LINEAR_SCAN_MIN.name)
-        sys.stdout.flush()
-        min_algo = LinearAlgo.LINEAR_SCAN_MIN
-
-        data = []
-        for n in TEST_FOR_Ns:
-            time = median_run_time(lambda: lib.linear_time(n, min_algo))
-            data.append(time)
-
-        plt.plot(TEST_FOR_Ns, data, label=min_algo.name)
-        full_data.append((min_algo, data))
-
     plt.legend()
-    plt.savefig('QUICK_SELECT-' + str(nth) + '.png')
+    plt.savefig('RANDOM_CONTRACTION.png')
     plt.clf()
 
     print('chart created')
@@ -122,6 +90,4 @@ def generate_chart(nth):
 
 
 if __name__ == "__main__":
-    generate_chart(5)
-    generate_chart(1)
-    generate_chart(-1)
+    generate_chart()

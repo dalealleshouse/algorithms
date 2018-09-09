@@ -11,7 +11,7 @@ static bool graph_is_invalid(const Graph* graph)
 
 Graph* _CollaspeTo(Graph* graph, size_t size)
 {
-    while (graph->n > size) {
+    while (graph->n > size && graph->m > 1) {
         int edge_index = rand() % (graph->m - 1);
         Graph_CollapseEdge(graph, edge_index);
     }

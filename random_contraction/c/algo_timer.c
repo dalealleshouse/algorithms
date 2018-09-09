@@ -1,99 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
+#include "graph.h"
 #include "random_contraction.h"
 
-/* typedef void* (*selector)(const size_t nth, const size_t n, const size_t size, */
-/*     void* arr, const comparator comparator); */
+typedef enum { KARGER = 1, KARGER_STEIN = 2 } algo;
+typedef Graph* (*min_cut)(const Graph*);
 
-/* typedef void* (*linear_scan)( */
-/*     const size_t n, const size_t size, void* arr, const comparator comparator); */
+static min_cut get_selector(const algo algo)
+{
+    switch (algo) {
+    case KARGER:
+        return RC_KargerMinCut;
+    case KARGER_STEIN:
+        return RC_KargerSteinMinCut;
+    default:
+        fprintf(stderr, "Invalid algorithm\n");
+        return NULL;
+    }
+}
 
-/* static int int_comparator(const void* x, const void* y) */
-/* { */
-/*     if (x == y) */
-/*         return 0; */
+static unsigned RandomNumberBetween(unsigned low, unsigned high)
+{
+    return (rand() % (high - low)) + low;
+}
 
-/*     int _x = *(int*)x; */
-/*     int _y = *(int*)y; */
+double AlgoTime(const size_t n, const size_t m, const algo algo)
+{
+    min_cut min_cut = get_selector(algo);
+    if (min_cut == NULL)
+        return -1;
 
-/*     if (_x == _y) */
-/*         return 0; */
+    Graph* graph = Graph_Create();
+    if (graph == NULL)
+        return -1;
 
-/*     if (_x < _y) */
-/*         return -1; */
+    for (size_t i = 0; i < n; i++) {
+        GraphResult result = Graph_AddVertex(graph, i + 1);
 
-/*     return 1; */
-/* } */
+        if (result != Graph_Success)
+            printf("vertex fail %d\n", result);
+    }
 
-/* static selector get_selector(const algo algo) */
-/* { */
-/*     switch (algo) { */
-/*     case QUICK_SELECT: */
-/*         return quick_select; */
-/*     case QSORT_SELECT: */
-/*         return sort_select; */
-/*     default: */
-/*         fprintf(stderr, "Invalid select algorithm\n"); */
-/*         return NULL; */
-/*     } */
-/* } */
+    for (size_t i = 0; i < m; i++) {
+        unsigned y = RandomNumberBetween(1, n);
+        unsigned x = RandomNumberBetween(1, n);
 
-/* static linear_scan get_linear_scan(const linear_algo algo) */
-/* { */
-/*     switch (algo) { */
-/*     case MIN: */
-/*         return min; */
-/*     case MAX: */
-/*         return max; */
-/*     default: */
-/*         fprintf(stderr, "Invalid linear scan algorithm\n"); */
-/*         return NULL; */
-/*     } */
-/* } */
+        while (y == x)
+            y = RandomNumberBetween(1, n);
 
-/* double select_time(const size_t n, const size_t nth, const algo algo) */
-/* { */
-/*     selector selector = get_selector(algo); */
-/*     if (selector == NULL) */
-/*         return -1; */
+        GraphResult result = Graph_AddEdge(graph, x, y);
 
-/*     int arr[n]; */
-/*     for (size_t i = 0; i < n; i++) */
-/*         arr[i] = rand(); */
+        if (result != Graph_Success)
+            printf("edge fail %d, %d, %d \n", result, x, y);
+    }
 
-/*     clock_t t = clock(); */
-/*     void* result = selector(nth, n, sizeof(int), arr, int_comparator); */
-/*     t = clock() - t; */
+    clock_t t = clock();
+    Graph* result = min_cut(graph);
+    t = clock() - t;
 
-/*     if (result == NULL) */
-/*         return -1; */
+    if (result == NULL)
+        return -1;
 
-/*     double time = ((double)t) / CLOCKS_PER_SEC; */
+    Graph_Destroy(graph);
 
-/*     return time; */
-/* } */
-
-/* double linear_time(const size_t n, const linear_algo algo) */
-/* { */
-/*     linear_scan scan_algo = get_linear_scan(algo); */
-/*     if (scan_algo == NULL) */
-/*         return -1; */
-
-/*     int arr[n]; */
-/*     for (size_t i = 0; i < n; i++) */
-/*         arr[i] = rand(); */
-
-/*     clock_t t = clock(); */
-/*     void* result = scan_algo(n, sizeof(int), arr, int_comparator); */
-/*     t = clock() - t; */
-
-/*     if (result == NULL) */
-/*         return -1; */
-
-/*     double time = ((double)t) / CLOCKS_PER_SEC; */
-
-/*     return time; */
-/* } */
+    double time = ((double)t) / CLOCKS_PER_SEC;
+    return time;
+}

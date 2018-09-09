@@ -83,3 +83,25 @@ karger-stein:
 
    return min_cut
 ```
+
+## Actual Run Times
+
+The actual run times for finding the minimum cut of a randomly generated graph
+are shown below.  For details about how the calculations were run, see
+[compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
+recreate the data on your machine, navigate to the c directory and execute the
+[time_charts.sh](c/time_charts.sh) bash file.
+
+![RANDOM_CONTRACTION](c/RANDOM_CONTRACTION.png "RANDOM CONTRACTION RUN TIMES") 
+
+|ALGORITHM| n=25,m=250 |n=50,m=500 |n=75,m=750 |n=100,m=1000 |n=125,m=1250 |
+--|--|--|--|--|--|
+|KARGER |0.044031 sec|0.636622 sec|3.088025 sec|9.720699 sec|23.503915 sec|
+|KARGER_STEIN |0.008457 sec|0.027829 sec|0.077786 sec|0.172399 sec|0.348342 sec|
+
+Key Takeaways:
+- A probabilistic algorithm can be run multiple times to achieve a higher
+    probability of success.
+- By increasing the probability of producing the correct answer on each
+    iteration, the total number of iterations is decreased. This results in HUGH
+    overall run time savings.
