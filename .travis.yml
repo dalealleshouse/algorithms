@@ -9,4 +9,8 @@ services:
 
 install: docker pull dalealleshouse/algo_test_runner_c:latest
 
-script: ./ci_validatees:
+script: ./ci_validate
+
+branches:
+  except:
+		- wip
