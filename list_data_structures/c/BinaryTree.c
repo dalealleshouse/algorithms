@@ -1,7 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "MemAllocMock.h"
 #include "BinaryTree.h"
+#include "MemAllocMock.h"
 
 static BinaryTreeNode* BinaryTree_CreateNode()
 {
@@ -22,10 +23,28 @@ BinaryTree* BinaryTree_Create(comparator comparator)
     return self;
 }
 
+static void BinaryTree_ExpandTree(
+    BinaryTreeNode* root, BinaryTreeNode* item, comparator comparator)
+{
+    int comp_result = comparator(item->item, root->item);
+
+    if (comp_result < 0) {
+        if (root->left == NULL)
+            root->left = item;
+        else
+            BinaryTree_ExpandTree(root->left, item, comparator);
+    } else {
+        if (root->right == NULL)
+            root->right = item;
+        else
+            BinaryTree_ExpandTree(root->right, item, comparator);
+    }
+}
+
 ListOpResult BinaryTree_Insert(BinaryTree* self, void* item)
 {
     if (item == NULL)
-        return ListOp_NullParamter;
+        return ListOp_NullParameter;
 
     BinaryTreeNode* node = BinaryTree_CreateNode();
     if (node == NULL)
@@ -33,9 +52,12 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* item)
 
     node->item = item;
 
-    if (self->root == NULL)
+    if (self->root == NULL) {
         self->root = node;
+        return ListOp_Success;
+    }
 
+    BinaryTree_ExpandTree(self->root, node, self->comparator);
     return ListOp_Success;
 }
 
