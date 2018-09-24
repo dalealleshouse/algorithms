@@ -1,4 +1,125 @@
+# List Data Structures
+
+A *list* (aka *collection* or *container*) is a logical grouping of data items
+into a single unit. Lists enable operations such as inserting new items,
+searching through existing items, deleting items, and enumerating existing
+items. There are several common list data structures and different structures
+have different capabilities/performance characteristics.
+
+In the author's humble opinion, comprehension of list data structures is the
+first concept that an aspiring programmer should master because list
+manipulation is the single most common programming task. So common in fact that
+all mainstream languages have builtin list abstractions.  For instance, LISP,
+which stands for LISt Processor, is designed entirely around the concept.  C#
+has the `IEnumerable` interface and LINQ. Java has the somewhat comparable
+`Iterable` interface and Streams. Python has `list` and comprehensions. It's
+important to understand the concepts underlying these abstractions in order to
+choose the correct one. List data structures have differing strengths,
+weaknesses, and capabilities.  Sometimes choosing the right one is easy because
+it has some utility that others lack. On the other hand, it's possible to choose
+one that will meet the software requirements but have a prodigious negative
+impact on performance.
+
+This section examines four list data structures [Arrays](#arrays), [Linked
+Lists](#linked-lists), [Binary Trees](#binary-trees), and [Hash
+Tables](#hash-tables).
+
+
+## Arrays
+#data_structure, #list
+
+An array is the most common and simple list data structure. The constituent
+items occupy a single contiguous section of memory. The memory address of any
+item is easily calculable by taking the sum of the base address and the product
+of the desired index and the item size.  For example, see the array depicted
+below.
+
+```
+Address
+ 0x001         each item is 4 bytes
+   |
+{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}
+                    |
+                 Index 3
+
+```
+
+The memory address of the array item at index 3 is:
+
+```
+(base address) (item index) (size of item)
+      |             |             |
+    0x001    +     (3     *       4)       = 0x010 (16 in decimal)
+```
+
+The most notable attributes of an array are that array items are stored
+contiguously in memory and they require zero overhead.
+
+### Insertions
+The fact that arrays store items contiguously in memory makes insertions
+problematic. The operation requires four steps:
+
+* Allocate a new array large enough to accommodate the existing array and the
+    new item
+* Copy existing items from the original array to the desired position in new
+    array
+* Insert the item into new array
+* Dispose of the old array
+
+Caveats:
+- It's possible to allocate an array with empty slots to insert new items into.
+    However, this requires a separate mechanism for tracking which slots are
+    used and which are empty.
+- When copying items from an array into a new memory allocation, some sources
+    count each item copied as a separate operation. However, it can be done with a
+    single C `memcpy` command. Therefore, this project considers it a single
+    operation.
+
+
+
+
+
+### Advantages
+- *Access By Index*: As depicted above, access to any item is an
+    ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)") operation.
+- *Memory*: Zero overhead required. The total size of an array is the sum of all
+    its items.
+- *Cache Optimized*: Arrays are guaranteed to have optimal [spatial
+    locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
+    have profound performance implications. See the [Memory
+    Cache](../memory_cache/) section for more details.
+
+### Disadvantages
+- *Insertions*: Inserting a new item changes the total size of the array.
+    Because each item is stored contiguously, a new section of memory must be
+    allocated to accommodate it. Next, existing items must be copied into the
+    newly allocated area. The situation is exacerbated if items are inserted
+    into the middle because existing items must also be shifted to the left or
+    right.
+- *Deletions*: Deleting is subject to the same problems as insertions. Items
+    must be stored contiguously; therefore, they have to be shifted either to
+    the left or right to fill the missing void.
+
+## Linked Lists
+#data_structure, #list
+
+## Binary Trees
+#data_structure, #list, #graph
+
+## Hash Tables
+#data_structure, #list
+
+
+
+
+
+
+
+
+
+## BELOW IS A WORK IN PROGRESS
 # Binary Tree
+
 #data_structure
 
 Binary trees are similar to [Linked List](../linked_list)s in that they
