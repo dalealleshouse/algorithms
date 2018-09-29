@@ -4,6 +4,7 @@
 
 #include "ListOperations.h"
 
+typedef void (*freer)(void* x);
 typedef int (*comparator)(const void* x, const void* y);
 
 typedef struct BinaryTreeNode {
@@ -14,10 +15,11 @@ typedef struct BinaryTreeNode {
 
 typedef struct {
     comparator comparator;
+    freer freer;
     BinaryTreeNode* root;
 } BinaryTree;
 
-BinaryTree* BinaryTree_Create(comparator);
+BinaryTree* BinaryTree_Create(comparator, freer);
 ListOpResult BinaryTree_Insert(BinaryTree*, void*);
 ListOpResult BinaryTree_Delete(BinaryTree*, void*);
 void BinaryTree_Destroy(BinaryTree*);

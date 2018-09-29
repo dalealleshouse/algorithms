@@ -11,91 +11,54 @@ first concept that an aspiring programmer should master because list
 manipulation is the single most common programming task. So common in fact that
 all mainstream languages have builtin list abstractions.  For instance, LISP,
 which stands for LISt Processor, is designed entirely around the concept.  C#
-has the `IEnumerable` interface and LINQ. Java has the somewhat comparable
-`Iterable` interface and Streams. Python has `list` and comprehensions. It's
-important to understand the concepts underlying these abstractions in order to
-choose the correct one. List data structures have differing strengths,
-weaknesses, and capabilities.  Sometimes choosing the right one is easy because
-it has some utility that others lack. On the other hand, it's possible to choose
-one that will meet the software requirements but have a prodigious negative
-impact on performance.
+has the `IEnumerable` interface, Java has the `Iterable` interface, Python has
+`list`. There are many more examples but there is no need to belabor the point.
+
+List data structures have differing strengths, weaknesses, and capabilities.
+Therefore, it's important to fully understand list abstractions in order to
+choose the correct one. Sometimes choosing the right one is easy because a
+particular utility is required. Contrarily, it's possible to choose one that
+will meet the software requirements but have a prodigious negative impact on
+performance.
 
 This section examines four list data structures [Arrays](#arrays), [Linked
 Lists](#linked-lists), [Binary Trees](#binary-trees), and [Hash
 Tables](#hash-tables).
 
-
 ## Arrays
 #data_structure, #list
 
-An array is the most common and simple list data structure. The constituent
-items occupy a single contiguous section of memory. The memory address of any
-item is easily calculable by taking the sum of the base address and the product
-of the desired index and the item size.  For example, see the array depicted
-below.
+An array is the most common and simple list data structure. It imposes no memory
+overhead because the constituent items occupy a single contiguous section of
+memory. The graphic below depicts how an array is arranged in memory.
 
-```
-Address
- 0x001         each item is 4 bytes
-   |
-{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}
-                    |
-                 Index 3
+#### Array
+![Array](array.png)
 
-```
-
-The memory address of the array item at index 3 is:
-
-```
-(base address) (item index) (size of item)
-      |             |             |
-    0x001    +     (3     *       4)       = 0x010 (16 in decimal)
-```
-
-The most notable attributes of an array are that array items are stored
-contiguously in memory and they require zero overhead.
-
-### Insertions
-The fact that arrays store items contiguously in memory makes insertions
-problematic. The operation requires four steps:
-
-* Allocate a new array large enough to accommodate the existing array and the
-    new item
-* Copy existing items from the original array to the desired position in new
-    array
-* Insert the item into new array
-* Dispose of the old array
-
-Caveats:
-- It's possible to allocate an array with empty slots to insert new items into.
-    However, this requires a separate mechanism for tracking which slots are
-    used and which are empty.
-- When copying items from an array into a new memory allocation, some sources
-    count each item copied as a separate operation. However, it can be done with a
-    single C `memcpy` command. Therefore, this project considers it a single
-    operation.
-
-
-
-
+### Asymptotic Complexity
+- Insert\Delete: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
+- Search: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
+   - The [Binary Search](../binary_search) algorithm can perform array searches
+       in ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) if
+       the array is sorted
+- Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 
 ### Advantages
-- *Access By Index*: As depicted above, access to any item is an
-    ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)") operation.
+- *Access By Index*: Arrays are the only data structure capable of accessing
+    items by index in ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)").
+    The memory address of any item is easily calculable by summing the base
+    address and the product of the desired index and item size.
 - *Memory*: Zero overhead required. The total size of an array is the sum of all
     its items.
-- *Cache Optimized*: Arrays are guaranteed to have optimal [spatial
+- *Cache Optimized*: Guaranteed to have optimal [spatial
     locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
     have profound performance implications. See the [Memory
     Cache](../memory_cache/) section for more details.
 
 ### Disadvantages
-- *Insertions*: Inserting a new item changes the total size of the array.
-    Because each item is stored contiguously, a new section of memory must be
-    allocated to accommodate it. Next, existing items must be copied into the
-    newly allocated area. The situation is exacerbated if items are inserted
-    into the middle because existing items must also be shifted to the left or
-    right.
+- *Insertions*: Inserting a new item requires a larger contiguous section of
+    memory. Therefore, a new section of memory must be allocated and existing
+    items must be copied into the newly allocated area.
 - *Deletions*: Deleting is subject to the same problems as insertions. Items
     must be stored contiguously; therefore, they have to be shifted either to
     the left or right to fill the missing void.
@@ -103,8 +66,58 @@ Caveats:
 ## Linked Lists
 #data_structure, #list
 
+Linked list is a simple yet powerful data structure. Much like an array, a
+linked list is simply a collection of items. The difference is that linked list
+items are not stored contiguously in memory. Each item maintains a pointer to
+the next item in the list so the items can be located anywhere. This is depicted
+graphically below.
+
+#### Linked List
+![Linked List](singly_linked_list.png)
+
+By convention, the first item is the list is known as the *head* and the last
+item is known as the *tail*.  There are essentially two types of linked lists:
+*singly linked lists* (depicted above) and *doubly linked lists* (depicted
+below). As the names imply, singly linked lists maintain a single pointer to the
+next item. Doubly linked lists maintain a pointer to the next item as well as a
+pointer the previous item.
+
+#### Doubly Linked List
+![Doubly Linked List](doubly_linked_list.png)
+
+Linked lists are especially helpful for applications such as
+[Stack](../stack/)s, and [Queue](../queue/)s.
+
+### Asymptotic Complexity
+- Insert\Delete: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+- Search: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
+- Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
+
+### Advantages
+- *Insertions*: Insertions to the list is a
+    ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
+- *Deletions*: Deleting from the list is a
+    ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
+
+### Disadvantages
+- *Random access*: The only way to access items is sequentially by starting at
+    the head and navigating through the `next` pointers.
+- *Memory*: Each item in the list must maintain an additional pointer. The total
+    size of a linked list is the sum of the items plus the size of the pointers
+    times the number of items.
+- *Cache Optimized*: It is possible to create a linked list with poor [spatial
+    locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
+    have profound performance implications. See the [Memory
+    Cache](../memory_cache/) section for more details.
+
 ## Binary Trees
 #data_structure, #list, #graph
+
+### Asymptotic Complexity
+- Insert\Delete: ![O(log
+    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+- Search: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+- Enumerate: N/A
 
 ## Hash Tables
 #data_structure, #list
@@ -118,156 +131,9 @@ Caveats:
 
 
 ## BELOW IS A WORK IN PROGRESS
-# Binary Tree
-
-#data_structure
-
-Binary trees are similar to [Linked List](../linked_list)s in that they
-represent lists of objects with fast insertion and deletion operations.
 
 
 
-```
-                        50
-                       /  \
-                      40  60
-                     / \  / \
-```
-
-
-
-
-
-Linked Lists are a simple yet powerful data structure with utility similar to an
-array. Most high level languages provide a built in linked list. For instance,
-C# and Java both have the aptly named `LinkedList<T>` construct.  A linked list
-can provide utility that an array cannot. This utility is not free though. As
-with most programming constructs, there are trade offs that must be carefully
-considered.
-
-In order to appreciate linked lists, one must understand how they are different
-than arrays. Therefore, a bit of review is in order.
-
-## Array
-
-An array is stored in a single contiguous section of memory. The addresses of
-any item is easily calculated by adding the base address to the product of the
-desired index and the item size.  For example, see the array depicted below.
-
-```
-Address
- 0x001         each item is 4 bytes
-   |
-{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}{----}
-                    |
-                 Index 3
-
-Index 3 address = 0x001 + (3 * 4) = 0x010 (16 in decimal)
-```
-
-### Advantages
-- *Random access*: As depicted above, access to any item is an
-    ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)") operation.
-- *Memory*: Zero overhead required. The total size of an array is the sum of all
-    its items.
-- *Cache Optimized*: Arrays are guaranteed to have optimal [spatial
-    locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
-    have profound performance implications. See the [Memory
-    Cache](../memory_cache/) section for more details.
-
-### Disadvantages
-- *Insertions*: Inserting a new item changes the total size of the array.
-    Because each item is stored contiguously, a new section of memory must be
-    allocated to accommodate it. Next, existing items must be copied into the
-    newly allocated area. The situation is exacerbated if items are inserted
-    into the middle because existing items must also be shifted to the left or
-    right.
-- *Deletions*: Deleting is subject to the same problems as insertions. Items
-    must be stored contiguously; therefore, they have to be shifted either to
-    the left or right to fill the missing void.
-
-## Linked Lists
-
-Much like an array, a linked list is simply a collection of items. The
-difference is that linked list items are not stored contiguously. Each item
-maintains a pointer to the next item in the list. This is depicted graphically
-below.
-
-```
-Address
-0x001   { ---- next=0x010 }->       List Head
-                            |
-0x009   unrelated bits      |
-        <--------------------
-        |
-0x010   { ---- next=0x018 }->
-                            |
-        <--------------------
-        |
-0x018   { ---- next=0x020 }->
-                            |
-        <--------------------
-        |
-0x020   { ---- next=0x030 }->
-                            |
-0x028   unrelated bits      |
-        <--------------------
-        |
-0x030   { ---- next=NULL }          List Tail
-```
-
-### Advantages
-- *Insertions*: Insertions anywhere in the list is a
-    ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation. It only
-    requires updating pointers.
-- *Deletions*: Deleting from the list is a
-    ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation. It only
-    requires updating pointers.
-
-### Disadvantages
-- *Random access*: The only way to access items is sequentially by starting at
-    the head and navigating through the `next` pointers.
-- *Memory*: Each item in the list must maintain an additional pointer. The total
-    size of a linked list is the sum of the items plus the size of the pointers
-    times the number of items.
-- *Cache Optimized*: It is possible to create a linked list with poor [spatial
-    locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
-    have profound performance implications. See the [Memory
-    Cache](../memory_cache/) section for more details.
-
-There are essentially two types of linked lists: *singly linked lists* and
-*doubly linked lists*. As the names imply, singly linked lists maintain a single
-pointer to the next item. Doubly linked lists maintain a pointer to the next
-item as well as a pointer the previous item. A double linked list is depicted
-below.
-
-```
-                            Doubly Linked List
-
-Address
-0x001   { prev=NULL ---- next=0x010 }<->       List Head
-                                       |
-0x009   unrelated bits                 |
-        <------------------------------>
-        |
-0x010   { prev=Ox001 ---- next=0x018 }<->
-                                        |
-        <------------------------------->
-        |
-0x018   { prev=Ox010 ---- next=0x020 }<->
-                                        |
-        <------------------------------->
-        |
-0x020   { prev=Ox018 ---- next=0x030 }<->
-                                        |
-0x028   unrelated bits                  |
-        <------------------------------->
-        |
-0x030   { prev=x020 ---- next=NULL }          List Tail
-```
-
-Linked lists are especially helpful for things like [Stack](../stack/)s,
-[Heap](../heap/)s, and [Queue](../queue/)s.
 
 ## Actual Run Times
 
