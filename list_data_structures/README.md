@@ -54,6 +54,7 @@ memory. The graphic below depicts how an array is arranged in memory.
     locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
     have profound performance implications. See the [Memory
     Cache](../memory_cache/) section for more details.
+- *Maintains Order*: Maintains the order in which items are inserted
 
 ### Disadvantages
 - *Insertions*: Inserting a new item requires a larger contiguous section of
@@ -62,6 +63,9 @@ memory. The graphic below depicts how an array is arranged in memory.
 - *Deletions*: Deleting is subject to the same problems as insertions. Items
     must be stored contiguously; therefore, they have to be shifted either to
     the left or right to fill the missing void.
+- *Search*: Although sorted arrays can take advantage of [Binary
+    Search](../binary_search), there is no inherit support for search
+    operations other than examining each item individually.
 
 ## Linked Lists
 #data_structure, #list
@@ -98,10 +102,9 @@ Linked lists are especially helpful for applications such as
     ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
 - *Deletions*: Deleting from the list is a
     ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
+- *Maintains Order*: Maintains the order in which items are inserted
 
 ### Disadvantages
-- *Random access*: The only way to access items is sequentially by starting at
-    the head and navigating through the `next` pointers.
 - *Memory*: Each item in the list must maintain an additional pointer. The total
     size of a linked list is the sum of the items plus the size of the pointers
     times the number of items.
@@ -109,18 +112,70 @@ Linked lists are especially helpful for applications such as
     locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
     have profound performance implications. See the [Memory
     Cache](../memory_cache/) section for more details.
+- *Search*: There is no inherit support for search operations other than
+    examining each item individually.
 
 ## Binary Trees
 #data_structure, #list, #graph
 
-Binary trees are slightly more complex than other data structures. 
+Just like arrays and linked lists, binary trees are another list data structure
+(technically, they are a [graph](../graph_concepts) data structure but graph
+concepts aren't germane to this topic). Each item in a binary tree is a node
+with a left and right pointer. The left pointer points to a node with a lesser
+valued item and the right pointer points to a node with a greater valued item.
+The root node can be any node in the structure and acts as the entry point.
+Binary trees have built in support for [Binary Search](../binary_search) with a
+trade off of slightly slower insert and delete operations. The data structure is
+depicted in the image below.
+
+#### Binary Tree
+![Binary Tree](binary_tree.png)
+
+In reality, a more appropriate name may be *inverted* binary tree because it
+looks like an upside down tree. Alas, we are bound by convention. Remember the
+words of Bertrand Russell, "Conventional people are roused to fury by departure
+from convention, largely because they regard such departure as a criticism of
+themselves."
+
+A major concern with binary trees is *balance*. The image above represents a
+balanced tree because there are approximately the same number of items or either
+side of the root. Consider what would happen if sorted items are inserted which
+is depicted below. In this case, insert, delete, and search operations are
+actually ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
+
+#### Unbalanced Binary Tree
+![Unbalanced Binary Tree](unbalanced_binary_tree.png)
 
 ### Asymptotic Complexity
 - Insert\Delete: ![O(log
-    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
-- Search: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) for balanced
+    trees, ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)") for
+    unbalanced trees.
+- Search: ![O(log
+    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) for balanced
+    trees, ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)") for totally
+    trees.
 - Enumerate: ![O(n + log
- n)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;\log&space;n))
+    n)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;\log&space;n))
+    for balanced trees, ![O(n +
+    n)](https://latex.codecogs.com/gif.latex?O(n&plus;n)) for unbalanced trees.
+
+### Advantages
+- *Search*: Optimized for quick search operations
+- *Insertions*: Although slower then linked list, considerably faster than
+    arrays.
+- *Deletions*: Although slower then linked list, considerably faster than
+    arrays.
+
+### Disadvantages
+- *Memory*: Each item maintains two additional pointers. The total size of a
+    binary tree is the sum of the items plus the size of the pointers times the
+    number of items.
+- *Cache Optimized*: It is possible to create a binary tree with poor [spatial
+    locality](https://en.wikipedia.org/wiki/Locality_of_reference) which can
+    have profound performance implications. See the [Memory
+    Cache](../memory_cache/) section for more details.
+- *Maintains Order*: The order in which items are inserted is lost
 
 ## Hash Tables
 #data_structure, #list
@@ -151,7 +206,7 @@ recreate the data on your machine, navigate to the c directory and execute the
 All insertions were made to the head of the data structure. Each array insertion
 results in a reallocation and copy.
 
-![INSERTION RUN TIMES](c/INSERTION.png "INSERTION RUN TIMES") 
+![INSERTION RUN TIMES](c/INSERTION.png "INSERTION RUN TIMES")
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
@@ -171,16 +226,16 @@ code below show the actual code that is being timed.
 ```
 // Array Random Access Code
 for (size_t i = 0; i < n; i++)
-    val += arr[rand() % (n - 1)];
+val += arr[rand() % (n - 1)];
 
 // Linked List Random Access Code
 for (size_t i = 0; i < n; i++) {
-    void* item = list_get_at(&list, rand() % (n - 1));
-    val += (uintptr_t)item;
+void* item = list_get_at(&list, rand() % (n - 1));
+val += (uintptr_t)item;
 }
 ```
 
-![RANDOM ACCESS RUN TIMES](c/RANDOM_ACCESS.png "RANDOM ACCESS RUN TIMES") 
+![RANDOM ACCESS RUN TIMES](c/RANDOM_ACCESS.png "RANDOM ACCESS RUN TIMES")
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
@@ -200,14 +255,14 @@ code is shown below.
 ```
 // Array Sequential Access Code
 for (size_t i = 0; i < n; i++)
-    val += arr[i];
+val += arr[i];
 
 
 // Linked List Sequential Access Code
 list_item* item = list.head;
 while (item != NULL) {
-    val += (uintptr_t)item->payload;
-    item = item->next;
+val += (uintptr_t)item->payload;
+item = item->next;
 }
 ```
 
@@ -222,7 +277,7 @@ the validity of the results.
 
 
 ![SEQUENTIAL ACCESS RUN TIMES](c/SEQUENTIAL_ACCESS.png "SEQUENTIAL ACCESS RUN
-TIMES") 
+TIMES")
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
