@@ -4,9 +4,47 @@
 #include "BinaryTree.h"
 #include "MemAllocMock.h"
 
+static BinaryTreeNode* BinaryTree_FindNode(
+    const BinaryTree* self, BinaryTreeNode* node, const void* item)
+{
+    if (node == NULL)
+        return NULL;
+
+    int comp_result = self->comparator(item, node->item);
+
+    if (comp_result == 0)
+        return node;
+    else if (comp_result < 0)
+        return BinaryTree_FindNode(self, node->left, item);
+    else
+        return BinaryTree_FindNode(self, node->right, item);
+}
+
 static BinaryTreeNode* BinaryTree_CreateNode()
 {
     return calloc(sizeof(BinaryTreeNode), 1);
+}
+
+static void BinaryTree_FreeNode(BinaryTreeNode* node, freer freer)
+{
+    if (freer != NULL)
+        freer(node->item);
+
+    free(node);
+}
+
+static void BinaryTree_FreeNodeAndChildren(BinaryTreeNode* node, freer freer)
+{
+    if (node == NULL)
+        return;
+
+    if (node->left != NULL)
+        BinaryTree_FreeNodeAndChildren(node->left, freer);
+
+    if (node->right != NULL)
+        BinaryTree_FreeNodeAndChildren(node->right, freer);
+
+    BinaryTree_FreeNode(node, freer);
 }
 
 BinaryTree* BinaryTree_Create(comparator comparator, freer freer)
@@ -25,20 +63,25 @@ BinaryTree* BinaryTree_Create(comparator comparator, freer freer)
 }
 
 static void BinaryTree_ExpandTree(
-    BinaryTreeNode* root, BinaryTreeNode* item, comparator comparator)
+    BinaryTree* self, BinaryTreeNode* root, BinaryTreeNode* item)
 {
-    int comp_result = comparator(item->item, root->item);
+    if (self->root == NULL) {
+        self->root = item;
+        return;
+    }
+
+    int comp_result = self->comparator(item->item, root->item);
 
     if (comp_result < 0) {
         if (root->left == NULL)
             root->left = item;
         else
-            BinaryTree_ExpandTree(root->left, item, comparator);
+            BinaryTree_ExpandTree(self, root->left, item);
     } else {
         if (root->right == NULL)
             root->right = item;
         else
-            BinaryTree_ExpandTree(root->right, item, comparator);
+            BinaryTree_ExpandTree(self, root->right, item);
     }
 }
 
@@ -53,12 +96,7 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* item)
 
     node->item = item;
 
-    if (self->root == NULL) {
-        self->root = node;
-        return ListOp_Success;
-    }
-
-    BinaryTree_ExpandTree(self->root, node, self->comparator);
+    BinaryTree_ExpandTree(self, self->root, node);
     return ListOp_Success;
 }
 
@@ -76,17 +114,14 @@ static ListOpResult BinaryTree_DeleteNode(
         BinaryTreeNode* left = node->left;
         BinaryTreeNode* right = node->right;
 
-        if (self->freer != NULL)
-            self->freer(node->item);
-
-        free(node);
+        BinaryTree_FreeNode(node, self->freer);
         *root = NULL;
 
         if (left != NULL)
-            BinaryTree_ExpandTree(self->root, left, self->comparator);
+            BinaryTree_ExpandTree(self, self->root, left);
 
         if (right != NULL)
-            BinaryTree_ExpandTree(self->root, right, self->comparator);
+            BinaryTree_ExpandTree(self, self->root, right);
 
         return ListOp_Success;
     }
@@ -102,27 +137,56 @@ ListOpResult BinaryTree_Delete(BinaryTree* self, void* item)
     if (self == NULL || item == NULL)
         return ListOp_NullParameter;
 
+    /* BinaryTreeNode* node = BinaryTree_FindNode(self, self->root, item); */
+
+    /* if(node == NULL) */
+    /*     return ListOp_NotFound; */
+
+    /* if(node->left == NULL && node->right == NULL) */
+    /*     BinaryTree_FreeNode(node, self->freer); */
+
+    /* return ListOp_Success; */
+
     return BinaryTree_DeleteNode(self, &self->root, item);
 }
 
-static void BinaryTree_FreeNode(BinaryTreeNode* node)
+void* BinaryTree_Search(const BinaryTree* self, const void* item)
+{
+    if (self == NULL || item == NULL)
+        return NULL;
+
+    BinaryTreeNode* node = BinaryTree_FindNode(self, self->root, item);
+
+    if (node == NULL)
+        return NULL;
+
+    return node->item;
+}
+
+static void BinaryTree_HandleNodes(BinaryTreeNode* node, item_handler handler)
 {
     if (node == NULL)
         return;
 
-    if (node->left != NULL)
-        BinaryTree_FreeNode(node->left);
+    BinaryTree_HandleNodes(node->left, handler);
+    handler(node->item);
+    BinaryTree_HandleNodes(node->right, handler);
+}
 
-    if (node->right != NULL)
-        BinaryTree_FreeNode(node->right);
+ListOpResult BinaryTree_Enumerate(const BinaryTree* self, item_handler handler)
+{
+    if (self == NULL || handler == NULL)
+        return ListOp_NullParameter;
 
-    free(node);
+    BinaryTree_HandleNodes(self->root, handler);
+
+    return ListOp_Success;
 }
 
 void BinaryTree_Destroy(BinaryTree* self)
 {
     if (self != NULL)
-        BinaryTree_FreeNode(self->root);
+        BinaryTree_FreeNodeAndChildren(self->root, self->freer);
 
     free(self);
 }

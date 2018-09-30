@@ -113,11 +113,14 @@ Linked lists are especially helpful for applications such as
 ## Binary Trees
 #data_structure, #list, #graph
 
+Binary trees are slightly more complex than other data structures. 
+
 ### Asymptotic Complexity
 - Insert\Delete: ![O(log
     n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
 - Search: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
-- Enumerate: N/A
+- Enumerate: ![O(n + log
+ n)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;\log&space;n))
 
 ## Hash Tables
 #data_structure, #list
