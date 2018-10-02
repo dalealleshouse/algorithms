@@ -10,13 +10,13 @@ objects are known as either *vertices* or *nodes*. The relationship between the
 vertices are *edges*. To make the concept a bit more concrete, consider modeling
 one's family as a graph. The people in the family would be vertices, and the
 relationships between them (mother, daughter, father, brother, etc..) would be
-edges. Edges are typically denoted by a pair. If Dick is Jane's brother, the
-relationship is be denoted as (Dick, Jane). The set of all vertices is denoted
-as `V` and `E` denotes the set of all edges. The *degree* of a vertex is the
-number of edges connected to it.
+edges. Edges are typically denoted by a pair known as the *endpoints*. If Dick
+is Jane's brother, the relationship is be denoted as (Dick, Jane). The set of
+all vertices is denoted as `V` and `E` denotes the set of all edges. The
+*degree* of a vertex is the number of edges connected to it.
 
 There are two types of graphs: *undirected* and *directed*. The edges of an
-undirected graph indicate a bi-directional relationship. (A, B) and (B, A) are
+undirected graph indicates a bi-directional relationship. (A, B) and (B, A) are
 essentially the same.  See the example below.
 
 #### Undirected Graph
@@ -60,6 +60,9 @@ is two or more edges related to the same two vertices. For instance, (A, B) and
 
 ![parallel edges](par-edges.png)
 
+Graphs are said to be *connected* when there is no way to separate the vertices
+without edges crossing between the parts.
+
 ## Graph Size
 
 In order to accurately predict the performance of graph algorithms, it's
@@ -68,12 +71,21 @@ size is made up of two components: the number of vertices and the number of
 edges. By convention, `n` denotes the number of vertices and `m` denotes the
 number of edges.
 
+```
+n = |V|
+m = |E|
+```
+
 Graph density is important when determining the best way to represent a graph in
 memory. Consider a graph with no parallel edges, the lower bound of `m` is
 ![n-1](https://latex.codecogs.com/gif.latex?n-1). The upper bound of `m` is
-![n(n-1)/2](https://latex.codecogs.com/gif.latex?n(n-1)/2). Roughly defined, a
-*sparse* graph is closer to the lower bound and a *dense* graph is closer to the
-upper bound.
+![n(n-1)/2](https://latex.codecogs.com/gif.latex?\frac{n(n-1)}{2}).
+
+Graphs conforming the lower bound are known as *tree*s. A *complete* graph has
+the maximum number of edges with none of them being parallel.
+
+Roughly defined, a *sparse* graph is closer to the lower bound and a *dense*
+graph is closer to the upper bound.
 
 ## Graph Representations
 

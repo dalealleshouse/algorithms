@@ -57,12 +57,9 @@ memory. The graphic below depicts how an array is arranged in memory.
 - *Maintains Order*: Maintains the order in which items are inserted
 
 ### Disadvantages
-- *Insertions*: Inserting a new item requires a larger contiguous section of
-    memory. Therefore, a new section of memory must be allocated and existing
-    items must be copied into the newly allocated area.
-- *Deletions*: Deleting is subject to the same problems as insertions. Items
-    must be stored contiguously; therefore, they have to be shifted either to
-    the left or right to fill the missing void.
+- *Insert\Delete*: Inserting\Deleting a item requires a different sized
+    contiguous section of memory. Therefore, a new section of memory must be
+    allocated and existing items must be copied into the newly allocated area.
 - *Search*: Although sorted arrays can take advantage of [Binary
     Search](../binary_search), there is no inherit support for search
     operations other than examining each item individually.
@@ -84,7 +81,7 @@ item is known as the *tail*.  There are essentially two types of linked lists:
 *singly linked lists* (depicted above) and *doubly linked lists* (depicted
 below). As the names imply, singly linked lists maintain a single pointer to the
 next item. Doubly linked lists maintain a pointer to the next item as well as a
-pointer the previous item.
+pointer to the previous item.
 
 #### Doubly Linked List
 ![Doubly Linked List](doubly_linked_list.png)
@@ -98,10 +95,7 @@ Linked lists are especially helpful for applications such as
 - Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 
 ### Advantages
-- *Insertions*: Insertions to the list is a
-    ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
-- *Deletions*: Deleting from the list is a
-    ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
+- *Insert\Delete*: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
 - *Maintains Order*: Maintains the order in which items are inserted
 
 ### Disadvantages
@@ -162,9 +156,7 @@ actually ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
 
 ### Advantages
 - *Search*: Optimized for quick search operations
-- *Insertions*: Although slower then linked list, considerably faster than
-    arrays.
-- *Deletions*: Although slower then linked list, considerably faster than
+- *Insert\Delete*: Although slower then linked list, considerably faster than
     arrays.
 
 ### Disadvantages

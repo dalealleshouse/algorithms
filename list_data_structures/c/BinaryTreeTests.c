@@ -5,6 +5,7 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
+#include "BinaryTreeTests.h"
 #include "BinaryTree.h"
 #include "MemAllocMock.h"
 
@@ -437,7 +438,7 @@ static void BinaryTree_Destroy_frees_all_nodes()
     BinaryTree_Destroy(tree);
 }
 
-static int register_test_suites()
+int register_binary_tree_tests()
 {
     CU_TestInfo Create_tests[] = { CU_TEST_INFO(BinaryTree_Create_bad_malloc),
         CU_TEST_INFO(BinaryTree_Create_inits_values),
@@ -493,7 +494,7 @@ static int register_test_suites()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Search_tests },
-        { .pName = "BinaryTree_Enumberate",
+        { .pName = "BinaryTree_Enumerate",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Enumerate_tests },
@@ -504,27 +505,4 @@ static int register_test_suites()
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
-}
-
-int main(void)
-{
-    if (CUE_SUCCESS != CU_initialize_registry())
-        return CU_get_error();
-
-    if (register_test_suites() != 0) {
-        CU_cleanup_registry();
-        return -1;
-    }
-
-    // Run all tests using the basic interface
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-
-    // You must get this value before CU_cleanup_registry() or it will revert to
-    // zero
-    int ret = (CU_get_number_of_failure_records() != 0);
-
-    /* Clean up registry and return */
-    CU_cleanup_registry();
-    return ret;
 }
