@@ -184,7 +184,7 @@ ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index)
     return ListOp_Success;
 }
 
-void* LinkedList_Search(LinkedList* self, const void* item)
+void* LinkedList_Search(const LinkedList* self, const void* item)
 {
     if (self == NULL || item == NULL)
         return NULL;
