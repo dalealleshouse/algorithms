@@ -97,12 +97,6 @@ static void BinaryTree_Create_null_param()
 }
 
 /*************************** BinaryTree_Insert ********************************/
-static void NodeHasValue(int expected, BinaryTreeNode* node)
-{
-    CU_ASSERT_PTR_NOT_NULL(node);
-    CU_ASSERT_EQUAL(expected, VOIDP2INT(node->item));
-}
-
 static void BinaryTree_Insert_bad_malloc()
 {
     BinaryTree* tree = BinaryTree_Create(int_comparator, NULL);
@@ -414,6 +408,7 @@ static void BinaryTree_Destroy_frees_all_nodes()
 
     for (size_t i = 0; i < 50; i++) {
         int* val = malloc(sizeof(int));
+        *val = i;
         InsertAndCheckSuccess(tree, val);
     }
 
