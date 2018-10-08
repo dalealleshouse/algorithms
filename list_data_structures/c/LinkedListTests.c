@@ -382,6 +382,54 @@ static void LinkedList_Search_finds_item()
     LinkedList_Destroy(list);
 }
 
+/*************************** LinkedList_Enumerate *****************************/
+static const size_t mock_n = 13;
+static int mock_vals[] = { 50, 25, 33, 11, 30, 40, 75, 61, 89, 52, 82, 95, 55 };
+static int mock_pos = 0;
+static void MockItemHandler(void* item)
+{
+    CU_ASSERT_EQUAL(mock_vals[mock_pos], *(int*)item);
+    mock_pos++;
+}
+
+static void LinkedList_Enumerate_null_paramter()
+{
+    LinkedList* list = LinkedList_Create(NULL, int_comparator);
+
+    ListOpResult result = LinkedList_Enumerate(list, NULL);
+    CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+
+    result = LinkedList_Enumerate(NULL, MockItemHandler);
+    CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+
+    LinkedList_Destroy(list);
+}
+
+static void LinkedList_Enumerate_empty()
+{
+    LinkedList* list = LinkedList_Create(NULL, int_comparator);
+
+    ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);
+    CU_ASSERT_EQUAL(ListOp_Success, result);
+
+    LinkedList_Destroy(list);
+}
+
+static void LinkedList_Enumerate_standard()
+{
+    LinkedList* list = LinkedList_Create(NULL, int_comparator);
+
+    for (size_t i = 0; i < mock_n; i++)
+        LinkedList_InsertAt(list, &mock_vals[i], list->size);
+
+    mock_pos = 0;
+    ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);
+    CU_ASSERT_EQUAL(ListOp_Success, result);
+    CU_ASSERT_EQUAL(mock_n, mock_pos);
+
+    LinkedList_Destroy(list);
+}
+
 /*************************** LinkedList_Destory *******************************/
 // If there are no errors, this passes
 static void LinkedList_Destroy_null_parameter() { LinkedList_Destroy(NULL); }
@@ -442,6 +490,11 @@ int register_linked_list_tests()
               CU_TEST_INFO(LinkedList_Search_not_found),
               CU_TEST_INFO(LinkedList_Search_finds_item), CU_TEST_INFO_NULL };
 
+    CU_TestInfo enumerate_tests[]
+        = { CU_TEST_INFO(LinkedList_Enumerate_null_paramter),
+              CU_TEST_INFO(LinkedList_Enumerate_empty),
+              CU_TEST_INFO(LinkedList_Enumerate_standard), CU_TEST_INFO_NULL };
+
     CU_TestInfo destroy_tests[] = { CU_TEST_INFO(
                                         LinkedList_Destroy_null_parameter),
         CU_TEST_INFO(LinkedList_Destroy_null_freer),
@@ -463,6 +516,10 @@ int register_linked_list_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = search_tests },
+        { .pName = "LinkedList_Enumerate",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = enumerate_tests },
         { .pName = "LinkedList_Destroy",
             .pInitFunc = noop,
             .pCleanupFunc = noop,

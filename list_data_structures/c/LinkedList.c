@@ -201,6 +201,21 @@ void* LinkedList_Search(LinkedList* self, const void* item)
     return NULL;
 }
 
+ListOpResult LinkedList_Enumerate(const LinkedList* self, item_handler handler)
+{
+    if (self == NULL || handler == NULL)
+        return ListOp_NullParameter;
+
+    LinkedListItem* current = self->head;
+
+    while (current != NULL) {
+        handler(current->payload);
+        current = current->next;
+    }
+
+    return ListOp_Success;
+}
+
 void LinkedList_Destroy(LinkedList* list)
 {
     if (list == NULL)
