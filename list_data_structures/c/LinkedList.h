@@ -23,11 +23,13 @@ typedef struct LinkedListItem {
 typedef struct {
     size_t size;
     freer freer;
+    comparator comparator;
     LinkedListItem* head;
     LinkedListItem* tail;
 } LinkedList;
 
-LinkedList* LinkedList_Create(freer);
+LinkedList* LinkedList_Create(freer, comparator);
 ListOpResult LinkedList_InsertAt(LinkedList*, void*, const size_t);
 ListOpResult LinkedList_DeleteAt(LinkedList*, const size_t);
+void* LinkedList_Search(LinkedList*, const void*);
 void LinkedList_Destroy(LinkedList*);

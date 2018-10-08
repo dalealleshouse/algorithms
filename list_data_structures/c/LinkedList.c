@@ -3,7 +3,7 @@
 #include "LinkedList.h"
 #include "MemAllocMock.h"
 
-LinkedList* LinkedList_Create(freer freer)
+LinkedList* LinkedList_Create(freer freer, comparator comparator)
 {
     LinkedList* list = calloc(sizeof(LinkedList), 1);
 
@@ -11,6 +11,7 @@ LinkedList* LinkedList_Create(freer freer)
         return NULL;
 
     list->freer = freer;
+    list->comparator = comparator;
     return list;
 }
 
@@ -181,6 +182,23 @@ ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index)
 
     self->size--;
     return ListOp_Success;
+}
+
+void* LinkedList_Search(LinkedList* self, const void* item)
+{
+    if (self == NULL || item == NULL)
+        return NULL;
+
+    LinkedListItem* current = self->head;
+
+    while (current != NULL) {
+        if (self->comparator(item, current->payload) == 0)
+            return current->payload;
+
+        current = current->next;
+    }
+
+    return NULL;
 }
 
 void LinkedList_Destroy(LinkedList* list)

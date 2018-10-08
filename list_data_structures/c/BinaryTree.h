@@ -4,10 +4,6 @@
 
 #include "ListOperations.h"
 
-typedef void (*freer)(void* x);
-typedef void (*item_handler)(void* x);
-typedef int (*comparator)(const void* x, const void* y);
-
 typedef struct BinaryTreeNode {
     void* item;
     struct BinaryTreeNode* left;

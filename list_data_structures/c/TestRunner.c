@@ -1,8 +1,8 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-#include "BinaryTreeTests.h"
-#include "LinkedListTests.h"
+int register_binary_tree_tests();
+int register_linked_list_tests();
 
 int main(void)
 {
