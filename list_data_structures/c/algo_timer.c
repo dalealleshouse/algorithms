@@ -12,7 +12,7 @@ void* BuildEmptyDataStructure(Structure str)
 {
     switch (str) {
     case ARRAY:
-        return Array_Create(ptr_comparator, sizeof(uintptr_t));
+        return Array_Create(int_comparator, sizeof(uintptr_t));
     case LINKED_LIST:
     case LINKED_LIST_POOR_LOCALITY:
         return LinkedList_Create(NULL, ptr_comparator);
@@ -27,7 +27,7 @@ void* BuildEmptyDataStructure(Structure str)
 void* BuildDataStructure(Structure str, size_t n)
 {
     void* ds = BuildEmptyDataStructure(str);
-    InsertOp op = GetInsertOperation(str);
+    ListOp op = GetInsertOperation(str);
     if (ds == NULL)
         return NULL;
 
@@ -107,7 +107,7 @@ ListOpResult BinaryTree_InsertOp(void* tree, uintptr_t item)
     return BinaryTree_Insert(tree, (void*)item);
 }
 
-InsertOp GetInsertOperation(Structure str)
+ListOp GetInsertOperation(Structure str)
 {
     switch (str) {
     case ARRAY:
@@ -123,7 +123,81 @@ InsertOp GetInsertOperation(Structure str)
     }
 }
 
-double OperationTime(Operation op, Structure st, size_t n, size_t num_op)
+uintptr_t Array_SearchOp(const void* array, const uintptr_t item)
+{
+    void* result = Array_Search(array, &item);
+
+    if (result == NULL)
+        return 0;
+
+    return *(uintptr_t*)result;
+}
+
+uintptr_t LinkedList_SearchOp(const void* list, const uintptr_t item)
+{
+    return (uintptr_t)LinkedList_Search(list, (void*)item);
+}
+
+uintptr_t BinaryTree_SearchOp(const void* tree, const uintptr_t item)
+{
+    return (uintptr_t)BinaryTree_Search(tree, (void*)item);
+}
+
+SearchOp GetSearchOperation(Structure str)
+{
+    switch (str) {
+    case ARRAY:
+        return Array_SearchOp;
+    case LINKED_LIST:
+    case LINKED_LIST_POOR_LOCALITY:
+        return LinkedList_SearchOp;
+    case BINARY_TREE:
+    case BINARY_TREE_UNBALANCED:
+        return BinaryTree_SearchOp;
+    default:
+        return NULL;
+    }
+}
+
+void Array_EnumerateHandler(void* item) { _enumerate_sum += *(uintptr_t*)item; }
+
+void Array_EnumerateOp(const void* array)
+{
+    Array_Enumerate(array, Array_EnumerateHandler);
+}
+
+void ListAndTree_EnumerateHandler(void* item)
+{
+    _enumerate_sum += (uintptr_t)item;
+}
+
+void LinkedList_EnumerateOp(const void* list)
+{
+    LinkedList_Enumerate(list, ListAndTree_EnumerateHandler);
+}
+
+void BinaryTree_EnumerateOp(const void* tree)
+{
+    BinaryTree_Enumerate(tree, ListAndTree_EnumerateHandler);
+}
+
+EnumerateOp GetEnumerateOperation(Structure str)
+{
+    switch (str) {
+    case ARRAY:
+        return Array_EnumerateOp;
+    case LINKED_LIST:
+    case LINKED_LIST_POOR_LOCALITY:
+        return LinkedList_EnumerateOp;
+    case BINARY_TREE:
+    case BINARY_TREE_UNBALANCED:
+        return BinaryTree_EnumerateOp;
+    default:
+        return NULL;
+    }
+}
+
+double OperationTime(Operation op, Structure st, size_t n)
 {
     clock_t t;
     void* ds;
@@ -132,27 +206,44 @@ double OperationTime(Operation op, Structure st, size_t n, size_t num_op)
     case INSERT:
         // In the case of insert, n is ignored
         ds = BuildEmptyDataStructure(st);
-        InsertOp op = GetInsertOperation(st);
+        ListOp op = GetInsertOperation(st);
         if (ds == NULL || op == NULL)
             return -1;
 
         // Timed operation
         t = clock();
-        for (size_t i = 0; i < num_op; i++)
+        for (size_t i = 0; i < n; i++)
             op(ds, rand());
         t = clock() - t;
-
-        DestroyStructure(st, ds);
+        break;
     case SEARCH:
         ds = BuildDataStructure(st, n);
-        return -1;
+        SearchOp s_op = GetSearchOperation(st);
+        if (ds == NULL || s_op == NULL)
+            return -1;
+
+        t = clock();
+        for (size_t i = 0; i < n; i++)
+            s_op(ds, rand());
+        t = clock() - t;
+        break;
     case ENUMERATE:
         ds = BuildDataStructure(st, n);
-        return -1;
+        EnumerateOp e_op = GetEnumerateOperation(st);
+        _enumerate_sum = 0;
+
+        t = clock();
+        e_op(ds);
+        t = clock() - t;
+
+        // print to keep the compiler from optimizing the enumerate away
+        printf("ignore this = %lu\n", _enumerate_sum);
+        break;
     default:
         return -1;
     }
 
+    DestroyStructure(st, ds);
     double time = ((double)t) / CLOCKS_PER_SEC;
     return time;
 }
