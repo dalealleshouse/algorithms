@@ -95,6 +95,7 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* item)
         return ListOp_FailedMalloc;
 
     node->item = item;
+    self->n++;
 
     BinaryTree_ExpandTree(self, self->root, node);
     return ListOp_Success;
@@ -123,6 +124,7 @@ static ListOpResult BinaryTree_DeleteNode(
         if (right != NULL)
             BinaryTree_ExpandTree(self, self->root, right);
 
+        self->n--;
         return ListOp_Success;
     }
 
@@ -136,16 +138,6 @@ ListOpResult BinaryTree_Delete(BinaryTree* self, void* item)
 {
     if (self == NULL || item == NULL)
         return ListOp_NullParameter;
-
-    /* BinaryTreeNode* node = BinaryTree_FindNode(self, self->root, item); */
-
-    /* if(node == NULL) */
-    /*     return ListOp_NotFound; */
-
-    /* if(node->left == NULL && node->right == NULL) */
-    /*     BinaryTree_FreeNode(node, self->freer); */
-
-    /* return ListOp_Success; */
 
     return BinaryTree_DeleteNode(self, &self->root, item);
 }

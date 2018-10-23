@@ -133,9 +133,9 @@ themselves."
 
 A major concern with binary trees is *balance*. The image above represents a
 balanced tree because there are approximately the same number of items or either
-side of the root. Consider what would happen if sorted items are inserted which
-is depicted below. In this case, insert, delete, and search operations are
-actually ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
+side of the root. Consider what would happen if sorted items are inserted as
+depicted below. In this case, insert, delete, and search operations are actually
+![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
 
 #### Unbalanced Binary Tree
 ![Unbalanced Binary Tree](unbalanced_binary_tree.png)
@@ -147,8 +147,8 @@ actually ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
     unbalanced trees.
 - Search: ![O(log
     n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) for balanced
-    trees, ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)") for totally
-    trees.
+    trees, ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)") for
+    unbalanced trees.
 - Enumerate: ![O(n + log
     n)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;\log&space;n))
     for balanced trees, ![O(n +

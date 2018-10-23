@@ -14,6 +14,7 @@ typedef struct {
     comparator comparator;
     freer freer;
     BinaryTreeNode* root;
+    size_t n;
 } BinaryTree;
 
 BinaryTree* BinaryTree_Create(comparator, freer);
