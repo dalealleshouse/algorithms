@@ -96,8 +96,8 @@ recreate the data on your machine, navigate to the c directory and execute the
 
 |ALGORITHM| n=25,m=250 |n=50,m=500 |n=75,m=750 |n=100,m=1000 |n=125,m=1250 |
 --|--|--|--|--|--|
-|KARGER |0.044031 sec|0.636622 sec|3.088025 sec|9.720699 sec|23.503915 sec|
-|KARGER_STEIN |0.008457 sec|0.027829 sec|0.077786 sec|0.172399 sec|0.348342 sec|
+|KARGER |0.053415 sec|0.722489 sec|3.389049 sec|10.802166 sec|24.735355 sec|
+|KARGER_STEIN |0.009551 sec|0.037323 sec|0.089343 sec|0.210117 sec|0.416360 sec|
 
 Key Takeaways:
 - A probabilistic algorithm can be run multiple times to achieve a higher
