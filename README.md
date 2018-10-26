@@ -56,20 +56,19 @@ Actual run time data
 
 ## Index
 
-* [Linked Lists](linked_list/)
-    * [C](linked_list/c)
-* [Quick Select](quick_select/)
-	* [C](quick_select/c/)
-* [Random Contraction](random_contraction/)
-    * [C](random_contraction/c)
+* [List Data Structures](list_data_structures/)
+    * [Array](list_data_structures/README.md#arrays)
+    * [Linked List](list_data_structures/README.md#linked-lists)
+    * [Binary Tree](list_data_structures/README.md#binary-trees)
+    * [Hash Tables](list_data_structures/README.md#hash-tables)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
     * [Selection Sort](sorting/README.md#selection-sort)
     * [Merge Sort](sorting/README.md#merge-sort)
     * [Quick Sort](sorting/README.md#quick-sort)
-	* [C](sorting/c/)
-	* [Python](sorting/python/)
+* [Quick Select](quick_select/)
+* [Random Contraction](random_contraction/)
 
 ## Build/Tests
 ### C

@@ -1,5 +1,8 @@
 Add error handling/checking into random_contraction.c
 
+Add a way to track which nodes are collapsed so that we can output the min cut
+along with it's size
+
 Graph_FromFile assumes the graph is undirected, but it does so in a rather hacky
 way. While adding edges, it ignores edges with a vertex higher than the current
 vertex. It would be a good idea to rethink this code
