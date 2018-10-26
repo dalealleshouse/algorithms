@@ -37,8 +37,8 @@ static void Array_Checker(void* ds)
     uintptr_t actual = (uintptr_t)((uintptr_t*)array->array)[0];
     uintptr_t actual_2 = (uintptr_t)((uintptr_t*)array->array)[1];
 
-    CU_ASSERT_EQUAL(expected, actual);
-    CU_ASSERT_EQUAL(expected_2, actual_2);
+    CU_ASSERT_EQUAL(expected, actual_2);
+    CU_ASSERT_EQUAL(expected_2, actual);
 }
 
 static void LinkedList_Checker(void* ds)

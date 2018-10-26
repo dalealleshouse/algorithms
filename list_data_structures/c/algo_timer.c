@@ -39,8 +39,11 @@ void* BuildDataStructure(Structure str, size_t n)
             op(ds, rand());
         break;
     case LINKED_LIST_POOR_LOCALITY:
-        for (size_t i = 0; i < n * 4; i++)
+        for (size_t i = 0; i < n * 4; i++) {
+            void* temp = malloc(10000);
             op(ds, rand());
+            free(temp);
+        }
 
         LinkedList* list = (LinkedList*)ds;
         for (size_t i = 0; i < n * 3; i++)

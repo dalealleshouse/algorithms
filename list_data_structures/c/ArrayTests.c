@@ -91,6 +91,7 @@ static void Array_Insert_standard()
 {
     const size_t n = 5;
     const int items[] = { 1, 2, 3, 4, 5 };
+    const int expected[] = { 5, 4, 3, 2, 1 };
 
     Array* array = Array_Create(int_comparator, sizeof(int));
 
@@ -100,7 +101,7 @@ static void Array_Insert_standard()
     }
 
     CU_ASSERT_EQUAL(n, array->n);
-    CU_ASSERT_EQUAL(0, memcmp(items, array->array, sizeof(int) * n));
+    CU_ASSERT_EQUAL(0, memcmp(expected, array->array, sizeof(int) * n));
 
     Array_Destroy(array);
 }
@@ -175,10 +176,10 @@ static void Array_Search_standard()
     }
 
     void* result = Array_Search(array, &find);
-    CU_ASSERT_PTR_EQUAL(result, (char*)array->array + array->item_size);
+    CU_ASSERT_PTR_EQUAL(result, (char*)array->array + (array->item_size * 3));
 
     result = Array_Search(array, &find2);
-    CU_ASSERT_PTR_EQUAL(result, (char*)array->array + (array->item_size * 3));
+    CU_ASSERT_PTR_EQUAL(result, (char*)array->array + array->item_size);
 
     Array_Destroy(array);
 }
@@ -189,7 +190,9 @@ static int mock_vals[] = { 50, 25, 33, 11, 30, 40, 75, 61, 89, 52, 82, 95, 55 };
 static int mock_pos = 0;
 static void MockItemHandler(void* item)
 {
-    CU_ASSERT_EQUAL(mock_vals[mock_pos], VOIDP2INT(item));
+    // The items are inserted into the head, so they are backwards from how they
+    // are inserted
+    CU_ASSERT_EQUAL(mock_vals[mock_n - 1 - mock_pos], VOIDP2INT(item));
     mock_pos++;
 }
 

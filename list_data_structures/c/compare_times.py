@@ -20,19 +20,21 @@ class CtypesEnum(IntEnum):
 
 
 class Operations(CtypesEnum):
-    INSERTION = 1,
-    RANDOM_ACCESS = 2,
-    SEQUENTIAL_ACCESS = 3
+    INSERT = 1,
+    SEARCH = 2,
+    ENUMERATE = 3
 
 
 class Structures(CtypesEnum):
-    LINKED_LIST = 1,
-    DISPERSED_LINKED_LIST = 2,
-    ARRAY = 3
+    ARRAY = 1,
+    LINKED_LIST = 2,
+    LINKED_LIST_POOR_LOCALITY = 3,
+    BINARY_TREE = 4,
+    BINARY_TREE_UNBALANCED = 5
 
 
-lib.op_time.argtypes = [Operations, Structures, ctypes.c_size_t]
-lib.op_time.restype = ctypes.c_double
+lib.OperationTime.argtypes = [Operations, Structures, ctypes.c_size_t]
+lib.OperationTime.restype = ctypes.c_double
 
 
 def median_run_time(func):
@@ -89,7 +91,7 @@ def generate_chart(op, structs):
     for st in structs:
         data = []
         for n in TEST_FOR_Ns:
-            time = median_run_time(lambda: lib.op_time(op, st, n))
+            time = median_run_time(lambda: lib.OperationTime(op, st, n))
             data.append(time)
 
         plt.plot(TEST_FOR_Ns, data, label=st.name)
@@ -105,10 +107,14 @@ def generate_chart(op, structs):
 
 
 if __name__ == "__main__":
-    generate_chart(Operations.INSERTION,
-                   [Structures.LINKED_LIST, Structures.ARRAY])
-    generate_chart(Operations.RANDOM_ACCESS,
-                   [Structures.LINKED_LIST, Structures.ARRAY])
-    generate_chart(Operations.SEQUENTIAL_ACCESS,
-                   [Structures.LINKED_LIST, Structures.ARRAY,
-                    Structures.DISPERSED_LINKED_LIST])
+    generate_chart(Operations.INSERT,
+                   [Structures.ARRAY, Structures.LINKED_LIST,
+                    Structures.BINARY_TREE])
+    generate_chart(Operations.SEARCH,
+                   [Structures.ARRAY, Structures.LINKED_LIST,
+                    Structures.LINKED_LIST_POOR_LOCALITY,
+                    Structures.BINARY_TREE, Structures.BINARY_TREE_UNBALANCED])
+    generate_chart(Operations.ENUMERATE,
+                   [Structures.ARRAY, Structures.LINKED_LIST,
+                    Structures.LINKED_LIST_POOR_LOCALITY,
+                    Structures.BINARY_TREE, Structures.BINARY_TREE_UNBALANCED])

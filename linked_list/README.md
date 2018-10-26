@@ -1,3 +1,7 @@
+# DEPRECATED
+This section is deprecated in favor of [list data
+structures](../list_data_structures)
+
 # Linked Lists
 #data_structure
 

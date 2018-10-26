@@ -35,9 +35,10 @@ ListOpResult Array_Insert(Array* self, const void* item)
             return ListOp_FailedMalloc;
 
         self->array = arr;
-        size_t offset = self->n * self->item_size;
+        memmove((char*)self->array + self->item_size, self->array,
+            self->item_size * self->n);
         self->n++;
-        memcpy((char*)self->array + offset, item, self->item_size);
+        memcpy(self->array, item, self->item_size);
     }
 
     return ListOp_Success;

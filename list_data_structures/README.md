@@ -107,7 +107,9 @@ Linked lists are especially helpful for applications such as
     have profound performance implications. See the [Memory
     Cache](../memory_cache/) section for more details.
 - *Search*: There is no inherit support for search operations other than
-    examining each item individually.
+    examining each item individually. Additionally, unlike Arrays, linked lists
+    cannot take advantage of [Binary Search](../binary_search), regardless of
+    the sort order.
 
 ## Binary Trees
 #data_structure, #list, #graph
@@ -172,114 +174,78 @@ depicted below. In this case, insert, delete, and search operations are actually
 ## Hash Tables
 #data_structure, #list
 
-
-
-
-
-
-
-
-
-## BELOW IS A WORK IN PROGRESS
-
-
-
+### Coming soon...
 
 ## Actual Run Times
 
-The actual run times for performing operations on arrays and linked list are
-shown below.  For details about how the calculations were run, see
+The actual run times for performing operations on list data structures are shown
+below.  For details about how the calculations were run, see
 [compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
 recreate the data on your machine, navigate to the c directory and execute the
-[time_charts.sh](c/time_charts.sh) bash file.
+[../../time_charts.sh](time_charts.sh) bash file.
 
-### Insertions
+### Insert
 
-All insertions were made to the head of the data structure. Each array insertion
-results in a reallocation and copy.
+The following chart and table show the actual run times for `n` insert operation
+on the specified data structures.
 
-![INSERTION RUN TIMES](c/INSERTION.png "INSERTION RUN TIMES")
-
-|STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
-|--|--|--|--|--|
-|LINKED_LIST |0.000003 sec|0.000032 sec|0.000315 sec|0.002879 sec|
-|ARRAY |0.000003 sec|0.000080 sec|0.005127 sec|0.584865 sec|
-
-Key Takeaways:
-- Inserting 100,000 items into a array is approximately a half second slower
-    than inserting the same items into a linked list.
-- The extra time is due to the array needed to be resized on each insertion.
-
-### Random Access
-
-The times below are for accessing an item at a random index inside a loop. The
-code below show the actual code that is being timed.
-
-```
-// Array Random Access Code
-for (size_t i = 0; i < n; i++)
-val += arr[rand() % (n - 1)];
-
-// Linked List Random Access Code
-for (size_t i = 0; i < n; i++) {
-void* item = list_get_at(&list, rand() % (n - 1));
-val += (uintptr_t)item;
-}
-```
-
-![RANDOM ACCESS RUN TIMES](c/RANDOM_ACCESS.png "RANDOM ACCESS RUN TIMES")
+![INSERT RUN TIMES](c/INSERT.png "INSERT RUN TIMES")
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
-|LINKED_LIST |0.000009 sec|0.000995 sec|0.084897 sec|4.125063 sec|
-|ARRAY |0.000002 sec|0.000015 sec|0.000145 sec|0.001475 sec|
+|ARRAY |0.000012 sec|0.000074 sec|0.005261 sec|0.890071 sec|
+|LINKED_LIST |0.000005 sec|0.000047 sec|0.000451 sec|0.004580 sec|
+|BINARY_TREE |0.000007 sec|0.000094 sec|0.001416 sec|0.025229 sec|
 
 Key Takeaways:
-- 100,000 random access operations are a whopping 4 seconds slower with a linked
-    list than with an array.
+* Inserting 100,000 items into a array is approximately a half to three
+    quarters of a second slower than inserting the same items into a linked
+    list.
+* *Caveat*: For this demo, the new item is inserted at the head of the array.
+    Inserting an item into the tail of an array *may* be dramatically faster
+    (possibly even faster than linked lists) depending on the language and the
+    contents of memory. The interested reader should study the internal working
+    of `malloc` to fully understand this.  [Click
+    Here](https://danluu.com/malloc-tutorial/) for a decent introduction.
 
-### Sequential Access
+### Search
 
-Sequential access refers to reading all items in a data structure by starting at
-the head and reading each item in order until the tail is reached. The actual
-code is shown below.
+The following chart and table show the actual run times for `n` search
+operations on a data structure with `n` items.
 
-```
-// Array Sequential Access Code
-for (size_t i = 0; i < n; i++)
-val += arr[i];
-
-
-// Linked List Sequential Access Code
-list_item* item = list.head;
-while (item != NULL) {
-val += (uintptr_t)item->payload;
-item = item->next;
-}
-```
-
-The *DISPERSED LINKED LIST* data point shows a linked list in which the items
-are distributed across a large area of memory. Conversely, the *LINKED_LIST*'s
-items are stored adjacent to each other in memory.
-
-As a side note, there is a fair amount of minutia involved with allocating
-memory using `malloc`. The individual items in the linked list will not be 100%
-distributed as advertised.  However, this distinction holds no real bearing on
-the validity of the results.
-
-
-![SEQUENTIAL ACCESS RUN TIMES](c/SEQUENTIAL_ACCESS.png "SEQUENTIAL ACCESS RUN
-TIMES")
+![SEARCH RUN TIMES](c/SEARCH.png "SEARCH RUN TIMES")
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
-|LINKED_LIST |0.000002 sec|0.000007 sec|0.000089 sec|0.001177 sec|
-|ARRAY |0.000001 sec|0.000001 sec|0.000005 sec|0.000043 sec|
-|DISPERSED_LINKED_LIST |0.000002 sec|0.000011 sec|0.000108 sec|0.003723 sec|
+|ARRAY |0.000034 sec|0.003165 sec|0.148806 sec|15.389051 sec|
+|LINKED_LIST |0.000016 sec|0.002385 sec|0.196797 sec|16.685011 sec|
+|LINKED_LIST_POOR_LOCALITY |0.000019 sec|0.004976 sec|1.014671 sec|420.594918 sec|
+|BINARY_TREE |0.000006 sec|0.000077 sec|0.001221 sec|0.022148 sec|
+|BINARY_TREE_UNBALANCED |0.000044 sec|0.004681 sec|0.456133 sec|43.199407 sec|
 
 Key Takeaways:
-- The time differences over 100,000 operations is around .003 seconds.
-- The results demonstrate the importance [spatial
-    locality](https://en.wikipedia.org/wiki/Locality_of_reference). Poor
-    locality, as demonstrated by the dispersed linked list, can have performance
-    penalties due to cache misses.
+* As predicted, searching a balanced BINARY_TREE is lighting fast.
+* BINARY_TREE_UNBALANCED negates the advantages of the binary search algorithm
+* LINKED_LIST_POOR_LOCALITY has the worst performance by far and it demonstrates
+    the performance implications of not being able to take advantage of the
+    cache. Accessing memory that is not contiguous causes cache misses, which
+    are expensive.
+
+### Enumerate
+
+The following chart and table show the actual run times for enumerating `n`
+items from the specified data structures.
+
+![ENUMERATE RUN TIMES](c/ENUMERATE.png "ENUMERATE RUN TIMES")
+
+|STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|ARRAY |0.000001 sec|0.000002 sec|0.000007 sec|0.000031 sec|
+|LINKED_LIST |0.000001 sec|0.000002 sec|0.000018 sec|0.000222 sec|
+|LINKED_LIST_POOR_LOCALITY |0.000001 sec|0.000005 sec|0.000059 sec|0.003024 sec|
+|BINARY_TREE |0.000001 sec|0.000009 sec|0.000103 sec|0.001312 sec|
+|BINARY_TREE_UNBALANCED |0.000001 sec|0.000003 sec|0.000028 sec|0.000275 sec|
+
+Key Takeaways:
+* There is less than .002 seconds difference between each data structure over
+    100,000 items.
