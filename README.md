@@ -61,6 +61,7 @@ Actual run time data
     * [Linked List](list_data_structures/README.md#linked-lists)
     * [Binary Tree](list_data_structures/README.md#binary-trees)
     * [Hash Tables](list_data_structures/README.md#hash-tables)
+* [Queue](queue/)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
