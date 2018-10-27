@@ -40,6 +40,13 @@ refer to directed edges as *arcs*. See the example below.
 * `V`: A, B, C, D
 * `E`: (A, C), (A, D), (B, A), (B, D), (D, A), (D, C)
 
+An important concept related to directed graphs is *cycle*s. A cycle occurs when
+there exists a vertex that has a path that leads back to itself. An example is
+shown below. A graph with no cycles is said to *acyclic*.
+
+#### Cycle
+![cycle](cycle.png)
+
 Edges can also have weights associated with them. Weighting assigns a cost to
 each edge. Weighting can be modeled in almost any way imaginable. In a network,
 this weight could be connection latency. Going back to the family graph example.

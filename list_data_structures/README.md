@@ -120,7 +120,7 @@ concepts aren't germane to this topic). Each item in a binary tree is a node
 with a left and right pointer. The left pointer points to a node with a lesser
 valued item and the right pointer points to a node with a greater valued item.
 The root node can be any node in the structure and acts as the entry point.
-Binary trees have built in support for [Binary Search](../binary_search) with a
+Binary trees have builtin support for [Binary Search](../binary_search) with a
 trade off of slightly slower insert and delete operations. The data structure is
 depicted in the image below.
 
@@ -182,7 +182,7 @@ The actual run times for performing operations on list data structures are shown
 below.  For details about how the calculations were run, see
 [compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
 recreate the data on your machine, navigate to the c directory and execute the
-[../../time_charts.sh](time_charts.sh) bash file.
+[time_charts.sh](../../time_charts.sh) bash file.
 
 ### Insert
 
@@ -228,8 +228,8 @@ Key Takeaways:
 * BINARY_TREE_UNBALANCED negates the advantages of the binary search algorithm
 * LINKED_LIST_POOR_LOCALITY has the worst performance by far and it demonstrates
     the performance implications of not being able to take advantage of the
-    cache. Accessing memory that is not contiguous causes cache misses, which
-    are expensive.
+    cache. Repeatedly accessing memory that is not stored contiguously in memory
+    causes cache misses, which are expensive.
 
 ### Enumerate
 
