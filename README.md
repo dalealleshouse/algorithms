@@ -32,8 +32,6 @@ Implementation Quality
     accepting randomly sorted arrays are using the exact same inputs.  For the
     purposes of this project, `rand()` it is sufficient. However, a different
     solution is required for production scenarios.
-* The C code simply returns negative values for errors. This is no means of
-    reporting error conditions.
 
 Actual run time data
 * Actual run time data for the C implementation of the algorithms is included 
@@ -61,6 +59,7 @@ Actual run time data
     * [Linked List](list_data_structures/README.md#linked-lists)
     * [Binary Tree](list_data_structures/README.md#binary-trees)
     * [Hash Tables](list_data_structures/README.md#hash-tables)
+* [Queue](queue/)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
@@ -68,6 +67,8 @@ Actual run time data
     * [Merge Sort](sorting/README.md#merge-sort)
     * [Quick Sort](sorting/README.md#quick-sort)
 * [Quick Select](quick_select/)
+* [Graph Concepts](graph_concepts/)
+* [Graph Search](graph_search/)
 * [Random Contraction](random_contraction/)
 
 ## Build/Tests
