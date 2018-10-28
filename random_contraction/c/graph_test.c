@@ -45,8 +45,7 @@ static void Graph_Create_intializes_graph()
     Graph_Destroy(graph);
 }
 
-/*************************** Graph_AddVertex
- * ***************************************/
+/*************************** Graph_AddVertex **********************************/
 static void Graph_AddVertex_null()
 {
     int result = Graph_AddVertex(NULL, 0);

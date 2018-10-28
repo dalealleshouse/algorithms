@@ -17,7 +17,8 @@ software parlance, a queue is known as a *First-in-First-Out* data structure
 because the first item added to the queue is the first one out (clever, huh?).
 
 Typically, a [Linked List](../list_data_structures/README.md#linked-lists) is
-used when implementing a queue. However, an array is also a viable option. The
+used when implementing a queue. However, an
+[Array](../list_data_structures/README.md#arrays) is also a viable option. The
 reader is encouraged to examine the code to get a better understanding of how
 queues work.
 
