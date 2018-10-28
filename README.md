@@ -13,6 +13,9 @@ Build environments
     examples demonstrate how to use the containers as stored on [Docker
     Hub](https://hub.docker.com). However, the [docker](docker/) folder has all
     files required to build the containers locally if that is the preference.
+- Each folder acts as a stand-alone project. Files are shared between projects
+    with hard links. Soft links would be preferable, but Docker can't deal with
+    them.
 
 Implementation Quality
 * Several of the implementations utilize recursion. Recursion provides an

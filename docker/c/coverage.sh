@@ -9,7 +9,7 @@ lcov --no-external \
     --gcov-tool llvm-gcov.sh \
     --capture -o ./src/cov.info
 
-lcov --remove ./src/cov.info '/src/*test*' '/src/algo*' \
+lcov --remove ./src/cov.info '/src/*test*' '/src/*Test*' '/src/algo*' '/src/MemAllocMock*' \
     -o ./src/cov.info
 
 genhtml ./src/cov.info -o ./src/output

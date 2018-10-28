@@ -7,12 +7,13 @@ pre-requisite for graph algorithms.
 
 Graphs represent pair wise relationships among objects. In graph jargon, the
 objects are known as either *vertices* or *nodes*. The relationship between the
-vertices are *edges*. To make the concept a bit more concrete, consider modeling
-one's family as a graph. The people in the family would be vertices, and the
-relationships between them (mother, daughter, father, brother, etc..) would be
-edges. Edges are typically denoted by a pair known as the *endpoints*. If Dick
-is Jane's brother, the relationship is be denoted as (Dick, Jane). The set of
-all vertices is denoted as `V` and `E` denotes the set of all edges. The
+vertices are *edges*. Vertices that are connected via an edge are said to be
+*adjacent* to each other.  To make the concept a bit more concrete, consider
+modeling one's family as a graph. The people in the family would be vertices,
+and the relationships between them (mother, daughter, father, brother, etc..)
+would be edges. Edges are typically denoted by a pair known as the *endpoints*.
+If Dick is Jane's brother, the relationship is be denoted as (Dick, Jane). The
+set of all vertices is denoted as `V` and `E` denotes the set of all edges. The
 *degree* of a vertex is the number of edges connected to it.
 
 There are two types of graphs: *undirected* and *directed*. The edges of an

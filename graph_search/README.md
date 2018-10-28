@@ -4,21 +4,20 @@
 Prerequisite: [Graph Concepts](../graph_concepts)
 
 Any aspiring computer scientist should make understanding graph search
-algorithms a priority because of their ubiquity. Graph search is a common
-problem in computer science because of it's wide range of applications. Luckily,
-there are many blazingly fast solutions. There are two purposes for graph search
-algorithms. The first, and obvious, purpose is to locate a particular node.  The
-second is to identify vertices *reachable* from a specified vertex. A vertex is
-reachable from another vertex if there is a path through the graph connecting
-the two vertices.
+algorithms a priority because of their ubiquity and wide range of applications.
+There are two purposes for graph search. The first, and obvious, purpose is to
+locate a particular node. The second is to identify vertices *reachable* from a
+specified vertex. A vertex is reachable from another vertex if there is a path
+through the graph connecting the two vertices. While this may seem parochial,
+determining reachability is the cornerstone of more advanced analysis.
 
 There are two primary types of graph search algorithms: breadth first and depth
 first. Both have the same goal - efficiently search a graph by only visiting
-each node once.
+each node once. As demonstrated below, they have the same basic structure with
+only slight deviations which make them uniquely suited for different purposes.
 
-As a matter of note, for most purposes graph search works essentially the same
-in both directed and undirected graphs. The exception the rule is when checking
-connectivity.
+Unless otherwise specified, graph search algorithms presented here work
+essentially the same for both directed and undirected graphs.
 
 ## Asymptotic Complexity
 The asymptotic complexity of every algorithm presented in this section is
@@ -30,6 +29,9 @@ data. Because of this, graph search algorithms are considered *free primitives*.
 
 BFS examines each edge of a particular vertex before following any edges of
 connected vertices.
+
+```
+```
 
 
 ## BFS - Shortest Path
