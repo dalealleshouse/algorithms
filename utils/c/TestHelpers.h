@@ -15,6 +15,6 @@ typedef struct TestThingy {
     double z;
 } TestThingy;
 
-static int noop(void) { return 0; }
+int noop(void);
 
 void TestFaliedMalloc(void (*tester)(void));

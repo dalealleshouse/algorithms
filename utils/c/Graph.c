@@ -70,6 +70,9 @@ void Graph_Destroy(Graph* self, freer freer)
     if (self == NULL)
         return;
 
+    for (size_t i = 0; i < self->n; i++)
+        Graph_VertexDestroy(self->V[i], freer);
+
     free(self);
 }
 

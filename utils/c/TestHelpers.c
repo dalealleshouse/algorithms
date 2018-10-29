@@ -4,6 +4,8 @@
 #include "MemAllocMock.h"
 #include "TestHelpers.h"
 
+int noop(void) { return 0; }
+
 void TestFaliedMalloc(void (*tester)(void))
 {
     MemAllocMock_InterceptMalloc(NULL);
