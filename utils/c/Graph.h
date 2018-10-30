@@ -5,7 +5,9 @@
 
 #include "CommonTypes.h"
 
-typedef enum {
+typedef enum GraphResult {
+    Graph_DuplicateVertexId = -4,
+    Graph_InvalidVertexId = -3,
     Graph_FailedMemoryAllocation = -2,
     Graph_NullParameter = -1,
     Graph_Success = 0
@@ -20,7 +22,7 @@ typedef struct Edge {
     struct Edge* next;
 } Edge;
 
-typedef struct {
+typedef struct Vertex {
     // Id of the vertex
     int id;
 
@@ -34,28 +36,34 @@ typedef struct {
     Edge* edges;
 } Vertex;
 
-typedef struct {
+typedef struct Graph {
     // Number of vertices
     size_t n;
+
+    // Number of spaces allocated in V
+    size_t n_allocated;
 
     // Vertices
     Vertex** V;
 
     // Number of edges - sum of degree of all vertices
     size_t m;
+
+    // private members
+    struct GraphPrivate* _;
 } Graph;
 
-// The "Create" methods are convenience methods that malloc and init objects
+// Initalize values to default
 GraphResult Graph_Init(Graph*);
-Graph* Graph_Create(void);
-
 GraphResult Graph_VertexInit(Vertex*);
-Vertex* Graph_VertexCreate(int, void*);
-
 GraphResult Graph_EdgeInit(Edge*);
+
+// Convenience methods that malloc and init objects
+Graph* Graph_Create(void);
+Vertex* Graph_VertexCreate(int, void*);
 Edge* Graph_EdgeCreate(int);
 
-GraphResult Graph_AddVertex(Graph*, const Vertex*);
+GraphResult Graph_AddVertex(Graph*, Vertex*);
 GraphResult Graph_AutoAddVertex(Graph*, int, void*);
 
 GraphResult Graph_AddEdge(Vertex*, const Edge*);
@@ -67,5 +75,6 @@ void Graph_Print(const Graph*, FILE* file);
 // Functions of Mass Destruction
 void Graph_Destroy(Graph*, freer);
 void Graph_VertexDestroy(Vertex*, freer);
+void Graph_EdgeDestroy(Edge*);
 
 char* Graph_ErrorMessage(GraphResult);

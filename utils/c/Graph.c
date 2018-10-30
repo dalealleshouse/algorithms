@@ -10,6 +10,9 @@
             Graph_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);     \
     }
 
+const size_t INIT_VERTEX_SIZE = 100;
+const size_t GROWTH_FACTOR = 2;
+
 GraphResult Graph_Init(Graph* self)
 {
     if (self == NULL)
@@ -57,12 +60,56 @@ Vertex* Graph_VertexCreate(int id, void* data)
         return NULL;
     }
 
-    v->degree = 0;
-    v->edges = NULL;
+    Graph_VertexInit(v);
     v->id = id;
     v->data = data;
 
     return v;
+}
+
+GraphResult Graph_EdgeInit(Edge* edge)
+{
+    if (edge == NULL)
+        return Graph_NullParameter;
+
+    edge->head = -1;
+    edge->next = NULL;
+
+    return Graph_Success;
+}
+
+Edge* Graph_EdgeCreate(int head)
+{
+    Edge* edge = malloc(sizeof(Edge));
+    if (edge == NULL) {
+        GRAPH_ERROR(Graph_FailedMemoryAllocation);
+        return NULL;
+    }
+
+    Graph_EdgeInit(edge);
+    edge->head = head;
+
+    return edge;
+}
+
+GraphResult Graph_AddVertex(Graph* self, Vertex* vertex)
+{
+    if (self == NULL || vertex == NULL)
+        return Graph_NullParameter;
+
+    if (vertex->id < 0)
+        return Graph_InvalidVertexId;
+
+    if (self->V == NULL)
+        self->V = calloc(sizeof(Vertex*), 100);
+
+    if (self->V[vertex->id] != NULL)
+        return Graph_DuplicateVertexId;
+
+    self->V[vertex->id] = vertex;
+
+    self->n++;
+    return Graph_Success;
 }
 
 void Graph_Destroy(Graph* self, freer freer)
@@ -78,6 +125,9 @@ void Graph_Destroy(Graph* self, freer freer)
 
 void Graph_VertexDestroy(Vertex* vertex, freer freer)
 {
+    if (vertex == NULL)
+        return;
+
     if (freer != NULL)
         freer(vertex->data);
     else
@@ -86,9 +136,15 @@ void Graph_VertexDestroy(Vertex* vertex, freer freer)
     free(vertex);
 }
 
+void Graph_EdgeDestroy(Edge* edge) { free(edge); }
+
 char* Graph_ErrorMessage(GraphResult result)
 {
     switch (result) {
+    case Graph_DuplicateVertexId:
+        return "Attempt to add two vertices with the sam id";
+    case Graph_InvalidVertexId:
+        return "Invalid vertex ID";
     case Graph_FailedMemoryAllocation:
         return "Failed to allocate memory";
     case Graph_NullParameter:
