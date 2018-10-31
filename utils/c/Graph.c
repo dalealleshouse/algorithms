@@ -10,22 +10,41 @@
             Graph_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);     \
     }
 
-const size_t INIT_VERTEX_SIZE = 100;
-const size_t GROWTH_FACTOR = 2;
+static void EdgeDestroy(Edge* edge) { free(edge); }
 
-GraphResult Graph_Init(Graph* self)
+static void VertexDestroy(Vertex* vertex, freer freer)
 {
-    if (self == NULL)
-        return Graph_NullParameter;
+    if (vertex == NULL)
+        return;
 
-    self->m = 0;
-    self->n = 0;
-    self->V = NULL;
+    if (freer != NULL)
+        freer(vertex->data);
 
-    return Graph_Success;
+    Edge* curr = vertex->edges;
+    while (curr != NULL) {
+        Edge* temp = curr->next;
+        EdgeDestroy(curr);
+        curr = temp;
+    }
+
+    free(vertex);
 }
 
-Graph* Graph_Create(void)
+static Edge* Graph_EdgeCreate(int head)
+{
+    Edge* edge = malloc(sizeof(Edge));
+    if (edge == NULL) {
+        GRAPH_ERROR(Graph_FailedMemoryAllocation);
+        return NULL;
+    }
+
+    edge->head = head;
+    edge->next = NULL;
+
+    return edge;
+}
+
+Graph* Graph_Create(size_t max_size)
 {
     Graph* graph = malloc(sizeof(Graph));
 
@@ -34,81 +53,68 @@ Graph* Graph_Create(void)
         return NULL;
     }
 
-    Graph_Init(graph);
+    graph->V = calloc(sizeof(Vertex*), max_size);
+    graph->m = 0;
+    graph->n = 0;
+    graph->max_size = max_size;
+
     return graph;
 }
 
-GraphResult Graph_VertexInit(Vertex* vertex)
+GraphResult Graph_AddVertex(Graph* self, int id, void* data)
 {
-    if (vertex == NULL)
+    if (self == NULL)
         return Graph_NullParameter;
 
-    vertex->id = -1;
-    vertex->degree = 0;
-    vertex->edges = NULL;
-    vertex->data = NULL;
-
-    return Graph_Success;
-}
-
-Vertex* Graph_VertexCreate(int id, void* data)
-{
-    Vertex* v = malloc(sizeof(Vertex));
-
-    if (v == NULL) {
-        GRAPH_ERROR(Graph_FailedMemoryAllocation);
-        return NULL;
-    }
-
-    Graph_VertexInit(v);
-    v->id = id;
-    v->data = data;
-
-    return v;
-}
-
-GraphResult Graph_EdgeInit(Edge* edge)
-{
-    if (edge == NULL)
-        return Graph_NullParameter;
-
-    edge->head = -1;
-    edge->next = NULL;
-
-    return Graph_Success;
-}
-
-Edge* Graph_EdgeCreate(int head)
-{
-    Edge* edge = malloc(sizeof(Edge));
-    if (edge == NULL) {
-        GRAPH_ERROR(Graph_FailedMemoryAllocation);
-        return NULL;
-    }
-
-    Graph_EdgeInit(edge);
-    edge->head = head;
-
-    return edge;
-}
-
-GraphResult Graph_AddVertex(Graph* self, Vertex* vertex)
-{
-    if (self == NULL || vertex == NULL)
-        return Graph_NullParameter;
-
-    if (vertex->id < 0)
+    if (id < 0)
         return Graph_InvalidVertexId;
 
-    if (self->V == NULL)
-        self->V = calloc(sizeof(Vertex*), 100);
+    // it's ok to cast to size_t b/c the line above ensures it isn't negative
+    if ((size_t)id >= self->max_size)
+        return Graph_VertexIdExceedsMaxSize;
 
-    if (self->V[vertex->id] != NULL)
+    if (self->V[id] != NULL)
         return Graph_DuplicateVertexId;
 
-    self->V[vertex->id] = vertex;
+    Vertex* v = malloc(sizeof(Vertex));
+    if (v == NULL)
+        return Graph_FailedMemoryAllocation;
 
+    v->id = id;
+    v->data = data;
+    v->degree = 0;
+    v->edges = NULL;
+
+    self->V[id] = v;
     self->n++;
+
+    return Graph_Success;
+}
+
+GraphResult Graph_AddEdge(Graph* self, int head, int tail)
+{
+    if (self == NULL)
+        return Graph_NullParameter;
+
+    if (head < 0 || tail < 0)
+        return Graph_InvalidVertexId;
+
+    // cast to size_t ok b/c the previous condition ensures it's not negative
+    if ((size_t)head >= self->max_size || (size_t)tail >= self->max_size)
+        return Graph_VertexIdExceedsMaxSize;
+
+    if (self->V[head] == NULL || self->V[tail] == NULL)
+        return Graph_InvalidVertexId;
+
+    Edge* edge = malloc(sizeof(Edge));
+    if (edge == NULL)
+        return Graph_FailedMemoryAllocation;
+
+    edge->head = head;
+    edge->next = self->V[tail]->edges;
+    self->V[tail]->edges = edge;
+    self->m++;
+
     return Graph_Success;
 }
 
@@ -117,30 +123,18 @@ void Graph_Destroy(Graph* self, freer freer)
     if (self == NULL)
         return;
 
-    for (size_t i = 0; i < self->n; i++)
-        Graph_VertexDestroy(self->V[i], freer);
+    for (size_t i = 0; i < self->max_size; i++)
+        VertexDestroy(self->V[i], freer);
 
+    free(self->V);
     free(self);
 }
-
-void Graph_VertexDestroy(Vertex* vertex, freer freer)
-{
-    if (vertex == NULL)
-        return;
-
-    if (freer != NULL)
-        freer(vertex->data);
-    else
-        free(vertex->data);
-
-    free(vertex);
-}
-
-void Graph_EdgeDestroy(Edge* edge) { free(edge); }
 
 char* Graph_ErrorMessage(GraphResult result)
 {
     switch (result) {
+    case Graph_VertexIdExceedsMaxSize:
+        return "The ID of the vertex is greater than max size";
     case Graph_DuplicateVertexId:
         return "Attempt to add two vertices with the sam id";
     case Graph_InvalidVertexId:

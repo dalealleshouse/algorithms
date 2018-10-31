@@ -6,6 +6,7 @@
 #include "CommonTypes.h"
 
 typedef enum GraphResult {
+    Graph_VertexIdExceedsMaxSize = -5,
     Graph_DuplicateVertexId = -4,
     Graph_InvalidVertexId = -3,
     Graph_FailedMemoryAllocation = -2,
@@ -41,40 +42,20 @@ typedef struct Graph {
     size_t n;
 
     // Number of spaces allocated in V
-    size_t n_allocated;
+    size_t max_size;
 
     // Vertices
     Vertex** V;
 
     // Number of edges - sum of degree of all vertices
     size_t m;
-
-    // private members
-    struct GraphPrivate* _;
 } Graph;
 
-// Initalize values to default
-GraphResult Graph_Init(Graph*);
-GraphResult Graph_VertexInit(Vertex*);
-GraphResult Graph_EdgeInit(Edge*);
+Graph* Graph_Create(size_t);
+GraphResult Graph_AddVertex(Graph*, int, void*);
+GraphResult Graph_AddEdge(Graph*, int, int);
 
-// Convenience methods that malloc and init objects
-Graph* Graph_Create(void);
-Vertex* Graph_VertexCreate(int, void*);
-Edge* Graph_EdgeCreate(int);
-
-GraphResult Graph_AddVertex(Graph*, Vertex*);
-GraphResult Graph_AutoAddVertex(Graph*, int, void*);
-
-GraphResult Graph_AddEdge(Vertex*, const Edge*);
-GraphResult Graph_AutoAddEdge(Vertex*, unsigned);
-
-GraphResult Graph_FromFile(Graph*, const char* path);
-void Graph_Print(const Graph*, FILE* file);
-
-// Functions of Mass Destruction
+// Function of Mass Destruction
 void Graph_Destroy(Graph*, freer);
-void Graph_VertexDestroy(Vertex*, freer);
-void Graph_EdgeDestroy(Edge*);
 
 char* Graph_ErrorMessage(GraphResult);
