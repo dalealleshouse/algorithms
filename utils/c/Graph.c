@@ -30,20 +30,6 @@ static void VertexDestroy(Vertex* vertex, freer freer)
     free(vertex);
 }
 
-static Edge* Graph_EdgeCreate(int head)
-{
-    Edge* edge = malloc(sizeof(Edge));
-    if (edge == NULL) {
-        GRAPH_ERROR(Graph_FailedMemoryAllocation);
-        return NULL;
-    }
-
-    edge->head = head;
-    edge->next = NULL;
-
-    return edge;
-}
-
 Graph* Graph_Create(size_t max_size)
 {
     Graph* graph = malloc(sizeof(Graph));
