@@ -16,7 +16,7 @@ first. Both have the same goal - efficiently search a graph by only visiting
 each node once. As demonstrated below, they have the same basic structure with
 only slight deviations which make them uniquely suited for different purposes.
 
-Unless otherwise specified, graph search algorithms presented here work
+Unless otherwise specified, the graph search algorithms presented here work
 essentially the same for both directed and undirected graphs.
 
 ## Asymptotic Complexity
@@ -28,16 +28,57 @@ data. Because of this, graph search algorithms are considered *free primitives*.
 ## Breadth First Search (BFS)
 
 BFS examines each edge of a particular vertex before following any edges of
-connected vertices.
+connected vertices. The key to this is the use of a [Queue](../queue) as shown
+in the pseudo below.
+
+### Pseudo Code
 
 ```
-```
+G = input graph
+q = queue data structure
+v = starting vertex
+side effects: marks all vertices conquered that are reachable from v
 
+conquer(v)
+q->enqueue(v)
+
+while q is not empty:
+    v = q->dequeue
+    for each edge in v:
+        w = edge->head
+        if w is NOT conquered:
+            conquer(w)
+            q->enqueue(w)
+```
 
 ## BFS - Shortest Path
 
 One unique attribute of BFS is that with only a few extra lines of code, it can
-be used to calculate the shortest path between two nodes.
+be used to calculate the shortest path between two nodes. The code below marks
+each vertex with the degrees of separation from the input vertex.
+
+### Pseudo Code
+
+<pre>
+G = input graph
+q = queue data structure
+v = starting vertex
+side effects: marks all vertices conquered that are reachable from v
+
+conquer(v)
+<b>v->distance = 0</b>
+q->enqueue(v)
+
+while q is not empty:
+    v = q->dequeue
+    for each edge in v:
+        w = edge->head
+        if w is NOT conquered:
+            conquer(w)
+            <b>w->distance = v->distance + 1</b>
+            q->enqueue(w)
+</pre>
+
 
 ## Depth First Search (DFS)
 
