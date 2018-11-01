@@ -184,6 +184,56 @@ static void Graph_AddEdge_intializes_values()
     Graph_Destroy(graph, NULL);
 }
 
+/*************************** Graph_FromFile ***********************************/
+static void Graph_FromFile_null_parameter()
+{
+    Graph* graph = Graph_FromFile(10, NULL);
+    CU_ASSERT_PTR_NULL(graph);
+}
+
+static void Graph_FromFile_malloc_tester(void)
+{
+    Graph* graph = Graph_FromFile(6, "src/graphs/Graph-4-2.txt");
+    CU_ASSERT_PTR_NULL(graph);
+}
+
+static void Graph_FromFile_failed_malloc()
+{
+    TestFaliedMalloc(Graph_FromFile_malloc_tester);
+}
+
+static void Graph_FromFile_invalid_path()
+{
+    Graph* graph = Graph_FromFile(10, "bad_path.txt");
+    CU_ASSERT_PTR_NULL(graph);
+}
+
+static void Graph_FromFile_insufficent_size()
+{
+    Graph* graph = Graph_FromFile(5, "src/graphs/Graph-4-2.txt");
+    CU_ASSERT_PTR_NOT_NULL(graph);
+
+    Graph_Destroy(graph, NULL);
+}
+
+static void Graph_FromFile_bad_data()
+{
+    Graph* graph = Graph_FromFile(3, "src/graphs/BadGraph.txt");
+    CU_ASSERT_PTR_NOT_NULL(graph);
+    Graph_Destroy(graph, NULL);
+}
+
+static void Graph_FromFile_standard()
+{
+    Graph* graph = Graph_FromFile(9, "src/graphs/Graph-4-2.txt");
+
+    CU_ASSERT_PTR_NOT_NULL(graph);
+    CU_ASSERT_EQUAL(9, graph->n);
+    CU_ASSERT_EQUAL(10, graph->m);
+
+    Graph_Destroy(graph, NULL);
+}
+
 /*************************** Graph_Destroy ************************************/
 static void Graph_Destroy_complex_graph()
 {
@@ -225,6 +275,12 @@ int register_graph_tests()
         CU_TEST_INFO(Graph_AddEdge_invalid_head),
         CU_TEST_INFO(Graph_AddEdge_invalid_tail),
         CU_TEST_INFO(Graph_AddEdge_intializes_values),
+        CU_TEST_INFO(Graph_FromFile_failed_malloc),
+        CU_TEST_INFO(Graph_FromFile_null_parameter),
+        CU_TEST_INFO(Graph_FromFile_invalid_path),
+        CU_TEST_INFO(Graph_FromFile_insufficent_size),
+        CU_TEST_INFO(Graph_FromFile_bad_data),
+        CU_TEST_INFO(Graph_FromFile_standard),
         CU_TEST_INFO(Graph_Destroy_complex_graph), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Graph",

@@ -6,6 +6,8 @@
 #include "CommonTypes.h"
 
 typedef enum GraphResult {
+    Graph_FileOpenError = -7,
+    Graph_InvalidFilePath = -6,
     Graph_VertexIdExceedsMaxSize = -5,
     Graph_DuplicateVertexId = -4,
     Graph_InvalidVertexId = -3,
@@ -54,6 +56,7 @@ typedef struct Graph {
 Graph* Graph_Create(size_t);
 GraphResult Graph_AddVertex(Graph*, int, void*);
 GraphResult Graph_AddEdge(Graph*, int, int);
+Graph* Graph_FromFile(const size_t, const char* path);
 
 // Function of Mass Destruction
 void Graph_Destroy(Graph*, freer);

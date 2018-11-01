@@ -3,25 +3,31 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// Initial size of vertex and edge allocation
-const size_t INITIAL_ALLOC;
+#include "CommonTypes.h"
 
-// Factor by when to increase allocation size when more space is required
-const size_t REALLOC_FACTOR;
-
-typedef enum {
-    Graph_InvalidEdgeIndex = -6,
-    Graph_InvalidVertex = -5,
-    Graph_EdgeIsSelfLoop = -4,
-    Graph_DuplicateVertex = -3,
+typedef enum GraphResult {
+    Graph_FileOpenError = -7,
+    Graph_InvalidFilePath = -6,
+    Graph_VertexIdExceedsMaxSize = -5,
+    Graph_DuplicateVertexId = -4,
+    Graph_InvalidVertexId = -3,
     Graph_FailedMemoryAllocation = -2,
     Graph_NullParameter = -1,
     Graph_Success = 0
 } GraphResult;
 
-typedef struct {
+// Edges are a linked list
+typedef struct Edge {
+    // Id of the vertex at the head of the edge, the tail is vertex object
+    // hosting this edge
+    int head;
+
+    struct Edge* next;
+} Edge;
+
+typedef struct Vertex {
     // Id of the vertex
-    unsigned vertex_id;
+    int id;
 
     // data associated with the vertex
     void* data;
@@ -29,39 +35,30 @@ typedef struct {
     // Number of edges connected to the vertex
     size_t degree;
 
-    struct VertexPrivate* _;
+    // Linked list of edges associated with this vertex
+    Edge* edges;
 } Vertex;
 
-typedef struct {
-    // Id of the vertex at the tail of the edge
-    unsigned tail;
-
-    // Id of the vertex at the head of the edge
-    unsigned head;
-} Edge;
-
-typedef struct {
+typedef struct Graph {
     // Number of vertices
     size_t n;
 
+    // Number of spaces allocated in V
+    size_t max_size;
+
     // Vertices
-    Vertex* V;
+    Vertex** V;
 
-    // Number of edges
+    // Number of edges - sum of degree of all vertices
     size_t m;
-
-    // Edges
-    Edge* E;
-
-    // Private graph members
-    struct GraphPrivate* _;
 } Graph;
 
-GraphResult Graph_Init(Graph*);
+Graph* Graph_Create(size_t);
+GraphResult Graph_AddVertex(Graph*, int, void*);
+GraphResult Graph_AddEdge(Graph*, int, int);
+Graph* Graph_FromFile(const size_t, const char* path);
 
-GraphResult Graph_AddVertex(Graph*, const unsigned id);
-GraphResult Graph_AddEdge(Graph*, const unsigned tail, const unsigned head);
-GraphResult Graph_FromFile(Graph*, const char* path);
-void Graph_Print(const Graph*, FILE* file);
+// Function of Mass Destruction
+void Graph_Destroy(Graph*, freer);
 
-void Graph_Destroy(Graph*);
+char* Graph_ErrorMessage(GraphResult);

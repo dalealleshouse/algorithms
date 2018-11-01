@@ -1,7 +1,10 @@
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "Graph.h"
 #include "MemAllocMock.h"
+
+const static size_t BUFFER_SIZE = 1024;
 
 // We may need a better way to log errors, but this will work for now
 #define GRAPH_ERROR(result)                                                    \
@@ -104,6 +107,63 @@ GraphResult Graph_AddEdge(Graph* self, int head, int tail)
     return Graph_Success;
 }
 
+static void AddVertex_PrintError(Graph* self, int id)
+{
+    GraphResult result = Graph_AddVertex(self, id, NULL);
+    if (result != Graph_Success)
+        GRAPH_ERROR(result);
+}
+
+static void AddEdge_PrintError(Graph* self, int head, int tail)
+{
+    GraphResult result = Graph_AddEdge(self, head, tail);
+    if (result != Graph_Success)
+        GRAPH_ERROR(result);
+}
+
+Graph* Graph_FromFile(const size_t n, const char* path)
+{
+    if (path == NULL) {
+        GRAPH_ERROR(Graph_NullParameter);
+        return NULL;
+    }
+
+    if (access(path, R_OK) != 0) {
+        GRAPH_ERROR(Graph_InvalidFilePath);
+        return NULL;
+    }
+
+    FILE* file = fopen(path, "r");
+    if (file == NULL) {
+        return NULL;
+    }
+
+    Graph* g = Graph_Create(n);
+    if (g == NULL) {
+        GRAPH_ERROR(Graph_FailedMemoryAllocation);
+        fclose(file);
+        return NULL;
+    }
+
+    for (size_t i = 0; i < n; i++)
+        AddVertex_PrintError(g, i);
+
+    char line[BUFFER_SIZE];
+    while (fgets(line, BUFFER_SIZE, file)) {
+        char* remaining;
+        int vertex = strtoul(line, &remaining, 10);
+
+        int edge = strtoul(remaining, &remaining, 10);
+        while (edge != 0) {
+            AddEdge_PrintError(g, edge, vertex);
+            edge = strtoul(remaining, &remaining, 10);
+        }
+    }
+
+    fclose(file);
+    return g;
+}
+
 void Graph_Destroy(Graph* self, freer freer)
 {
     if (self == NULL)
@@ -119,16 +179,20 @@ void Graph_Destroy(Graph* self, freer freer)
 char* Graph_ErrorMessage(GraphResult result)
 {
     switch (result) {
+    case Graph_FileOpenError:
+        return "fopen returned NULL";
+    case Graph_InvalidFilePath:
+        return "Invalid file path";
     case Graph_VertexIdExceedsMaxSize:
         return "The ID of the vertex is greater than max size";
     case Graph_DuplicateVertexId:
-        return "Attempt to add two vertices with the sam id";
+        return "Attempt to add two vertices with the same id";
     case Graph_InvalidVertexId:
         return "Invalid vertex ID";
     case Graph_FailedMemoryAllocation:
         return "Failed to allocate memory";
     case Graph_NullParameter:
-        return "One of the requited parameters passed to the fuction is NULL";
+        return "One of the requited parameters passed to the function is NULL";
     case Graph_Success:
         return "Success";
     default:
