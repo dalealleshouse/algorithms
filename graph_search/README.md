@@ -79,6 +79,37 @@ while q is not empty:
             q->enqueue(w)
 </pre>
 
+## Connected Components (Undirected Graphs Only)
+
+This algorithm identifies the [connected
+components](../graph_concepts/README.md#connected-components) in a graph by
+marking each vertex with a component id. Any vertex with a matching id is part
+of the same connected component. Differing ids indicate no connectivity.
+Although shown below with BFS, DFS works equally well for this purpose.
+
+```
+G = input graph
+q = queue data structure
+side effects: marks all vertices with a component id
+
+component_id = 0
+
+for each vertex (v) in G:
+    if v is NOT conquered:
+        component_id = component_id + 1
+        conquer(v)
+        v->component_id = component_id
+        q->enqueue(v)
+
+        while q is not empty:
+            v = q->dequeue
+            for each edge in v:
+                w = edge->head
+                if w is NOT conquered:
+                    conquer(w)
+                    w->component_id = component_id
+                    q->enqueue(w)
+ ```
 
 ## Depth First Search (DFS)
 

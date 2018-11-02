@@ -6,13 +6,6 @@
 
 const static size_t BUFFER_SIZE = 1024;
 
-// We may need a better way to log errors, but this will work for now
-#define GRAPH_ERROR(result)                                                    \
-    {                                                                          \
-        fprintf(stderr, "Graph Error: %s, %s, %s, %d\n",                       \
-            Graph_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);     \
-    }
-
 static void EdgeDestroy(Edge* edge) { free(edge); }
 
 static void VertexDestroy(Vertex* vertex, freer freer)

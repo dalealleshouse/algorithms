@@ -68,8 +68,29 @@ is two or more edges related to the same two vertices. For instance, (A, B) and
 
 ![parallel edges](par-edges.png)
 
-Graphs are said to be *connected* when there is no way to separate the vertices
-without edges crossing between the parts.
+Portions of a Graph are said to be *connected* when there is no way to separate
+the vertices without edges crossing between the parts. A common task is to
+identify all connected components of a graph. Consider the graph below, it is
+made up of three connected components.
+
+#### Connected Components
+![connected components](connected.png)
+
+The *minimum cut* is the grouping of vertices into two non-empty groups having
+the fewest number of crossing edges. Consider the graph in the graphic below.
+There is no other way of dividing the vertices that would result in fewer
+crossing edges.
+
+#### Minimum Cut
+
+![minimum cut](min-cut.png "Minimum Cut")
+
+In an undirected graph, a crossing edge is considered any edge that has an end
+point in both groups. A crossing edge in a directed graph is when an edge has a
+tail in group 1 and a head in group 2.  The *minimum cut size* is the number of
+crossing edges. Logically, the size cannot exceed the minimum degree of the
+graph.
+
 
 ## Graph Size
 
@@ -156,23 +177,6 @@ Vertices                Edges
 
 Adjacency lists have lower space requirements than matrices. Additionally, they
 are optimized for graph search algorithms.
-
-## Minimum Cut
-
-The *minimum cut* is the grouping of vertices into two non-empty groups having
-the fewest number of crossing edges. Consider the graph in the graphic below.
-There is no other way of dividing the vertices that would result in fewer
-crossing edges.
-
-### Minimum Cut
-
-![minimum cut](min-cut.png "Minimum Cut")
-
-In an undirected graph, a crossing edge is considered any edge that has an end
-point in both groups. A crossing edge in a directed graph is when an edge has a
-tail in group 1 and a head in group 2.  The *minimum cut size* is the number of
-crossing edges. Logically, the size cannot exceed the minimum degree of the
-graph.
 
 ## Common Uses 
 

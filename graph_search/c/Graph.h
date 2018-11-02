@@ -5,6 +5,13 @@
 
 #include "CommonTypes.h"
 
+// We may need a better way to log errors, but this will work for now
+#define GRAPH_ERROR(result)                                                    \
+    {                                                                          \
+        fprintf(stderr, "Graph Error: %s, %s, %s, %d\n",                       \
+            Graph_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);     \
+    }
+
 typedef enum GraphResult {
     Graph_FileOpenError = -7,
     Graph_InvalidFilePath = -6,
