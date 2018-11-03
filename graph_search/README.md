@@ -87,6 +87,8 @@ marking each vertex with a component id. Any vertex with a matching id is part
 of the same connected component. Differing ids indicate no connectivity.
 Although shown below with BFS, DFS works equally well for this purpose.
 
+### Pseudo Code
+
 ```
 G = input graph
 q = queue data structure
@@ -118,6 +120,24 @@ possible and only back tracks when absolutely necessary. It is identical to BFS
 with two exceptions. First, it uses a [Stack](../stack) instead of a Queue.
 Second, items are concured after being `pop`ed from the stack instead of before
 they are `enqueue`ed.
+
+### Pseudo Code
+
+```
+G = input graph
+s = stack data structure
+v = starting vertex
+side effects: marks all vertices conquered that are reachable from v
+
+s->push(v)
+
+while s is not empty:
+    v = s->pop
+    if v is NOT conquered:
+        for each edge in v:
+            w = edge->head
+            s->push(w)
+ ```
 
 ## Applications
 * Connectivity - In a network, ensure that every node is reachable. 

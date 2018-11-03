@@ -8,30 +8,56 @@
 
 /*******************************************************************************
  * SmallGraph.txt
+ * 0
+ * |
  *         1
  *       / | \
  *     2   3   4
- *    /    \      |
- *   5       6    7
+ *    /    \         |
+ *   5       6       7
  *   |     / | \
  *   8    9 10 11
  * ****************************************************************************/
 
-/*************************** Breadth First Search *****************************/
-bool con(Vertex* x, Vertex* y)
+const static size_t small_n = 12;
+const static char* small_path = "src/graphs/small.txt";
+
+Graph* CreateSut() { return Graph_FromFile(small_n, small_path); }
+
+typedef struct Conqured {
+    bool is_conquered;
+} Conqured;
+
+// returns false if the current vertex id is 5, this is useful for ensuring that
+// the search algorithms stop when the conqueror return false
+bool conquer(Vertex* x, Vertex* y)
 {
-    (void)x;
     (void)y;
+    // if null, or already conquered, return false
+    if (x == NULL || x->data != NULL)
+        return false;
+
+    // mark as conquered
+    Conqured* c = malloc(sizeof(c));
+    c->is_conquered = true;
+    x->data = c;
+
+    if (x->id == 5)
+        return false;
+
     return true;
 }
 
-bool is_con(Vertex* x)
+bool is_con(Vertex* v)
 {
-    (void)x;
-    return true;
+    if (v->data == NULL)
+        return false;
+
+    return ((Conqured*)v->data)->is_conquered;
 }
 
-SearchStrategy strategy = { con, is_con };
+SearchStrategy strategy = { conquer, is_con };
+/*************************** Breadth First Search *****************************/
 
 static void Graph_BFS_null_parameter()
 {
@@ -47,7 +73,7 @@ static void Graph_BFS_null_parameter()
     result = Graph_BFS(graph, 1, &bad);
     CU_ASSERT_EQUAL(Graph_NullParameter, result);
 
-    SearchStrategy bad2 = { con, NULL };
+    SearchStrategy bad2 = { conquer, NULL };
     result = Graph_BFS(graph, 1, &bad2);
     CU_ASSERT_EQUAL(Graph_NullParameter, result);
 
@@ -56,7 +82,7 @@ static void Graph_BFS_null_parameter()
 
 static void Graph_BFS_invalid_vertex()
 {
-    Graph* graph = Graph_FromFile(12, "src/graphs/small.txt");
+    Graph* graph = CreateSut();
 
     GraphResult result = Graph_BFS(graph, 15, &strategy);
     CU_ASSERT_EQUAL(Graph_VertexIdExceedsMaxSize, result);
@@ -67,14 +93,30 @@ static void Graph_BFS_invalid_vertex()
     Graph_Destroy(graph, NULL);
 }
 
+static void Graph_BFS_stops_on_false_con()
+{
+    Graph* graph = CreateSut();
+
+    Graph_BFS(graph, 1, &strategy);
+
+    for (size_t i = 0; i < small_n; i++) {
+        if (i > 0 && i <= 6) {
+            CU_ASSERT_TRUE(is_con(graph->V[i]));
+        } else {
+            CU_ASSERT_FALSE(is_con(graph->V[i]));
+        }
+    }
+
+    Graph_Destroy(graph, free);
+}
+
 /*************************** Graph_Reachable **********************************/
 static void Graph_Reachable_marks_single_node_reachable()
 {
-    const size_t n = 12;
-    Graph* graph = Graph_FromFile(n, "src/graphs/small.txt");
+    Graph* graph = CreateSut();
     Graph_Reachable(graph, 7);
 
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < small_n; i++) {
         if (i == 7) {
             CU_ASSERT_PTR_NOT_NULL(graph->V[i]->data);
             CU_ASSERT_TRUE(((VertexData*)graph->V[i]->data)->am_i_conquered);
@@ -87,11 +129,10 @@ static void Graph_Reachable_marks_single_node_reachable()
 
 static void Graph_Reachable_marks_all_reachable()
 {
-    const size_t n = 12;
-    Graph* graph = Graph_FromFile(n, "src/graphs/small.txt");
+    Graph* graph = CreateSut();
     Graph_Reachable(graph, 1);
 
-    for (size_t i = 1; i < n; i++) {
+    for (size_t i = 1; i < small_n; i++) {
         if (i == 7) {
             CU_ASSERT_PTR_NULL(graph->V[i]->data);
         } else {
@@ -114,8 +155,7 @@ static int ShortestPath(Vertex* v)
 
 static void Graph_ShortestPath_standard()
 {
-    const size_t n = 12;
-    Graph* graph = Graph_FromFile(n, "src/graphs/small.txt");
+    Graph* graph = CreateSut();
 
     Graph_ShortestPath(graph, 4);
 
@@ -145,8 +185,7 @@ static int ComponentId(Vertex* v)
 
 static void Graph_Connected_standard()
 {
-    const size_t n = 12;
-    Graph* graph = Graph_FromFile(n, "src/graphs/small.txt");
+    Graph* graph = CreateSut();
 
     Graph_Connected(graph);
 
@@ -166,10 +205,63 @@ static void Graph_Connected_standard()
     Graph_Destroy(graph, free);
 }
 
+/*************************** Depth First Search *******************************/
+static void Graph_DFS_null_parameter()
+{
+    Graph* graph = Graph_Create(10);
+
+    GraphResult result = Graph_DFS(NULL, 1, &strategy);
+    CU_ASSERT_EQUAL(Graph_NullParameter, result);
+
+    result = Graph_DFS(graph, 1, NULL);
+    CU_ASSERT_EQUAL(Graph_NullParameter, result);
+
+    SearchStrategy bad = { NULL, is_con };
+    result = Graph_DFS(graph, 1, &bad);
+    CU_ASSERT_EQUAL(Graph_NullParameter, result);
+
+    SearchStrategy bad2 = { conquer, NULL };
+    result = Graph_DFS(graph, 1, &bad2);
+    CU_ASSERT_EQUAL(Graph_NullParameter, result);
+
+    Graph_Destroy(graph, NULL);
+}
+
+static void Graph_DFS_invalid_vertex()
+{
+    Graph* graph = CreateSut();
+
+    GraphResult result = Graph_DFS(graph, 15, &strategy);
+    CU_ASSERT_EQUAL(Graph_VertexIdExceedsMaxSize, result);
+
+    result = Graph_DFS(graph, -1, &strategy);
+    CU_ASSERT_EQUAL(Graph_InvalidVertexId, result);
+
+    Graph_Destroy(graph, NULL);
+}
+
+static void Graph_DFS_stops_on_false_con()
+{
+    Graph* graph = CreateSut();
+
+    Graph_DFS(graph, 1, &strategy);
+
+    for (size_t i = 0; i < small_n; i++) {
+        if (i == 1 || i == 2 || i == 5) {
+            CU_ASSERT_TRUE(is_con(graph->V[i]));
+        } else {
+            CU_ASSERT_FALSE(is_con(graph->V[i]));
+        }
+    }
+
+    Graph_Destroy(graph, free);
+}
+
 int register_bfs_tests()
 {
     CU_TestInfo BFS_tests[] = { CU_TEST_INFO(Graph_BFS_null_parameter),
-        CU_TEST_INFO(Graph_BFS_invalid_vertex), CU_TEST_INFO_NULL };
+        CU_TEST_INFO(Graph_BFS_invalid_vertex),
+        CU_TEST_INFO(Graph_BFS_stops_on_false_con), CU_TEST_INFO_NULL };
 
     CU_TestInfo Reachable_Tests[]
         = { CU_TEST_INFO(Graph_Reachable_marks_single_node_reachable),
@@ -181,6 +273,10 @@ int register_bfs_tests()
 
     CU_TestInfo Connected_Tests[]
         = { CU_TEST_INFO(Graph_Connected_standard), CU_TEST_INFO_NULL };
+
+    CU_TestInfo DFS_tests[] = { CU_TEST_INFO(Graph_DFS_invalid_vertex),
+        CU_TEST_INFO(Graph_DFS_null_parameter),
+        CU_TEST_INFO(Graph_DFS_stops_on_false_con), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Breadth First Search",
                                   .pInitFunc = noop,
@@ -198,6 +294,10 @@ int register_bfs_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Connected_Tests },
+        { .pName = "Depth First Search",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = DFS_tests },
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);

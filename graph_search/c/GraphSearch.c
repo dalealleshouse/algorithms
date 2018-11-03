@@ -2,6 +2,7 @@
 
 #include "GraphSearch.h"
 #include "Queue.h"
+#include "Stack.h"
 
 static bool is_conquered(Vertex* v)
 {
@@ -27,7 +28,8 @@ static VertexData* VertexData_Create(size_t shortest_path, int component_id)
     return d;
 }
 
-GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy)
+static GraphResult SearchIsValid(
+    Graph* self, int vertex_id, SearchStrategy* strategy)
 {
     if (self == NULL || strategy == NULL || strategy->conqueror == NULL
         || strategy->is_conquered == NULL)
@@ -39,9 +41,20 @@ GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy)
     if ((size_t)vertex_id >= self->max_size)
         return Graph_VertexIdExceedsMaxSize;
 
+    return Graph_Success;
+}
+
+GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy)
+{
+    GraphResult result = SearchIsValid(self, vertex_id, strategy);
+    if (result != Graph_Success)
+        return result;
+
     Queue* q = Queue_Create();
     Queue_Enqueue(q, self->V[vertex_id]);
-    strategy->conqueror(self->V[vertex_id], NULL);
+    bool con_result = strategy->conqueror(self->V[vertex_id], NULL);
+    if (!con_result)
+        return Graph_Success;
 
     while (!Queue_IsEmpty(q)) {
         Vertex* v = Queue_Dequeue(q);
@@ -49,7 +62,12 @@ GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy)
         while (e != NULL) {
             Vertex* w = self->V[e->head];
             if (!strategy->is_conquered(w)) {
-                strategy->conqueror(w, v);
+                con_result = strategy->conqueror(w, v);
+                if (!con_result) {
+                    Queue_Destroy(q);
+                    return Graph_Success;
+                }
+
                 Queue_Enqueue(q, w);
             }
             e = e->next;
@@ -57,7 +75,40 @@ GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy)
     }
 
     Queue_Destroy(q);
-    return Graph_Success;
+    return result;
+}
+
+GraphResult Graph_DFS(Graph* self, int vertex_id, SearchStrategy* strategy)
+{
+    GraphResult result = SearchIsValid(self, vertex_id, strategy);
+    if (result != Graph_Success)
+        return result;
+
+    Stack* s = Stack_Create();
+    Stack_Push(s, self->V[vertex_id]);
+
+    Vertex* prev = NULL;
+    while (!Stack_IsEmpty(s)) {
+        Vertex* v = Stack_Pop(s);
+        if (!strategy->is_conquered(v)) {
+            bool con_result = strategy->conqueror(v, prev);
+            if (!con_result) {
+                Stack_Destroy(s);
+                return Graph_Success;
+            }
+
+            Edge* e = v->edges;
+            while (e != NULL) {
+                Vertex* w = self->V[e->head];
+                Stack_Push(s, w);
+                e = e->next;
+            }
+            prev = v;
+        }
+    }
+
+    Stack_Destroy(s);
+    return result;
 }
 
 static bool reachable_conqueror(Vertex* v, Vertex* p)
