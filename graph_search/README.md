@@ -79,7 +79,7 @@ while q is not empty:
             q->enqueue(w)
 </pre>
 
-## Connected Components (Undirected Graphs Only)
+## Connected Components (Undirected Graphs)
 
 This algorithm identifies the [connected
 components](../graph_concepts/README.md#connected-components) in a graph by
@@ -118,7 +118,7 @@ for each vertex (v) in G:
 DFS is analogous to searching a maze in that it dives as deep into the graph as
 possible and only back tracks when absolutely necessary. It is identical to BFS
 with two exceptions. First, it uses a [Stack](../stack) instead of a Queue.
-Second, items are concured after being `pop`ed from the stack instead of before
+Second, items are conquered after being `pop`ed from the stack instead of before
 they are `enqueue`ed.
 
 ### Pseudo Code
@@ -139,11 +139,22 @@ while s is not empty:
             s->push(w)
  ```
 
+## Topological Ordering (Acyclic Directed Graphs)
+
+Just as some applications, such as [shortest path](#bfs---shortest-path), only
+work with BFS, [topological
+ordering](../graph_concepts/README.md#topological-ordering) only works with DFS.
+
+
+
 ## Applications
 * Connectivity - In a network, ensure that every node is reachable. 
 * Shortest Path - Shortest distance between two places on a map (driving
     directions). Another example is determining degrees of separation such as
     finding a [Erdos number](https://en.wikipedia.org/wiki/Erd%C5%91s_number),
     or the more recent [Bacon number](https://oracleofbacon.org/).
-* Planning - Find the sequence of decisions from one point to another. For
+* Topological Ordering - Determine the ideal order of tasks that have precedence
+    constraints (e.g. university courses with pre-requisites)
+
+* Find the sequence of decisions from one point to another. For
     example, the sequence steps required to solve a puzzle.

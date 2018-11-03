@@ -43,10 +43,34 @@ refer to directed edges as *arcs*. See the example below.
 
 An important concept related to directed graphs is *cycle*s. A cycle occurs when
 there exists a vertex that has a path that leads back to itself. An example is
-shown below. A graph with no cycles is said to *acyclic*.
+shown below.
 
 #### Cycle
 ![cycle](cycle.png)
+
+A graph with no cycles is said to *acyclic*. A *directed acyclic* graph is
+particularly interesting because such graphs have a least one (usually many)
+*topological ordering*. A graph with a cycle has no topological ordering. While
+the goal of this project is to abstain from recondite mathematical definitions,
+this concept is much easier to understand in such terms. A topological sort is
+is an ordering of vertices
+![vertices](https://latex.codecogs.com/gif.latex?v_{1},v_{2},...v_{n}) in such a
+way, that if there exists an edge with a tail of
+![v_j](https://latex.codecogs.com/gif.latex?v_{j}) and a head of
+![v_i](https://latex.codecogs.com/gif.latex?v_{i}), then
+![v_i](https://latex.codecogs.com/gif.latex?v_{j}) comes before
+![v_i](https://latex.codecogs.com/gif.latex?v_{i}). Consider a graph in which
+the vertices represent tasks and directed edges represent precedence
+constraints. The topological orderings are acceptable sequences to complete the
+tasks. This is depicted graphically below.
+
+#### Topological Ordering
+
+![topological ordering](top-ordering.png)
+
+Every directed acyclic graph has a *source vertex*, that is a vertex with no
+incoming edges. The interested reader is encouraged to contemplate why this is
+true...
 
 Edges can also have weights associated with them. Weighting assigns a cost to
 each edge. Weighting can be modeled in almost any way imaginable. In a network,
@@ -70,7 +94,7 @@ is two or more edges related to the same two vertices. For instance, (A, B) and
 
 Portions of a Graph are said to be *connected* when there is no way to separate
 the vertices without edges crossing between the parts. A common task is to
-identify all connected components of a graph. Consider the graph below, it is
+identify all connected components of a graph.  Consider the graph below, it is
 made up of three connected components.
 
 #### Connected Components
