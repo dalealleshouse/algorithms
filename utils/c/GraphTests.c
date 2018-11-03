@@ -18,7 +18,7 @@ static void Graph_Create_malloc_tester(void)
 
 static void Graph_Create_failed_malloc()
 {
-    TestFaliedMalloc(Graph_Create_malloc_tester);
+    TestFailedMalloc(Graph_Create_malloc_tester);
 }
 
 static void Graph_Create_initalizes_values()
@@ -48,7 +48,7 @@ static void Graph_AddVertex_malloc_tester(void)
 static void Graph_AddVertex_failed_malloc()
 {
     _graph = Graph_Create(10);
-    TestFaliedMalloc(Graph_AddVertex_malloc_tester);
+    TestFailedMalloc(Graph_AddVertex_malloc_tester);
     Graph_Destroy(_graph, NULL);
 }
 
@@ -122,7 +122,7 @@ static void Graph_AddEdge_failed_malloc()
     _graph = Graph_Create(10);
     Graph_AddVertex(_graph, 1, NULL);
     Graph_AddVertex(_graph, 2, NULL);
-    TestFaliedMalloc(Graph_AddEdge_malloc_tester);
+    TestFailedMalloc(Graph_AddEdge_malloc_tester);
     Graph_Destroy(_graph, NULL);
 }
 
@@ -199,7 +199,7 @@ static void Graph_FromFile_malloc_tester(void)
 
 static void Graph_FromFile_failed_malloc()
 {
-    TestFaliedMalloc(Graph_FromFile_malloc_tester);
+    TestFailedMalloc(Graph_FromFile_malloc_tester);
 }
 
 static void Graph_FromFile_invalid_path()

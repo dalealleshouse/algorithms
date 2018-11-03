@@ -114,16 +114,16 @@ for each vertex (v) in G:
 ## Depth First Search (DFS)
 
 DFS is analogous to searching a maze in that it dives as deep into the graph as
-possible and only back tracks when absolutely necessary. One advantage is that
-it can find the topological ordering of directed acyclic graphs.
+possible and only back tracks when absolutely necessary. It is identical to BFS
+with two exceptions. First, it uses a [Stack](../stack) instead of a Queue.
+Second, items are concured after being `pop`ed from the stack instead of before
+they are `enqueue`ed.
 
 ## Applications
-* Connectivity - In a network, ensure that every node is reachable from any
-    node. Another example is determining degrees of separation such as finding a
-    [Erdos number](https://en.wikipedia.org/wiki/Erd%C5%91s_number), or the more
-    recent [Bacon number](https://oracleofbacon.org/).
+* Connectivity - In a network, ensure that every node is reachable. 
 * Shortest Path - Shortest distance between two places on a map (driving
-    directions).
+    directions). Another example is determining degrees of separation such as
+    finding a [Erdos number](https://en.wikipedia.org/wiki/Erd%C5%91s_number),
+    or the more recent [Bacon number](https://oracleofbacon.org/).
 * Planning - Find the sequence of decisions from one point to another. For
     example, the sequence steps required to solve a puzzle.
-* Connected Components - 

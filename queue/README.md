@@ -30,10 +30,7 @@ enqueue:
     Add item to the end of the list
 
 dequeue:
-    Remove item from the head of the front of the list and return it
-
-is_empty:
-    return true if there are no items in the queue
+    Remove item from the head the list and returns it
 ```
 
 ## Applications
