@@ -4,12 +4,16 @@
 #include <stdio.h>
 
 #include "CommonTypes.h"
+#include "ErrorReporter.h"
 
 // We may need a better way to log errors, but this will work for now
 #define GRAPH_ERROR(result)                                                    \
     {                                                                          \
-        fprintf(stderr, "Graph Error: %s, %s, %s, %d\n",                       \
+        char str[1000];                                                        \
+        sprintf(str, "Graph Error: %s, %s, %s, %d\n",                          \
             Graph_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);     \
+                                                                               \
+        ErrorReporter_Report(result, str);                                     \
     }
 
 typedef enum GraphResult {

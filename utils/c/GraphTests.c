@@ -4,6 +4,7 @@
 #include "CUnit/CUnit.h"
 #include "TestHelpers.h"
 
+#include "ErrorReporter.h"
 #include "Graph.h"
 #include "MemAllocMock.h"
 
@@ -14,6 +15,8 @@ static void Graph_Create_malloc_tester(void)
 {
     Graph* graph = Graph_Create(1);
     CU_ASSERT_PTR_NULL(graph);
+    CU_ASSERT_EQUAL(
+        Graph_FailedMemoryAllocation, ErrorReporter_LastErrorCode());
 }
 
 static void Graph_Create_failed_malloc()
@@ -188,12 +191,15 @@ static void Graph_AddEdge_intializes_values()
 static void Graph_FromFile_null_parameter()
 {
     Graph* graph = Graph_FromFile(10, NULL);
+    CU_ASSERT_EQUAL(Graph_NullParameter, ErrorReporter_LastErrorCode());
     CU_ASSERT_PTR_NULL(graph);
 }
 
 static void Graph_FromFile_malloc_tester(void)
 {
     Graph* graph = Graph_FromFile(6, "src/graphs/Graph-4-2.txt");
+    CU_ASSERT_EQUAL(
+        Graph_FailedMemoryAllocation, ErrorReporter_LastErrorCode());
     CU_ASSERT_PTR_NULL(graph);
 }
 
@@ -205,6 +211,7 @@ static void Graph_FromFile_failed_malloc()
 static void Graph_FromFile_invalid_path()
 {
     Graph* graph = Graph_FromFile(10, "bad_path.txt");
+    CU_ASSERT_EQUAL(Graph_InvalidFilePath, ErrorReporter_LastErrorCode());
     CU_ASSERT_PTR_NULL(graph);
 }
 
@@ -212,6 +219,8 @@ static void Graph_FromFile_insufficent_size()
 {
     Graph* graph = Graph_FromFile(5, "src/graphs/Graph-4-2.txt");
     CU_ASSERT_PTR_NOT_NULL(graph);
+    CU_ASSERT_EQUAL(
+        Graph_VertexIdExceedsMaxSize, ErrorReporter_LastErrorCode());
 
     Graph_Destroy(graph, NULL);
 }
