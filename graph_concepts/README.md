@@ -5,6 +5,7 @@ This project contains many graph algorithms. This section provides a brief
 overview of graph concepts. Consider comprehension of this material a
 pre-requisite for graph algorithms.
 
+## Graphs
 Graphs represent pair wise relationships among objects. In graph jargon, the
 objects are known as either *vertices* or *nodes*. The relationship between the
 vertices are *edges*. Vertices that are connected via an edge are said to be
@@ -12,7 +13,7 @@ vertices are *edges*. Vertices that are connected via an edge are said to be
 modeling one's family as a graph. The people in the family would be vertices,
 and the relationships between them (mother, daughter, father, brother, etc..)
 would be edges. Edges are typically denoted by a pair known as the *endpoints*.
-If Dick is Jane's brother, the relationship is be denoted as (Dick, Jane). The
+If Dick is Jane's brother, the relationship is denoted as (Dick, Jane). The
 set of all vertices is denoted as `V` and `E` denotes the set of all edges. The
 *degree* of a vertex is the number of edges connected to it.
 
@@ -41,13 +42,14 @@ refer to directed edges as *arcs*. See the example below.
 * `V`: A, B, C, D
 * `E`: (A, C), (A, D), (B, A), (B, D), (D, A), (D, C)
 
+### Cycle
 An important concept related to directed graphs is *cycle*s. A cycle occurs when
 there exists a vertex that has a path that leads back to itself. An example is
 shown below.
 
-#### Cycle
 ![cycle](cycle.png)
 
+### Topological Ordering
 A graph with no cycles is said to *acyclic*. A *directed acyclic* graph is
 particularly interesting because such graphs have a least one (usually many)
 *topological ordering*. A graph with a cycle has no topological ordering. While
@@ -64,14 +66,13 @@ the vertices represent tasks and directed edges represent precedence
 constraints. The topological orderings are acceptable sequences to complete the
 tasks. This is depicted graphically below.
 
-#### Topological Ordering
-
 ![topological ordering](top-ordering.png)
 
 Every directed acyclic graph has a *source vertex*, that is a vertex with no
 incoming edges. The interested reader is encouraged to contemplate why this is
 true...
 
+### Edge Weights
 Edges can also have weights associated with them. Weighting assigns a cost to
 each edge. Weighting can be modeled in almost any way imaginable. In a network,
 this weight could be connection latency. Going back to the family graph example.
@@ -80,32 +81,28 @@ relationship may have a weight of 5 whereas a sibling relationship may have a
 weight of 3. See the image below. In this graph, the (Janice, Richard) edge has
 a higher weight than the (Jane, Dick) edge.
 
-#### Edge Weights
-
 ![weighted graph](weight-graph.png)
 
+### Parallel Edges
 A term commonly used in graph applications is *parallel edge*. A parallel edge
 is two or more edges related to the same two vertices. For instance, (A, B) and
 (B, A) are parallel edges. The edges in the graphic below are parallel edges.
 
-#### Parallel Edges
-
 ![parallel edges](par-edges.png)
 
+### Connected Components
 Portions of a Graph are said to be *connected* when there is no way to separate
 the vertices without edges crossing between the parts. A common task is to
 identify all connected components of a graph.  Consider the graph below, it is
 made up of three connected components.
 
-#### Connected Components
 ![connected components](connected.png)
 
+### Minimum Cut
 The *minimum cut* is the grouping of vertices into two non-empty groups having
 the fewest number of crossing edges. Consider the graph in the graphic below.
 There is no other way of dividing the vertices that would result in fewer
 crossing edges.
-
-#### Minimum Cut
 
 ![minimum cut](min-cut.png "Minimum Cut")
 
@@ -116,7 +113,7 @@ crossing edges. Logically, the size cannot exceed the minimum degree of the
 graph.
 
 
-## Graph Size
+### Graph Size
 
 In order to accurately predict the performance of graph algorithms, it's
 important to have common terminology for expressing the size of a graph. The
@@ -140,7 +137,7 @@ the maximum number of edges with none of them being parallel.
 Roughly defined, a *sparse* graph is closer to the lower bound and a *dense*
 graph is closer to the upper bound.
 
-## Graph Representations
+### Graph Representations
 
 There are several ways of representing a graph. Two of the most common are
 adjacency matrices and adjacency lists.  The choice of which to use depends on
@@ -150,7 +147,7 @@ For both cases, consider the graph below.
 
 ![directed graph](dir-graph.png)
 
-### Adjacency Matrix
+#### Adjacency Matrix
 An adjacency matrix depicts vertices as indices across the top and side of a
 matrix. A one at the intersection of two vertices indicates a connected edge
 while a zero indicates no connection. The associated adjacency matrix for the
@@ -161,7 +158,7 @@ graph in question is shown below.
 The amount of space required to store an adjacency matrix is
 ![n^2](https://latex.codecogs.com/gif.latex?n^2).
 
-### Adjacency List
+#### Adjacency List
 
 There are several different ways to create an adjacency list. However, the
 general concept is to have four components:
@@ -202,7 +199,7 @@ Vertices                Edges
 Adjacency lists have lower space requirements than matrices. Additionally, they
 are optimized for graph search algorithms.
 
-## Common Uses 
+### Common Uses 
 
 There are virtually countless applications for graphs. Below are just a few
 common uses.

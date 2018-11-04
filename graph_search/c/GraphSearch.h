@@ -3,8 +3,7 @@
 #include "Graph.h"
 
 typedef struct VertexData {
-    size_t shortest_path;
-    int component_id;
+    int value;
     bool am_i_conquered;
 } VertexData;
 
@@ -19,4 +18,5 @@ GraphResult Graph_BFS(Graph*, int, SearchStrategy*);
 GraphResult Graph_Reachable(Graph*, int);
 GraphResult Graph_ShortestPath(Graph*, int);
 GraphResult Graph_Connected(Graph*);
+GraphResult Graph_TopSort(Graph*);
 GraphResult Graph_DFS(Graph*, int, SearchStrategy*);

@@ -12,7 +12,7 @@ static bool is_conquered(Vertex* v)
     return ((VertexData*)v->data)->am_i_conquered;
 }
 
-static VertexData* VertexData_Create(size_t shortest_path, int component_id)
+static VertexData* VertexData_Create(int value)
 {
     VertexData* d = calloc(sizeof(VertexData), 1);
 
@@ -22,8 +22,7 @@ static VertexData* VertexData_Create(size_t shortest_path, int component_id)
     }
 
     d->am_i_conquered = true;
-    d->shortest_path = shortest_path;
-    d->component_id = component_id;
+    d->value = value;
 
     return d;
 }
@@ -117,7 +116,7 @@ static bool reachable_conqueror(Vertex* v, Vertex* p)
     if (v->data != NULL)
         return true;
 
-    v->data = VertexData_Create(0, 0);
+    v->data = VertexData_Create(0);
 
     return true;
 }
@@ -133,12 +132,13 @@ static bool shortest_path_conqueror(Vertex* v, Vertex* p)
     if (v == NULL || v->data != NULL)
         return false;
 
-    VertexData* d = VertexData_Create(0, 0);
+    int shortest_path;
     if (p == NULL)
-        d->shortest_path = 0;
+        shortest_path = 0;
     else
-        d->shortest_path = ((VertexData*)p->data)->shortest_path + 1;
+        shortest_path = ((VertexData*)p->data)->value + 1;
 
+    VertexData* d = VertexData_Create(shortest_path);
     v->data = d;
 
     return true;
@@ -157,7 +157,7 @@ static bool connected_conqueror(Vertex* v, Vertex* p)
     if (v == NULL || v->data != NULL)
         return false;
 
-    v->data = VertexData_Create(0, component_id);
+    v->data = VertexData_Create(component_id);
     return true;
 }
 
@@ -173,6 +173,40 @@ GraphResult Graph_Connected(Graph* self)
             if (result != Graph_Success)
                 return result;
         }
+    }
+
+    return Graph_Success;
+}
+
+static int order = 0;
+static void Graph_DFS_TopSort(Graph* self, int vertex_id)
+{
+    Vertex* v = self->V[vertex_id];
+    reachable_conqueror(v, NULL);
+
+    Edge* e = v->edges;
+    while (e != NULL) {
+        Vertex* w = self->V[e->head];
+        if (!is_conquered(w))
+            Graph_DFS_TopSort(self, e->head);
+
+        e = e->next;
+    }
+
+    ((VertexData*)v->data)->value = order;
+    order--;
+}
+
+GraphResult Graph_TopSort(Graph* self)
+{
+    if (self == NULL)
+        return Graph_NullParameter;
+
+    order = self->n;
+
+    for (size_t i = 0; i < self->n; i++) {
+        if (!is_conquered(self->V[i]))
+            Graph_DFS_TopSort(self, i);
     }
 
     return Graph_Success;

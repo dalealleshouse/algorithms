@@ -134,10 +134,27 @@ s->push(v)
 while s is not empty:
     v = s->pop
     if v is NOT conquered:
+        conquer(v)
         for each edge in v:
             w = edge->head
             s->push(w)
  ```
+
+DFS also lends itself to a rather elegant recursive implementation that does not
+require any additional data structures.
+
+```
+G = input graph
+v = starting vertex
+side effects: marks all vertices conquered that are reachable from v
+
+conquer(v)
+
+for each edge in v:
+    w = edge->head
+    if w is NOT conquered:
+        recurse (G, w)
+```
 
 ## Topological Ordering (Acyclic Directed Graphs)
 
@@ -145,7 +162,32 @@ Just as some applications, such as [shortest path](#bfs---shortest-path), only
 work with BFS, [topological
 ordering](../graph_concepts/README.md#topological-ordering) only works with DFS.
 
+```
+Global variable: order
 
+topo-sort:
+    G = input graph
+
+    order = |V| - number of vertices in G
+    for every vertex in G:
+        if vertex is NOT conquered:
+            dfs-topo(G, vertex)
+
+dfs-topo:
+    G = input graph
+    v = starting vertex
+    side effects: marks every vertex with a topological sort order
+
+    conquer(v)
+
+    for each edge in V:
+        w = edge->head
+        if w is NOT conquered:
+            dfs-topo(G, w)
+
+    v->top-order = order
+    order = order - 1
+```
 
 ## Applications
 * Connectivity - In a network, ensure that every node is reachable. 

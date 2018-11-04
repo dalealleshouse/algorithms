@@ -7,7 +7,7 @@
 #include "TestHelpers.h"
 
 /*******************************************************************************
- * SmallGraph.txt
+ * small.txt
  * 0
  * |
  *         1
@@ -17,12 +17,34 @@
  *   5       6       7
  *   |     / | \
  *   8    9 10 11
+ *
+ * -----------------------------------------------------------------------------
+ *
+ * directed.txt
+ *    1
+ *   * \
+ *  /   *
+ * 0     3
+ *  \   *
+ *   * /
+ *    2
  * ****************************************************************************/
 
 const static size_t small_n = 12;
+const static size_t dir_n = 4;
 const static char* small_path = "src/graphs/small.txt";
+const static char* dir_path = "src/graphs/directed.txt";
 
 Graph* CreateSut() { return Graph_FromFile(small_n, small_path); }
+Graph* CreateDirSut() { return Graph_FromFile(dir_n, dir_path); }
+
+static int Value(Vertex* v)
+{
+    if (v == NULL || v->data == NULL)
+        return -1;
+
+    return ((VertexData*)v->data)->value;
+}
 
 typedef struct Conqured {
     bool is_conquered;
@@ -57,8 +79,8 @@ bool is_con(Vertex* v)
 }
 
 SearchStrategy strategy = { conquer, is_con };
-/*************************** Breadth First Search *****************************/
 
+/*************************** Breadth First Search *****************************/
 static void Graph_BFS_null_parameter()
 {
     Graph* graph = Graph_Create(10);
@@ -145,62 +167,46 @@ static void Graph_Reachable_marks_all_reachable()
 }
 
 /*************************** Shortest Path ************************************/
-static int ShortestPath(Vertex* v)
-{
-    if (v == NULL || v->data == NULL)
-        return -1;
-
-    return ((VertexData*)v->data)->shortest_path;
-}
-
 static void Graph_ShortestPath_standard()
 {
     Graph* graph = CreateSut();
 
     Graph_ShortestPath(graph, 4);
 
-    CU_ASSERT_EQUAL(1, ShortestPath(graph->V[1]));
-    CU_ASSERT_EQUAL(2, ShortestPath(graph->V[2]));
-    CU_ASSERT_EQUAL(2, ShortestPath(graph->V[3]));
-    CU_ASSERT_EQUAL(0, ShortestPath(graph->V[4]));
-    CU_ASSERT_EQUAL(3, ShortestPath(graph->V[5]));
-    CU_ASSERT_EQUAL(3, ShortestPath(graph->V[6]));
-    CU_ASSERT_EQUAL(-1, ShortestPath(graph->V[7]));
-    CU_ASSERT_EQUAL(4, ShortestPath(graph->V[8]));
-    CU_ASSERT_EQUAL(4, ShortestPath(graph->V[9]));
-    CU_ASSERT_EQUAL(4, ShortestPath(graph->V[10]));
-    CU_ASSERT_EQUAL(4, ShortestPath(graph->V[11]));
+    CU_ASSERT_EQUAL(1, Value(graph->V[1]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[2]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[3]));
+    CU_ASSERT_EQUAL(0, Value(graph->V[4]));
+    CU_ASSERT_EQUAL(3, Value(graph->V[5]));
+    CU_ASSERT_EQUAL(3, Value(graph->V[6]));
+    CU_ASSERT_EQUAL(-1, Value(graph->V[7]));
+    CU_ASSERT_EQUAL(4, Value(graph->V[8]));
+    CU_ASSERT_EQUAL(4, Value(graph->V[9]));
+    CU_ASSERT_EQUAL(4, Value(graph->V[10]));
+    CU_ASSERT_EQUAL(4, Value(graph->V[11]));
 
     Graph_Destroy(graph, free);
 }
 
 /*************************** Connected Components *****************************/
-static int ComponentId(Vertex* v)
-{
-    if (v == NULL || v->data == NULL)
-        return -1;
-
-    return ((VertexData*)v->data)->component_id;
-}
-
 static void Graph_Connected_standard()
 {
     Graph* graph = CreateSut();
 
     Graph_Connected(graph);
 
-    CU_ASSERT_EQUAL(1, ComponentId(graph->V[0]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[1]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[2]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[3]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[4]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[5]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[6]));
-    CU_ASSERT_EQUAL(3, ComponentId(graph->V[7]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[8]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[9]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[10]));
-    CU_ASSERT_EQUAL(2, ComponentId(graph->V[11]));
+    CU_ASSERT_EQUAL(1, Value(graph->V[0]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[1]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[2]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[3]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[4]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[5]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[6]));
+    CU_ASSERT_EQUAL(3, Value(graph->V[7]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[8]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[9]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[10]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[11]));
 
     Graph_Destroy(graph, free);
 }
@@ -257,6 +263,29 @@ static void Graph_DFS_stops_on_false_con()
     Graph_Destroy(graph, free);
 }
 
+/*************************** Topological Sort *********************************/
+static void Graph_TopSort_null_paramter()
+{
+    GraphResult result = Graph_TopSort(NULL);
+
+    CU_ASSERT_EQUAL(Graph_NullParameter, result);
+}
+
+static void Graph_TopSort_standard()
+{
+    Graph* graph = CreateDirSut();
+
+    GraphResult result = Graph_TopSort(graph);
+
+    CU_ASSERT_EQUAL(Graph_Success, result);
+    CU_ASSERT_EQUAL(1, Value(graph->V[0]));
+    CU_ASSERT_EQUAL(2, Value(graph->V[1]));
+    CU_ASSERT_EQUAL(3, Value(graph->V[2]));
+    CU_ASSERT_EQUAL(4, Value(graph->V[3]));
+
+    Graph_Destroy(graph, free);
+}
+
 int register_bfs_tests()
 {
     CU_TestInfo BFS_tests[] = { CU_TEST_INFO(Graph_BFS_null_parameter),
@@ -278,6 +307,9 @@ int register_bfs_tests()
         CU_TEST_INFO(Graph_DFS_null_parameter),
         CU_TEST_INFO(Graph_DFS_stops_on_false_con), CU_TEST_INFO_NULL };
 
+    CU_TestInfo Top_Tests[] = { CU_TEST_INFO(Graph_TopSort_null_paramter),
+        CU_TEST_INFO(Graph_TopSort_standard), CU_TEST_INFO_NULL };
+
     CU_SuiteInfo suites[] = { { .pName = "Breadth First Search",
                                   .pInitFunc = noop,
                                   .pCleanupFunc = noop,
@@ -298,6 +330,10 @@ int register_bfs_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = DFS_tests },
+        { .pName = "Topological Sort",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = Top_Tests },
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
