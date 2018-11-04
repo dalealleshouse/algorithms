@@ -79,12 +79,12 @@ while q is not empty:
             q->enqueue(w)
 </pre>
 
-## Connected Components (Undirected Graphs)
+## Connected Components (Undirected)
 
 This algorithm identifies the [connected
-components](../graph_concepts/README.md#connected-components) in a graph by
-marking each vertex with a component id. Any vertex with a matching id is part
-of the same connected component. Differing ids indicate no connectivity.
+components](../graph_concepts/README.md#connected-components-undirected) in a
+graph by marking each vertex with a component id. Any vertex with a matching id
+is part of the same connected component. Differing ids indicate no connectivity.
 Although shown below with BFS, DFS works equally well for this purpose.
 
 ### Pseudo Code
@@ -161,6 +161,9 @@ for each edge in v:
 Just as some applications, such as [shortest path](#bfs---shortest-path), only
 work with BFS, [topological
 ordering](../graph_concepts/README.md#topological-ordering) only works with DFS.
+The algorithm laid out below discovers a valid topological ordering for the
+input graph. One important thing to note is that this is only one of possibly
+many.
 
 ```
 Global variable: order
@@ -189,6 +192,14 @@ dfs-topo:
     order = order - 1
 ```
 
+### Strongly Connected Components (Directed)
+
+Finding the [strongly connected
+components](../graph_concepts/README.md#strongly-connected-components-directed)
+of a directed graph is the most complex of the algorithms shown here. It is
+often referred to as the *Kosaraju* algorithm because he is the person who
+discovered it in 1978.
+
 ## Applications
 * Connectivity - In a network, ensure that every node is reachable. 
 * Shortest Path - Shortest distance between two places on a map (driving
@@ -196,7 +207,5 @@ dfs-topo:
     finding a [Erdos number](https://en.wikipedia.org/wiki/Erd%C5%91s_number),
     or the more recent [Bacon number](https://oracleofbacon.org/).
 * Topological Ordering - Determine the ideal order of tasks that have precedence
-    constraints (e.g. university courses with pre-requisites)
-
-* Find the sequence of decisions from one point to another. For
-    example, the sequence steps required to solve a puzzle.
+    constraints (e.g. university courses with pre-requisites or steps to solve a
+    puzzle)

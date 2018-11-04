@@ -55,22 +55,24 @@ particularly interesting because such graphs have a least one (usually many)
 *topological ordering*. A graph with a cycle has no topological ordering. While
 the goal of this project is to abstain from recondite mathematical definitions,
 this concept is much easier to understand in such terms. A topological sort is
-is an ordering of vertices
+an ordering of vertices
 ![vertices](https://latex.codecogs.com/gif.latex?v_{1},v_{2},...v_{n}) in such a
 way, that if there exists an edge with a tail of
 ![v_j](https://latex.codecogs.com/gif.latex?v_{j}) and a head of
 ![v_i](https://latex.codecogs.com/gif.latex?v_{i}), then
 ![v_i](https://latex.codecogs.com/gif.latex?v_{j}) comes before
-![v_i](https://latex.codecogs.com/gif.latex?v_{i}). Consider a graph in which
-the vertices represent tasks and directed edges represent precedence
-constraints. The topological orderings are acceptable sequences to complete the
-tasks. This is depicted graphically below.
+![v_i](https://latex.codecogs.com/gif.latex?v_{i}). It's a ordering of vertices
+in which the directed edges of the graph always move forward in the ordering.
+Consider a graph in which the vertices represent tasks and directed edges
+represent precedence constraints. The topological orderings are acceptable
+sequences in which to complete the tasks. This is depicted graphically below.
 
 ![topological ordering](top-ordering.png)
 
 Every directed acyclic graph has a *source vertex*, that is a vertex with no
-incoming edges. The interested reader is encouraged to contemplate why this is
-true...
+incoming edges. Additionally, there must exists a vertex with no outgoing edges
+known as the *sink vertex*.  The interested reader is encouraged to contemplate
+why this is true...
 
 ### Edge Weights
 Edges can also have weights associated with them. Weighting assigns a cost to
@@ -90,13 +92,22 @@ is two or more edges related to the same two vertices. For instance, (A, B) and
 
 ![parallel edges](par-edges.png)
 
-### Connected Components
+### Connected Components (Undirected)
 Portions of a Graph are said to be *connected* when there is no way to separate
 the vertices without edges crossing between the parts. A common task is to
 identify all connected components of a graph.  Consider the graph below, it is
 made up of three connected components.
 
 ![connected components](connected.png)
+
+### Strongly Connected Components (Directed)
+Deciphering connected components in a directed graph is a bit more difficult
+than it is in undirected graphs. A *strongly connected component* is a
+subsection of a directed graph in which there is a directed path from every
+vertex to every other vertex. The rather convoluted graph below demonstrates the
+concept.
+
+![strongly connected components](strongly-connected.png)
 
 ### Minimum Cut
 The *minimum cut* is the grouping of vertices into two non-empty groups having
