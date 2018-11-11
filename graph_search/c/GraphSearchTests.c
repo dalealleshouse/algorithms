@@ -298,7 +298,7 @@ static void Graph_TopSort_standard()
 /*************************** Strongly Connected Components ********************/
 static void Graph_SCC_MagicOrdering_null_paramter()
 {
-    int* result = Graph_SCC_MagicOrdering(NULL);
+    Stack* result = Graph_SCC_MagicOrdering(NULL);
 
     CU_ASSERT_PTR_NULL(result);
     CU_ASSERT_EQUAL(Graph_NullParameter, ErrorReporter_LastErrorCode());
@@ -309,14 +309,16 @@ static void Graph_SCC_MagicOrdering_standard()
     int expected[] = { 1, 7, 4, 9, 6, 3, 8, 2, 5, 0 };
     Graph* graph = CreateSimpleSCCSut();
 
-    int* result = Graph_SCC_MagicOrdering(graph);
+    Stack* result = Graph_SCC_MagicOrdering(graph);
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(result);
-    for (int i = 0; i < (int)simple_n; i++)
-        CU_ASSERT_EQUAL(expected[i], result[i]);
+    for (int i = 0; i < (int)simple_n; i++) {
+        Vertex* v = Stack_Pop(result);
+        CU_ASSERT_EQUAL(expected[i], v->id);
+    }
 
     Graph_Destroy(graph, free);
-    free(result);
+    Stack_Destroy(result);
 }
 
 static void Graph_SCC_MagicOrdering_standard_two()
@@ -324,14 +326,16 @@ static void Graph_SCC_MagicOrdering_standard_two()
     int expected[] = { 7, 10, 11, 4, 1, 5, 3, 2, 9, 6, 8, 0 };
     Graph* graph = CreateSCCSut();
 
-    int* result = Graph_SCC_MagicOrdering(graph);
+    Stack* result = Graph_SCC_MagicOrdering(graph);
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(result);
-    for (int i = 0; i < (int)scc_n; i++)
-        CU_ASSERT_EQUAL(expected[i], result[i]);
+    for (int i = 0; i < (int)scc_n; i++) {
+        Vertex* v = Stack_Pop(result);
+        CU_ASSERT_EQUAL(expected[i], v->id);
+    }
 
     Graph_Destroy(graph, free);
-    free(result);
+    Stack_Destroy(result);
 }
 
 static void Graph_SCC_null_parameter()

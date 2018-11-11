@@ -248,7 +248,7 @@ static bool scc_is_conquered(Vertex* v)
  * This will generate a valid order for discovering strongly connected
  * components
  */
-static int* Graph_MagicOrdering(Graph* self, int vertex_id, int* order)
+static Stack* Graph_MagicOrdering(Graph* self, int vertex_id, Stack* order)
 {
     Vertex* v = self->V[vertex_id];
     magic_ordering_conqueror(v, NULL);
@@ -262,23 +262,22 @@ static int* Graph_MagicOrdering(Graph* self, int vertex_id, int* order)
         e = e->next;
     }
 
-    *order = vertex_id;
-    return order - 1;
+    Stack_Push(order, v);
+    return order;
 }
 
-int* Graph_SCC_MagicOrdering(Graph* self)
+Stack* Graph_SCC_MagicOrdering(Graph* self)
 {
     if (self == NULL) {
         GRAPH_ERROR(Graph_NullParameter);
         return NULL;
     }
 
-    int* ordering = calloc(sizeof(int), self->n);
-    int* curr = ordering + self->n - 1;
+    Stack* ordering = Stack_Create();
 
     for (size_t i = 0; i < self->n; i++) {
         if (!is_conquered(self->V[i]))
-            curr = Graph_MagicOrdering(self, i, curr);
+            Graph_MagicOrdering(self, i, ordering);
     }
 
     return ordering;
@@ -289,18 +288,19 @@ GraphResult Graph_SCC(Graph* self)
     if (self == NULL)
         return Graph_NullParameter;
 
-    int* mo = Graph_SCC_MagicOrdering(self);
+    Stack* mo = Graph_SCC_MagicOrdering(self);
 
     for (size_t i = 0; i < self->n; i++) {
-        if (scc_is_conquered(self->V[mo[i]]))
+        Vertex* v = Stack_Pop(mo);
+        if (scc_is_conquered(v))
             continue;
 
-        scc_id = self->V[mo[i]]->id;
+        scc_id = v->id;
         SearchStrategy scc = { scc_conqueror, scc_is_conquered };
 
-        Graph_DFS(self, mo[i], &scc);
+        Graph_DFS(self, v->id, &scc);
     }
 
-    free(mo);
+    Stack_Destroy(mo);
     return Graph_Success;
 }

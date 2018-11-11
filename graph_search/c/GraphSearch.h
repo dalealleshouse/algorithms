@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graph.h"
+#include "Stack.h"
 
 typedef struct VertexData {
     int value;
@@ -20,5 +21,5 @@ GraphResult Graph_Reachable(Graph*, int);
 GraphResult Graph_ShortestPath(Graph*, int);
 GraphResult Graph_Connected(Graph*);
 GraphResult Graph_TopSort(Graph*);
-int* Graph_SCC_MagicOrdering(Graph*);
+Stack* Graph_SCC_MagicOrdering(Graph*);
 GraphResult Graph_SCC(Graph*);

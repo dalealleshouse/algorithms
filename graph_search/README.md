@@ -203,6 +203,28 @@ to process the vertices. The goal is to identify the reverse topological
 ordering of all strongly connected components.  The second discovers the
 strongly connected components.
 
+```
+// equivalent to a topological sort with the direction of the edges reversed
+magic-ordering:
+    G = input graph
+
+    for every vertex in G:
+        if vertex is NOT conquered:
+            reverse-topo-sort(G, vertex)
+
+reverse-topo-sort:
+    G = input graph
+    v = starting vertex
+    side effects: marks every verex with a reverse topological sort order
+
+    conquer(v)
+
+    for each incoming edge in V:
+        w = edge->tail
+        if w is NOT conquered:
+            reverse-topo-sort(G, w)
+```
+
 ## Applications
 * Connectivity - In a network, ensure that every node is reachable. 
 * Shortest Path - Shortest distance between two places on a map (driving
