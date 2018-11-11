@@ -4,12 +4,16 @@
 #include <stdio.h>
 
 #include "CommonTypes.h"
+#include "ErrorReporter.h"
 
 // We may need a better way to log errors, but this will work for now
 #define GRAPH_ERROR(result)                                                    \
     {                                                                          \
-        fprintf(stderr, "Graph Error: %s, %s, %s, %d\n",                       \
+        char str[1000];                                                        \
+        sprintf(str, "Graph Error: %s, %s, %s, %d\n",                          \
             Graph_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);     \
+                                                                               \
+        ErrorReporter_Report(result, str);                                     \
     }
 
 typedef enum GraphResult {
@@ -23,10 +27,9 @@ typedef enum GraphResult {
     Graph_Success = 0
 } GraphResult;
 
-// Edges are a linked list
 typedef struct Edge {
-    // Id of the vertex at the head of the edge, the tail is vertex object
-    // hosting this edge
+    int tail;
+
     int head;
 
     struct Edge* next;
@@ -44,14 +47,13 @@ typedef struct Vertex {
 
     // Linked list of edges associated with this vertex
     Edge* edges;
+
+    Edge* in_edges;
 } Vertex;
 
 typedef struct Graph {
     // Number of vertices
     size_t n;
-
-    // Number of spaces allocated in V
-    size_t max_size;
 
     // Vertices
     Vertex** V;
@@ -61,7 +63,6 @@ typedef struct Graph {
 } Graph;
 
 Graph* Graph_Create(size_t);
-GraphResult Graph_AddVertex(Graph*, int, void*);
 GraphResult Graph_AddEdge(Graph*, int, int);
 Graph* Graph_FromFile(const size_t, const char* path);
 

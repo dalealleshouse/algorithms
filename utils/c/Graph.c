@@ -71,10 +71,8 @@ static GraphResult Graph_AddVertex(Graph* self, int id, void* data)
 static void AddVertex_PrintError(Graph* self, int id)
 {
     GraphResult result = Graph_AddVertex(self, id, NULL);
-    if (result != Graph_Success) {
+    if (result != Graph_Success)
         GRAPH_ERROR(result);
-        printf("ERRORR=%s\n", Graph_ErrorMessage(result));
-    }
 }
 
 static void AddEdge_PrintError(Graph* self, int head, int tail)

@@ -32,14 +32,20 @@
 
 const static size_t small_n = 12;
 const static size_t dir_n = 4;
-const static size_t scc_n = 11;
+const static size_t scc_n = 12;
+const static size_t simple_n = 10;
 const static char* small_path = "src/graphs/small.txt";
 const static char* dir_path = "src/graphs/directed.txt";
 const static char* scc_path = "src/graphs/small-scc.txt";
+const static char* simple_scc_path = "src/graphs/simple-scc.txt";
 
 Graph* CreateSut() { return Graph_FromFile(small_n, small_path); }
 Graph* CreateDirSut() { return Graph_FromFile(dir_n, dir_path); }
 Graph* CreateSCCSut() { return Graph_FromFile(scc_n, scc_path); }
+Graph* CreateSimpleSCCSut()
+{
+    return Graph_FromFile(simple_n, simple_scc_path);
+}
 
 static int Value(Vertex* v)
 {
@@ -290,6 +296,44 @@ static void Graph_TopSort_standard()
 }
 
 /*************************** Strongly Connected Components ********************/
+static void Graph_SCCOrder_null_paramter()
+{
+    int* result = Graph_SCCOrder(NULL);
+
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(Graph_NullParameter, ErrorReporter_LastErrorCode());
+}
+
+static void Graph_SCCOrder_standard()
+{
+    int expected[] = { 1, 7, 4, 9, 6, 3, 8, 2, 5, 0 };
+    Graph* graph = CreateSimpleSCCSut();
+
+    int* result = Graph_SCCOrder(graph);
+
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    for (int i = 0; i < (int)simple_n; i++)
+        CU_ASSERT_EQUAL(expected[i], result[i]);
+
+    Graph_Destroy(graph, free);
+    free(result);
+}
+
+static void Graph_SCCOrder_standard_two()
+{
+    int expected[] = { 7, 10, 11, 4, 1, 5, 3, 2, 9, 6, 8, 0 };
+    Graph* graph = CreateSCCSut();
+
+    int* result = Graph_SCCOrder(graph);
+
+    CU_ASSERT_PTR_NOT_NULL_FATAL(result);
+    for (int i = 0; i < (int)scc_n; i++)
+        CU_ASSERT_EQUAL(expected[i], result[i]);
+
+    Graph_Destroy(graph, free);
+    free(result);
+}
+
 static void Graph_SCC_null_parameter()
 {
     GraphResult result = Graph_SCC(NULL);
@@ -346,7 +390,10 @@ int register_graph_search_tests()
     CU_TestInfo Top_Tests[] = { CU_TEST_INFO(Graph_TopSort_null_paramter),
         CU_TEST_INFO(Graph_TopSort_standard), CU_TEST_INFO_NULL };
 
-    CU_TestInfo SCC_tests[] = { CU_TEST_INFO(Graph_SCC_null_parameter),
+    CU_TestInfo SCC_tests[] = { CU_TEST_INFO(Graph_SCCOrder_null_paramter),
+        CU_TEST_INFO(Graph_SCCOrder_standard),
+        CU_TEST_INFO(Graph_SCCOrder_standard_two),
+        CU_TEST_INFO(Graph_SCC_null_parameter),
         CU_TEST_INFO(Graph_SCC_standard), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Breadth First Search",

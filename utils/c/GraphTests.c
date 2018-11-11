@@ -110,7 +110,7 @@ static void Graph_AddEdge_sets_incoming()
 
     CU_ASSERT_EQUAL(Graph_Success, result);
     CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V[1]->in_edges);
-    /* CU_ASSERT_EQUAL(2, graph->V[1]->in_edges->tail); */
+    CU_ASSERT_EQUAL(2, graph->V[1]->in_edges->tail);
 
     Graph_Destroy(graph, NULL);
 }
@@ -213,8 +213,7 @@ int register_graph_tests()
         CU_TEST_INFO(Graph_FromFile_insufficent_size),
         CU_TEST_INFO(Graph_FromFile_bad_data),
         CU_TEST_INFO(Graph_FromFile_standard),
-        CU_TEST_INFO(Graph_Destroy_complex_graph),
-        CU_TEST_INFO_NULL };
+        CU_TEST_INFO(Graph_Destroy_complex_graph), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Graph",
                                   .pInitFunc = noop,

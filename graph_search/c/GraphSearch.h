@@ -20,4 +20,5 @@ GraphResult Graph_Reachable(Graph*, int);
 GraphResult Graph_ShortestPath(Graph*, int);
 GraphResult Graph_Connected(Graph*);
 GraphResult Graph_TopSort(Graph*);
+int* Graph_SCCOrder(Graph*);
 GraphResult Graph_SCC(Graph*);

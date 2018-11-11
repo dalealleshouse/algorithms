@@ -37,7 +37,7 @@ static GraphResult SearchIsValid(
     if (vertex_id < 0)
         return Graph_InvalidVertexId;
 
-    if ((size_t)vertex_id >= self->max_size)
+    if ((size_t)vertex_id >= self->n)
         return Graph_VertexIdExceedsMaxSize;
 
     return Graph_Success;
@@ -165,7 +165,7 @@ GraphResult Graph_Connected(Graph* self)
 {
     SearchStrategy strategy = { connected_conqueror, is_conquered };
     component_id = 0;
-    for (size_t i = 0; i < self->max_size; i++) {
+    for (size_t i = 0; i < self->n; i++) {
         if (self->V[i] != NULL && !is_conquered(self->V[i])) {
             component_id++;
             GraphResult result = Graph_BFS(self, i, &strategy);
@@ -178,6 +178,7 @@ GraphResult Graph_Connected(Graph* self)
     return Graph_Success;
 }
 
+// sooooooooo tread unsafe it hurts
 static int order = 0;
 static void Graph_DFS_TopSort(Graph* self, int vertex_id)
 {
@@ -210,6 +211,47 @@ GraphResult Graph_TopSort(Graph* self)
     }
 
     return Graph_Success;
+}
+
+/*
+ * Reverse topological ordering
+ * This will generate a valid order for discovering strongly connected
+ * components
+ */
+static int* Graph_MagicOrdering(Graph* self, int vertex_id, int* order)
+{
+    Vertex* v = self->V[vertex_id];
+    reachable_conqueror(v, NULL);
+
+    Edge* e = v->in_edges;
+    while (e != NULL) {
+        Vertex* w = self->V[e->tail];
+        if (!is_conquered(w))
+            order = Graph_MagicOrdering(self, e->tail, order);
+
+        e = e->next;
+    }
+
+    *order = vertex_id;
+    return order - 1;
+}
+
+int* Graph_SCCOrder(Graph* self)
+{
+    if (self == NULL) {
+        GRAPH_ERROR(Graph_NullParameter);
+        return NULL;
+    }
+
+    int* ordering = calloc(sizeof(int), self->n);
+    int* curr = ordering + self->n - 1;
+
+    for (size_t i = 0; i < self->n; i++) {
+        if (!is_conquered(self->V[i]))
+            curr = Graph_MagicOrdering(self, i, curr);
+    }
+
+    return ordering;
 }
 
 GraphResult Graph_SCC(Graph* self)
