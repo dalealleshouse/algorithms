@@ -1,5 +1,5 @@
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "MemAllocMock.h"
@@ -164,8 +164,10 @@ Graph* Graph_FromFile(const char* path)
         return NULL;
 
     Graph* self = Graph_Create();
-    if (self == NULL)
+    if (self == NULL) {
+        fclose(file);
         return NULL;
+    }
 
     char line[BUFFER_SIZE];
     while (fgets(line, BUFFER_SIZE, file)) {
