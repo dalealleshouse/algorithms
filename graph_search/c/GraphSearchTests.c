@@ -296,20 +296,20 @@ static void Graph_TopSort_standard()
 }
 
 /*************************** Strongly Connected Components ********************/
-static void Graph_SCCOrder_null_paramter()
+static void Graph_SCC_MagicOrdering_null_paramter()
 {
-    int* result = Graph_SCCOrder(NULL);
+    int* result = Graph_SCC_MagicOrdering(NULL);
 
     CU_ASSERT_PTR_NULL(result);
     CU_ASSERT_EQUAL(Graph_NullParameter, ErrorReporter_LastErrorCode());
 }
 
-static void Graph_SCCOrder_standard()
+static void Graph_SCC_MagicOrdering_standard()
 {
     int expected[] = { 1, 7, 4, 9, 6, 3, 8, 2, 5, 0 };
     Graph* graph = CreateSimpleSCCSut();
 
-    int* result = Graph_SCCOrder(graph);
+    int* result = Graph_SCC_MagicOrdering(graph);
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(result);
     for (int i = 0; i < (int)simple_n; i++)
@@ -319,12 +319,12 @@ static void Graph_SCCOrder_standard()
     free(result);
 }
 
-static void Graph_SCCOrder_standard_two()
+static void Graph_SCC_MagicOrdering_standard_two()
 {
     int expected[] = { 7, 10, 11, 4, 1, 5, 3, 2, 9, 6, 8, 0 };
     Graph* graph = CreateSCCSut();
 
-    int* result = Graph_SCCOrder(graph);
+    int* result = Graph_SCC_MagicOrdering(graph);
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(result);
     for (int i = 0; i < (int)scc_n; i++)
@@ -348,20 +348,22 @@ static void Graph_SCC_standard()
     GraphResult result = Graph_SCC(graph);
 
     CU_ASSERT_EQUAL(Graph_Success, result);
-    /* CU_ASSERT_EQUAL(1, Value(graph->V[6])); */
-    /* CU_ASSERT_EQUAL(1, Value(graph->V[9])); */
-    /* CU_ASSERT_EQUAL(1, Value(graph->V[10])); */
+    CU_ASSERT_EQUAL(0, Value(graph->V[0]));
 
-    /* CU_ASSERT_EQUAL(2, Value(graph->V[3])); */
+    CU_ASSERT_EQUAL(1, Value(graph->V[1]));
+    CU_ASSERT_EQUAL(1, Value(graph->V[2]));
+    CU_ASSERT_EQUAL(1, Value(graph->V[3]));
+    CU_ASSERT_EQUAL(1, Value(graph->V[5]));
 
-    /* CU_ASSERT_EQUAL(3, Value(graph->V[0])); */
-    /* CU_ASSERT_EQUAL(3, Value(graph->V[1])); */
-    /* CU_ASSERT_EQUAL(3, Value(graph->V[2])); */
-    /* CU_ASSERT_EQUAL(3, Value(graph->V[4])); */
+    CU_ASSERT_EQUAL(4, Value(graph->V[4]));
 
-    /* CU_ASSERT_EQUAL(4, Value(graph->V[5])); */
-    /* CU_ASSERT_EQUAL(4, Value(graph->V[7])); */
-    /* CU_ASSERT_EQUAL(4, Value(graph->V[8])); */
+    CU_ASSERT_EQUAL(9, Value(graph->V[6]));
+    CU_ASSERT_EQUAL(9, Value(graph->V[8]));
+    CU_ASSERT_EQUAL(9, Value(graph->V[9]));
+
+    CU_ASSERT_EQUAL(7, Value(graph->V[7]));
+    CU_ASSERT_EQUAL(7, Value(graph->V[10]));
+    CU_ASSERT_EQUAL(7, Value(graph->V[11]));
 
     Graph_Destroy(graph, free);
 }
@@ -390,11 +392,12 @@ int register_graph_search_tests()
     CU_TestInfo Top_Tests[] = { CU_TEST_INFO(Graph_TopSort_null_paramter),
         CU_TEST_INFO(Graph_TopSort_standard), CU_TEST_INFO_NULL };
 
-    CU_TestInfo SCC_tests[] = { CU_TEST_INFO(Graph_SCCOrder_null_paramter),
-        CU_TEST_INFO(Graph_SCCOrder_standard),
-        CU_TEST_INFO(Graph_SCCOrder_standard_two),
-        CU_TEST_INFO(Graph_SCC_null_parameter),
-        CU_TEST_INFO(Graph_SCC_standard), CU_TEST_INFO_NULL };
+    CU_TestInfo SCC_tests[]
+        = { CU_TEST_INFO(Graph_SCC_MagicOrdering_null_paramter),
+              CU_TEST_INFO(Graph_SCC_MagicOrdering_standard),
+              CU_TEST_INFO(Graph_SCC_MagicOrdering_standard_two),
+              CU_TEST_INFO(Graph_SCC_null_parameter),
+              CU_TEST_INFO(Graph_SCC_standard), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Breadth First Search",
                                   .pInitFunc = noop,

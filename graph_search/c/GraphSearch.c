@@ -213,6 +213,36 @@ GraphResult Graph_TopSort(Graph* self)
     return Graph_Success;
 }
 
+static bool magic_ordering_conqueror(Vertex* v, Vertex* p)
+{
+    (void)p;
+    if (v->data != NULL)
+        return true;
+
+    v->data = VertexData_Create(-1);
+
+    return true;
+}
+
+static int scc_id = -1;
+static bool scc_conqueror(Vertex* v, Vertex* p)
+{
+    (void)p;
+    if (v->data == NULL)
+        return true;
+
+    ((VertexData*)v->data)->value = scc_id;
+    return true;
+}
+
+static bool scc_is_conquered(Vertex* v)
+{
+    if (v->data == NULL)
+        return false;
+
+    return ((VertexData*)v->data)->value != -1;
+}
+
 /*
  * Reverse topological ordering
  * This will generate a valid order for discovering strongly connected
@@ -221,7 +251,7 @@ GraphResult Graph_TopSort(Graph* self)
 static int* Graph_MagicOrdering(Graph* self, int vertex_id, int* order)
 {
     Vertex* v = self->V[vertex_id];
-    reachable_conqueror(v, NULL);
+    magic_ordering_conqueror(v, NULL);
 
     Edge* e = v->in_edges;
     while (e != NULL) {
@@ -236,7 +266,7 @@ static int* Graph_MagicOrdering(Graph* self, int vertex_id, int* order)
     return order - 1;
 }
 
-int* Graph_SCCOrder(Graph* self)
+int* Graph_SCC_MagicOrdering(Graph* self)
 {
     if (self == NULL) {
         GRAPH_ERROR(Graph_NullParameter);
@@ -259,5 +289,18 @@ GraphResult Graph_SCC(Graph* self)
     if (self == NULL)
         return Graph_NullParameter;
 
+    int* mo = Graph_SCC_MagicOrdering(self);
+
+    for (size_t i = 0; i < self->n; i++) {
+        if (scc_is_conquered(self->V[mo[i]]))
+            continue;
+
+        scc_id = self->V[mo[i]]->id;
+        SearchStrategy scc = { scc_conqueror, scc_is_conquered };
+
+        Graph_DFS(self, mo[i], &scc);
+    }
+
+    free(mo);
     return Graph_Success;
 }
