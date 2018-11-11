@@ -27,10 +27,9 @@ typedef enum GraphResult {
     Graph_Success = 0
 } GraphResult;
 
-// Edges are a linked list
 typedef struct Edge {
-    // Id of the vertex at the head of the edge, the tail is vertex object
-    // hosting this edge
+    int tail;
+
     int head;
 
     struct Edge* next;
@@ -48,14 +47,13 @@ typedef struct Vertex {
 
     // Linked list of edges associated with this vertex
     Edge* edges;
+
+    Edge* in_edges;
 } Vertex;
 
 typedef struct Graph {
     // Number of vertices
     size_t n;
-
-    // Number of spaces allocated in V
-    size_t max_size;
 
     // Vertices
     Vertex** V;
@@ -65,7 +63,6 @@ typedef struct Graph {
 } Graph;
 
 Graph* Graph_Create(size_t);
-GraphResult Graph_AddVertex(Graph*, int, void*);
 GraphResult Graph_AddEdge(Graph*, int, int);
 Graph* Graph_FromFile(const size_t, const char* path);
 

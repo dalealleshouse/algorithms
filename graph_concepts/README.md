@@ -109,6 +109,11 @@ concept.
 
 ![strongly connected components](strongly-connected.png)
 
+If each strongly connected component is treated as a single node, the graph
+becomes a directed acyclic graph. Just like nodes in a directed graph, a
+strongly connected components with no incoming edges is known as a *source* and
+one without any outgoing edges is known as a *sink*.
+
 ### Minimum Cut
 The *minimum cut* is the grouping of vertices into two non-empty groups having
 the fewest number of crossing edges. Consider the graph in the graphic below.

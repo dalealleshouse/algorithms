@@ -196,9 +196,12 @@ dfs-topo:
 
 Finding the [strongly connected
 components](../graph_concepts/README.md#strongly-connected-components-directed)
-of a directed graph is the most complex of the algorithms shown here. It is
-often referred to as the *Kosaraju* algorithm because he is the person who
-discovered it in 1978.
+of a directed graph is the most complex of the algorithms shown here. This
+algorithm (often referred to as the *Kosaraju* or *Kosaraju-Sharir* algorithm)
+performs DFS on the graph twice. The first time it derives an ordering in which
+to process the vertices. The goal is to identify the reverse topological
+ordering of all strongly connected components.  The second discovers the
+strongly connected components.
 
 ## Applications
 * Connectivity - In a network, ensure that every node is reachable. 

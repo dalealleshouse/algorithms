@@ -5,14 +5,14 @@
 
 #include "TestHelpers.h"
 
-int register_bfs_tests();
+int register_graph_search_tests();
 
 int main(void)
 {
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
 
-    if (register_bfs_tests() != 0) {
+    if (register_graph_search_tests() != 0) {
         CU_cleanup_registry();
         return -1;
     }

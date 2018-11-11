@@ -8,6 +8,16 @@ const static size_t BUFFER_SIZE = 1024;
 
 static void EdgeDestroy(Edge* edge) { free(edge); }
 
+static void EdgesDestory(Edge* edge)
+{
+    Edge* curr = edge;
+    while (curr != NULL) {
+        Edge* temp = curr->next;
+        EdgeDestroy(curr);
+        curr = temp;
+    }
+}
+
 static void VertexDestroy(Vertex* vertex, freer freer)
 {
     if (vertex == NULL)
@@ -16,34 +26,19 @@ static void VertexDestroy(Vertex* vertex, freer freer)
     if (freer != NULL)
         freer(vertex->data);
 
-    Edge* curr = vertex->edges;
-    while (curr != NULL) {
-        Edge* temp = curr->next;
-        EdgeDestroy(curr);
-        curr = temp;
-    }
+    EdgesDestory(vertex->edges);
+    EdgesDestory(vertex->in_edges);
 
     free(vertex);
 }
 
-Graph* Graph_Create(size_t max_size)
-{
-    Graph* graph = malloc(sizeof(Graph));
-
-    if (graph == NULL) {
-        GRAPH_ERROR(Graph_FailedMemoryAllocation);
-        return NULL;
-    }
-
-    graph->V = calloc(sizeof(Vertex*), max_size);
-    graph->m = 0;
-    graph->n = 0;
-    graph->max_size = max_size;
-
-    return graph;
-}
-
-GraphResult Graph_AddVertex(Graph* self, int id, void* data)
+/*
+ * This function is a bit over-engineered for a private function, but it was
+ * orginally meant to be public. It was eaiser to just create all the vertices
+ * during create than try to add them in after the fact and keep track of nulls
+ * and such.
+ */
+static GraphResult Graph_AddVertex(Graph* self, int id, void* data)
 {
     if (self == NULL)
         return Graph_NullParameter;
@@ -52,7 +47,7 @@ GraphResult Graph_AddVertex(Graph* self, int id, void* data)
         return Graph_InvalidVertexId;
 
     // it's ok to cast to size_t b/c the line above ensures it isn't negative
-    if ((size_t)id >= self->max_size)
+    if ((size_t)id >= self->n)
         return Graph_VertexIdExceedsMaxSize;
 
     if (self->V[id] != NULL)
@@ -66,9 +61,82 @@ GraphResult Graph_AddVertex(Graph* self, int id, void* data)
     v->data = data;
     v->degree = 0;
     v->edges = NULL;
+    v->in_edges = NULL;
 
     self->V[id] = v;
-    self->n++;
+
+    return Graph_Success;
+}
+
+static void AddVertex_PrintError(Graph* self, int id)
+{
+    GraphResult result = Graph_AddVertex(self, id, NULL);
+    if (result != Graph_Success) {
+        GRAPH_ERROR(result);
+        printf("ERRORR=%s\n", Graph_ErrorMessage(result));
+    }
+}
+
+static void AddEdge_PrintError(Graph* self, int head, int tail)
+{
+    GraphResult result = Graph_AddEdge(self, head, tail);
+    if (result != Graph_Success)
+        GRAPH_ERROR(result);
+}
+
+Graph* Graph_Create(size_t n)
+{
+    Graph* graph = malloc(sizeof(Graph));
+
+    if (graph == NULL) {
+        GRAPH_ERROR(Graph_FailedMemoryAllocation);
+        return NULL;
+    }
+
+    graph->V = calloc(sizeof(Vertex*), n);
+    graph->m = 0;
+    graph->n = n;
+
+    for (size_t i = 0; i < n; i++)
+        AddVertex_PrintError(graph, i);
+
+    return graph;
+}
+
+static Edge* Graph_EdgeInit(int head, int tail)
+{
+    Edge* edge = calloc(sizeof(Edge), 1);
+    if (edge == NULL)
+        return NULL;
+
+    edge->head = head;
+    edge->tail = tail;
+
+    return edge;
+}
+
+// It is assumed that all paramters are validated by the caller
+static GraphResult Graph_AddInEdge(Graph* self, int head, int tail)
+{
+    Edge* edge = Graph_EdgeInit(head, tail);
+    if (edge == NULL)
+        return Graph_FailedMemoryAllocation;
+
+    edge->next = self->V[head]->in_edges;
+    self->V[head]->in_edges = edge;
+
+    return Graph_Success;
+}
+
+// It is assumed that all paramters are validated by the caller
+static GraphResult Graph_AddOutEdge(Graph* self, int head, int tail)
+{
+    Edge* edge = Graph_EdgeInit(head, tail);
+    if (edge == NULL)
+        return Graph_FailedMemoryAllocation;
+
+    edge->next = self->V[tail]->edges;
+    self->V[tail]->edges = edge;
 
     return Graph_Success;
 }
@@ -82,36 +150,25 @@ GraphResult Graph_AddEdge(Graph* self, int head, int tail)
         return Graph_InvalidVertexId;
 
     // cast to size_t ok b/c the previous condition ensures it's not negative
-    if ((size_t)head >= self->max_size || (size_t)tail >= self->max_size)
+    if ((size_t)head >= self->n || (size_t)tail >= self->n)
         return Graph_VertexIdExceedsMaxSize;
 
     if (self->V[head] == NULL || self->V[tail] == NULL)
         return Graph_InvalidVertexId;
 
-    Edge* edge = malloc(sizeof(Edge));
-    if (edge == NULL)
-        return Graph_FailedMemoryAllocation;
+    GraphResult result;
 
-    edge->head = head;
-    edge->next = self->V[tail]->edges;
-    self->V[tail]->edges = edge;
+    result = Graph_AddInEdge(self, head, tail);
+    if (result != Graph_Success)
+        return result;
+
+    result = Graph_AddOutEdge(self, head, tail);
+    if (result != Graph_Success)
+        return result;
+
     self->m++;
 
     return Graph_Success;
-}
-
-static void AddVertex_PrintError(Graph* self, int id)
-{
-    GraphResult result = Graph_AddVertex(self, id, NULL);
-    if (result != Graph_Success)
-        GRAPH_ERROR(result);
-}
-
-static void AddEdge_PrintError(Graph* self, int head, int tail)
-{
-    GraphResult result = Graph_AddEdge(self, head, tail);
-    if (result != Graph_Success)
-        GRAPH_ERROR(result);
 }
 
 Graph* Graph_FromFile(const size_t n, const char* path)
@@ -138,9 +195,6 @@ Graph* Graph_FromFile(const size_t n, const char* path)
         return NULL;
     }
 
-    for (size_t i = 0; i < n; i++)
-        AddVertex_PrintError(g, i);
-
     char line[BUFFER_SIZE];
     while (fgets(line, BUFFER_SIZE, file)) {
         char* remaining;
@@ -162,7 +216,7 @@ void Graph_Destroy(Graph* self, freer freer)
     if (self == NULL)
         return;
 
-    for (size_t i = 0; i < self->max_size; i++)
+    for (size_t i = 0; i < self->n; i++)
         VertexDestroy(self->V[i], freer);
 
     free(self->V);

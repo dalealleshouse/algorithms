@@ -15,8 +15,9 @@ typedef struct SearchStrategy {
 } SearchStrategy;
 
 GraphResult Graph_BFS(Graph*, int, SearchStrategy*);
+GraphResult Graph_DFS(Graph*, int, SearchStrategy*);
 GraphResult Graph_Reachable(Graph*, int);
 GraphResult Graph_ShortestPath(Graph*, int);
 GraphResult Graph_Connected(Graph*);
 GraphResult Graph_TopSort(Graph*);
-GraphResult Graph_DFS(Graph*, int, SearchStrategy*);
+GraphResult Graph_SCC(Graph*);

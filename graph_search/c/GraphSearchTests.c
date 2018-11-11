@@ -32,11 +32,14 @@
 
 const static size_t small_n = 12;
 const static size_t dir_n = 4;
+const static size_t scc_n = 11;
 const static char* small_path = "src/graphs/small.txt";
 const static char* dir_path = "src/graphs/directed.txt";
+const static char* scc_path = "src/graphs/small-scc.txt";
 
 Graph* CreateSut() { return Graph_FromFile(small_n, small_path); }
 Graph* CreateDirSut() { return Graph_FromFile(dir_n, dir_path); }
+Graph* CreateSCCSut() { return Graph_FromFile(scc_n, scc_path); }
 
 static int Value(Vertex* v)
 {
@@ -286,7 +289,40 @@ static void Graph_TopSort_standard()
     Graph_Destroy(graph, free);
 }
 
-int register_bfs_tests()
+/*************************** Strongly Connected Components ********************/
+static void Graph_SCC_null_parameter()
+{
+    GraphResult result = Graph_SCC(NULL);
+
+    CU_ASSERT_EQUAL(Graph_NullParameter, result);
+}
+
+static void Graph_SCC_standard()
+{
+    Graph* graph = CreateSCCSut();
+
+    GraphResult result = Graph_SCC(graph);
+
+    CU_ASSERT_EQUAL(Graph_Success, result);
+    /* CU_ASSERT_EQUAL(1, Value(graph->V[6])); */
+    /* CU_ASSERT_EQUAL(1, Value(graph->V[9])); */
+    /* CU_ASSERT_EQUAL(1, Value(graph->V[10])); */
+
+    /* CU_ASSERT_EQUAL(2, Value(graph->V[3])); */
+
+    /* CU_ASSERT_EQUAL(3, Value(graph->V[0])); */
+    /* CU_ASSERT_EQUAL(3, Value(graph->V[1])); */
+    /* CU_ASSERT_EQUAL(3, Value(graph->V[2])); */
+    /* CU_ASSERT_EQUAL(3, Value(graph->V[4])); */
+
+    /* CU_ASSERT_EQUAL(4, Value(graph->V[5])); */
+    /* CU_ASSERT_EQUAL(4, Value(graph->V[7])); */
+    /* CU_ASSERT_EQUAL(4, Value(graph->V[8])); */
+
+    Graph_Destroy(graph, free);
+}
+
+int register_graph_search_tests()
 {
     CU_TestInfo BFS_tests[] = { CU_TEST_INFO(Graph_BFS_null_parameter),
         CU_TEST_INFO(Graph_BFS_invalid_vertex),
@@ -309,6 +345,9 @@ int register_bfs_tests()
 
     CU_TestInfo Top_Tests[] = { CU_TEST_INFO(Graph_TopSort_null_paramter),
         CU_TEST_INFO(Graph_TopSort_standard), CU_TEST_INFO_NULL };
+
+    CU_TestInfo SCC_tests[] = { CU_TEST_INFO(Graph_SCC_null_parameter),
+        CU_TEST_INFO(Graph_SCC_standard), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Breadth First Search",
                                   .pInitFunc = noop,
@@ -334,6 +373,10 @@ int register_bfs_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Top_Tests },
+        { .pName = "Strongly Connected Components",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = SCC_tests },
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);

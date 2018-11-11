@@ -211,3 +211,11 @@ GraphResult Graph_TopSort(Graph* self)
 
     return Graph_Success;
 }
+
+GraphResult Graph_SCC(Graph* self)
+{
+    if (self == NULL)
+        return Graph_NullParameter;
+
+    return Graph_Success;
+}
