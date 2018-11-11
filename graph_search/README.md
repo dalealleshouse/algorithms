@@ -198,31 +198,68 @@ Finding the [strongly connected
 components](../graph_concepts/README.md#strongly-connected-components-directed)
 of a directed graph is the most complex of the algorithms shown here. This
 algorithm (often referred to as the *Kosaraju* or *Kosaraju-Sharir* algorithm)
-performs DFS on the graph twice. The first time it derives an ordering in which
-to process the vertices. The goal is to identify the reverse topological
+performs DFS twice. The first time it derives an ordering in which to process
+the vertices that guarantees the second pass of DFS will start with a sink
+component. In other words, the goal is to identify the reverse topological
 ordering of all strongly connected components.  The second discovers the
 strongly connected components.
 
+
 ```
+strong-connected-components:
+    G = input graph
+    S = stack to hold ordering
+
+    magic-ordering(G, S)
+    set all vertices to NOT conquered
+
+    while S is not empty:
+        v = S->pop
+        if v is NOT conquered:
+            scc-dfs(G, v)
+            
+scc-dfs:
+    G = input graph
+    v = starting vertex
+    scc_id = strongly connected component id to mark all vertices with
+    side effects: marks all reachable vertices with a strongly connected
+    component id
+
+    s = new stack data structure
+    s->push(v)
+
+    while s is not empty:
+        v = s->pop
+        if v is NOT conquered:
+            conquer(v)
+            v->scc_id = scc_id
+            for each edge in v:
+                w = edge->head
+                s->push(w)
+
 // equivalent to a topological sort with the direction of the edges reversed
 magic-ordering:
     G = input graph
+    S = stack to hold ordering
 
     for every vertex in G:
         if vertex is NOT conquered:
-            reverse-topo-sort(G, vertex)
+            reverse-topo-sort(G, S, vertex)
 
 reverse-topo-sort:
     G = input graph
+    S = stack to hold ordering
     v = starting vertex
-    side effects: marks every verex with a reverse topological sort order
+    side effect: places vertices on the stack in the "magic order"
 
     conquer(v)
 
     for each incoming edge in V:
         w = edge->tail
         if w is NOT conquered:
-            reverse-topo-sort(G, w)
+            reverse-topo-sort(G, S, w)
+
+    S->push(v)
 ```
 
 ## Applications
@@ -234,3 +271,5 @@ reverse-topo-sort:
 * Topological Ordering - Determine the ideal order of tasks that have precedence
     constraints (e.g. university courses with pre-requisites or steps to solve a
     puzzle)
+* Strongly Connected Components: Collapse a complicated graph into a more
+    manageable graph.
