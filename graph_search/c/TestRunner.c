@@ -7,7 +7,4 @@
 
 int register_graph_search_tests();
 
-int main(void)
-{
-    return TestRunner(register_graph_search_tests);
-}
+int main(void) { return TestRunner(register_graph_search_tests); }
