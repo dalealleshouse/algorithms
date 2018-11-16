@@ -26,6 +26,7 @@ times are only slightly higher than the amount of time required to read the
 data. Because of this, graph search algorithms are considered *free primitives*.
 
 ## Breadth First Search (BFS)
+#graph-search, #breadth-first-search
 
 BFS examines each edge of a particular vertex before following any edges of
 connected vertices. The key to this is the use of a [Queue](../queue) as shown
@@ -52,6 +53,7 @@ while q is not empty:
 ```
 
 ## BFS - Shortest Path
+#graph-search, #breadth-first-search
 
 One unique attribute of BFS is that with only a few extra lines of code, it can
 be used to calculate the shortest path between two nodes. The code below marks
@@ -80,6 +82,7 @@ while q is not empty:
 </pre>
 
 ## Connected Components (Undirected)
+#graph-search, #breadth-first-search
 
 This algorithm identifies the [connected
 components](../graph_concepts/README.md#connected-components-undirected) in a
@@ -114,6 +117,7 @@ for each vertex (v) in G:
  ```
 
 ## Depth First Search (DFS)
+#graph-search, #depth-first-search
 
 DFS is analogous to searching a maze in that it dives as deep into the graph as
 possible and only back tracks when absolutely necessary. It is identical to BFS
@@ -157,6 +161,7 @@ for each edge in v:
 ```
 
 ## Topological Ordering (Acyclic Directed Graphs)
+#graph-search, #depth-first-search
 
 Just as some applications, such as [shortest path](#bfs---shortest-path), only
 work with BFS, [topological
@@ -193,6 +198,7 @@ dfs-topo:
 ```
 
 ### Strongly Connected Components (Directed)
+#graph-search, #depth-first-search
 
 Finding the [strongly connected
 components](../graph_concepts/README.md#strongly-connected-components-directed)

@@ -71,9 +71,11 @@ Actual run time data
     * [Merge Sort](sorting/README.md#merge-sort)
     * [Quick Sort](sorting/README.md#quick-sort)
 * [Quick Select](quick_select/)
-* [Graph Concepts](graph_concepts/)
-* [Graph Search](graph_search/)
-* [Random Contraction](random_contraction/)
+* Graphs
+    * [Graph Concepts](graph_concepts/)
+    * [Graph Search](graph_search/)
+    * [Shortest Path](shortest_path/)
+    * [Random Contraction](random_contraction/)
 
 ## Build/Tests
 ### C
