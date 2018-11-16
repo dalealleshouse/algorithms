@@ -10,7 +10,7 @@ LINKFLAGS 	 = -lcunit -flto -lm
 
 TARGET			= src/test_runner
 SHARED_TARGET	= src/algo.so
-SOURCES			= $(shell echo src/*.c)
+SOURCES			= $(shell echo src/*.c src/**/*.c)
 OBJECTS			= $(SOURCES:.c=.o)
 
 all: $(TARGET)

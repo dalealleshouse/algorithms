@@ -3,8 +3,8 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
+#include "include/TestHelpers.h"
 #include "GraphSearch.h"
-#include "TestHelpers.h"
 
 /*******************************************************************************
  * small.txt

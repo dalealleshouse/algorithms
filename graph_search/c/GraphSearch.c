@@ -1,8 +1,7 @@
 #include <stdlib.h>
 
+#include "include/Queue.h"
 #include "GraphSearch.h"
-#include "Queue.h"
-#include "Stack.h"
 
 static bool is_conquered(Vertex* v)
 {

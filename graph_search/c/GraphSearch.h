@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Graph.h"
-#include "Stack.h"
+#include "include/Graph.h"
+#include "include/Stack.h"
 
 typedef struct VertexData {
     int value;

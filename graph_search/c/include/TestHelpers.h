@@ -18,3 +18,5 @@ typedef struct TestThingy {
 int noop(void);
 
 void TestFailedMalloc(void (*tester)(void));
+
+int TestRunner(int (*register_tests)());
