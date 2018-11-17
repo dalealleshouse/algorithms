@@ -305,7 +305,7 @@ char* Graph_ErrorMessage(GraphResult result)
     case Graph_FailedMemoryAllocation:
         return "Failed to allocate memory";
     case Graph_NullParameter:
-        return "One of the requited parameters passed to the function is NULL";
+        return "One of the required parameters passed to the function is NULL";
     case Graph_Success:
         return "Success";
     default:

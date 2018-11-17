@@ -3,37 +3,25 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-#include "MemAllocMock.h"
 #include "Queue.h"
-
-#define CU_TEST_INFO(test_func)                                                \
-    {                                                                          \
-#test_func, test_func                                                  \
-    }
-
-static int noop(void) { return 0; }
-
-typedef struct TestThingy {
-    int id;
-    size_t n;
-    int x;
-    int y;
-    double z;
-} TestThingy;
+#include "include/MemAllocMock.h"
+#include "include/TestHelpers.h"
 
 /*************************** Queue_Create *************************************/
+static void Queue_Create_malloc_tester(void)
+{
+    Queue* sut = Queue_Create();
+    CU_ASSERT_PTR_NULL(sut);
+}
+
 static void Queue_Create_failed_malloc()
 {
-    MemAllocMock_InterceptMalloc(NULL);
-    Queue* sut = Queue_Create(NULL);
-    CU_ASSERT_EQUAL(1, MemAllocMock_MallocInterceptCount());
-    CU_ASSERT_PTR_NULL(sut);
-    MemAllocMock_ResetMalloc();
+    TestFailedMalloc(Queue_Create_malloc_tester);
 }
 
 static void Queue_Create_initalizes_values()
 {
-    Queue* sut = Queue_Create(free);
+    Queue* sut = Queue_Create();
 
     CU_ASSERT_PTR_NULL(sut->head);
     CU_ASSERT_PTR_NULL(sut->tail);
@@ -45,7 +33,7 @@ static void Queue_Create_initalizes_values()
 /*************************** Queue_Enqueue ************************************/
 static void Queue_Enqueue_failed_malloc()
 {
-    Queue* sut = Queue_Create(NULL);
+    Queue* sut = Queue_Create();
 
     const int dummy = 5;
     MemAllocMock_InterceptMalloc(NULL);
@@ -219,7 +207,7 @@ static void Queue_Destroy_null()
     Queue_Destroy(NULL);
 }
 
-static int register_tests()
+int register_queue_tests()
 {
     CU_TestInfo Queue_tests[] = { CU_TEST_INFO(Queue_Create_failed_malloc),
         CU_TEST_INFO(Queue_Create_initalizes_values),
@@ -243,27 +231,4 @@ static int register_tests()
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
-}
-
-int main(void)
-{
-    if (CUE_SUCCESS != CU_initialize_registry())
-        return CU_get_error();
-
-    if (register_tests() != 0) {
-        CU_cleanup_registry();
-        return -1;
-    }
-
-    // Run all tests using the basic interface
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-
-    // You must get this value before CU_cleanup_registry() or it will revert to
-    // zero
-    int ret = (CU_get_number_of_failure_records() != 0);
-
-    /* Clean up registry and return */
-    CU_cleanup_registry();
-    return ret;
 }

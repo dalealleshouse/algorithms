@@ -1,6 +1,7 @@
-# Queue (First-In-First-Out)
+# Queue
 #data_structure
 
+## Queue (First-In-First-Out)
 Queues are highly useful and very powerful.  Most mainstream languages come
 equipped with a queue construct. With the exception of C programmers, it's
 highly unlikely that the average coder will every have to implement a queue.
@@ -22,7 +23,11 @@ used when implementing a queue. However, an
 reader is encouraged to examine the code to get a better understanding of how
 queues work.
 
-## Pseudo Code
+### Asymptotic Time Complexity
+* Enqueue: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+* Dequeue: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+
+### Pseudo Code
 Typical methods
 
 ```
@@ -30,10 +35,13 @@ enqueue:
     Add item to the end of the list
 
 dequeue:
-    Remove item from the head the list and returns it
+    Remove item from the head of the list and returns it
+
+peek:
+    Return item from the head without removing it from the list
 ```
 
-## Applications
+### Applications
 
 Below are just a couple examples of common uses for queueing.
 
@@ -44,3 +52,47 @@ Below are just a couple examples of common uses for queueing.
 * CPU Scheduling: A thread can place a job on a queue to be picked by another
     thread. *Caveat*: This requires the queue to be synchronized.
     Multi-threading concepts are covered in other sections.
+
+## Priority Queue
+Another type of queue is a *Priority Queue*. These behave very similarly to
+standard Queues with the exception that rather than being *First-In-First-Out*,
+the order in which items are removed is determined by a predefined priority
+function. There are multiple ways to implement this. A somewhat slow
+implementation using [Linked
+Lists](../list_data_structures/README.md#linked-list) is shown below. It is
+unlikely that anyone would use such an implementation in a production scenario;
+however, it is a useful learning tool for understanding how Priority Queues work
+at a conceptual level.
+
+### Asymptotic Time Complexity
+* Insert: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
+* Remove: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+
+### Pseudo Code
+
+```
+priority_function:
+    item1
+    item2
+
+    if item1 should be before item2
+        return 1
+    else
+        return 0
+
+
+insert:
+    new_item
+
+    for each item in the list:
+        if prority_function(new_item, item) = 1
+            insert new_item before item
+            break out of loop
+
+remove:
+    Remove item from the head of the list and returns it
+
+peek:
+    Return item from the head without removing it from the list
+```
+

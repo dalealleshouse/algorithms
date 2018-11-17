@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include "MemAllocMock.h"
 #include "Queue.h"
+#include "include/MemAllocMock.h"
 
 Queue* Queue_Create()
 {

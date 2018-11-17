@@ -18,3 +18,9 @@ void ErrorReporter_Report(int error_code, char* msg)
 int ErrorReporter_LastErrorCode() { return _error_code; }
 
 char* ErrorReporter_LastErrorMessage() { return _msg; }
+
+void ErrorReporter_Clear()
+{
+    _error_code = 0;
+    memset(_msg, 0, ERROR_MSG_SIZE);
+}
