@@ -53,7 +53,6 @@ static void NodeHasWeight(Vertex* v, double expected)
 
     ShortestPath* sp = v->data;
     CU_ASSERT_DOUBLE_EQUAL(expected, sp->distance, EPSILON);
-    printf("id=%d, acutal=%f, expected=%f\n", v->id, sp->distance, expected);
 }
 
 static void Graph_DijkstraShortestPath_small()

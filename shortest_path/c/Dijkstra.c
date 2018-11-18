@@ -92,6 +92,7 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start)
         while (e != NULL) {
             double dist = Distance(v) + e->weight;
             SetDistance(self->V[e->head], dist, v);
+            PQ_Reprioritize(pq, self->V[e->head]);
             e = e->next;
         }
     }
