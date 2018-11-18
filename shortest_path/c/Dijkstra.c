@@ -91,8 +91,13 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start)
         Edge* e = v->edges;
         while (e != NULL) {
             double dist = Distance(v) + e->weight;
-            SetDistance(self->V[e->head], dist, v);
-            PQ_Reprioritize(pq, self->V[e->head]);
+            Vertex* u = self->V[e->head];
+            SetDistance(u, dist, v);
+
+            // We only need to re prioritize if the distance changed
+            if (dist == Distance(u))
+                PQ_Reprioritize(pq, u);
+
             e = e->next;
         }
     }
