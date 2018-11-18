@@ -261,6 +261,17 @@ static void Graph_WeightedFromFile_standard()
     Graph_Destroy(graph, NULL);
 }
 
+static void Graph_WeightedFromFile_big()
+{
+    const int n = 201;
+    Graph* sut = Graph_WeightedFromFile(n, "src/graphs/big_weighted.txt");
+
+    CU_ASSERT_EQUAL(n, sut->n);
+    CU_ASSERT_EQUAL(3934, sut->m);
+
+    Graph_Destroy(sut, NULL);
+}
+
 /*************************** Graph_Destroy ************************************/
 static void Graph_Destroy_complex_graph()
 {
@@ -306,6 +317,7 @@ int register_graph_tests()
         CU_TEST_INFO(Graph_FromFile_bad_data),
         CU_TEST_INFO(Graph_FromFile_standard),
         CU_TEST_INFO(Graph_WeightedFromFile_standard),
+        CU_TEST_INFO(Graph_WeightedFromFile_big),
         CU_TEST_INFO(Graph_Destroy_complex_graph), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Graph",

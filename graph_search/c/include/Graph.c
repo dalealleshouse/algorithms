@@ -206,13 +206,14 @@ static void non_weight_parser(Graph* g, FILE* file)
 static EdgeTuple parse_edge_tuple(char* tuple)
 {
     char* remaining;
-    int vertex = strtoul(tuple, &remaining, 10);
+    int head = strtoul(tuple, &remaining, 10);
 
     // ignore the comma
     remaining++;
-    int edge = strtoul(remaining, &remaining, 10);
+    int weight = strtoul(remaining, &remaining, 10);
 
-    EdgeTuple t = { vertex, edge };
+    EdgeTuple t = { head, weight };
+    /* printf("head=%d, weight=%d\n", head, weight); */
     return t;
 }
 
@@ -229,10 +230,14 @@ static void weighted_parser(Graph* g, FILE* file)
         tok = strtok(remaining, seperator);
 
         while (tok != NULL && strcmp(tok, "\n") != 0) {
+            /* printf("\n%s\n", tok); */
             EdgeTuple t = parse_edge_tuple(tok);
+            /* printf("head=%d, tail=%d, weight=%d\n", t.head, vertex, t.weight); */
             AddWeightedEdge_PrintError(g, t.head, vertex, t.weight);
             tok = strtok(0, seperator);
         }
+
+        break;
     }
 }
 

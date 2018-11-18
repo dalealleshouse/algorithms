@@ -206,13 +206,13 @@ static void non_weight_parser(Graph* g, FILE* file)
 static EdgeTuple parse_edge_tuple(char* tuple)
 {
     char* remaining;
-    int vertex = strtoul(tuple, &remaining, 10);
+    int head = strtoul(tuple, &remaining, 10);
 
     // ignore the comma
     remaining++;
-    int edge = strtoul(remaining, &remaining, 10);
+    int weight = strtoul(remaining, &remaining, 10);
 
-    EdgeTuple t = { vertex, edge };
+    EdgeTuple t = { head, weight };
     return t;
 }
 
@@ -223,7 +223,7 @@ static void weighted_parser(Graph* g, FILE* file)
         char* remaining;
         int vertex = strtoul(line, &remaining, 10);
 
-        const char* seperator = " ";
+        const char* seperator = "\t";
         char* tok;
 
         tok = strtok(remaining, seperator);
