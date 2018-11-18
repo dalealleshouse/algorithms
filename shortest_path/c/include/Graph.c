@@ -292,6 +292,8 @@ void Graph_Destroy(Graph* self, freer freer)
 char* Graph_ErrorMessage(GraphResult result)
 {
     switch (result) {
+    case Graph_DependencyError:
+        return "One of the Graphs dependencies had an unrecoverable error.";
     case Graph_FileOpenError:
         return "fopen returned NULL";
     case Graph_InvalidFilePath:

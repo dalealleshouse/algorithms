@@ -6,6 +6,8 @@
 #include "Dijkstra.h"
 #include "include/TestHelpers.h"
 
+const double EPSILON = 0.00000000000001;
+
 const int small_n = 5;
 const char* small_path = "src/graphs/small.txt";
 
@@ -44,14 +46,14 @@ static void Graph_DijkstraShortestPath_failed_malloc()
     TestFailedMalloc(Graph_DijkstraShortestPath_malloc_tester);
 }
 
-static void NodeHasWeight(Vertex* v, int expected)
+static void NodeHasWeight(Vertex* v, double expected)
 {
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v->data);
 
-    ShortestPath* sp = (ShortestPath*)v->data;
-    CU_ASSERT_EQUAL(expected, sp->distance);
-    printf("id=%d, length=%d, actual=%d\n", v->id, sp->distance, expected);
+    ShortestPath* sp = v->data;
+    CU_ASSERT_DOUBLE_EQUAL(expected, sp->distance, EPSILON);
+    printf("id=%d, acutal=%f, expected=%f\n", v->id, sp->distance, expected);
 }
 
 static void Graph_DijkstraShortestPath_small()
@@ -62,9 +64,9 @@ static void Graph_DijkstraShortestPath_small()
 
     CU_ASSERT_EQUAL(Graph_Success, result);
     NodeHasWeight(sut->V[1], 0);
-    /* NodeHasWeight(sut->V[2], 1); */
-    /* NodeHasWeight(sut->V[3], 6); */
-    /* NodeHasWeight(sut->V[4], 3); */
+    NodeHasWeight(sut->V[2], 1);
+    NodeHasWeight(sut->V[3], 6);
+    NodeHasWeight(sut->V[4], 3);
 
     Graph_Destroy(sut, free);
 }
@@ -77,13 +79,13 @@ static void Graph_DijkstraShortestPath_medium()
 
     CU_ASSERT_EQUAL(Graph_Success, result);
     NodeHasWeight(sut->V[1], 0);
-    /* NodeHasWeight(sut->V[2], 1); */
-    /* NodeHasWeight(sut->V[3], 2); */
-    /* NodeHasWeight(sut->V[4], 3); */
-    /* NodeHasWeight(sut->V[5], 4); */
-    /* NodeHasWeight(sut->V[6], 4); */
-    /* NodeHasWeight(sut->V[7], 3); */
-    /* NodeHasWeight(sut->V[8], 2); */
+    NodeHasWeight(sut->V[2], 1);
+    NodeHasWeight(sut->V[3], 2);
+    NodeHasWeight(sut->V[4], 3);
+    NodeHasWeight(sut->V[5], 4);
+    NodeHasWeight(sut->V[6], 4);
+    NodeHasWeight(sut->V[7], 3);
+    NodeHasWeight(sut->V[8], 2);
 
     Graph_Destroy(sut, free);
 }

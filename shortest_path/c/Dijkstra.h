@@ -3,7 +3,7 @@
 #include "include/Graph.h"
 
 typedef struct ShortestPath {
-    int distance;
+    double distance;
     Vertex* previous;
 } ShortestPath;
 

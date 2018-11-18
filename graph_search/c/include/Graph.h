@@ -17,6 +17,7 @@
     }
 
 typedef enum GraphResult {
+    Graph_DependencyError = -8,
     Graph_FileOpenError = -7,
     Graph_InvalidFilePath = -6,
     Graph_VertexIdExceedsMaxSize = -5,
