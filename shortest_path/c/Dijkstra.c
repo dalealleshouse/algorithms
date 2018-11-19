@@ -134,12 +134,14 @@ GraphResult Graph_DijkstraShortestPathNaive(Graph* self, int start)
 
         Edge* e = v->edges;
         while (e != NULL) {
-            double dist = Distance(v) + e->weight;
-            Vertex* u = self->V[e->head];
+            if (!IsConquered(self->V[e->head])) {
+                double dist = Distance(v) + e->weight;
+                Vertex* u = self->V[e->head];
 
-            r = SetDistance(u, dist, v);
-            if (r != Graph_Success)
-                return r;
+                r = SetDistance(u, dist, v);
+                if (r != Graph_Success)
+                    return r;
+            }
 
             e = e->next;
         }
