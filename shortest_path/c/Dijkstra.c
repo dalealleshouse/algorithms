@@ -6,6 +6,24 @@
 #include "include/MemAllocMock.h"
 #include "include/PriorityQueue.h"
 
+static GraphResult InitShortestPath(Vertex* v)
+{
+    if (v == NULL)
+        return Graph_NullParameter;
+
+    if (v->data == NULL) {
+        v->data = calloc(sizeof(ShortestPath), 1);
+
+        if (v->data == NULL)
+            return Graph_FailedMemoryAllocation;
+
+        ((ShortestPath*)v->data)->distance = INFINITY;
+        ((ShortestPath*)v->data)->conquered = false;
+    }
+
+    return Graph_Success;
+}
+
 static double Distance(Vertex* v)
 {
     if (v == NULL || v->data == NULL)
@@ -28,19 +46,31 @@ static int path_comparator(const void* x, const void* y)
     return -1;
 }
 
+static bool IsConquered(Vertex* v)
+{
+    if (v == NULL || v->data == NULL)
+        return false;
+
+    return ((ShortestPath*)v->data)->conquered;
+}
+
+static GraphResult Conquer(Vertex* v)
+{
+    GraphResult result = InitShortestPath(v);
+    if (result != Graph_Success)
+        return result;
+
+    ShortestPath* sp = v->data;
+    sp->conquered = true;
+
+    return Graph_Success;
+}
+
 static GraphResult SetDistance(Vertex* v, size_t distance, Vertex* prev)
 {
-    if (v == NULL)
-        return Graph_NullParameter;
-
-    if (v->data == NULL) {
-        v->data = calloc(sizeof(ShortestPath), 1);
-
-        if (v->data == NULL)
-            return Graph_FailedMemoryAllocation;
-
-        ((ShortestPath*)v->data)->distance = INFINITY;
-    }
+    GraphResult result = InitShortestPath(v);
+    if (result != Graph_Success)
+        return result;
 
     ShortestPath* sp = v->data;
 
@@ -63,6 +93,59 @@ static PriorityQueue* InitPQ(Graph* self)
         PQ_Insert(pq, self->V[i]);
 
     return pq;
+}
+
+static Vertex* FindMinDistance(Graph* self)
+{
+    Vertex* v = NULL;
+
+    for (size_t i = 0; i < self->n; i++) {
+        if (IsConquered(self->V[i]))
+            continue;
+
+        if (Distance(self->V[i]) < Distance(v))
+            v = self->V[i];
+    }
+
+    return v;
+}
+
+GraphResult Graph_DijkstraShortestPathNaive(Graph* self, int start)
+{
+    if (self == NULL)
+        return Graph_NullParameter;
+
+    if (start < 0 || (size_t)start >= self->n)
+        return Graph_InvalidVertexId;
+
+    GraphResult r = SetDistance(self->V[start], 0, NULL);
+    if (r != Graph_Success)
+        return r;
+
+    while (true) {
+        Vertex* v = FindMinDistance(self);
+
+        if (Distance(v) == INFINITY)
+            break;
+
+        r = Conquer(v);
+        if (r != Graph_Success)
+            return r;
+
+        Edge* e = v->edges;
+        while (e != NULL) {
+            double dist = Distance(v) + e->weight;
+            Vertex* u = self->V[e->head];
+
+            r = SetDistance(u, dist, v);
+            if (r != Graph_Success)
+                return r;
+
+            e = e->next;
+        }
+    }
+
+    return Graph_Success;
 }
 
 GraphResult Graph_DijkstraShortestPath(Graph* self, int start)
