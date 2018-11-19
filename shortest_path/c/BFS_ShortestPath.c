@@ -1,6 +1,5 @@
 #include <stdlib.h>
 
-#include "include/GraphSearch.h"
 #include "BFS_ShortestPath.h"
 
 static VertexData* VertexData_Create(int value)

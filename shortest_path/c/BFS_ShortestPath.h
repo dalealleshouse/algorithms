@@ -1,5 +1,5 @@
 #pragma once
 
-#include "include/Graph.h"
+#include "include/GraphSearch.h"
 
 GraphResult Graph_ShortestPath(Graph*, int);
