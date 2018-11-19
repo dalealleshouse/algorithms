@@ -175,28 +175,6 @@ static void Graph_Reachable_marks_all_reachable()
     Graph_Destroy(graph, free);
 }
 
-/*************************** Shortest Path ************************************/
-static void Graph_ShortestPath_standard()
-{
-    Graph* graph = CreateSut();
-
-    Graph_ShortestPath(graph, 4);
-
-    CU_ASSERT_EQUAL(1, Value(graph->V[1]));
-    CU_ASSERT_EQUAL(2, Value(graph->V[2]));
-    CU_ASSERT_EQUAL(2, Value(graph->V[3]));
-    CU_ASSERT_EQUAL(0, Value(graph->V[4]));
-    CU_ASSERT_EQUAL(3, Value(graph->V[5]));
-    CU_ASSERT_EQUAL(3, Value(graph->V[6]));
-    CU_ASSERT_EQUAL(-1, Value(graph->V[7]));
-    CU_ASSERT_EQUAL(4, Value(graph->V[8]));
-    CU_ASSERT_EQUAL(4, Value(graph->V[9]));
-    CU_ASSERT_EQUAL(4, Value(graph->V[10]));
-    CU_ASSERT_EQUAL(4, Value(graph->V[11]));
-
-    Graph_Destroy(graph, free);
-}
-
 /*************************** Connected Components *****************************/
 static void Graph_Connected_standard()
 {
@@ -383,9 +361,6 @@ int register_graph_search_tests()
               CU_TEST_INFO(Graph_Reachable_marks_all_reachable),
               CU_TEST_INFO_NULL };
 
-    CU_TestInfo ShortestPath_Tests[]
-        = { CU_TEST_INFO(Graph_ShortestPath_standard), CU_TEST_INFO_NULL };
-
     CU_TestInfo Connected_Tests[]
         = { CU_TEST_INFO(Graph_Connected_standard), CU_TEST_INFO_NULL };
 
@@ -411,10 +386,6 @@ int register_graph_search_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Reachable_Tests },
-        { .pName = "Shortest Path",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = ShortestPath_Tests },
         { .pName = "Connected",
             .pInitFunc = noop,
             .pCleanupFunc = noop,

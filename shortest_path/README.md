@@ -14,7 +14,7 @@ Search](../graph_search)
 One unique attribute of
 [BFS](../graph_search/README.md#breadth-first-search-bfs) is that with only a
 few extra lines of code, it can be used to calculate the degrees of separation
-between nodes. This is only valid for *non-weighted undirected* graphs.
+between nodes. This is only valid for *non-weighted* graphs.
 
 ### Asymptotic Complexity
 ![O(m+n)](https://latex.codecogs.com/gif.latex?O(m&plus;n))
@@ -42,6 +42,4 @@ while q is not empty:
 
 ## Dijkstra's
 Dijkstra's shortest-path algorithm calculates the shortest distance between
-vertices in a *weighted graph with **non-negative** edge weights*. *Shortest
-Path* is defined as the path for which the sum of the edge weights is the
-smallest.
+vertices in a *weighted graph with **non-negative** edge weights*. 
