@@ -50,32 +50,50 @@ to ensure they fully understand this.
 The algorithm as shown in the this section is a naive implementation. Each
 iteration of the main while loop requires a scan over all edges to find the one
 with the minimum distance. While this runtime isn't horrible, it's possible to
-do much better using a [priority queue](../queue/README.md#priority-queue).
+do much better using the implementation in the next section.
 
 ### Asymptotic Complexity
 ![O(mn)](https://latex.codecogs.com/gif.latex?O(mn))
 
 ### Pseudo Code
 ```
-G = input graph
-v = starting vertex
-side effects: marks all vertices with the shortest distance from the starting
-vertex
+dijkstra:
+    G = input graph with distance of each vertex set to infinity
+    v = starting vertex
+    side effects: marks all vertices with the shortest distance from the starting
+    vertex
 
-S = All vertices in G
-for each vertex in S:
-    vertex.distance = infinity
+    S = empty array
 
-v.distance = 0
+    v.distance = 0
+    S.add(v)
 
-while S is not empty:
-    u = vertex in S having the minimum distance
-    remove u from Q
+    while true:
+        u = find_min(G, S)
+        if u is NULL or u.distance == infinity:
+            break
 
-    for each outgoing edge in u:
-        distance = u.distance + edge.weight
-        if distance < edge.head.distance
-            edge.head.distance = distance
+        S.add(u)
+
+find_min:
+    G = input graph
+    S = array containing all conquered vertices
+
+    v = NULL
+
+    for each vertex in S:
+        for each edge in vertex:
+            if edge.head is contained in S:
+                continue
+
+            distance = edge.tail.distance + edge.weight
+            if distance < edge.head.distance
+                edge.head.distance = distance
+
+            if edge.head.distance < v.distance
+                v = edge.head
+
+    return v
 ```
 
 ## Dijkstra's
@@ -86,31 +104,34 @@ with an asymptotic complex of ![O(lg
 n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) to keep track of the
 current minimum distance.
 
+do much better using a [priority queue](../queue/README.md#priority-queue).
+
 ### Asymptotic Complexity
 ![O(mlogn)](https://latex.codecogs.com/gif.latex?O(m\lg&space;n))
 
 ### Pseudo Code
 ```
-G = input graph
+G = input graph with distance of each vertex set to infinity
 v = starting vertex
 Q = priority queue using vertex.distance as the key
 side effects: marks all vertices with the shortest distance from the starting
 vertex
 
 v.distance = 0
-
-for each vertex in S:
-    if vertex is not source
-        vertex.distance = infinity
-    add vertex to Q
-
+Q.insert(v)
 
 while Q is not empty:
     u = Q.extract_minimum
 
     for each outgoing edge in u:
+        if edge.head has already been processed, skip it
+
         distance = u.distance + edge.weight
         if distance < edge.head.distance
             edge.head.distance = distance
-            Q.reprioritize(edge.head)
+
+            if edge.head exists in Q:
+                Q.reprioritize(edge.head)
+            else
+                Q.insert(v)
 ```

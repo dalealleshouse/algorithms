@@ -4,7 +4,6 @@
 #include "CUnit/CUnit.h"
 
 #include "Dijkstra.h"
-#include "include/MemAllocMock.h"
 #include "include/TestHelpers.h"
 
 const double EPSILON = 0.00000000000001;
@@ -22,13 +21,13 @@ const char* big_path = "src/graphs/big.txt";
 static int Distance(Vertex* v)
 {
     if (v == NULL || v->data == NULL)
-        return 1000000;
+        return INFINITY;
 
     ShortestPath* sp = v->data;
     return sp->distance;
 }
 
-static void NodeHasWeight(Vertex* v, double expected)
+static void NodeHasDistance(Vertex* v, double expected)
 {
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v->data);
@@ -78,10 +77,10 @@ Graph* sut;
         GraphResult result = ALGO(sut, 1);                                     \
                                                                                \
         CU_ASSERT_EQUAL(Graph_Success, result);                                \
-        NodeHasWeight(sut->V[1], 0);                                           \
-        NodeHasWeight(sut->V[2], 1);                                           \
-        NodeHasWeight(sut->V[3], 6);                                           \
-        NodeHasWeight(sut->V[4], 3);                                           \
+        NodeHasDistance(sut->V[1], 0);                                         \
+        NodeHasDistance(sut->V[2], 1);                                         \
+        NodeHasDistance(sut->V[3], 6);                                         \
+        NodeHasDistance(sut->V[4], 3);                                         \
                                                                                \
         Graph_Destroy(sut, free);                                              \
     }                                                                          \
@@ -93,14 +92,14 @@ Graph* sut;
         GraphResult result = ALGO(sut, 1);                                     \
                                                                                \
         CU_ASSERT_EQUAL(Graph_Success, result);                                \
-        NodeHasWeight(sut->V[1], 0);                                           \
-        NodeHasWeight(sut->V[2], 1);                                           \
-        NodeHasWeight(sut->V[3], 2);                                           \
-        NodeHasWeight(sut->V[4], 3);                                           \
-        NodeHasWeight(sut->V[5], 4);                                           \
-        NodeHasWeight(sut->V[6], 4);                                           \
-        NodeHasWeight(sut->V[7], 3);                                           \
-        NodeHasWeight(sut->V[8], 2);                                           \
+        NodeHasDistance(sut->V[1], 0);                                         \
+        NodeHasDistance(sut->V[2], 1);                                         \
+        NodeHasDistance(sut->V[3], 2);                                         \
+        NodeHasDistance(sut->V[4], 3);                                         \
+        NodeHasDistance(sut->V[5], 4);                                         \
+        NodeHasDistance(sut->V[6], 4);                                         \
+        NodeHasDistance(sut->V[7], 3);                                         \
+        NodeHasDistance(sut->V[8], 2);                                         \
                                                                                \
         Graph_Destroy(sut, free);                                              \
     }                                                                          \
