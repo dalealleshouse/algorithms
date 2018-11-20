@@ -40,7 +40,7 @@ while q is not empty:
             q->enqueue(w)
 </pre>
 
-## Dijkstra's
+## Dijkstra's (Naive)
 Dijkstra's shortest path algorithm calculates the shortest distance between
 vertices in a *weighted graph with **non-negative** edge weights*. This is
 without a doubt one of the *greatest hits* of algorithms with countless
@@ -78,7 +78,7 @@ while S is not empty:
             edge.head.distance = distance
 ```
 
-## Dijkstra's w/ Priority Queue
+## Dijkstra's
 By making a small change to the way in which the vertex with the minimum
 distance is determined, it's possible to reduce the running time of Dijkstra's
 algorithm. The trick is to us a priority queue with insert and delete operations
