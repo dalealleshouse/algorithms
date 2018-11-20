@@ -102,18 +102,6 @@ static GraphResult SetDistanceAndConquer(
     return Graph_Success;
 }
 
-static PriorityQueue* InitPQ(Graph* self)
-{
-    PriorityQueue* pq = PQ_Create(path_comparator);
-    if (pq == NULL)
-        return NULL;
-
-    for (size_t i = 0; i < self->n; i++)
-        PQ_Insert(pq, self->V[i]);
-
-    return pq;
-}
-
 static Vertex* FindMin(Graph* self, Vertex* conquered[])
 {
     Vertex* v = NULL;
