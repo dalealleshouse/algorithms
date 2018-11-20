@@ -95,16 +95,25 @@ static PriorityQueue* InitPQ(Graph* self)
     return pq;
 }
 
-static Vertex* FindMinDistance(Graph* self)
+static Vertex* FindMin(Graph* self, Vertex* conquered[])
 {
     Vertex* v = NULL;
+    size_t tracker = 0;
+    Vertex* curr = conquered[tracker];
 
-    for (size_t i = 0; i < self->n; i++) {
-        if (IsConquered(self->V[i]))
-            continue;
-
-        if (Distance(self->V[i]) < Distance(v))
-            v = self->V[i];
+    while (curr != NULL) {
+        Edge* e = curr->edges;
+        while (e != NULL) {
+            Vertex* tail = self->V[e->tail];
+            Vertex* head = self->V[e->head];
+            if (!IsConquered(head)) {
+                SetDistance(head, Distance(tail) + e->weight, tail);
+                if (Distance(head) < Distance(v))
+                    v = head;
+            }
+            e = e->next;
+        }
+        curr = conquered[++tracker];
     }
 
     return v;
@@ -118,35 +127,33 @@ GraphResult Graph_DijkstraShortestPathNaive(Graph* self, int start)
     if (start < 0 || (size_t)start >= self->n)
         return Graph_InvalidVertexId;
 
-    GraphResult r = SetDistance(self->V[start], 0, NULL);
+    size_t tracker = 1;
+    Vertex** conquered = calloc(sizeof(Vertex*), self->n + 1);
+    if (conquered == NULL)
+        return Graph_FailedMemoryAllocation;
+
+    Vertex* startv = self->V[start];
+    GraphResult r = SetDistance(startv, 0, NULL);
+    if (r != Graph_Success)
+        return r;
+
+    conquered[0] = startv;
+    r = Conquer(startv);
     if (r != Graph_Success)
         return r;
 
     while (true) {
-        Vertex* v = FindMinDistance(self);
-
+        Vertex* v = FindMin(self, conquered);
         if (Distance(v) == INFINITY)
             break;
 
+        conquered[tracker++] = v;
         r = Conquer(v);
         if (r != Graph_Success)
             return r;
-
-        Edge* e = v->edges;
-        while (e != NULL) {
-            if (!IsConquered(self->V[e->head])) {
-                double dist = Distance(v) + e->weight;
-                Vertex* u = self->V[e->head];
-
-                r = SetDistance(u, dist, v);
-                if (r != Graph_Success)
-                    return r;
-            }
-
-            e = e->next;
-        }
     }
 
+    free(conquered);
     return Graph_Success;
 }
 
