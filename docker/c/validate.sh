@@ -18,6 +18,7 @@ function test_build() {
 
 test_build all
 test_build address-san
+# disabled due to problems with shared libaries and false positives
 # test_build memory-san
 test_build thread-san
 test_build release

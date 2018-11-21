@@ -21,6 +21,8 @@ function run_c_code_coverage() {
         ./coverage.sh
 }
 
+./libs.sh
+
 # Run the dockerized tests inside every subdirectory named c
 for D in `find . -type d -name 'c' ! -path './docker/c'`
 do
