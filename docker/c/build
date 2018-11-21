@@ -11,5 +11,5 @@ case "$1" in
   *) docker build -t dalealleshouse/algo_test_runner_c:$1 \
     -t dalealleshouse/algo_test_runner_c \
     ./
-    docker image rm $(docker image ls --filter dangling=true -q) ;;
+    docker system prune -f ;;
 esac

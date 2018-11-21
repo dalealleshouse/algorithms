@@ -18,6 +18,6 @@ function test_build() {
 
 test_build all
 test_build address-san
-test_build memory-san
+# test_build memory-san
 test_build thread-san
 test_build release

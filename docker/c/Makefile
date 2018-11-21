@@ -6,11 +6,13 @@ CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 SHAREDFLAGS	 = -std=c11 -O3 -D NDEBUG -fPIC -shared
-LINKFLAGS 	 = -lcunit -flto -lm
+LIBFLAGS	 = -std=c11 -O3 -D NDEBUG -fvisibility=hidden
+LINKFLAGS 	 = -lcunit -flto -lm src/include/libutils.a src/include/libstack.a src/include/libqueue.a src/include/libgraph_search.a
 
 TARGET			= src/test_runner
 SHARED_TARGET	= src/algo.so
-SOURCES			= $(shell echo src/*.c src/**/*.c)
+LIB_NAME	 	?=utils
+SOURCES			= $(shell echo src/*.c )
 OBJECTS			= $(SOURCES:.c=.o)
 
 all: $(TARGET)
@@ -42,16 +44,22 @@ thread-san: $(TARGET)
 address-san: CFLAGS += -fsanitize=address,undefined
 address-san: $(TARGET)
 
+library: $(SOURCES)
+	$(CC) $(CFLAGS) $(LIBFLAGS) $(SOURCES) -c
+	ar rcs src/lib$(LIB_NAME).a *.o
+
 clean:
 	-rm -f $(OBJECTS)
 	-rm -f $(TARGET)
 	-rm -f $(SHARED_TARGET)
+	-rm -f src/*.a
 	-rm -f src/gmon.out
 	-rm -rf src/output
 	-rm -f src/*.gcda
 	-rm -f src/*.gcov
 	-rm -f src/*.gcno
 	-rm -f src/*.info
+	-rm -f src/run_result.txt
 
 %.o: %.c
 	  $(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $< -flto

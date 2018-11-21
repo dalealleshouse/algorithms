@@ -4,7 +4,7 @@
 #include "CUnit/CUnit.h"
 
 #include "Stack.h"
-#include "TestHelpers.h"
+#include "include/TestHelpers.h"
 
 /*************************** Stack_Create *************************************/
 static void Stack_Create_malloc_tester(void)

@@ -3,8 +3,8 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-#include "include/TestHelpers.h"
 #include "GraphSearch.h"
+#include "include/TestHelpers.h"
 
 /*******************************************************************************
  * small.txt
@@ -87,7 +87,7 @@ bool is_con(Vertex* v)
     return ((Conqured*)v->data)->is_conquered;
 }
 
-SearchStrategy strategy = { conquer, is_con };
+static SearchStrategy strategy = { conquer, is_con };
 
 /*************************** Breadth First Search *****************************/
 static void Graph_BFS_null_parameter()
