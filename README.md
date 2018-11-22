@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.com/dalealleshouse/algorithms.svg?branch=master)](https://travis-ci.com/dalealleshouse/algorithms)
 
 # Algorithms
-Examples of popular algorithms in several different languages. The purpose is to
-demonstrate algorithm design and analysis fundamentals. This project is part of
-a book I'm planning to write. I'd be happy to accept any pull requests.
-Contributors will be recognized in the book.
+The purpose of this project is to demonstrate algorithm/data structure design
+and analysis fundamentals. This project is part of a book I'm planning to write.
+I'd be happy to accept any pull requests.  Contributors will be recognized in
+the book.
 
 ## A few things to note about..
 
@@ -13,9 +13,9 @@ Build environments
     examples demonstrate how to use the containers as stored on [Docker
     Hub](https://hub.docker.com). However, the [docker](docker/) folder has all
     files required to build the containers locally if that is the preference.
-- Each folder acts as a stand-alone project. Files are shared between projects
-    with hard links. Soft links would be preferable, but Docker can't deal with
-    them.
+- Each `c` folder acts as a stand-alone project. Files are shared between
+    projects via static libraries which aren't checked into source control. Use
+    the `libs.sh` script to build the static libraries locally.
 
 Implementation Quality
 * Several of the implementations utilize recursion. Recursion provides an
@@ -33,16 +33,16 @@ Implementation Quality
     great article about what this is true. Furthermore, `rand()` is never
     seeded. This ensures that the actual run time comparisons between algorithms
     accepting randomly sorted arrays are using the exact same inputs.  For the
-    purposes of this project, `rand()` it is sufficient. However, a different
+    purposes of this project, `rand()` is sufficient. However, a different
     solution is required for production scenarios.
 
 Actual run time data
-* Actual run time data for the C implementation of the algorithms is included 
-    in each section. C was chosen as the language for showcasing run times
-    because it executes "closest to the metal" and therefore provides the most
-    accurate representation of an algorithm's run time. However, even though the
-    actual run time wont be the same, the comparative difference between the run
-    times should be commiserate in your language of choice.
+* Many sections include actual run time data for the C implementation of the
+    algorithms. C was chosen as the language for showcasing run times because it
+    executes "closest to the metal" and therefore provides the most accurate
+    representation of an algorithm's run time. However, even though the actual
+    run time wont be the same, the comparative difference between the run times
+    should be commiserate in your language of choice.
 * Milliseconds are close to non-consequential for most applications. Remember
     the words of the great Donald Knuth - "pre-mature optimization is the root
     of all evil."
@@ -52,8 +52,9 @@ Actual run time data
 * All run time data was collected using a docker container running on a Surface
     Book 2 Laptop (Intel Core i7, 16GB RAM).
 * Each time value represents the median of 3 separate executions.
-* You can recreate the data using your own hardware by running the
-    time_charts.sh bash script located in each c directory.
+* You can recreate the run time data using your own hardware by navigating to
+    the desired directory and running the time_charts.sh bash script located in
+    the root diretory.
 
 ## Index
 
@@ -62,8 +63,9 @@ Actual run time data
     * [Linked List](list_data_structures/README.md#linked-lists)
     * [Binary Tree](list_data_structures/README.md#binary-trees)
     * [Hash Tables](list_data_structures/README.md#hash-tables)
-* [Queue](queue/)
-* [Stack](stack/)
+* Data Structures
+    * [Queue](queue/)
+    * [Stack](stack/)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
@@ -79,12 +81,13 @@ Actual run time data
 
 ## Build/Tests
 ### C
-All of the C code is designed to build and run independently. Code is shared
-between projects via static libraries. The static libraries must be built
-locally before running the code will run. Use the following script to build the
-shared libraries.
+Each directory containing C code is designed to build and run independently.
+Code is shared between projects via static libraries which aren't checked into
+source control and must therefore be built locally. Use the following script to
+build the shared libraries. *The Docker commands below will NOT work until these
+libraries are built*.
 
-```bash
+``` bash
 ./libs.sh
 ```
 
