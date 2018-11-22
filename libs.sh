@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # declare -a libs=(utils queue stack)
-declare -a libs=(utils queue stack graph_search)
+declare -a libs=(utils data_structures graph_search)
 
 function clean_libs() {
     for D in `find . -type d -name 'c' ! -path './docker/c' ! -path './utils/c'`

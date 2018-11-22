@@ -204,7 +204,7 @@ static void Stack_Destroy_null()
     Stack_Destroy(NULL);
 }
 
-static int register_tests()
+int register_stack_tests()
 {
     CU_TestInfo Stack_tests[] = { CU_TEST_INFO(Stack_Create_failed_malloc),
         CU_TEST_INFO(Stack_Create_initalizes_values),
@@ -226,27 +226,4 @@ static int register_tests()
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
-}
-
-int main(void)
-{
-    if (CUE_SUCCESS != CU_initialize_registry())
-        return CU_get_error();
-
-    if (register_tests() != 0) {
-        CU_cleanup_registry();
-        return -1;
-    }
-
-    // Run all tests using the basic interface
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-
-    // You must get this value before CU_cleanup_registry() or it will revert to
-    // zero
-    int ret = (CU_get_number_of_failure_records() != 0);
-
-    /* Clean up registry and return */
-    CU_cleanup_registry();
-    return ret;
 }
