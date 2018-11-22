@@ -21,7 +21,7 @@ function run_c_code_coverage() {
         ./coverage.sh
 }
 
-ls -l *.sh
+chmod +x libs.sh
 
 ./libs.sh
 
