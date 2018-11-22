@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# declare -a libs=(utils queue stack)
 declare -a libs=(utils data_structures graph_search)
 
 function clean_libs() {
