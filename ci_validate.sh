@@ -21,6 +21,8 @@ function run_c_code_coverage() {
         ./coverage.sh
 }
 
+ls -l *.sh
+
 ./libs.sh
 
 # Run the dockerized tests inside every subdirectory named c
