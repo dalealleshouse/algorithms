@@ -4,7 +4,7 @@
 declare -a libs=(utils data_structures graph_search)
 
 function clean_libs() {
-    for D in `find . -type d -name 'c' ! -path './docker/c' ! -path './utils/c'`
+    for D in `find . -type d -name 'c' ! -path './docker/c'`
     do
         mkdir -p $D/include
         rm -rf $D/include/*
