@@ -79,6 +79,15 @@ Actual run time data
 
 ## Build/Tests
 ### C
+All of the C code is designed to build and run independently. Code is shared
+between projects via static libraries. The static libraries must be built
+locally before running the code will run. Use the following script to build the
+shared libraries.
+
+```bash
+./libs.sh
+```
+
 All units tests are written with
 [cunit](http://cunit.sourceforge.net/doc/index.html). To run the tests,
 navigate to the folder containing the C code and run the following command:
