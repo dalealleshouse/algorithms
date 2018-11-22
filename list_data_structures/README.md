@@ -1,5 +1,4 @@
 # List Data Structures
-
 A *list* (aka *collection* or *container*) is a logical grouping of data items
 into a single unit. Lists enable operations such as inserting new items,
 searching through existing items, deleting items, and enumerating existing
