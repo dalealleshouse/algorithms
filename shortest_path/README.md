@@ -99,29 +99,24 @@ find_min:
 ## Dijkstra's
 By making a small change to the way in which the vertex with the minimum
 distance is determined, it's possible to reduce the running time of Dijkstra's
-algorithm. The trick is to us a priority queue with insert and delete operations
-with an asymptotic complex of ![O(lg
-n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) to keep track of the
-current minimum distance.
-
-do much better using a [priority queue](../queue/README.md#priority-queue).
+algorithm. The trick is to us a [heap](../data_structures/README.md#heap).
 
 ### Asymptotic Complexity
-![O(mlogn)](https://latex.codecogs.com/gif.latex?O(m\lg&space;n))
+![O((m + n)log n)](https://latex.codecogs.com/gif.latex?O((m + n)\lg&space;n))
 
 ### Pseudo Code
 ```
 G = input graph with distance of each vertex set to infinity
 v = starting vertex
-Q = priority queue using vertex.distance as the key
+H = head using vertex.distance as the key
 side effects: marks all vertices with the shortest distance from the starting
 vertex
 
 v.distance = 0
-Q.insert(v)
+H.insert(v)
 
-while Q is not empty:
-    u = Q.extract_minimum
+while H is not empty:
+    u = H.extract_minimum
 
     for each outgoing edge in u:
         if edge.head has already been processed, skip it
@@ -130,8 +125,10 @@ while Q is not empty:
         if distance < edge.head.distance
             edge.head.distance = distance
 
-            if edge.head exists in Q:
-                Q.reprioritize(edge.head)
+            if edge.head exists in H:
+                // Force reorder of keys
+                H.delete(edge.head)
+                H.insert(edge.head)
             else
-                Q.insert(v)
+                H.insert(v)
 ```

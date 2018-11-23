@@ -53,8 +53,8 @@ Actual run time data
     Book 2 Laptop (Intel Core i7, 16GB RAM).
 * Each time value represents the median of 3 separate executions.
 * You can recreate the run time data using your own hardware by navigating to
-    the desired directory and running the time_charts.sh bash script located in
-    the root diretory.
+    the desired directory and running the `time_charts.sh` bash script located
+    in the root directory.
 
 ## Index
 
@@ -64,9 +64,10 @@ Actual run time data
     * [Binary Tree](list_data_structures/README.md#binary-trees)
     * [Hash Tables](list_data_structures/README.md#hash-tables)
 * [Data Structures](data_structures/)
-    * [Stack](data_strucutres/README.md#stack-last-in-first-out)
-    * [Queue](data_strucutres/README.md#queue-first-in-first-out)
-    * [Priority Queue](data_strucutres/README.md#priority-queue)
+    * [Stack](data_structures/README.md#stack-last-in-first-out)
+    * [Queue](data_structures/README.md#queue-first-in-first-out)
+    * [Priority Queue](data_structures/README.md#priority-queue)
+    * [Heap](data_structures/README.md#heap)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
@@ -74,8 +75,7 @@ Actual run time data
     * [Merge Sort](sorting/README.md#merge-sort)
     * [Quick Sort](sorting/README.md#quick-sort)
 * [Quick Select](quick_select/)
-* Graphs
-    * [Graph Concepts](graph_concepts/)
+* [Graphs](graph_concepts/)
     * [Graph Search](graph_search/)
     * [Shortest Path](shortest_path/)
     * [Random Contraction](random_contraction/)
