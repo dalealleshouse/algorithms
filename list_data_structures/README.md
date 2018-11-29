@@ -118,10 +118,10 @@ Just like arrays and linked lists, binary trees are another list data structure
 concepts aren't germane to this topic). Each item in a binary tree is a node
 with a left and right pointer. The left pointer points to a node with a lesser
 valued item and the right pointer points to a node with a greater valued item.
-The root node can be any node in the structure and acts as the entry point.
-Binary trees have builtin support for [Binary Search](../binary_search) with a
-trade off of slightly slower insert and delete operations. The data structure is
-depicted in the image below.
+The root node can be any node in the structure and acts as the entry point. An
+interesting property of binary trees is that there are multiple valid ways to
+rearrange the data. For instance, consider the binary tree depicted below. Both
+trees are valid, and contain the same data.
 
 #### Binary Tree
 ![Binary Tree](binary_tree.png)
@@ -132,10 +132,12 @@ words of Bertrand Russell, "Conventional people are roused to fury by departure
 from convention, largely because they regard such departure as a criticism of
 themselves."
 
-A major concern with binary trees is *balance*. The image above represents a
-balanced tree because there are approximately the same number of items or either
-side of the root. Consider what would happen if sorted items are inserted as
-depicted below. In this case, insert, delete, and search operations are actually
+Binary trees have builtin support for [Binary Search](../binary_search) with a
+trade off of slightly slower insert and delete operations.  A major concern with
+binary trees is *balance*. The image above represents a balanced tree because
+there are approximately the same number of items or either side of the root.
+Consider what would happen if sorted items are inserted as depicted below. In
+this case, insert, delete, and search operations are actually
 ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
 
 #### Unbalanced Binary Tree

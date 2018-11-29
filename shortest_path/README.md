@@ -99,10 +99,10 @@ find_min:
 ## Dijkstra's
 By making a small change to the way in which the vertex with the minimum
 distance is determined, it's possible to reduce the running time of Dijkstra's
-algorithm. The trick is to us a [heap](../data_structures/README.md#heap).
+algorithm. The trick is to use a [heap](../data_structures/README.md#heap).
 
 ### Asymptotic Complexity
-![O((m + n)log n)](https://latex.codecogs.com/gif.latex?O((m + n)\lg&space;n))
+![O((n+m)log n)](https://latex.codecogs.com/gif.latex?O((n&plus;m)\log&space;n))
 
 ### Pseudo Code
 ```

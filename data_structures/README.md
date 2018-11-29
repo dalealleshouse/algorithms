@@ -154,6 +154,16 @@ implementation of a priority queue. In reality, the distinction isn't that
 important. Heaps are a great way to create a priority queue with methods that
 have excellent asymptotic time complexity.
 
+While heaps are logically trees, they
+are stored in memory as [Arrays](../list_data_structures/README.md#array).
+
+
+With the highest priority item at the root,
+locating it is a trivial ![O(1)](https://latex.codecogs.com/gif.latex?O(1))
+operation.
+
+A heap is stored as an 
+
 ### Asymptotic Time Complexity
 * Insert: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
 * Extract: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
