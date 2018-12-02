@@ -5,6 +5,8 @@
 
 static size_t ParentIndex(size_t index) { return (index - 1) >> 1; }
 
+static size_t ChildIndex(size_t index) { return (index << 1) + 1; }
+
 static void Swap(void* data[], size_t x, size_t y)
 {
     void* temp = data[x];
@@ -24,6 +26,40 @@ static void BubbleUp(Heap* self, size_t start)
 
         Swap(self->data, start, parent_index);
         start = parent_index;
+    }
+}
+
+static size_t GreatestPriority(Heap* self, size_t x, size_t y)
+{
+    if (y >= self->n)
+        return x;
+
+    if (x >= self->n)
+        return y;
+
+    int result = self->comparator(self->data[x], self->data[y]);
+
+    if (result >= 0)
+        return x;
+
+    return y;
+}
+
+static void BubbleDown(Heap* self, size_t start)
+{
+    size_t child;
+
+    while ((child = ChildIndex(start)) < self->n) {
+        child = GreatestPriority(self, child, child + 1);
+
+        int comp_result
+            = self->comparator(self->data[start], self->data[child]);
+
+        if (comp_result >= 0)
+            return;
+
+        Swap(self->data, start, child);
+        start = child;
     }
 }
 
@@ -72,6 +108,9 @@ HeapResult Heap_Insert(Heap* self, void* item)
     if (self == NULL || item == NULL)
         return HeapNullParameter;
 
+    if (self->size == self->n)
+        return HeapOverflow;
+
     self->data[self->n] = item;
     BubbleUp(self, self->n);
     self->n++;
@@ -79,9 +118,59 @@ HeapResult Heap_Insert(Heap* self, void* item)
     return HeapSuccess;
 }
 
+void* Heap_Extract(Heap* self)
+{
+    if (self == NULL) {
+        HEAP_ERROR(HeapNullParameter);
+        return NULL;
+    }
+
+    if (Heap_IsEmpty(self)) {
+        HEAP_ERROR(HeapEmpty);
+        return NULL;
+    }
+
+    void* item = self->data[0];
+    self->n--;
+    Swap(self->data, 0, self->n);
+    BubbleDown(self, 0);
+
+    return item;
+}
+
+void* Heap_Find(Heap* self)
+{
+    if (self == NULL) {
+        HEAP_ERROR(HeapNullParameter);
+        return NULL;
+    }
+
+    if (Heap_IsEmpty(self)) {
+        HEAP_ERROR(HeapEmpty);
+        return NULL;
+    }
+
+    return self->data[0];
+}
+
+bool Heap_IsEmpty(Heap* self)
+{
+    if (self == NULL) {
+        HEAP_ERROR(HeapNullParameter);
+        return true;
+    }
+
+    if (self->n == 0)
+        return true;
+
+    return false;
+}
+
 char* Heap_ErrorMessage(HeapResult result)
 {
     switch (result) {
+    case HeapOverflow:
+        return "Attempted to place more items in the heap than it is sized for";
     case HeapEmpty:
         return "Attempted operation on an empty heap";
     case HeapFailedMemoryAllocation:

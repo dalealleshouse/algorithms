@@ -17,6 +17,7 @@
     }
 
 typedef enum {
+    HeapOverflow = -5,
     HeapEmpty = -4,
     HeapFailedMemoryAllocation = -3,
     HeapInvalidSize = -2,
