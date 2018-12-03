@@ -3,9 +3,19 @@
 #include "Heap.h"
 #include "include/MemAllocMock.h"
 
-static size_t ParentIndex(size_t index) { return (index - 1) >> 1; }
+static size_t ParentIndex(size_t index)
+{
+    index++;
+    index = index >> 1;
+    return index - 1;
+}
 
-static size_t ChildIndex(size_t index) { return (index << 1) + 1; }
+static size_t ChildIndex(size_t index)
+{
+    index++;
+    index = index << 1;
+    return index - 1;
+}
 
 static void Swap(void* data[], size_t x, size_t y)
 {

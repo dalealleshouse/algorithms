@@ -116,6 +116,7 @@ how Priority Queues work at a conceptual level.
 ### Asymptotic Time Complexity
 * Insert: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 * Extract: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+* Find: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
 
 ### Pseudo Code
 
@@ -131,7 +132,6 @@ priority_function:
     if item1 should be after item2
         return -1
 
-
 insert:
     new_item
 
@@ -143,7 +143,7 @@ insert:
 extract:
     Remove item from the head of the list and returns it
 
-peek:
+find:
     Return item from the head without removing it from the list
 ```
 
@@ -152,18 +152,95 @@ Some sources claim that heaps and priority queues are the same thing. Others
 indicate that a priority queue is an abstract data type and a heap is an
 implementation of a priority queue. In reality, the distinction isn't that
 important. Heaps are a great way to create a priority queue with methods that
-have excellent asymptotic time complexity.
+have excellent asymptotic time complexity and minimal memory overhead.
 
-While heaps are logically trees, they
-are stored in memory as [Arrays](../list_data_structures/README.md#array).
+Heaps are unique in that they are logically *similar* to [Binary
+Trees](../list_data_structures/README.md#binary-trees) but are stored in memory
+as [Arrays](../list_data_structures/README.md#array). First, consider a heap as
+a tree.
 
+Logically, a heap is a tree that maintains the following properties:
+1. The node with the highest priority resides at the root
+1. Every node has 2 children at most
+1. Every layer of the tree is as full as possible
+1. Every node has an equal or higher priority than it's children
 
-With the highest priority item at the root,
-locating it is a trivial ![O(1)](https://latex.codecogs.com/gif.latex?O(1))
-operation.
+There are many valid ways to organize data in a tree while maintaining these
+properties. This concept is best understood visually. See the image below.
 
-A heap is stored as an 
+![Heap](heap.png)
+
+A standard binary tree locates it's children via pointers stored on each node.
+Conversely, a heap stores all nodes in an array and locates it's ancestry via
+simple index calculations. Considering a *non-zero based index* array and `i` is
+the index of the node in question, the following formulas are used to calculate
+the index of parent and children nodes in the array.
+
+* Parent = ![Parent](https://latex.codecogs.com/gif.latex?\left&space;\lfloor&space;\frac{i}{2}&space;\right&space;\rfloor)
+* Left Child = ![Left Child](https://latex.codecogs.com/gif.latex?2i)
+* Right Child = ![Right Child](https://latex.codecogs.com/gif.latex?2i&plus;1)
+
+This is a difficult concept to understand without a visual. Please see the image
+below.
+
+![Heap Indexing](heap-indexing.png)
 
 ### Asymptotic Time Complexity
 * Insert: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
 * Extract: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+* Find: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+
+### Pseudo Code
+
+```
+priority_function:
+    item1
+    item2
+
+    if item1 and item2 are equal
+        return 0
+    if item1 should be before item2
+        return 1
+    if item1 should be after item2
+        return -1
+
+insert:
+    heap_data = array containing heap items
+    n = number of items in the array
+    new_item = item to insert into the heap
+
+    heap_data[n] = new_item
+    bubble_up_item = new_item
+    n = n + 1
+
+    while bubble_up_item does NOT equal the first item in the tree:
+        parent = bubble_up_item's parent
+
+        if (priority_function(bubble_up_item, parent) <= 0:
+            exit loop and stop processing
+        
+        swap bubble_up_item and parent in heap_data
+        bubble_up_item = parent
+
+extract:
+    heap_data = array containing heap items
+    n = number of items in the array
+
+    return_item = heap_data[0]
+    n = n - 1
+
+    move last item in the array to the first item in the array
+    bubble_down_item = first item in array
+
+    while bubble_down_item has children:
+        child = child with the greatest priority
+
+        if (priority_function(bubble_up_item, parent) >= 0:
+            exit loop and stop processing
+
+        swap child and bubble_down_item in heap_data
+        bubble_down_item = child
+
+peek:
+    Return item at heap_data[0] without removing it from the array
+```
