@@ -6,21 +6,16 @@
 #include "CUnit/CUnit.h"
 
 #include "BinaryTree.h"
-#include "MemAllocMock.h"
+#include "include/MemAllocMock.h"
+#include "include/TestHelpers.h"
 
 #define INT2VOIDP(i) (void*)(uintptr_t)(i)
 #define VOIDP2INT(i) *(int*)(i)
-#define CU_TEST_INFO(test_func)                                                \
-    {                                                                          \
-#test_func, test_func                                                  \
-    }
 
 typedef struct {
     bool valid;
     size_t n;
 } TreeValidationResult;
-
-static int noop(void) { return 0; }
 
 static void InsertAndCheckSuccess(BinaryTree* tree, void* value)
 {

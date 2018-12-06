@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "BinaryTree.h"
-#include "MemAllocMock.h"
+#include "include/MemAllocMock.h"
 
 static BinaryTreeNode* BinaryTree_FindNode(
     const BinaryTree* self, BinaryTreeNode* node, const void* item)

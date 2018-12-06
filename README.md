@@ -60,6 +60,7 @@ Actual run time data
 
 * [List Data Structures](list_data_structures/)
     * [Array](list_data_structures/README.md#arrays)
+    * [Sorted Array](list_data_structures/README.md#sorted-arrays)
     * [Linked List](list_data_structures/README.md#linked-lists)
     * [Binary Tree](list_data_structures/README.md#binary-trees)
     * [Hash Tables](list_data_structures/README.md#hash-tables)

@@ -7,8 +7,10 @@ extern int register_heap_tests();
 
 int register_tests()
 {
-    return register_stack_tests() + register_queue_tests()
-        + register_priority_queue_tests() + register_heap_tests();
+    return (register_stack_tests() != 0 + register_queue_tests()
+               != 0 + register_priority_queue_tests()
+               != 0 + register_heap_tests() != 0)
+        * -1;
 }
 
 int main(void) { TestRunner(register_tests); }

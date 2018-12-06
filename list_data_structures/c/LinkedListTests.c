@@ -5,14 +5,8 @@
 #include "CUnit/CUnit.h"
 
 #include "LinkedList.h"
-#include "MemAllocMock.h"
-
-#define CU_TEST_INFO(test_func)                                                \
-    {                                                                          \
-#test_func, test_func                                                  \
-    }
-
-static int noop(void) { return 0; }
+#include "include/MemAllocMock.h"
+#include "include/TestHelpers.h"
 
 static void ListIsValid(
     const LinkedList* list, const size_t n, void* expected[n])

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "LinkedList.h"
-#include "MemAllocMock.h"
+#include "include/MemAllocMock.h"
 
 LinkedList* LinkedList_Create(freer freer, comparator comparator)
 {

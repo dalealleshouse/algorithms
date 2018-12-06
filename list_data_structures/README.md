@@ -20,9 +20,9 @@ particular utility is required. Contrarily, it's possible to choose one that
 will meet the software requirements but have a prodigious negative impact on
 performance.
 
-This section examines four list data structures [Arrays](#arrays), [Linked
-Lists](#linked-lists), [Binary Trees](#binary-trees), and [Hash
-Tables](#hash-tables).
+This section examines five list data structures [Arrays](#arrays), [Sorted
+Arrays](#sorted-arrays), [Linked Lists](#linked-lists), [Binary
+Trees](#binary-trees), and [Hash Tables](#hash-tables).
 
 ## Arrays
 #data_structure, #list
@@ -37,9 +37,6 @@ memory. The graphic below depicts how an array is arranged in memory.
 ### Asymptotic Complexity
 - Insert\Delete: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 - Search: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
-   - The [Binary Search](../binary_search) algorithm can perform array searches
-       in ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) if
-       the array is sorted
 - Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 
 ### Advantages
@@ -59,9 +56,77 @@ memory. The graphic below depicts how an array is arranged in memory.
 - *Insert\Delete*: Inserting\Deleting a item requires a different sized
     contiguous section of memory. Therefore, a new section of memory must be
     allocated and existing items must be copied into the newly allocated area.
-- *Search*: Although sorted arrays can take advantage of [Binary
-    Search](../binary_search), there is no inherit support for search
-    operations other than examining each item individually.
+- *Search*: The only way to search an array is to start at the first item and
+    examine each item individually.
+
+## Sorted Arrays
+#data_structure, #list
+
+A sorted array has considerably more utility than a standard array. Because of
+this, [sorting algorithms](../sorting) are one of the most studied areas of
+computer science. Sorted arrays are an excellent option in cases where the data
+is well defined and does not require inserts and deletes. Insert and delete
+operations are especially onerous for sorted arrays because they require a
+complete rearrangement of memory. Sorting an array enables all of these extra
+abilities:
+
+1. Min - Find the minimum value in the array
+1. Max - Find the maximum value in an array
+1. Predecessor - Find the item directly before an arbitrary item
+1. Successor - Find the item directly after an arbitrary item
+1. Rank - Return the i<sup>th</sup> ranked item
+
+In addition to the added utility, the search operation goes from linear to
+algorithmic time. That's a considerable gain. The efficiency is achieved by
+using a special search algorithm called *binary search* that only works on
+sorted content. This is an important algorithm to understand because of it's
+ubiquity. Binary Search is the only operation for which pseudo code is provided
+because the rest are fairly self explanatory by pursuing the provided source
+code.
+
+```
+binary_search:
+    A = starting point of an array
+    value = value to search for
+    n = number of items to search
+
+    if n <= 0:
+        return NOT FOUND
+
+    half = floor of n / 2
+
+    if A[half] equals value:
+        return A[half]
+
+    if value is greater than A[half]
+        return binary_search(A[half + 1], n - half - 1)
+
+    // if it isn't greater or equal, it must be less than
+    return binary_search(A[0], half)
+```
+
+### Asymptotic Complexity
+- Search: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+- Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
+- Min: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) 
+- Max: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) 
+- Predecessor: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+- Successor: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+- Select: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) 
+- Rank: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+
+### Advantages
+- *Array Advantages*: All of the advantages of standard arrays
+- *Search*: Optimized for quick search operations
+- *Utility*: Many useful operations beyond standard arrays
+
+### Disadvantages
+- *Insert\Delete*: Virtually unsupported because the array would either need to
+    be resorted, or all the items will need to be shifted in memory.
+- *Sort Time*: The fastest an array can be sorted is 
+    ![O(n lg_{2}n)](https://latex.codecogs.com/gif.latex?O(n&space;\lg_{2}n)).
+    This time must be calculated into any algorithm hoping to capitalize on the
+    added utility.
 
 ## Linked Lists
 #data_structure, #list
