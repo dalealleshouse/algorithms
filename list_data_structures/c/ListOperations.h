@@ -1,6 +1,18 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdio.h>
+
+#include "include/ErrorReporter.h"
+
+#define LIST_ERROR(list_type, result)                                          \
+    {                                                                          \
+        char str[1000];                                                        \
+        sprintf(str, "%s Error: %s, %s, %s, %d\n", list_type,                  \
+            ListOp_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);    \
+                                                                               \
+        ErrorReporter_Report(result, str);                                     \
+    }
 
 typedef void (*freer)(void* x);
 typedef void (*item_handler)(void* x);

@@ -63,26 +63,24 @@ memory. The graphic below depicts how an array is arranged in memory.
 #data_structure, #list
 
 A sorted array has considerably more utility than a standard array. Because of
-this, [sorting algorithms](../sorting) are one of the most studied areas of
+this, [sorting algorithms](../sorting) are one of the most scrutinized areas of
 computer science. Sorted arrays are an excellent option in cases where the data
 is well defined and does not require inserts and deletes. Insert and delete
-operations are especially onerous for sorted arrays because they require a
-complete rearrangement of memory. Sorting an array enables all of these extra
-abilities:
+operations are especially onerous because they require a complete rearrangement
+of data in memory. Sorting an array enables all of these extra abilities:
 
 1. Min - Find the minimum value in the array
 1. Max - Find the maximum value in an array
 1. Predecessor - Find the item directly before an arbitrary item
 1. Successor - Find the item directly after an arbitrary item
-1. Rank - Return the i<sup>th</sup> ranked item
+1. Rank - Find the rank of any specific item
 
-In addition to the added utility, the search operation goes from linear to
-algorithmic time. That's a considerable gain. The efficiency is achieved by
-using a special search algorithm called *binary search* that only works on
-sorted content. This is an important algorithm to understand because of it's
-ubiquity. Binary Search is the only operation for which pseudo code is provided
-because the rest are fairly self explanatory by pursuing the provided source
-code.
+In addition to the added utility, search operations go from linear to
+logarithmic time. That's a considerable gain. The efficiency is achieved by
+using a special algorithm called *binary search* that only works on sorted
+content. This is an important algorithm to understand because of it's ubiquity.
+Binary Search is the only operation for which pseudo code is provided because
+the rest are fairly self explanatory by pursuing the provided source code.
 
 ```
 binary_search:
@@ -122,7 +120,7 @@ binary_search:
 
 ### Disadvantages
 - *Insert\Delete*: Virtually unsupported because the array would either need to
-    be resorted, or all the items will need to be shifted in memory.
+    be resorted, or all the items would need to be shifted in memory.
 - *Sort Time*: The fastest an array can be sorted is 
     ![O(n lg_{2}n)](https://latex.codecogs.com/gif.latex?O(n&space;\lg_{2}n)).
     This time must be calculated into any algorithm hoping to capitalize on the
@@ -180,52 +178,111 @@ Linked lists are especially helpful for applications such as
 
 Just like arrays and linked lists, binary trees are another list data structure
 (technically, they are a [graph](../graph_concepts) data structure but graph
-concepts aren't germane to this topic). Each item in a binary tree is a node
-with a left and right pointer. The left pointer points to a node with a lesser
-valued item and the right pointer points to a node with a greater valued item.
-The root node can be any node in the structure and acts as the entry point. An
-interesting property of binary trees is that there are multiple valid ways to
-rearrange the data. For instance, consider the binary tree depicted below. Both
-trees are valid, and contain the same data.
+concepts aren't germane to this topic). They are the most complex list data
+structure, so the reader is highly encouraged to thoroughly examine the provided
+source code.
+
+Each item in a binary tree is a node with a left and right pointer. The left
+pointer points to a node with a *lesser valued* item and the right pointer
+points to a node with a *greater valued* item.  The root node can be any node in
+the structure and acts as the entry point. An interesting property of binary
+trees is that there are multiple valid ways to rearrange the data. For instance,
+consider the binary trees depicted below. Both trees are valid, and contain the
+same data.
 
 #### Binary Tree
 ![Binary Tree](binary_tree.png)
 
-In reality, a more appropriate name may be *inverted* binary tree because it
-looks like an upside down tree. Alas, we are bound by convention. Remember the
-words of Bertrand Russell, "Conventional people are roused to fury by departure
-from convention, largely because they regard such departure as a criticism of
-themselves."
+The majority of binary tree operations require a *tree traversal* which is
+simply navigating through the nodes of the tree via a *binary search* (see
+[Sorted Array](#sorted-arrays) section) type algorithm. The pseudo code for a
+binary tree traversal is shown below.
 
-Binary trees have builtin support for [Binary Search](../binary_search) with a
-trade off of slightly slower insert and delete operations.  A major concern with
-binary trees is *balance*. The image above represents a balanced tree because
-there are approximately the same number of items or either side of the root.
-Consider what would happen if sorted items are inserted as depicted below. In
-this case, insert, delete, and search operations are actually
+```
+traverse:
+    Node = root node of binary tree data structure
+    Item = item to search for
+
+    if Node is NULL:
+        return NOT FOUND
+
+    if Node->Item is equal to Item:
+        return Node
+
+    if Node->Item is greater than Item:
+        traverse(Node->Right, Item)
+
+    // If it's not equal or greater, it must be less
+    traverse(Node->Left, Item)
+```
+
+Binary tree traversal is typically classified as an ![O(log
+n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) operation; however,
+this is only true of perfectly *balanced* tree. The first tree in the image
+above represents a balanced tree because each "level" of the tree is as full as
+possible. Consider what would happen if sorted items are inserted as depicted
+below. In this case tree traversals are actually
 ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
 
 #### Unbalanced Binary Tree
 ![Unbalanced Binary Tree](unbalanced_binary_tree.png)
 
+A more accurate measure of asymptotic complexity for tree traversal is based on
+tree *height* which is defined as the number of nodes from the root to the
+longest leaf. The height will always be between ![log_2
+n](https://latex.codecogs.com/gif.latex?\approx&space;\log_{2}&space;n) and
+![n-1](https://latex.codecogs.com/gif.latex?n-1). Using the examples in the
+image below, the height of the balanced tree is 4 and the height of the
+unbalanced tree is 5. Therefore, the worst case tree traversal on the unbalanced
+tree will take 5 steps. The balanced tree, even though it has more nodes, only
+needs 4 steps in the worst case.
+
+#### Tree Height
+![Tree Height](tree-height.png)
+
+One possible option for mitigating the unbalanced tree problem is to *rotate*
+nodes. This is depicted in the image below. Starting at the root, simply
+*rotate* each node until there are an even number of nodes on either side. It's
+possible to rotate nodes at any level of the tree to obtain balance.
+
+#### Tree Rotation
+![Rotate](tree_rotate.png)
+
+One important thing to note is that rotation is NOT free. Insert and delete
+operations go from ![O(log
+n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) to ![O(2 log
+n)](https://latex.codecogs.com/gif.latex?O(2\log_{2}n)).  Obviously, asymptotic
+notation drops constants so the 2 is irrelevant in that sense; however, rotation
+still presents a real world impact that must be understood. In that same vein,
+with a bit of ingenuity trees support every operation that [Sorted
+Arrays](#sorted-array) do. However, implementing these operation adds
+complexity, memory overhead, and clock cycles. Make sure to fully comprehend the
+trade offs before implementing features.
+
+As a side note, a more appropriate name may be *inverted* tree because they look
+like an upside down tree. Alas, we are bound by convention. Remember the words
+of Bertrand Russell, "Conventional people are roused to fury by departure from
+convention, largely because they regard such departure as a criticism of
+themselves."
+
 ### Asymptotic Complexity
-- Insert\Delete: ![O(log
-    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) for balanced
-    trees, ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)") for
-    unbalanced trees.
-- Search: ![O(log
-    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) for balanced
-    trees, ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)") for
-    unbalanced trees.
-- Enumerate: ![O(n + log
-    n)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;\log&space;n))
-    for balanced trees, ![O(n +
-    n)](https://latex.codecogs.com/gif.latex?O(n&plus;n)) for unbalanced trees.
+- Insert\Delete: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Search: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Enumerate:
+    ![O(n +
+    height)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;height))
+- Min: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Max: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Predecessor: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Successor: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Select: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Rank: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
 
 ### Advantages
 - *Search*: Optimized for quick search operations
 - *Insert\Delete*: Although slower then linked list, considerably faster than
     arrays.
+- *Utility*: The most utility of any data other list data structure
 
 ### Disadvantages
 - *Memory*: Each item maintains two additional pointers. The total size of a
@@ -236,6 +293,7 @@ this case, insert, delete, and search operations are actually
     have profound performance implications. See the [Memory
     Cache](../memory_cache/) section for more details.
 - *Maintains Order*: The order in which items are inserted is lost
+- *Complexity*: The most complex list data structure.
 
 ## Hash Tables
 #data_structure, #list
