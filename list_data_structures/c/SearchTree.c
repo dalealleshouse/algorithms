@@ -286,9 +286,49 @@ void* SearchTree_Successor(const SearchTree* self, const void* item)
     return succ;
 }
 
+static size_t RootIndex(const SearchTreeNode* root)
+{
+    size_t i = root->size - ((root->right == NULL) ? 0 : root->right->size);
+    printf("id=%d, index=%zu\n", *(int*)root->item, i);
+    return i;
+}
+
+static size_t NodeSize(const SearchTreeNode* node)
+{
+    return (node == 0) ? 0 : node->size;
+}
+
+static void* Select(const SearchTreeNode* root, const size_t index)
+{
+    size_t left = NodeSize(root->left);
+
+    if (left == index)
+        return root->item;
+
+    if (index < left)
+        return Select(root->left, index);
+
+    return Select(root->right, index - left - 1);
+}
+
 void* SearchTree_Select(const SearchTree* self, const size_t index)
 {
-    return NULL;
+    if (self == NULL) {
+        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        return NULL;
+    }
+
+    if (self->n == 0) {
+        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        return NULL;
+    }
+
+    if (index >= self->n) {
+        LIST_ERROR("Search Tree", ListOp_InvalidIndex);
+        return NULL;
+    }
+
+    return Select(self->root, index);
 }
 
 size_t SearchTree_Rank(const SearchTree* self, const void* item) { return 0; }

@@ -8,6 +8,21 @@
 #include "include/ErrorReporter.h"
 #include "include/TestHelpers.h"
 
+#define SUT(code_block)                                                        \
+    {                                                                          \
+        SearchTree* sut = CreateSut(mock_vals);                                \
+        code_block;                                                            \
+        SearchTree_Destroy(sut, NULL);                                         \
+    }
+
+#define EMPTY_SUT(code_block)                                                  \
+    {                                                                          \
+        int val[] = { TERMINATOR };                                            \
+        SearchTree* sut = CreateSut(val);                                      \
+        code_block;                                                            \
+        SearchTree_Destroy(sut, NULL);                                         \
+    }
+
 /*************************** Helpers ******************************************/
 const int TERMINATOR = INT_MIN;
 
@@ -30,17 +45,6 @@ static SearchTree* CreateSut(int* vals)
     return tree;
 }
 
-static size_t abs_size_t(size_t x, size_t y)
-{
-    if (x == y)
-        return 0;
-
-    if (x > y)
-        return x - y;
-
-    return y - x;
-}
-
 static size_t NodeCount(SearchTreeNode* node)
 {
     if (node == NULL)
@@ -59,6 +63,18 @@ static size_t NodeCount(SearchTreeNode* node)
 static void TreeSizeEqualsNodeCount(SearchTree* tree)
 {
     CU_ASSERT_EQUAL(tree->n, NodeCount(tree->root));
+}
+
+#ifdef BALANCE
+static size_t abs_size_t(size_t x, size_t y)
+{
+    if (x == y)
+        return 0;
+
+    if (x > y)
+        return x - y;
+
+    return y - x;
 }
 
 static void TreeIsBalanced(SearchTreeNode* node)
@@ -80,6 +96,7 @@ static void TreeIsBalanced(SearchTreeNode* node)
 
     TreeIsBalanced(node->right);
 }
+#endif
 
 static void NodeIsValid(SearchTreeNode* node)
 {
@@ -126,7 +143,9 @@ static void TreeIsValid(SearchTree* tree, size_t n)
     CU_ASSERT_EQUAL(tree->n, tree->root->size);
     TreeSizeEqualsNodeCount(tree);
     TreePropertyHolds(tree->root);
+#ifdef BALANCE
     TreeIsBalanced(tree->root);
+#endif
 }
 
 static SearchTree* ManuallyGenerateValidTree()
@@ -272,18 +291,17 @@ static void SearchTree_Insert_inits_values()
 
 static void SearchTree_Insert_maintains_tree_property()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-
-    TreePropertyHolds(sut->root);
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({ TreePropertyHolds(sut->root); });
 }
 
 static void SearchTree_Insert_sets_size()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-    TreeSizeEqualsNodeCount(sut);
-    SearchTree_Destroy(sut, NULL);
+    SUT({ TreeSizeEqualsNodeCount(sut); });
+}
+
+static void SearchTree_Insert_creates_valid_tree()
+{
+    SUT({ TreeIsValid(sut, mock_n); });
 }
 
 /*************************** SearchTree_Enumerate *****************************/
@@ -296,242 +314,246 @@ static void MockItemHandler(void* item)
 
 static void SearchTree_Enumerate_null_paramter()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-
-    BINARY_INT_NULL_TEST(
-        ListOp_NullParameter, sut, MockItemHandler, SearchTree_Enumerate);
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({
+        BINARY_INT_NULL_TEST(
+            ListOp_NullParameter, sut, MockItemHandler, SearchTree_Enumerate);
+    });
 }
 
 static void SearchTree_Enumerate_empty()
 {
-    int vals[] = { TERMINATOR };
-    SearchTree* sut = CreateSut(vals);
-
-    ListOpResult result = SearchTree_Enumerate(sut, MockItemHandler);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
-
-    SearchTree_Destroy(sut, NULL);
+    EMPTY_SUT({
+        ListOpResult result = SearchTree_Enumerate(sut, MockItemHandler);
+        CU_ASSERT_EQUAL(ListOp_Success, result);
+    });
 }
 
 static void SearchTree_Enumerate_standard()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-
-    mock_pos = 0;
-    ListOpResult result = SearchTree_Enumerate(sut, MockItemHandler);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
-    CU_ASSERT_EQUAL(mock_n, mock_pos);
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({
+        mock_pos = 0;
+        ListOpResult result = SearchTree_Enumerate(sut, MockItemHandler);
+        CU_ASSERT_EQUAL(ListOp_Success, result);
+        CU_ASSERT_EQUAL(mock_n, mock_pos);
+    });
 }
 
 /*************************** SearchTree_Search ********************************/
 static void SearchTree_Search_not_found()
 {
-    int not_found = 401;
-    SearchTree* sut = CreateSut(mock_vals);
-
-    ErrorReporter_Clear();
-    void* result = SearchTree_Search(sut, &not_found);
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({
+        int not_found = 401;
+        ErrorReporter_Clear();
+        void* result = SearchTree_Search(sut, &not_found);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Search_empty()
 {
-    int val[] = { TERMINATOR };
-    SearchTree* sut = CreateSut(val);
-    int search_for = 5;
+    EMPTY_SUT({
+        int search_for = 5;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Search(sut, &search_for);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Search(sut, &search_for);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Search_standard()
 {
-    SearchTree* sut = CreateSut(mock_vals);
+    SUT({
+        int* val = mock_vals;
 
-    int* val = mock_vals;
-
-    while (*val != TERMINATOR) {
-        void* result = SearchTree_Search(sut, val);
-        CU_ASSERT_PTR_NOT_NULL(result);
-        CU_ASSERT_EQUAL(*(int*)result, *val);
-        val++;
-    }
-
-    SearchTree_Destroy(sut, NULL);
+        while (*val != TERMINATOR) {
+            void* result = SearchTree_Search(sut, val);
+            CU_ASSERT_PTR_NOT_NULL(result);
+            CU_ASSERT_EQUAL(*(int*)result, *val);
+            val++;
+        }
+    });
 }
 
 /*************************** SearchTree_Min ***********************************/
 static void SearchTree_Min_empty()
 {
-    int val[] = { TERMINATOR };
-    SearchTree* sut = CreateSut(val);
+    EMPTY_SUT({
+        ErrorReporter_Clear();
+        void* result = SearchTree_Min(sut);
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Min(sut);
-
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Min_standard()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-
-    void* result = SearchTree_Min(sut);
-    CU_ASSERT_EQUAL(11, *(int*)result);
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({
+        void* result = SearchTree_Min(sut);
+        CU_ASSERT_EQUAL(11, *(int*)result);
+    });
 }
 
 /*************************** SearchTree_Max ***********************************/
 static void SearchTree_Max_empty()
 {
-    int val[] = { TERMINATOR };
-    SearchTree* sut = CreateSut(val);
+    EMPTY_SUT({
+        ErrorReporter_Clear();
+        void* result = SearchTree_Max(sut);
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Max(sut);
-
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Max_standard()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-
-    void* result = SearchTree_Max(sut);
-    CU_ASSERT_EQUAL(95, *(int*)result);
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({
+        void* result = SearchTree_Max(sut);
+        CU_ASSERT_EQUAL(95, *(int*)result);
+    });
 }
 
 /*************************** SearchTree_Predecessor ***************************/
 static void SearchTree_Predecessor_empty()
 {
-    int val[] = { TERMINATOR };
-    SearchTree* sut = CreateSut(val);
-    int search_for = 5;
+    EMPTY_SUT({
+        int search_for = 5;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Predecessor(sut, &search_for);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Predecessor(sut, &search_for);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Predecessor_not_found()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-    int not_found = 401;
+    SUT({
+        int not_found = 401;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Predecessor(sut, &not_found);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Predecessor(sut, &not_found);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Predecessor_first_item()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-    int first = 11;
+    SUT({
+        int first = 11;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Predecessor(sut, &first);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Predecessor(sut, &first);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(0, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(0, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Predecessor_standard()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-
-    for (size_t i = 1; i < mock_n; i++) {
-        void* result = SearchTree_Predecessor(sut, &mock_ordered[i]);
-        CU_ASSERT_EQUAL(mock_ordered[i - 1], *(int*)result);
-    }
-
-    SearchTree_Destroy(sut, NULL);
+    SUT({
+        for (size_t i = 1; i < mock_n; i++) {
+            void* result = SearchTree_Predecessor(sut, &mock_ordered[i]);
+            CU_ASSERT_EQUAL(mock_ordered[i - 1], *(int*)result);
+        }
+    });
 }
 
 /*************************** SearchTree_Successor *****************************/
 static void SearchTree_Successor_empty()
 {
-    int val[] = { TERMINATOR };
-    SearchTree* sut = CreateSut(val);
-    int search_for = 5;
+    EMPTY_SUT({
+        int search_for = 5;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Successor(sut, &search_for);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Successor(sut, &search_for);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Successor_not_found()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-    int not_found = 401;
+    SUT({
+        int not_found = 401;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Successor(sut, &not_found);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Successor(sut, &not_found);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Successor_last_item()
 {
-    SearchTree* sut = CreateSut(mock_vals);
-    int last = 95;
+    SUT({
+        int last = 95;
 
-    ErrorReporter_Clear();
-    void* result = SearchTree_Successor(sut, &last);
+        ErrorReporter_Clear();
+        void* result = SearchTree_Successor(sut, &last);
 
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(0, ErrorReporter_LastErrorCode());
-
-    SearchTree_Destroy(sut, NULL);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(0, ErrorReporter_LastErrorCode());
+    });
 }
 
 static void SearchTree_Successor_standard()
 {
-    SearchTree* sut = CreateSut(mock_vals);
+    SUT({
+        for (size_t i = 0; i < mock_n - 1; i++) {
+            void* result = SearchTree_Successor(sut, &mock_ordered[i]);
+            CU_ASSERT_EQUAL(mock_ordered[i + 1], *(int*)result);
+        }
+    });
+}
 
-    for (size_t i = 0; i < mock_n - 1; i++) {
-        void* result = SearchTree_Successor(sut, &mock_ordered[i]);
-        CU_ASSERT_EQUAL(mock_ordered[i + 1], *(int*)result);
-    }
+/*************************** SearchTree_Select ********************************/
+static void SearchTree_Select_null_paramter()
+{
+    ErrorReporter_Clear();
+    void* result = SearchTree_Select(NULL, 1);
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+}
 
-    SearchTree_Destroy(sut, NULL);
+static void SearchTree_Select_empty()
+{
+    EMPTY_SUT({
+        ErrorReporter_Clear();
+        void* result = SearchTree_Select(sut, 0);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void SearchTree_Select_out_of_bounds()
+{
+    SUT({
+        ErrorReporter_Clear();
+        void* result = SearchTree_Select(sut, mock_n + 1);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_InvalidIndex, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void SearchTree_Select_standard()
+{
+    SUT({
+        for (size_t i = 0; i < mock_n; i++) {
+            void* result = SearchTree_Select(sut, i);
+            CU_ASSERT_EQUAL(mock_ordered[i], *(int*)result);
+        }
+    });
 }
 
 /*************************** Common *******************************************/
@@ -559,7 +581,7 @@ static void SearchTree_null_parameters()
     SearchTree_Destroy(tree, NULL);
 }
 
-static void SearchTree_Test()
+static void SearchTree_validate_validator()
 {
     SearchTree* sut = ManuallyGenerateValidTree();
     TreeIsValid(sut, 10);
@@ -573,12 +595,13 @@ int register_search_tree_tests()
               CU_TEST_INFO(SearchTree_Create_failed_mem_allocation),
               CU_TEST_INFO(SearchTree_Create_init_values), CU_TEST_INFO_NULL };
 
-    CU_TestInfo insert_tests[]
-        = { CU_TEST_INFO(SearchTree_Insert_failed_mem_allocation),
-              CU_TEST_INFO(SearchTree_Insert_creates_root),
-              CU_TEST_INFO(SearchTree_Insert_inits_values),
-              CU_TEST_INFO(SearchTree_Insert_maintains_tree_property),
-              CU_TEST_INFO(SearchTree_Insert_sets_size), CU_TEST_INFO_NULL };
+    CU_TestInfo insert_tests[] = { CU_TEST_INFO(
+                                       SearchTree_Insert_failed_mem_allocation),
+        CU_TEST_INFO(SearchTree_Insert_creates_root),
+        CU_TEST_INFO(SearchTree_Insert_inits_values),
+        CU_TEST_INFO(SearchTree_Insert_maintains_tree_property),
+        CU_TEST_INFO(SearchTree_Insert_sets_size),
+        CU_TEST_INFO(SearchTree_Insert_creates_valid_tree), CU_TEST_INFO_NULL };
 
     CU_TestInfo enumerate_tests[]
         = { CU_TEST_INFO(SearchTree_Enumerate_null_paramter),
@@ -605,8 +628,14 @@ int register_search_tree_tests()
         CU_TEST_INFO(SearchTree_Successor_last_item),
         CU_TEST_INFO(SearchTree_Successor_standard), CU_TEST_INFO_NULL };
 
-    CU_TestInfo common_tests[]
-        = { CU_TEST_INFO(SearchTree_null_parameters), CU_TEST_INFO_NULL };
+    CU_TestInfo select_tests[]
+        = { CU_TEST_INFO(SearchTree_Select_null_paramter),
+              CU_TEST_INFO(SearchTree_Select_empty),
+              CU_TEST_INFO(SearchTree_Select_out_of_bounds),
+              CU_TEST_INFO(SearchTree_Select_standard), CU_TEST_INFO_NULL };
+
+    CU_TestInfo common_tests[] = { CU_TEST_INFO(SearchTree_null_parameters),
+        CU_TEST_INFO(SearchTree_validate_validator), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "SearchTree_Create",
                                   .pInitFunc = noop,
@@ -636,6 +665,10 @@ int register_search_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = successor_tests },
+        { .pName = "SearchTree_Select",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = select_tests },
         { .pName = "SearchTree Common",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
