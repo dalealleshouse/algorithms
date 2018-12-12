@@ -20,8 +20,8 @@ typedef struct {
 
 BinaryTree* BinaryTree_Create(comparator);
 ListOpResult BinaryTree_Insert(BinaryTree*, void*);
-ListOpResult BinaryTree_Delete(BinaryTree*, void*);
 ListOpResult BinaryTree_Enumerate(const BinaryTree*, item_handler);
+void* BinaryTree_Delete(BinaryTree*, void*);
 void* BinaryTree_Search(const BinaryTree*, const void*);
 void* BinaryTree_Min(const BinaryTree*);
 void* BinaryTree_Max(const BinaryTree*);

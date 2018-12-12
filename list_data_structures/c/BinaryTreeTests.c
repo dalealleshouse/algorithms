@@ -139,8 +139,14 @@ static void TreePropertyHolds(BinaryTreeNode* node)
 static void TreeIsValid(BinaryTree* tree, size_t n)
 {
     CU_ASSERT_PTR_NOT_NULL(tree);
+
+    if (n == 0) {
+        CU_ASSERT_PTR_NULL(tree->root);
+    } else {
+        CU_ASSERT_EQUAL(tree->n, tree->root->size);
+    }
+
     CU_ASSERT_EQUAL(n, tree->n);
-    CU_ASSERT_EQUAL(tree->n, tree->root->size);
     TreeSizeEqualsNodeCount(tree);
     TreePropertyHolds(tree->root);
 #ifdef BALANCE
@@ -302,6 +308,92 @@ static void BinaryTree_Insert_sets_size()
 static void BinaryTree_Insert_creates_valid_tree()
 {
     SUT({ TreeIsValid(sut, mock_n); });
+}
+
+/*************************** BinaryTree_Delete ********************************/
+static void BinaryTree_Delete_null_paramter()
+{
+    SUT({
+        int search_for = 5;
+        BINARY_NULL_TEST(
+            ListOp_NullParameter, sut, &search_for, BinaryTree_Delete);
+    });
+}
+
+static void BinaryTree_Delete_empty()
+{
+    EMPTY_SUT({
+        int search_for = 5;
+        ErrorReporter_Clear();
+        BinaryTree_Delete(sut, &search_for);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void BinaryTree_Delete_not_found()
+{
+    SUT({
+        int not_found = 401;
+        ErrorReporter_Clear();
+        void* result = BinaryTree_Delete(sut, &not_found);
+        CU_ASSERT_PTR_NULL(result);
+        CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+        TreeIsValid(sut, mock_n);
+    });
+}
+
+static void BinaryTree_DeleteTest(int doomed)
+{
+    SUT({
+        void* result = BinaryTree_Delete(sut, &doomed);
+        CU_ASSERT_EQUAL(doomed, *(int*)result);
+        TreeIsValid(sut, mock_n - 1);
+
+        ErrorReporter_Clear();
+        void* found = BinaryTree_Search(sut, &doomed);
+        CU_ASSERT_PTR_NULL(found);
+        CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void BinaryTree_Delete_leaf() { BinaryTree_DeleteTest(11); }
+
+static void BinaryTree_Delete_degree_1_node() { BinaryTree_DeleteTest(52); }
+
+static void BinaryTree_Delete_degree_2_node() { BinaryTree_DeleteTest(75); }
+
+static void BinaryTree_Delete_root() { BinaryTree_DeleteTest(50); }
+
+static void BinaryTree_Delete_last_item()
+{
+    SUT({
+        for (size_t i = 0; i < mock_n; i++) {
+            int doomed = mock_ordered[i];
+            void* result = BinaryTree_Delete(sut, &doomed);
+            CU_ASSERT_EQUAL(doomed, *(int*)result);
+            TreeIsValid(sut, mock_n - i - 1);
+        }
+
+        CU_ASSERT_EQUAL(0, sut->n);
+        CU_ASSERT_PTR_NULL(sut->root);
+    });
+}
+
+static void BinaryTree_Delete_standard()
+{
+    for (size_t i = 0; i < mock_n; i++) {
+        SUT({
+            int doomed = mock_ordered[i];
+            void* result = BinaryTree_Delete(sut, &doomed);
+            CU_ASSERT_EQUAL(doomed, *(int*)result);
+            TreeIsValid(sut, mock_n - 1);
+
+            ErrorReporter_Clear();
+            void* found = BinaryTree_Search(sut, &doomed);
+            CU_ASSERT_PTR_NULL(found);
+            CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+        });
+    }
 }
 
 /*************************** BinaryTree_Enumerate *****************************/
@@ -612,6 +704,28 @@ static void BinaryTree_Rank_standard()
     });
 }
 
+/*************************** BinaryTree_Destory *******************************/
+static void BinaryTree_Destroy_null()
+{
+    // if this does not blow up, it passes
+    BinaryTree_Destroy(NULL, NULL);
+}
+
+size_t free_tracker = 0;
+static void TestFreer(void* val)
+{
+    (void)val;
+    free_tracker++;
+}
+
+static void BinaryTree_Destroy_runs_freer()
+{
+    free_tracker = 0;
+    BinaryTree* sut = CreateSut(mock_vals);
+    BinaryTree_Destroy(sut, TestFreer);
+    CU_ASSERT_EQUAL(mock_n, free_tracker);
+}
+
 /*************************** Common *******************************************/
 static void BinaryTree_null_parameters()
 {
@@ -659,6 +773,17 @@ int register_search_tree_tests()
         CU_TEST_INFO(BinaryTree_Insert_sets_size),
         CU_TEST_INFO(BinaryTree_Insert_creates_valid_tree), CU_TEST_INFO_NULL };
 
+    CU_TestInfo delete_tests[]
+        = { CU_TEST_INFO(BinaryTree_Delete_null_paramter),
+              CU_TEST_INFO(BinaryTree_Delete_empty),
+              CU_TEST_INFO(BinaryTree_Delete_not_found),
+              CU_TEST_INFO(BinaryTree_Delete_leaf),
+              CU_TEST_INFO(BinaryTree_Delete_degree_1_node),
+              CU_TEST_INFO(BinaryTree_Delete_degree_2_node),
+              CU_TEST_INFO(BinaryTree_Delete_root),
+              CU_TEST_INFO(BinaryTree_Delete_standard),
+              CU_TEST_INFO(BinaryTree_Delete_last_item), CU_TEST_INFO_NULL };
+
     CU_TestInfo enumerate_tests[]
         = { CU_TEST_INFO(BinaryTree_Enumerate_null_paramter),
               CU_TEST_INFO(BinaryTree_Enumerate_empty),
@@ -695,6 +820,9 @@ int register_search_tree_tests()
         CU_TEST_INFO(BinaryTree_Rank_not_found),
         CU_TEST_INFO(BinaryTree_Rank_standard), CU_TEST_INFO_NULL };
 
+    CU_TestInfo destroy_tests[] = { CU_TEST_INFO(BinaryTree_Destroy_null),
+        CU_TEST_INFO(BinaryTree_Destroy_runs_freer), CU_TEST_INFO_NULL };
+
     CU_TestInfo common_tests[] = { CU_TEST_INFO(BinaryTree_null_parameters),
         CU_TEST_INFO(BinaryTree_validate_validator), CU_TEST_INFO_NULL };
 
@@ -706,6 +834,10 @@ int register_search_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = insert_tests },
+        { .pName = "BinaryTree_Delete",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = delete_tests },
         { .pName = "BinaryTree_Enumerate",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
@@ -734,6 +866,10 @@ int register_search_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = rank_tests },
+        { .pName = "BinaryTree_Destroy",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = destroy_tests },
         { .pName = "BinaryTree Common",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
@@ -745,4 +881,3 @@ int register_search_tree_tests()
 
 /* ListOpResult BinaryTree_Insert(BinaryTree*, void*); */
 /* ListOpResult BinaryTree_Delete(BinaryTree*, void*); */
-/* void BinaryTree_Destroy(BinaryTree*, freer); */

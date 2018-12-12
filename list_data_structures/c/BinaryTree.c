@@ -4,16 +4,18 @@
 #include "BinaryTree.h"
 #include "include/MemAllocMock.h"
 
+static void DeleteNode(BinaryTreeNode**);
+
 BinaryTree* BinaryTree_Create(comparator comparator)
 {
     if (comparator == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     BinaryTree* tree = calloc(sizeof(BinaryTree), 1);
     if (tree == NULL) {
-        LIST_ERROR("Search Tree", ListOp_FailedMalloc);
+        LIST_ERROR("Binary Tree", ListOp_FailedMalloc);
         return NULL;
     }
 
@@ -74,9 +76,126 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* item)
     return ListOp_Success;
 }
 
-ListOpResult BinaryTree_Delete(BinaryTree* self, void* item)
+static void DecrementSize(BinaryTreeNode* node)
 {
-    return ListOp_Success;
+    if (node == NULL)
+        return;
+
+    DecrementSize(node->parent);
+    node->size--;
+}
+
+static void DeleteLeaf(BinaryTreeNode** doomed)
+{
+    BinaryTreeNode* node = *doomed;
+
+    DecrementSize(node);
+
+    free(node);
+    *doomed = NULL;
+}
+
+static void DeleteDegreeOne(BinaryTreeNode** doomed)
+{
+    BinaryTreeNode* node = *doomed;
+
+    DecrementSize(node);
+    BinaryTreeNode* child = (node->left != NULL) ? node->left : node->right;
+    child->parent = node->parent;
+    free(node);
+    *doomed = child;
+}
+
+static BinaryTreeNode** FindParentPointer(BinaryTreeNode* node)
+{
+    BinaryTreeNode* parent = node->parent;
+
+    if (parent->left == node)
+        return &parent->left;
+
+    return &parent->right;
+}
+
+static void DeleteDegreeTwo(BinaryTreeNode** doomed)
+{
+    BinaryTreeNode* node = *doomed;
+
+    BinaryTreeNode* largest_left = node->left;
+    while (largest_left->right != NULL)
+        largest_left = largest_left->right;
+
+    void* new_value = largest_left->item;
+    node->item = new_value;
+    BinaryTreeNode** doomed_p = FindParentPointer(largest_left);
+    DeleteNode(doomed_p);
+}
+
+static size_t Degree(BinaryTreeNode* node)
+{
+    return (node->left != NULL) + (node->right != NULL);
+}
+
+static void DeleteNode(BinaryTreeNode** doomed)
+{
+    BinaryTreeNode* node = *doomed;
+
+    size_t degree = Degree(node);
+
+    switch (degree) {
+    case 0:
+        DeleteLeaf(doomed);
+        break;
+    case 1:
+        DeleteDegreeOne(doomed);
+        break;
+    case 2:
+        DeleteDegreeTwo(doomed);
+        break;
+    }
+}
+
+static void* Delete(BinaryTreeNode** root, void* doomed, comparator comparator)
+{
+    BinaryTreeNode* node = *root;
+
+    if (node == NULL)
+        return NULL;
+
+    int result = comparator(doomed, node->item);
+
+    if (result == 0) {
+        void* found = node->item;
+        DeleteNode(root);
+        return found;
+    }
+
+    if (result < 0)
+        return Delete(&node->left, doomed, comparator);
+
+    return Delete(&node->right, doomed, comparator);
+}
+
+void* BinaryTree_Delete(BinaryTree* self, void* item)
+{
+    if (self == NULL || item == NULL) {
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
+        return NULL;
+    }
+
+    if (self->n == 0) {
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
+        return NULL;
+    }
+
+    void* result = Delete(&self->root, item, self->comparator);
+
+    if (result == NULL) {
+        LIST_ERROR("Binary Tree", ListOp_NotFound);
+        return NULL;
+    }
+
+    self->n--;
+    return result;
 }
 
 static void Enumerate(BinaryTreeNode* node, item_handler item_handler)
@@ -119,18 +238,18 @@ static void* Search(
 void* BinaryTree_Search(const BinaryTree* self, const void* item)
 {
     if (self == NULL || item == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return NULL;
     }
 
     void* found = Search(self->root, item, self->comparator);
     if (found == NULL)
-        LIST_ERROR("Search Tree", ListOp_NotFound);
+        LIST_ERROR("Binary Tree", ListOp_NotFound);
 
     return found;
 }
@@ -146,12 +265,12 @@ static void* Min(BinaryTreeNode* root)
 void* BinaryTree_Min(const BinaryTree* self)
 {
     if (self == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return NULL;
     }
 
@@ -169,12 +288,12 @@ static void* Max(BinaryTreeNode* root)
 void* BinaryTree_Max(const BinaryTree* self)
 {
     if (self == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return NULL;
     }
 
@@ -199,7 +318,7 @@ static void* Predecessor(
     const BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
     if (root == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NotFound);
+        LIST_ERROR("Binary Tree", ListOp_NotFound);
         return NULL;
     }
 
@@ -221,12 +340,12 @@ static void* Predecessor(
 void* BinaryTree_Predecessor(const BinaryTree* self, const void* item)
 {
     if (self == NULL || item == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return NULL;
     }
 
@@ -252,7 +371,7 @@ static void* Successor(
     const BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
     if (root == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NotFound);
+        LIST_ERROR("Binary Tree", ListOp_NotFound);
         return NULL;
     }
 
@@ -274,24 +393,17 @@ static void* Successor(
 void* BinaryTree_Successor(const BinaryTree* self, const void* item)
 {
     if (self == NULL || item == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return NULL;
     }
 
     void* succ = Successor(self->root, item, self->comparator);
     return succ;
-}
-
-static size_t RootIndex(const BinaryTreeNode* root)
-{
-    size_t i = root->size - ((root->right == NULL) ? 0 : root->right->size);
-    printf("id=%d, index=%zu\n", *(int*)root->item, i);
-    return i;
 }
 
 static size_t NodeSize(const BinaryTreeNode* node)
@@ -315,17 +427,17 @@ static void* Select(const BinaryTreeNode* root, const size_t index)
 void* BinaryTree_Select(const BinaryTree* self, const size_t index)
 {
     if (self == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return NULL;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return NULL;
     }
 
     if (index >= self->n) {
-        LIST_ERROR("Search Tree", ListOp_InvalidIndex);
+        LIST_ERROR("Binary Tree", ListOp_InvalidIndex);
         return NULL;
     }
 
@@ -353,19 +465,19 @@ size_t Rank(const BinaryTreeNode* root, const void* item, comparator comparator,
 size_t BinaryTree_Rank(const BinaryTree* self, const void* item)
 {
     if (self == NULL || item == NULL) {
-        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        LIST_ERROR("Binary Tree", ListOp_NullParameter);
         return RANK_ERROR;
     }
 
     if (self->n == 0) {
-        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        LIST_ERROR("Binary Tree", ListOp_EmptyList);
         return RANK_ERROR;
     }
 
     size_t result = Rank(self->root, item, self->comparator, 0);
 
     if (result == RANK_ERROR)
-        LIST_ERROR("Search Tree", ListOp_NotFound);
+        LIST_ERROR("Binary Tree", ListOp_NotFound);
 
     return result;
 }
@@ -386,6 +498,9 @@ static void FreeNodes(BinaryTreeNode* node, freer freer)
 
 void BinaryTree_Destroy(BinaryTree* self, freer freer)
 {
+    if (self == NULL)
+        return;
+
     FreeNodes(self->root, freer);
     free(self);
 }
