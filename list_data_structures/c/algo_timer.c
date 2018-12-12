@@ -18,7 +18,7 @@ void* BuildEmptyDataStructure(Structure str)
         return LinkedList_Create(NULL, ptr_comparator);
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
-        return BinaryTree_Create(ptr_comparator, NULL);
+        return BinaryTree_Create(ptr_comparator);
     default:
         return NULL;
     }
@@ -72,7 +72,7 @@ void DestroyStructure(Structure str, void* structure)
         break;
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
-        BinaryTree_Destroy(structure);
+        BinaryTree_Destroy(structure, NULL);
         break;
     }
 }
