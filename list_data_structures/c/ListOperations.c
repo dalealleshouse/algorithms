@@ -1,4 +1,8 @@
+#include <stdint.h>
+
 #include "ListOperations.h"
+
+const size_t RANK_ERROR = SIZE_MAX;
 
 int int_comparator(const void* x, const void* y)
 {

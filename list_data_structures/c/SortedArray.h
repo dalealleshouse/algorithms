@@ -1,10 +1,7 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "Array.h"
-
-const size_t RANK_ERROR;
+#include "ListOperations.h"
 
 void* SortedArray_Search(const Array*, const void*);
 void* SortedArray_Min(const Array*);

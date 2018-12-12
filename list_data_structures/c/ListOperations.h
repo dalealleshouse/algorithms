@@ -5,6 +5,8 @@
 
 #include "include/ErrorReporter.h"
 
+const size_t RANK_ERROR;
+
 #define LIST_ERROR(list_type, result)                                          \
     {                                                                          \
         char str[1000];                                                        \

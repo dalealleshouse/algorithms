@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "SearchTree.h"
@@ -331,7 +332,43 @@ void* SearchTree_Select(const SearchTree* self, const size_t index)
     return Select(self->root, index);
 }
 
-size_t SearchTree_Rank(const SearchTree* self, const void* item) { return 0; }
+size_t Rank(const SearchTreeNode* root, const void* item, comparator comparator,
+    size_t offset)
+{
+    if (root == NULL)
+        return RANK_ERROR;
+
+    int result = comparator(item, root->item);
+
+    size_t left = NodeSize(root->left);
+    if (result == 0)
+        return left + offset;
+
+    if (result < 0)
+        return Rank(root->left, item, comparator, offset);
+
+    return Rank(root->right, item, comparator, offset + left + 1);
+}
+
+size_t SearchTree_Rank(const SearchTree* self, const void* item)
+{
+    if (self == NULL || item == NULL) {
+        LIST_ERROR("Search Tree", ListOp_NullParameter);
+        return RANK_ERROR;
+    }
+
+    if (self->n == 0) {
+        LIST_ERROR("Search Tree", ListOp_EmptyList);
+        return RANK_ERROR;
+    }
+
+    size_t result = Rank(self->root, item, self->comparator, 0);
+
+    if (result == RANK_ERROR)
+        LIST_ERROR("Search Tree", ListOp_NotFound);
+
+    return result;
+}
 
 static void FreeNodes(SearchTreeNode* node, freer freer)
 {

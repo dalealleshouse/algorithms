@@ -556,6 +556,62 @@ static void SearchTree_Select_standard()
     });
 }
 
+/*************************** SearchTree_Rank ********************************/
+static void SearchTree_Rank_null_paramter()
+{
+    SUT({
+        int search_for = 5;
+
+        ErrorReporter_Clear();
+        size_t result = SearchTree_Rank(NULL, NULL);
+        CU_ASSERT_EQUAL(RANK_ERROR, result);
+        CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+
+        ErrorReporter_Clear();
+        result = SearchTree_Rank(sut, NULL);
+        CU_ASSERT_EQUAL(RANK_ERROR, result);
+        CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+
+        ErrorReporter_Clear();
+        result = SearchTree_Rank(NULL, &search_for);
+        CU_ASSERT_EQUAL(RANK_ERROR, result);
+        CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void SearchTree_Rank_empty()
+{
+    EMPTY_SUT({
+        int search_for = 5;
+
+        ErrorReporter_Clear();
+        size_t result = SearchTree_Rank(sut, &search_for);
+        CU_ASSERT_EQUAL(RANK_ERROR, result);
+        CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void SearchTree_Rank_not_found()
+{
+    SUT({
+        int not_found = 401;
+        ErrorReporter_Clear();
+        size_t result = SearchTree_Rank(sut, &not_found);
+        CU_ASSERT_EQUAL(RANK_ERROR, result);
+        CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void SearchTree_Rank_standard()
+{
+    SUT({
+        for (size_t i = 0; i < mock_n; i++) {
+            size_t result = SearchTree_Rank(sut, &mock_ordered[i]);
+            CU_ASSERT_EQUAL(result, i);
+        }
+    });
+}
+
 /*************************** Common *******************************************/
 static void SearchTree_null_parameters()
 {
@@ -634,6 +690,11 @@ int register_search_tree_tests()
               CU_TEST_INFO(SearchTree_Select_out_of_bounds),
               CU_TEST_INFO(SearchTree_Select_standard), CU_TEST_INFO_NULL };
 
+    CU_TestInfo rank_tests[] = { CU_TEST_INFO(SearchTree_Rank_null_paramter),
+        CU_TEST_INFO(SearchTree_Rank_empty),
+        CU_TEST_INFO(SearchTree_Rank_not_found),
+        CU_TEST_INFO(SearchTree_Rank_standard), CU_TEST_INFO_NULL };
+
     CU_TestInfo common_tests[] = { CU_TEST_INFO(SearchTree_null_parameters),
         CU_TEST_INFO(SearchTree_validate_validator), CU_TEST_INFO_NULL };
 
@@ -669,6 +730,10 @@ int register_search_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = select_tests },
+        { .pName = "SearchTree_Rank",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = rank_tests },
         { .pName = "SearchTree Common",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
@@ -678,13 +743,6 @@ int register_search_tree_tests()
     return CU_register_suites(suites);
 }
 
-/* SearchTree* SearchTree_Create(comparator); */
-
 /* ListOpResult SearchTree_Insert(SearchTree*, void*); */
 /* ListOpResult SearchTree_Delete(SearchTree*, void*); */
-
-/* ListOpResult SearchTree_Enumerate(const SearchTree*, item_handler); */
-
-/* void* SearchTree_Select(const SearchTree*, const size_t); */
-/* size_t SearchTree_Rank(const SearchTree*, const void*); */
 /* void SearchTree_Destroy(SearchTree*, freer); */

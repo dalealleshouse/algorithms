@@ -2,8 +2,6 @@
 
 #include "SortedArray.h"
 
-const size_t RANK_ERROR = SIZE_MAX;
-
 static void* BinarySearch(const void* arr, comparator comparator,
     const void* search_for, const size_t n, const size_t item_size)
 {
