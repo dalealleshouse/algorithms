@@ -244,3 +244,26 @@ extract:
 peek:
     Return item at heap_data[0] without removing it from the array
 ```
+
+
+
+## IGNORE
+
+One possible option for mitigating the unbalanced tree problem is to *rotate*
+nodes. This is depicted in the image below. Starting at the root, simply
+*rotate* each node until there are an even number of nodes on either side. It's
+possible to rotate nodes at any level of the tree to obtain balance.
+
+#### Tree Rotation
+![Rotate](tree_rotate.png)
+
+One important thing to note is that rotation is NOT free. Insert and delete
+operations go from ![O(log
+n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) to ![O(2 log
+n)](https://latex.codecogs.com/gif.latex?O(2\log_{2}n)).  Obviously, asymptotic
+notation drops constants so the 2 is irrelevant in that sense; however, rotation
+still presents a real world impact that must be understood. In that same vein,
+with a bit of ingenuity trees support every operation that [Sorted
+Arrays](#sorted-array) do. However, implementing these operation adds
+complexity, memory overhead, and clock cycles. Make sure to fully comprehend the
+trade offs before implementing features.

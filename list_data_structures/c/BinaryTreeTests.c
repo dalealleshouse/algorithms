@@ -65,39 +65,6 @@ static void TreeSizeEqualsNodeCount(BinaryTree* tree)
     CU_ASSERT_EQUAL(tree->n, NodeCount(tree->root));
 }
 
-#ifdef BALANCE
-static size_t abs_size_t(size_t x, size_t y)
-{
-    if (x == y)
-        return 0;
-
-    if (x > y)
-        return x - y;
-
-    return y - x;
-}
-
-static void TreeIsBalanced(BinaryTreeNode* node)
-{
-    if (node == NULL)
-        return;
-
-    TreeIsBalanced(node->left);
-
-    int node_id = *(int*)node->item;
-    size_t left_size = (node->left == NULL) ? 0 : node->left->size;
-    size_t right_size = (node->right == NULL) ? 0 : node->right->size;
-    size_t diff = abs_size_t(left_size, right_size);
-    if (diff > 1) {
-        printf("ASSERT FAILURE on node %d - unbalanced left=%zu, right=%zu\n",
-            node_id, left_size, right_size);
-        CU_FAIL();
-    }
-
-    TreeIsBalanced(node->right);
-}
-#endif
-
 static void NodeIsValid(BinaryTreeNode* node)
 {
     if (node == NULL)
@@ -149,9 +116,6 @@ static void TreeIsValid(BinaryTree* tree, size_t n)
     CU_ASSERT_EQUAL(n, tree->n);
     TreeSizeEqualsNodeCount(tree);
     TreePropertyHolds(tree->root);
-#ifdef BALANCE
-    TreeIsBalanced(tree->root);
-#endif
 }
 
 static BinaryTree* ManuallyGenerateValidTree()

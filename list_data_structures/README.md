@@ -182,13 +182,14 @@ concepts aren't germane to this topic). They are the most complex list data
 structure, so the reader is highly encouraged to thoroughly examine the provided
 source code.
 
-Each item in a binary tree is a node with a left and right pointer. The left
-pointer points to a node with a *lesser valued* item and the right pointer
-points to a node with a *greater valued* item.  The root node can be any node in
-the structure and acts as the entry point. An interesting property of binary
-trees is that there are multiple valid ways to rearrange the data. For instance,
-consider the binary trees depicted below. Both trees are valid, and contain the
-same data.
+Each node in a binary tree has a left and right pointer. The left pointer points
+to a node with a *lesser valued* item and the right pointer points to a node
+with a *greater valued* item. Furthermore, every descendant to the left of a
+given node has a lesser value and likewise every descendant to the right has a
+greater value. The root node can be any node in the structure and acts as the
+entry point. An interesting property of binary trees is that there are multiple
+valid ways to rearrange the data. For instance, consider the binary trees
+depicted below. Both trees are valid, and contain the same data.
 
 #### Binary Tree
 ![Binary Tree](binary_tree.png)
@@ -240,30 +241,146 @@ needs 4 steps in the worst case.
 #### Tree Height
 ![Tree Height](tree-height.png)
 
-One possible option for mitigating the unbalanced tree problem is to *rotate*
-nodes. This is depicted in the image below. Starting at the root, simply
-*rotate* each node until there are an even number of nodes on either side. It's
-possible to rotate nodes at any level of the tree to obtain balance.
-
-#### Tree Rotation
-![Rotate](tree_rotate.png)
-
-One important thing to note is that rotation is NOT free. Insert and delete
-operations go from ![O(log
-n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) to ![O(2 log
-n)](https://latex.codecogs.com/gif.latex?O(2\log_{2}n)).  Obviously, asymptotic
-notation drops constants so the 2 is irrelevant in that sense; however, rotation
-still presents a real world impact that must be understood. In that same vein,
-with a bit of ingenuity trees support every operation that [Sorted
-Arrays](#sorted-array) do. However, implementing these operation adds
-complexity, memory overhead, and clock cycles. Make sure to fully comprehend the
-trade offs before implementing features.
+Balance is a major concern with trees. There are several significantly more
+complicated variations of tree data structures that self balance. These are
+touched upon in the [Data Structures](../data_structures/) section.
 
 As a side note, a more appropriate name may be *inverted* tree because they look
 like an upside down tree. Alas, we are bound by convention. Remember the words
 of Bertrand Russell, "Conventional people are roused to fury by departure from
 convention, largely because they regard such departure as a criticism of
 themselves."
+
+### Pseudo Code
+```
+insert:
+    node: tree node to start from
+    item: item to insert
+
+    if item is less than node:
+        if node->left is NULL:
+            node->left = item
+            return
+        else
+            insert(node->left, item)
+    else
+        if node->right is NULL:
+            node->right = item
+            return
+        else
+            InsertNode(node->right, item)
+
+delete:
+    node: tree node to start from
+    item: item to insert - item will have exactly 0, 1, or 2 children
+
+    if item has 0 children:
+        delete pointer to item in parent node
+        delete item
+
+    if item has 1 child:
+        update item->parent to point to child instead of item
+        update child->parent to item->parent
+        delete item
+
+    // item has 2 children
+    largest_left = largest item in the left subtree
+    delete largest_left from tree
+    replace item with largest_left
+
+search:
+    node: tree node to start from
+    item: item to insert - item will have exactly 0, 1, or 2 children
+
+    if item equal node:
+        return node
+
+    if item is less than node:
+        search(node->left, item)
+
+    // item must be greater than b/c it's not equal or less
+    search(node->right, item)
+
+enumerate:
+    node: tree node to start from
+
+    enumerate(node->left)
+    output node
+    enumerate(node->right)
+
+min:
+    node: tree node to start from
+
+    if node->left == NULL:
+        return node
+
+    return min(node->left)
+
+max:
+    node: tree node to start from
+
+    if node->right == NULL:
+        return node
+
+    return min(node->right)
+
+predecessor:
+    item: item to find predecessor of
+
+    if item->left is not NULL:
+        return max(item->left)
+
+    return first parent of item that is less than item
+
+successor:
+    item: item to find successor of
+
+    if item->right is not NULL:
+        return min(item->right)
+
+    return first parent of item that is greater than item
+
+select:
+    node: tree node to start from
+    index: index of the item to select
+
+    left = number of items in left subtree
+
+    if left equals index:
+        return node
+
+    if index is less than left:
+        return select(node->left, index)
+
+    return select(node->right, index - left - 1)
+
+rank:
+    node: tree node to start from
+    item: item to find rank for
+    offset: accumulative offset of the index
+
+    left = number of items in left subtree
+
+    if node equals item:
+        return left + offset
+
+    if node < item:
+        return rank(node->left, item, offset)
+
+    return rank(node->right, item, offset + left + 1)
+    
+```
+
+The delete operation in the pseudo code above can be a bit tricky to understand
+without a visual. There are three possible paths a delete operation can take:
+
+1. The node to delete has no children (leaf node)
+1. The node to delete has a single child
+1. The node to delete has two children
+
+The image below depicts each path graphically.
+
+![Binary Tree Delete](tree_delete.png)
 
 ### Asymptotic Complexity
 - Insert\Delete: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))

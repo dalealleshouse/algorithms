@@ -131,3 +131,13 @@ following command:
 ``` bash
 docker run --rm -v $(pwd):/src/ dalealleshouse/algo_test_runner_py
 ```
+
+
+## TODO List:
+1. Auto balance binary search tree
+1. Hash Table for list data structures
+1. New run times for all list data structures
+1. Update Shortest Path to use a Heap instead of a naive priority queue
+    - requires a re-prioritize method on the heap implementation which in turn
+        requires a hash table
+1. Actual run time for naive shortest path vs. priority queue shortest path
