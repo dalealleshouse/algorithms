@@ -390,6 +390,8 @@ The image below depicts each path graphically.
 - *Complexity*: The most complex list data structure.
 
 ## Self Balancing Search Trees
+#concept
+
 The previous section on [Binary Trees](#binary-trees) took a few liberties
 concerning asymptotic complexity. The purpose was to meter the amount of new
 concepts introduced; however, with the introductory concepts out of the way it's
@@ -435,15 +437,15 @@ traverse:
 
 As is hopefully clear by now, balance is a major concern with trees. One common
 solution to the balance problem is *rotations*. Conceptually, a rotation is
-turning a node to change the number of nodes on either side. The image below
+rotating a node to change the number of nodes on either side. The image below
 depicts the most simple rotation operations possible.
 
 #### Simple Tree Rotation
 ![Rotate](tree_rotate.png)
 
 Of course, things get more complicated when there are child nodes. Consider the
-rotation depicted in the image below. The red arrow represent pointers that will
-be deleted and the blue arrow represent pointers that will be added.
+rotation depicted in the image below. The red arrows represent pointers that
+will be deleted and the blue arrows represent pointers that will be added.
 
 ![Complex Left Rotation](complex_left_rotation.png)
 
@@ -468,32 +470,17 @@ Much like a left rotation, three things happen in a right rotation.
    pointer (NULL)
 1. The left node's (61) right pointer changes to the rotation node (75)
 
+With a firm grasp of balance and rotation, the concept of a *self balancing*
+tree is simple: it's a tree data structure that performs rotations during insert
+and delete operations in order to ensure the tree stays balanced. This begs the
+question, why would anyone ever use a standard Binary Tree over a Self Balancing
+Tree? The answer is that although rotations are a constant time operation, they
+are by no means free. If data is inserted into a tree in random order,
+statistically, the tree will be balanced and rotation operations are simply
+wasting precious clock cycles. 
 
-
-
-
-
-
-
-----
-## WIP
-One important thing to note is that rotation is NOT free. Insert and delete
-operations go from ![O(log
-n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) to ![O(2 log
-n)](https://latex.codecogs.com/gif.latex?O(2\log_{2}n)).  Obviously, asymptotic
-notation drops constants so the 2 is irrelevant in that sense; however, rotation
-still presents a real world impact that must be understood. In that same vein,
-with a bit of ingenuity trees support every operation that [Sorted
-Arrays](#sorted-array) do. However, implementing these operation adds
-complexity, memory overhead, and clock cycles. Make sure to fully comprehend the
-trade offs before implementing features.
-
-
-
-
-
-There are many different types of *self balancing* search trees including but
-not limited to:
+There are many different types of self balancing search trees including but not
+limited to:
 
 * Red-black trees
 * Splay trees
@@ -508,15 +495,16 @@ not limited to:
 
 Each has slightly different run times characteristics. One could write a book
 simply on tree data structures.  For brevity, this source only examines
-Red-Black trees.  They are fairly simple and representative of all the tree
-variations. In the event that the reader has an exceedingly performance critical
-application for trees, it's highly recommended that they delve deeper into this
-topic. For the majority of applications, the differences are trivial.
+Red-Black trees.  They are fairly representative of all the tree variations. In
+the event that the reader has an exceedingly performance critical application
+for trees, it's highly recommended that they delve deeper into this topic. For
+the majority of applications, the differences are trivial.
 
+## Red-Black Tree
+#data_structure, #list, #graph
 
+### Coming soon...
 
-
-----
 ## Hash Tables
 #data_structure, #list
 

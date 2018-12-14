@@ -250,8 +250,8 @@ static const BinaryTreeNode* Select(
     return Select(root->right, index - left - 1);
 }
 
-static size_t Rank(const BinaryTreeNode* root, const void* item, comparator comparator,
-    size_t offset)
+static size_t Rank(const BinaryTreeNode* root, const void* item,
+    comparator comparator, size_t offset)
 {
     if (root == NULL)
         return RANK_ERROR;
