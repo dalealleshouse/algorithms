@@ -104,14 +104,14 @@ binary_search:
 ```
 
 ### Asymptotic Complexity
-- Search: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+- Search: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
 - Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 - Min: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) 
 - Max: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) 
-- Predecessor: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
-- Successor: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+- Predecessor: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Successor: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
 - Select: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) 
-- Rank: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) 
+- Rank: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
 
 ### Advantages
 - *Array Advantages*: All of the advantages of standard arrays
@@ -157,7 +157,7 @@ Linked lists are especially helpful for applications such as
 - Enumerate: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 
 ### Advantages
-- *Insert\Delete*: ![O(1)](https://latex.codecogs.com/gif.latex?O(1)) operation
+- *Insert\Delete*: Constant time operation
 - *Maintains Order*: Maintains the order in which items are inserted
 
 ### Disadvantages
@@ -177,73 +177,52 @@ Linked lists are especially helpful for applications such as
 #data_structure, #list, #graph
 
 Just like arrays and linked lists, binary trees are another list data structure
-(technically, they are a [graph](../graph_concepts) data structure but graph
-concepts aren't germane to this topic). They are the most complex list data
-structure, so the reader is highly encouraged to thoroughly examine the provided
+(technically, a [graph](../graph_concepts) data structure but graph concepts
+aren't germane to this topic). They are the most complex list data structure, so
+the reader is highly encouraged to thoroughly examine the provided pseudo and
 source code.
 
-Each node in a binary tree has a left and right pointer. The left pointer points
-to a node with a *lesser valued* item and the right pointer points to a node
-with a *greater valued* item. Furthermore, every descendant to the left of a
-given node has a lesser value and likewise every descendant to the right has a
-greater value. The root node can be any node in the structure and acts as the
-entry point. An interesting property of binary trees is that there are multiple
-valid ways to rearrange the data. For instance, consider the binary trees
-depicted below. Both trees are valid, and contain the same data.
+As the name implies, binary trees arrange data in a tree like structure with a
+root, branches, and leaves. Each node in a binary tree has a left and right
+pointer. The left pointer points to a node with a *lesser valued* item and the
+right pointer points to a node with a *greater valued* item. Furthermore, every
+descendant to the left of a given node has a lesser value and likewise every
+descendant to the right has a greater value. The root node can be any node in
+the structure and acts as the entry point. The image below depicts a typical
+binary tree.
 
 #### Binary Tree
 ![Binary Tree](binary_tree.png)
 
-The majority of binary tree operations require a *tree traversal* which is
-simply navigating through the nodes of the tree via a *binary search* (see
-[Sorted Array](#sorted-arrays) section) type algorithm. The pseudo code for a
-binary tree traversal is shown below.
+An interesting property of binary trees is that there are multiple valid ways to
+rearrange data. For instance, consider the binary trees depicted below. Both
+trees are valid, and contain the same data.
 
-```
-traverse:
-    Node = root node of binary tree data structure
-    Item = item to search for
+#### Same Data, Different Valid Arrangements
+![Binary Tree Data Arrangement](tree_data_arrange.png)
 
-    if Node is NULL:
-        return NOT FOUND
+Binary trees provide all the same utility as [Sorted Arrays](#sorted-arrays)
+with the added bonus of performant insert and deletes. The table below compares
+the asymptotic complexity for operations on the two types of data structures. As
+is shown, sorted arrays do have slightly faster run times for some operations.
+However, if insert and delete is a requirement binary trees are always a better
+option.
 
-    if Node->Item is equal to Item:
-        return Node
+|Operation  |Sorted Array   | Binary Tree   |
+|---|---|---|
+|Insert\Delete |![O(n)](https://latex.codecogs.com/gif.latex?O(n))<sup>1</sup> | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
+|Search |![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
+|Enumerate |![O(n)](https://latex.codecogs.com/gif.latex?O(n)) |![O(n + log 2 n)](https://latex.codecogs.com/gif.latex?O(n&plus;\log_{2}n)) |
+|Min\Max |![O(1)](https://latex.codecogs.com/gif.latex?O(1)) |![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
+|Predecessor\Successor | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
+|Select |![O(1)](https://latex.codecogs.com/gif.latex?O(1)) | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
+|Rank |![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
 
-    if Node->Item is greater than Item:
-        traverse(Node->Right, Item)
+<sup>1</sup> While this is technically only a liner run time, array
+insert/delete operations require reallocating larger/smaller chunks of memory
+and rearranging existing data. Therefore, the constant factors hidden by big O
+notation are significant.
 
-    // If it's not equal or greater, it must be less
-    traverse(Node->Left, Item)
-```
-
-Binary tree traversal is typically classified as an ![O(log
-n)](https://latex.codecogs.com/gif.latex?O(\log&space;n)) operation; however,
-this is only true of perfectly *balanced* tree. The first tree in the image
-above represents a balanced tree because each "level" of the tree is as full as
-possible. Consider what would happen if sorted items are inserted as depicted
-below. In this case tree traversals are actually
-![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)").
-
-#### Unbalanced Binary Tree
-![Unbalanced Binary Tree](unbalanced_binary_tree.png)
-
-A more accurate measure of asymptotic complexity for tree traversal is based on
-tree *height* which is defined as the number of nodes from the root to the
-longest leaf. The height will always be between ![log_2
-n](https://latex.codecogs.com/gif.latex?\approx&space;\log_{2}&space;n) and
-![n-1](https://latex.codecogs.com/gif.latex?n-1). Using the examples in the
-image below, the height of the balanced tree is 4 and the height of the
-unbalanced tree is 5. Therefore, the worst case tree traversal on the unbalanced
-tree will take 5 steps. The balanced tree, even though it has more nodes, only
-needs 4 steps in the worst case.
-
-#### Tree Height
-![Tree Height](tree-height.png)
-
-Balance is a major concern with trees. There are several significantly more
-complicated variations of tree data structures that self balance. These are
-touched upon in the [Data Structures](../data_structures/) section.
 
 As a side note, a more appropriate name may be *inverted* tree because they look
 like an upside down tree. Alas, we are bound by convention. Remember the words
@@ -383,17 +362,15 @@ The image below depicts each path graphically.
 ![Binary Tree Delete](tree_delete.png)
 
 ### Asymptotic Complexity
-- Insert\Delete: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Search: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Enumerate:
-    ![O(n +
-    height)](https://latex.codecogs.com/gif.latex?O(n&space;&plus;&space;height))
-- Min: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Max: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Predecessor: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Successor: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Select: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
-- Rank: ![O(height)](https://latex.codecogs.com/gif.latex?O(height))
+- Insert\Delete: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Search: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Enumerate: ![O(n + log 2 n)](https://latex.codecogs.com/gif.latex?O(n&plus;\log_{2}n)) 
+- Min: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Max: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Predecessor: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Successor: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Select: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Rank: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
 
 ### Advantages
 - *Search*: Optimized for quick search operations
@@ -412,6 +389,134 @@ The image below depicts each path graphically.
 - *Maintains Order*: The order in which items are inserted is lost
 - *Complexity*: The most complex list data structure.
 
+## Self Balancing Search Trees
+The previous section on [Binary Trees](#binary-trees) took a few liberties
+concerning asymptotic complexity. The purpose was to meter the amount of new
+concepts introduced; however, with the introductory concepts out of the way it's
+time to correct the oversight.  While most operations were advertised as ![O(log
+2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)), in reality, this is
+only true if the tree is perfectly *balanced*. A balanced tree has the same
+number of children on either side of each node. A more accurate measure of a
+tree's asymptotic complexity is derived from the tree's *height*. The height of
+a tree is the number of nodes from the root to the most distant leaf.  See the
+image below for a graphical reference.
+
+#### Tree Height
+![Tree Height](tree-height.png)
+
+Almost every tree operation requires a tree traversal (see pseudo code below).
+Consider how many steps it takes to traverse the trees in the image above. The
+unbalanced tree will require five steps. Even though the balanced tree has three
+times more nodes, the maximum number of steps to reach any node is four. This
+phenomena compounds quickly as more nodes are inserted. It is more accurate to
+replace all the ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+run times in the previous section with
+![O(height)](https://latex.codecogs.com/gif.latex?O(height)) because traversing
+a completely unbalanced tree is a linear
+(![O(n)](https://latex.codecogs.com/gif.latex?O(n))) operation.
+
+```
+traverse:
+    Node = root node of binary tree data structure
+    Item = item to search for
+
+    if Node is NULL:
+        return NOT FOUND
+
+    if Node->Item is equal to Item:
+        return Node
+
+    if Node->Item is greater than Item:
+        traverse(Node->Right, Item)
+
+    // If it's not equal or greater, it must be less
+    traverse(Node->Left, Item)
+```
+
+As is hopefully clear by now, balance is a major concern with trees. One common
+solution to the balance problem is *rotations*. Conceptually, a rotation is
+turning a node to change the number of nodes on either side. The image below
+depicts the most simple rotation operations possible.
+
+#### Simple Tree Rotation
+![Rotate](tree_rotate.png)
+
+Of course, things get more complicated when there are child nodes. Consider the
+rotation depicted in the image below. The red arrow represent pointers that will
+be deleted and the blue arrow represent pointers that will be added.
+
+![Complex Left Rotation](complex_left_rotation.png)
+
+In order to rotate the root node (50) to the left, three things must happen:
+
+1. The parent of the rotation node (50) becomes the parent of the right node
+   (75). In this case, NULL.
+1. The rotation node's (50) right pointer is updated to the right node's left
+   pointer
+1. The right node's (75) left pointer changes to the rotation node (50)
+
+A similar process occurs when rotating right. In this example, a branch node
+(75) is rotated. Consult the image below.
+
+![Complex Right Rotation](complex_right_rotation.png)
+
+Much like a left rotation, three things happen in a right rotation.
+
+1. The parent (50) of the rotation node (75) becomes the parent of the left node
+   (61).
+1. The rotation node's (75) left pointer is updated to the left node's right
+   pointer (NULL)
+1. The left node's (61) right pointer changes to the rotation node (75)
+
+
+
+
+
+
+
+
+----
+## WIP
+One important thing to note is that rotation is NOT free. Insert and delete
+operations go from ![O(log
+n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) to ![O(2 log
+n)](https://latex.codecogs.com/gif.latex?O(2\log_{2}n)).  Obviously, asymptotic
+notation drops constants so the 2 is irrelevant in that sense; however, rotation
+still presents a real world impact that must be understood. In that same vein,
+with a bit of ingenuity trees support every operation that [Sorted
+Arrays](#sorted-array) do. However, implementing these operation adds
+complexity, memory overhead, and clock cycles. Make sure to fully comprehend the
+trade offs before implementing features.
+
+
+
+
+
+There are many different types of *self balancing* search trees including but
+not limited to:
+
+* Red-black trees
+* Splay trees
+* AA trees
+* AVL trees
+* B-trees
+* 2-3 trees
+* Scapegoat trees
+* Treap trees
+* Weight-Balanced trees
+* etc...
+
+Each has slightly different run times characteristics. One could write a book
+simply on tree data structures.  For brevity, this source only examines
+Red-Black trees.  They are fairly simple and representative of all the tree
+variations. In the event that the reader has an exceedingly performance critical
+application for trees, it's highly recommended that they delve deeper into this
+topic. For the majority of applications, the differences are trivial.
+
+
+
+
+----
 ## Hash Tables
 #data_structure, #list
 

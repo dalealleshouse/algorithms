@@ -63,6 +63,8 @@ Actual run time data
     * [Sorted Array](list_data_structures/README.md#sorted-arrays)
     * [Linked List](list_data_structures/README.md#linked-lists)
     * [Binary Tree](list_data_structures/README.md#binary-trees)
+    * [Self Balancing Search
+        Trees](list_data_structures/README.md#self-balancing-search-trees)
     * [Hash Tables](list_data_structures/README.md#hash-tables)
 * [Data Structures](data_structures/)
     * [Stack](data_structures/README.md#stack-last-in-first-out)
@@ -134,7 +136,6 @@ docker run --rm -v $(pwd):/src/ dalealleshouse/algo_test_runner_py
 
 
 ## TODO List:
-1. Auto balance binary search tree
 1. Hash Table for list data structures
 1. New run times for all list data structures
 1. Update Shortest Path to use a Heap instead of a naive priority queue
