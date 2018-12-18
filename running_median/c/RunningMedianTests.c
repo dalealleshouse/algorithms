@@ -25,8 +25,7 @@ static void RunningMedian_Create_failed_mem_allocation()
 
     FAILED_MALLOC_TEST({ sut = RunningMedian_Create(); });
     CU_ASSERT_PTR_NULL(sut);
-    CU_ASSERT_EQUAL(
-        FailedMemoryAllocation, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(FailedMemoryAllocation, ErrorReporter_LastErrorCode());
 }
 
 static void RunningMedian_Create_happy_path()

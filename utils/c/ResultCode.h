@@ -4,8 +4,8 @@
 #define ERROR(source, result)                                                  \
     {                                                                          \
         char str[1000];                                                        \
-        sprintf(str, "source: %s, %s, %s, %d\n", Result_ErrorMessage(result),  \
-            __FILE__, __FUNCTION__, __LINE__);                                 \
+        sprintf(str, "%s: %s, %s, %s, %d\n", source,                           \
+            Result_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__);    \
                                                                                \
         ErrorReporter_Report(result, str);                                     \
     }

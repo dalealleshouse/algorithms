@@ -47,7 +47,7 @@ static double get_heap_value(Heap* heap)
 {
     void* val = Heap_Find(heap);
     if (val == NULL) {
-        ERROR("Running Median", DependancyError);
+        ERROR("RunningMedian", DependancyError);
         return NAN;
     }
 
@@ -131,20 +131,20 @@ RunningMedian* RunningMedian_Create()
 {
     RunningMedian* rm = malloc(sizeof(RunningMedian));
     if (rm == NULL) {
-        ERROR("Running Median", FailedMemoryAllocation);
+        ERROR("RunningMedian", FailedMemoryAllocation);
         return NULL;
     }
 
     rm->upper = Heap_Create(INITAL_HEAP_SIZE, min_comparator);
     if (rm->upper == NULL) {
-        ERROR("Running Median", DependancyError);
+        ERROR("RunningMedian", DependancyError);
         RunningMedian_Destroy(rm);
         return NULL;
     }
 
     rm->lower = Heap_Create(INITAL_HEAP_SIZE, max_comparator);
     if (rm->lower == NULL) {
-        ERROR("Running Median", DependancyError);
+        ERROR("RunningMedian", DependancyError);
         RunningMedian_Destroy(rm);
         return NULL;
     }
@@ -194,12 +194,12 @@ size_t RunningMedian_GetN(RunningMedian* self)
 double RunningMedian_Median(RunningMedian* self)
 {
     if (self == NULL) {
-        ERROR("Running Median", NullParameter);
+        ERROR("RunningMedian", NullParameter);
         return NAN;
     }
 
     if (self->n == 0) {
-        ERROR("Running Median", Empty);
+        ERROR("RunningMedian", Empty);
         return NAN;
     }
 
