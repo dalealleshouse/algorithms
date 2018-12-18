@@ -47,7 +47,7 @@ static double get_heap_value(Heap* heap)
 {
     void* val = Heap_Find(heap);
     if (val == NULL) {
-        RUNNING_MEDIAN_ERROR(RunningMedianHeapError);
+        ERROR("Running Median", DependancyError);
         return NAN;
     }
 
@@ -85,10 +85,10 @@ static HeapResult heap_insert(Heap* heap, double* value)
  * if there are an odd number of items, there should be one more item in lower
  * than in upper
  */
-static RunningMedianResult balance_heaps(RunningMedian* self)
+static Result balance_heaps(RunningMedian* self)
 {
     if (heap_is_balanced(self))
-        return RunningMedianSuccess;
+        return Success;
 
     Heap* too_many;
     Heap* too_low;
@@ -103,12 +103,13 @@ static RunningMedianResult balance_heaps(RunningMedian* self)
 
     double* temp = Heap_Extract(too_many);
     if (temp == NULL)
-        return RunningMedianHeapError;
+        return DependancyError;
 
     HeapResult result = heap_insert(too_low, temp);
     if (result != HeapSuccess)
-        return RunningMedianHeapError;
-    return RunningMedianSuccess;
+        return DependancyError;
+
+    return Success;
 }
 
 static Heap* find_insert_heap(RunningMedian* self, double value)
@@ -130,20 +131,20 @@ RunningMedian* RunningMedian_Create()
 {
     RunningMedian* rm = malloc(sizeof(RunningMedian));
     if (rm == NULL) {
-        RUNNING_MEDIAN_ERROR(RunningMedianFailedMemoryAllocation);
+        ERROR("Running Median", FailedMemoryAllocation);
         return NULL;
     }
 
     rm->upper = Heap_Create(INITAL_HEAP_SIZE, min_comparator);
     if (rm->upper == NULL) {
-        RUNNING_MEDIAN_ERROR(RunningMedianHeapError);
+        ERROR("Running Median", DependancyError);
         RunningMedian_Destroy(rm);
         return NULL;
     }
 
     rm->lower = Heap_Create(INITAL_HEAP_SIZE, max_comparator);
     if (rm->lower == NULL) {
-        RUNNING_MEDIAN_ERROR(RunningMedianHeapError);
+        ERROR("Running Median", DependancyError);
         RunningMedian_Destroy(rm);
         return NULL;
     }
@@ -152,29 +153,29 @@ RunningMedian* RunningMedian_Create()
     return rm;
 }
 
-RunningMedianResult RunningMedian_Insert(RunningMedian* self, double value)
+Result RunningMedian_Insert(RunningMedian* self, double value)
 {
     if (self == NULL)
-        return RunningMedianNullParamater;
+        return NullParameter;
 
     if (isnan(value) || isinf(value))
-        return RunningMedianInvalidValue;
+        return ArgumentOutOfRange;
 
     double* val = malloc(sizeof(double));
     if (val == NULL)
-        return RunningMedianFailedMemoryAllocation;
+        return FailedMemoryAllocation;
 
     *val = value;
 
     // Find which heap to insert the value into
     Heap* h = find_insert_heap(self, value);
     if (h == NULL)
-        return RunningMedianHeapError;
+        return DependancyError;
 
     // Insert the value
     HeapResult hresult = heap_insert(h, val);
     if (hresult != HeapSuccess)
-        return RunningMedianHeapError;
+        return DependancyError;
 
     self->n++;
 
@@ -193,12 +194,12 @@ size_t RunningMedian_GetN(RunningMedian* self)
 double RunningMedian_Median(RunningMedian* self)
 {
     if (self == NULL) {
-        RUNNING_MEDIAN_ERROR(RunningMedianNullParamater);
+        ERROR("Running Median", NullParameter);
         return NAN;
     }
 
     if (self->n == 0) {
-        RUNNING_MEDIAN_ERROR(RunningMedianEmpty);
+        ERROR("Running Median", Empty);
         return NAN;
     }
 
@@ -213,7 +214,7 @@ double RunningMedian_Median(RunningMedian* self)
 
         double result = (low + high) / 2;
         if (isinf(result))
-            RUNNING_MEDIAN_ERROR(RunningMedianArithmeticOverflow);
+            ERROR("RunningMedian", ArithmeticOverflow);
 
         return result;
     } else
@@ -230,27 +231,4 @@ void RunningMedian_Destroy(RunningMedian* self)
     Heap_Destroy(self->upper, free);
     Heap_Destroy(self->lower, free);
     free(self);
-}
-
-char* RunningMedian_ErrorMessage(RunningMedianResult result)
-{
-    switch (result) {
-    case RunningMedianArithmeticOverflow:
-        return "Running Median - an arithmetic overflow occured";
-    case RunningMedianEmpty:
-        return "Running Medain - no values have been added yet";
-    case RunningMedianInvalidValue:
-        return "Running Median - value is either NaN or Infinity";
-    case RunningMedianFailedMemoryAllocation:
-        return "RunningMedian - Failed Memory Allocation";
-    case RunningMedianNullParamater:
-        return "RunningMedian - Required parameter is NULL";
-    case RunningMedianHeapError:
-        return "RunningMedian - One of the internal heaps returned an "
-               "non-success code";
-    case RunningMedianSuccess:
-        return "RunningMedian - Success";
-    default:
-        return "Unknown error code";
-    }
 }
