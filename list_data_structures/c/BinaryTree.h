@@ -4,18 +4,21 @@
 
 #include "ListOperations.h"
 
+typedef enum { INVALID = 0, BLACK = 1, RED = 2 } COLOR;
+
 typedef struct BinaryTreeNode {
-    size_t size;
     struct BinaryTreeNode* left;
     struct BinaryTreeNode* right;
     struct BinaryTreeNode* parent;
-    void* item;
+    size_t size;
+    void* payload;
+    COLOR color;
 } BinaryTreeNode;
 
 typedef struct {
-    size_t n;
     comparator comparator;
     BinaryTreeNode* root;
+    size_t n;
 } BinaryTree;
 
 BinaryTree* BinaryTree_Create(comparator);
@@ -30,3 +33,8 @@ void* BinaryTree_Successor(const BinaryTree*, const void*);
 void* BinaryTree_Select(const BinaryTree*, const size_t);
 size_t BinaryTree_Rank(const BinaryTree*, const void*);
 void BinaryTree_Destroy(BinaryTree*, freer);
+
+// Replace the insert and delete methods above with these to have a self
+// balancing red black tree
+ListOpResult RedBlackTree_Insert(BinaryTree*, void*);
+void* RedBlackTree_Delete(BinaryTree*, void*);

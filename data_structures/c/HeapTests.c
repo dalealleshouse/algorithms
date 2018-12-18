@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "CUnit/Basic.h"
@@ -6,6 +7,15 @@
 #include "Heap.h"
 #include "include/ErrorReporter.h"
 #include "include/TestHelpers.h"
+
+#define SUT(size, code_block)                                                  \
+    {                                                                          \
+        Heap* sut = CreateSut(size);                                           \
+                                                                               \
+        code_block;                                                            \
+                                                                               \
+        Heap_Destroy(sut, TestHeapObj_Destroy);                                \
+    }
 
 typedef struct TestHeapObj {
     int id;
@@ -106,6 +116,14 @@ static void Heap_Create_intializes_variables()
     CU_ASSERT_PTR_EQUAL(TestComparator, sut->comparator);
 
     Heap_Destroy(sut, NULL);
+}
+
+static void Heap_Create_arith_overflow()
+{
+    ErrorReporter_Clear();
+    Heap* sut = Heap_Create(SIZE_MAX, TestComparator);
+    CU_ASSERT_PTR_NULL(sut);
+    CU_ASSERT_EQUAL(HeapArithmeticOverflow, ErrorReporter_LastErrorCode());
 }
 
 static void Heap_Insert_null_parameter()
@@ -270,6 +288,73 @@ static void Heap_Find_empty()
     Heap_Destroy(sut, NULL);
 }
 
+static void Heap_Resize_null_parameter()
+{
+    HeapResult result = Heap_Resize(NULL, 5);
+    CU_ASSERT_EQUAL(HeapNullParameter, result);
+}
+
+static void Heap_Resize_zero()
+{
+    SUT(10, {
+        HeapResult result = Heap_Resize(sut, 0);
+        CU_ASSERT_EQUAL(HeapInvalidSize, result);
+    });
+}
+
+static void Heap_Resize_too_small()
+{
+    SUT(10, {
+        HeapResult result = Heap_Resize(sut, 9);
+        CU_ASSERT_EQUAL(HeapInvalidSize, result);
+    });
+}
+
+static void Heap_Resize_arith_overflow()
+{
+    SUT(10, {
+        ErrorReporter_Clear();
+        HeapResult result = Heap_Resize(sut, SIZE_MAX);
+        CU_ASSERT_EQUAL(HeapArithmeticOverflow, result);
+    });
+}
+
+static void Heap_Resize_failed_malloc()
+{
+    SUT(10, {
+        FAILED_MALLOC_TEST({
+            HeapResult result = Heap_Resize(sut, 20);
+            CU_ASSERT_EQUAL(HeapFailedMemoryAllocation, result);
+        });
+    });
+}
+
+static void Heap_Resize_smaller_happy_path()
+{
+    SUT(10, {
+        void* item = Heap_Extract(sut);
+        TestHeapObj_Destroy(item);
+        HeapResult result = Heap_Resize(sut, 9);
+
+        CU_ASSERT_EQUAL(HeapSuccess, result);
+        CU_ASSERT_EQUAL(9, sut->size);
+    });
+}
+
+static void Heap_Resize_larger_happy_path()
+{
+    SUT(10, {
+        HeapResult result = Heap_Resize(sut, 20);
+        CU_ASSERT_EQUAL(HeapSuccess, result);
+        CU_ASSERT_EQUAL(20, sut->size);
+
+        TestHeapObj* obj = TestHeapObj_Create(5);
+        result = Heap_Insert(sut, obj);
+        CU_ASSERT_EQUAL(HeapSuccess, result);
+        CU_ASSERT_EQUAL(11, sut->n);
+    });
+}
+
 static void Heap_Destroy_null_parameter() { Heap_Destroy(NULL, free); }
 
 int register_heap_tests()
@@ -278,6 +363,7 @@ int register_heap_tests()
         CU_TEST_INFO(Heap_Create_invalid_size),
         CU_TEST_INFO(Heap_Create_failed_malloc),
         CU_TEST_INFO(Heap_Create_intializes_variables),
+        CU_TEST_INFO(Heap_Create_arith_overflow),
         CU_TEST_INFO(Heap_Insert_null_parameter),
         CU_TEST_INFO(Heap_Insert_first_item),
         CU_TEST_INFO(Heap_Insert_over_size),
@@ -291,7 +377,12 @@ int register_heap_tests()
         CU_TEST_INFO(Heap_Find_null_parameter),
         CU_TEST_INFO(Heap_Find_returns_highest_priority),
         CU_TEST_INFO(Heap_Find_empty), CU_TEST_INFO(Heap_Extract_empty_heap),
-        CU_TEST_INFO_NULL };
+        CU_TEST_INFO(Heap_Resize_null_parameter),
+        CU_TEST_INFO(Heap_Resize_zero), CU_TEST_INFO(Heap_Resize_too_small),
+        CU_TEST_INFO(Heap_Resize_arith_overflow),
+        CU_TEST_INFO(Heap_Resize_failed_malloc),
+        CU_TEST_INFO(Heap_Resize_smaller_happy_path),
+        CU_TEST_INFO(Heap_Resize_larger_happy_path), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Heap",
                                   .pInitFunc = noop,

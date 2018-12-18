@@ -17,6 +17,7 @@
     }
 
 typedef enum {
+    HeapArithmeticOverflow = -6,
     HeapOverflow = -5,
     HeapEmpty = -4,
     HeapFailedMemoryAllocation = -3,
@@ -29,11 +30,12 @@ typedef struct Heap {
     size_t n;
     size_t size;
     comparator comparator;
-    void* data[];
+    void** data;
 } Heap;
 
 Heap* Heap_Create(size_t, comparator);
 HeapResult Heap_Insert(Heap*, void*);
+HeapResult Heap_Resize(Heap*, size_t);
 void* Heap_Extract(Heap*);
 bool Heap_IsEmpty(Heap*);
 void* Heap_Find(Heap*);

@@ -2,6 +2,7 @@
 
 #include "Heap.h"
 #include "include/MemAllocMock.h"
+#include "include/OverflowChecker.h"
 
 static size_t ParentIndex(size_t index)
 {
@@ -85,11 +86,23 @@ Heap* Heap_Create(size_t size, comparator comparator)
         return NULL;
     }
 
-    // TODO: Add overflow protection
-    Heap* self = malloc(sizeof(Heap) + (sizeof(void*) * size));
+    if (is_mul_overflow_size_t(sizeof(void*), size)) {
+        HEAP_ERROR(HeapArithmeticOverflow);
+        return NULL;
+    }
+
+    Heap* self = malloc(sizeof(Heap));
 
     if (self == NULL) {
         HEAP_ERROR(HeapFailedMemoryAllocation);
+        return NULL;
+    }
+
+    self->data = malloc(sizeof(void*) * size);
+
+    if (self->data == NULL) {
+        HEAP_ERROR(HeapFailedMemoryAllocation);
+        Heap_Destroy(self, NULL);
         return NULL;
     }
 
@@ -105,11 +118,12 @@ void Heap_Destroy(Heap* self, freer freer)
     if (self == NULL)
         return;
 
-    if (freer != NULL) {
+    if (freer != NULL && self->data != NULL) {
         for (size_t i = 0; i < self->n; i++)
             freer(self->data[i]);
     }
 
+    free(self->data);
     free(self);
 }
 
@@ -124,6 +138,27 @@ HeapResult Heap_Insert(Heap* self, void* item)
     self->data[self->n] = item;
     BubbleUp(self, self->n);
     self->n++;
+
+    return HeapSuccess;
+}
+
+HeapResult Heap_Resize(Heap* self, size_t size)
+{
+    if (self == NULL)
+        return HeapNullParameter;
+
+    if (size < self->n)
+        return HeapInvalidSize;
+
+    if (is_mul_overflow_size_t(size, sizeof(void*)))
+        return HeapArithmeticOverflow;
+
+    void* new_data = realloc(self->data, sizeof(void*) * size);
+    if (new_data == NULL)
+        return HeapFailedMemoryAllocation;
+
+    self->data = new_data;
+    self->size = size;
 
     return HeapSuccess;
 }
@@ -179,6 +214,8 @@ bool Heap_IsEmpty(Heap* self)
 char* Heap_ErrorMessage(HeapResult result)
 {
     switch (result) {
+    case HeapArithmeticOverflow:
+        return "An operation caused an arithmetic overflow";
     case HeapOverflow:
         return "Attempted to place more items in the heap than it is sized for";
     case HeapEmpty:

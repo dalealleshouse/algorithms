@@ -55,8 +55,8 @@ static void BinaryTree_Checker(void* ds)
 {
     BinaryTree* tree = (BinaryTree*)ds;
 
-    uintptr_t actual = (uintptr_t)tree->root->item;
-    uintptr_t actual_2 = (uintptr_t)tree->root->right->item;
+    uintptr_t actual = (uintptr_t)tree->root->payload;
+    uintptr_t actual_2 = (uintptr_t)tree->root->right->payload;
 
     CU_ASSERT_EQUAL(expected, actual);
     CU_ASSERT_EQUAL(expected_2, actual_2);

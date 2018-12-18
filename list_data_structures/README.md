@@ -435,10 +435,81 @@ traverse:
     traverse(Node->Left, Item)
 ```
 
-As is hopefully clear by now, balance is a major concern with trees. One common
-solution to the balance problem is *rotations*. Conceptually, a rotation is
-rotating a node to change the number of nodes on either side. The image below
-depicts the most simple rotation operations possible.
+As is hopefully clear by now, balance is a major concern with trees. Luckily,
+there are many tree data structures designed to automatically maintain balance.
+These are know as *self balancing search trees*. Examples of such tree include,
+but are not limited to:
+
+* Red-black trees
+* Splay trees
+* AA trees
+* AVL trees
+* B-trees
+* 2-3 trees
+* 2-3-4 trees
+* Scapegoat trees
+* Treaps
+* Weight-Balanced trees
+* etc...
+
+Many of the examples listed above are simply enhanced binary trees. However,
+some are more exotic, such as B-trees which accommodate many keys per node. Each
+variation has slightly different run times characteristics and utility. 
+
+This begs the question, if there are trees capable of self balancing, why would
+anyone use a standard Binary Tree? The answer is that there is overhead
+associated with maintaining balance in the form of both complexity and clock
+cycles (see the [Principal of Parsimony](../data_structures)).  Self balancing
+ensures optimal tree traversals at the cost of less than optimal update and
+insert operations. Therefore, the ratio of insert/delete to traversal operations
+is a consideration. In cases where data is inserted in random order,
+statistically, a standard binary tree will be balanced regardless.  As with most
+cases in computer science, the particular circumstances of individual scenarios
+determine the optimal solution. There is no one right answer.
+
+One could write a book solely on tree data structures. In the event that the
+reader has an exceedingly performance critical application for trees (perhaps
+implementing a database), it's highly recommended that they delve deeper into
+this topic. For the majority of applications, the differences are trivial. For
+brevity, this source only examines Red-Black trees. Red-Black trees are popular
+and the concepts are easily translatable to other tree variations.
+
+## Red-Black Trees
+#data_structure, #list, #graph
+
+A red-black tree is an enhanced binary search tree. All of the constraints,
+operations, and pseudo code defined in [Binary Tree](#binary-trees) also applies
+here. In short, the changes required to make a binary tree a red-black tree are
+additive. Valid red-black trees maintain all Binary Tree properties in addition
+to the following.
+
+1. Every node is designated as either red or black
+1. The root node is always black
+1. Red nodes must have black children and parents. Otherwise stated, consecutive
+   red nodes are prohibited
+1. Every path starting at the root node and ending in a NULL pointer must pass
+   through the same number of black nodes (the path that traverse operations
+   take through the tree when searching for an item that doesn't exist)
+
+Although it's not entirely intuitive from reading these invariants, maintaining
+them ensures that the height of the tree is ![
+log(2,(n+1)](https://latex.codecogs.com/gif.latex?\leq&space;2\log_{2}(n&plus;1)).
+Consider the simplest possible case: a tree with three node. It's not possible
+to arrange the nodes in such a way that it is both unbalanced and also a valid
+red black tree. See the image below (The image does not provide an exhaustive
+account of every invalid variation, the reader is invited to extrapolate).
+
+#### Balance and Red-Black Tree Properties
+![Balance and Red-Black Properties](balance_red_black.png)
+
+If maintaining red-black tree properties ensures balance, the question becomes
+how is it possible to maintain these properties when inserting or deleting
+items. The answer is by two primary mechanisms: *recoloring* and *rotation*. The
+concept of recoloring is fairly self intuitive: changing the color of a node
+from red to black or black to red. Rotations are a more complex topic.
+Conceptually, a rotation is rotating a node to change the number of nodes on
+either side. The image below depicts the most simple rotation operations
+possible.
 
 #### Simple Tree Rotation
 ![Rotate](tree_rotate.png)
@@ -470,40 +541,22 @@ Much like a left rotation, three things happen in a right rotation.
    pointer (NULL)
 1. The left node's (61) right pointer changes to the rotation node (75)
 
-With a firm grasp of balance and rotation, the concept of a *self balancing*
-tree is simple: it's a tree data structure that performs rotations during insert
-and delete operations in order to ensure the tree stays balanced. This begs the
-question, why would anyone ever use a standard Binary Tree over a Self Balancing
-Tree? The answer is that although rotations are a constant time operation, they
-are by no means free. If data is inserted into a tree in random order,
-statistically, the tree will be balanced and rotation operations are simply
-wasting precious clock cycles. 
 
-There are many different types of self balancing search trees including but not
-limited to:
 
-* Red-black trees
-* Splay trees
-* AA trees
-* AVL trees
-* B-trees
-* 2-3 trees
-* Scapegoat trees
-* Treap trees
-* Weight-Balanced trees
-* etc...
 
-Each has slightly different run times characteristics. One could write a book
-simply on tree data structures.  For brevity, this source only examines
-Red-Black trees.  They are fairly representative of all the tree variations. In
-the event that the reader has an exceedingly performance critical application
-for trees, it's highly recommended that they delve deeper into this topic. For
-the majority of applications, the differences are trivial.
 
-## Red-Black Tree
-#data_structure, #list, #graph
 
-### Coming soon...
+Because insert is more simple
+than delete, it is considered first.
+
+
+
+1. Insert new node as usual
+1. Color node red - if parent is black, we're done
+1. If parent is red, the 3rd invariant is violated. Three cases
+    * Case 1. The grandparent's other child is red
+        Recolor grandparent red and grandparent's children black
+
 
 ## Hash Tables
 #data_structure, #list
@@ -516,7 +569,7 @@ The actual run times for performing operations on list data structures are shown
 below.  For details about how the calculations were run, see
 [compare_times.py](c/compare_times.py) and [algo_timer.c](c/algo_timer.c). To
 recreate the data on your machine, navigate to the c directory and execute the
-[time_charts.sh](../../time_charts.sh) bash file.
+[time_charts.sh](../../time_charts.sh) bash file located in the root directory.
 
 ### Insert
 
