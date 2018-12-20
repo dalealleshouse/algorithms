@@ -4,12 +4,14 @@
 #include "BinaryTree.h"
 #include "include/MemAllocMock.h"
 
-static void Delete(BinaryTreeNode**);
-static BinaryTreeNode* Max(BinaryTreeNode*);
+BinaryTreeNode sentinel = { NULL, NULL, NULL, NULL, 0, BLACK };
 
-static void TreeNodeDestroy(BinaryTreeNode* node, freer freer)
+static void delete(BinaryTreeNode**);
+static BinaryTreeNode* max(BinaryTreeNode*);
+
+static void tree_node_destroy(BinaryTreeNode* node, freer freer)
 {
-    if (node == NULL)
+    if (node == &sentinel)
         return;
 
     if (freer != NULL)
@@ -18,22 +20,26 @@ static void TreeNodeDestroy(BinaryTreeNode* node, freer freer)
     free(node);
 }
 
-static BinaryTreeNode* TreeNodeCreate(void* payload)
+static BinaryTreeNode* tree_node_create(void* payload)
 {
     BinaryTreeNode* node = calloc(sizeof(BinaryTreeNode), 1);
     if (node == NULL)
         return NULL;
 
+    node->parent = &sentinel;
+    node->left = &sentinel;
+    node->right = &sentinel;
     node->payload = payload;
     node->size = 1;
+    node->color = BLACK;
 
     return node;
 }
 
-static BinaryTreeNode* Traverse(
+static BinaryTreeNode* traverse(
     BinaryTreeNode* node, const void* search_for, comparator comparator)
 {
-    if (node == NULL)
+    if (node == &sentinel)
         return NULL;
 
     int result = comparator(search_for, node->payload);
@@ -42,66 +48,67 @@ static BinaryTreeNode* Traverse(
         return node;
 
     if (result < 0)
-        return Traverse(node->left, search_for, comparator);
+        return traverse(node->left, search_for, comparator);
 
-    return Traverse(node->right, search_for, comparator);
+    return traverse(node->right, search_for, comparator);
 }
 
-static void InsertNode(
+static void insert_node(
     BinaryTreeNode* root, BinaryTreeNode* new, comparator comparator)
 {
     root->size++;
     int result = comparator(new->payload, root->payload);
 
     if (result <= 0) {
-        if (root->left == NULL) {
+        if (root->left == &sentinel) {
             root->left = new;
             new->parent = root;
         } else {
-            InsertNode(root->left, new, comparator);
+            insert_node(root->left, new, comparator);
         }
         return;
     }
 
-    if (root->right == NULL) {
+    if (root->right == &sentinel) {
         root->right = new;
         new->parent = root;
     } else {
-        InsertNode(root->right, new, comparator);
+        insert_node(root->right, new, comparator);
     }
 }
 
-static void DecrementSize(BinaryTreeNode* node)
+static void decrement_size(BinaryTreeNode* node)
 {
-    if (node == NULL)
+    if (node == &sentinel)
         return;
 
-    DecrementSize(node->parent);
+    decrement_size(node->parent);
     node->size--;
 }
 
-static void DeleteLeaf(BinaryTreeNode** doomed)
+static void delete_leaf(BinaryTreeNode** doomed)
 {
     BinaryTreeNode* node = *doomed;
 
-    DecrementSize(node);
+    decrement_size(node);
 
-    TreeNodeDestroy(node, NULL);
-    *doomed = NULL;
+    tree_node_destroy(node, NULL);
+    *doomed = &sentinel;
 }
 
-static void DeleteDegreeOne(BinaryTreeNode** doomed)
+static void delete_degree_one(BinaryTreeNode** doomed)
 {
     BinaryTreeNode* node = *doomed;
 
-    DecrementSize(node);
-    BinaryTreeNode* child = (node->left != NULL) ? node->left : node->right;
+    decrement_size(node);
+    BinaryTreeNode* child
+        = (node->left != &sentinel) ? node->left : node->right;
     child->parent = node->parent;
-    TreeNodeDestroy(node, NULL);
+    tree_node_destroy(node, NULL);
     *doomed = child;
 }
 
-static BinaryTreeNode** FindParentPointer(BinaryTreeNode* node)
+static BinaryTreeNode** find_parent_pointer(BinaryTreeNode* node)
 {
     BinaryTreeNode* parent = node->parent;
 
@@ -111,72 +118,72 @@ static BinaryTreeNode** FindParentPointer(BinaryTreeNode* node)
     return &parent->right;
 }
 
-static void DeleteDegreeTwo(BinaryTreeNode** doomed)
+static void delete_degree_two(BinaryTreeNode** doomed)
 {
     BinaryTreeNode* node = *doomed;
 
-    BinaryTreeNode* largest_left = Max(node->left);
+    BinaryTreeNode* largest_left = max(node->left);
 
     void* new_value = largest_left->payload;
     node->payload = new_value;
-    BinaryTreeNode** doomed_p = FindParentPointer(largest_left);
-    Delete(doomed_p);
+    BinaryTreeNode** doomed_p = find_parent_pointer(largest_left);
+    delete(doomed_p);
 }
 
-static size_t Degree(BinaryTreeNode* node)
+static size_t degree(BinaryTreeNode* node)
 {
-    return (node->left != NULL) + (node->right != NULL);
+    return (node->left != &sentinel) + (node->right != &sentinel);
 }
 
-static void Delete(BinaryTreeNode** doomed)
+static void delete(BinaryTreeNode** doomed)
 {
     BinaryTreeNode* node = *doomed;
 
-    size_t degree = Degree(node);
+    size_t deg = degree(node);
 
-    switch (degree) {
+    switch (deg) {
     case 0:
-        DeleteLeaf(doomed);
+        delete_leaf(doomed);
         break;
     case 1:
-        DeleteDegreeOne(doomed);
+        delete_degree_one(doomed);
         break;
     case 2:
-        DeleteDegreeTwo(doomed);
+        delete_degree_two(doomed);
         break;
     }
 }
 
-static void Enumerate(BinaryTreeNode* node, item_handler payload_handler)
+static void enumerate(BinaryTreeNode* node, item_handler payload_handler)
 {
-    if (node == NULL)
+    if (node == &sentinel)
         return;
 
-    Enumerate(node->left, payload_handler);
+    enumerate(node->left, payload_handler);
     payload_handler(node->payload);
-    Enumerate(node->right, payload_handler);
+    enumerate(node->right, payload_handler);
 }
 
-static BinaryTreeNode* Min(BinaryTreeNode* root)
+static BinaryTreeNode* min(BinaryTreeNode* root)
 {
-    if (root->left == NULL)
+    if (root->left == &sentinel)
         return root;
 
-    return Min(root->left);
+    return min(root->left);
 }
 
-static BinaryTreeNode* Max(BinaryTreeNode* root)
+static BinaryTreeNode* max(BinaryTreeNode* root)
 {
-    if (root->right == NULL)
+    if (root->right == &sentinel)
         return root;
 
-    return Max(root->right);
+    return max(root->right);
 }
 
-static const BinaryTreeNode* ParentLessThan(
+static const BinaryTreeNode* parent_less_than(
     const BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
-    if (root == NULL)
+    if (root == &sentinel)
         return NULL;
 
     int result = comparator(search_for, root->payload);
@@ -184,28 +191,28 @@ static const BinaryTreeNode* ParentLessThan(
     if (result > 0)
         return root;
 
-    return ParentLessThan(root->parent, search_for, comparator);
+    return parent_less_than(root->parent, search_for, comparator);
 }
 
-static const BinaryTreeNode* Predecessor(
+static const BinaryTreeNode* predecessor(
     BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
-    const BinaryTreeNode* node = Traverse(root, search_for, comparator);
+    const BinaryTreeNode* node = traverse(root, search_for, comparator);
     if (node == NULL) {
         LIST_ERROR("Binary Tree", ListOp_NotFound);
         return NULL;
     }
 
-    if (node->left != NULL)
-        return Max(node->left);
+    if (node->left != &sentinel)
+        return max(node->left);
 
-    return ParentLessThan(node->parent, search_for, comparator);
+    return parent_less_than(node->parent, search_for, comparator);
 }
 
-static const BinaryTreeNode* ParentGreaterThan(
+static const BinaryTreeNode* parent_greater_than(
     const BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
-    if (root == NULL)
+    if (root == &sentinel)
         return NULL;
 
     int result = comparator(search_for, root->payload);
@@ -213,70 +220,72 @@ static const BinaryTreeNode* ParentGreaterThan(
     if (result < 0)
         return root;
 
-    return ParentGreaterThan(root->parent, search_for, comparator);
+    return parent_greater_than(root->parent, search_for, comparator);
 }
 
-static const BinaryTreeNode* Successor(
+static const BinaryTreeNode* successor(
     BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
-    const BinaryTreeNode* node = Traverse(root, search_for, comparator);
+    const BinaryTreeNode* node = traverse(root, search_for, comparator);
     if (node == NULL) {
         LIST_ERROR("Binary Tree", ListOp_NotFound);
         return NULL;
     }
 
-    if (node->right != NULL)
-        return Min(node->right);
+    if (node->right != &sentinel)
+        return min(node->right);
 
-    return ParentGreaterThan(node->parent, search_for, comparator);
+    return parent_greater_than(node->parent, search_for, comparator);
 }
 
-static size_t NodeSize(const BinaryTreeNode* node)
+static size_t node_size(const BinaryTreeNode* node)
 {
     return (node == 0) ? 0 : node->size;
 }
 
-static const BinaryTreeNode* Select(
+static const BinaryTreeNode* select(
     const BinaryTreeNode* root, const size_t index)
 {
-    size_t left = NodeSize(root->left);
+    size_t left = node_size(root->left);
 
     if (left == index)
         return root;
 
     if (index < left)
-        return Select(root->left, index);
+        return select(root->left, index);
 
-    return Select(root->right, index - left - 1);
+    return select(root->right, index - left - 1);
 }
 
-static size_t Rank(const BinaryTreeNode* root, const void* payload,
+static size_t rank(const BinaryTreeNode* root, const void* payload,
     comparator comparator, size_t offset)
 {
-    if (root == NULL)
+    if (root == &sentinel)
         return RANK_ERROR;
 
     int result = comparator(payload, root->payload);
 
-    size_t left = NodeSize(root->left);
+    size_t left = node_size(root->left);
     if (result == 0)
         return left + offset;
 
     if (result < 0)
-        return Rank(root->left, payload, comparator, offset);
+        return rank(root->left, payload, comparator, offset);
 
-    return Rank(root->right, payload, comparator, offset + left + 1);
+    return rank(root->right, payload, comparator, offset + left + 1);
 }
 
-static void FreeNodes(BinaryTreeNode* node, freer freer)
+static void balance(BinaryTreeNode* node) {}
+
+static void free_nodes(BinaryTreeNode* node, freer freer)
 {
-    if (node == NULL)
+    if (node == &sentinel || node == NULL)
         return;
 
-    FreeNodes(node->left, freer);
-    FreeNodes(node->right, freer);
+    free_nodes(node->left, freer);
+    free_nodes(node->right, freer);
 
-    TreeNodeDestroy(node, freer);
+    tree_node_destroy(node, freer);
 }
 
 BinaryTree* BinaryTree_Create(comparator comparator)
@@ -293,6 +302,7 @@ BinaryTree* BinaryTree_Create(comparator comparator)
     }
 
     tree->comparator = comparator;
+    tree->root = &sentinel;
     return tree;
 }
 
@@ -301,14 +311,14 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* payload)
     if (self == NULL || payload == NULL)
         return ListOp_NullParameter;
 
-    BinaryTreeNode* node = TreeNodeCreate(payload);
+    BinaryTreeNode* node = tree_node_create(payload);
     if (node == NULL)
         return ListOp_FailedMalloc;
 
-    if (self->root == NULL)
+    if (self->root == &sentinel)
         self->root = node;
     else
-        InsertNode(self->root, node, self->comparator);
+        insert_node(self->root, node, self->comparator);
 
     self->n++;
     return ListOp_Success;
@@ -326,7 +336,7 @@ void* BinaryTree_Delete(BinaryTree* self, void* payload)
         return NULL;
     }
 
-    BinaryTreeNode* doomed = Traverse(self->root, payload, self->comparator);
+    BinaryTreeNode* doomed = traverse(self->root, payload, self->comparator);
     if (doomed == NULL) {
         LIST_ERROR("Binary Tree", ListOp_NotFound);
         return NULL;
@@ -335,9 +345,9 @@ void* BinaryTree_Delete(BinaryTree* self, void* payload)
     void* result = doomed->payload;
 
     if (doomed == self->root)
-        Delete(&self->root);
+        delete(&self->root);
     else
-        Delete(FindParentPointer(doomed));
+        delete(find_parent_pointer(doomed));
 
     self->n--;
     return result;
@@ -355,7 +365,7 @@ void* BinaryTree_Search(const BinaryTree* self, const void* payload)
         return NULL;
     }
 
-    BinaryTreeNode* found = Traverse(self->root, payload, self->comparator);
+    BinaryTreeNode* found = traverse(self->root, payload, self->comparator);
     if (found == NULL) {
         LIST_ERROR("Binary Tree", ListOp_NotFound);
         return NULL;
@@ -370,7 +380,7 @@ ListOpResult BinaryTree_Enumerate(
     if (self == NULL || payload_handler == NULL)
         return ListOp_NullParameter;
 
-    Enumerate(self->root, payload_handler);
+    enumerate(self->root, payload_handler);
     return ListOp_Success;
 }
 
@@ -386,7 +396,7 @@ void* BinaryTree_Min(const BinaryTree* self)
         return NULL;
     }
 
-    BinaryTreeNode* node = Min(self->root);
+    BinaryTreeNode* node = min(self->root);
     return node->payload;
 }
 
@@ -402,7 +412,7 @@ void* BinaryTree_Max(const BinaryTree* self)
         return NULL;
     }
 
-    BinaryTreeNode* node = Max(self->root);
+    BinaryTreeNode* node = max(self->root);
     return node->payload;
 }
 
@@ -419,7 +429,7 @@ void* BinaryTree_Predecessor(const BinaryTree* self, const void* payload)
     }
 
     const BinaryTreeNode* pred
-        = Predecessor(self->root, payload, self->comparator);
+        = predecessor(self->root, payload, self->comparator);
     if (pred == NULL)
         return NULL;
 
@@ -439,7 +449,7 @@ void* BinaryTree_Successor(const BinaryTree* self, const void* payload)
     }
 
     const BinaryTreeNode* succ
-        = Successor(self->root, payload, self->comparator);
+        = successor(self->root, payload, self->comparator);
     if (succ == NULL)
         return NULL;
 
@@ -463,7 +473,7 @@ void* BinaryTree_Select(const BinaryTree* self, const size_t index)
         return NULL;
     }
 
-    return Select(self->root, index)->payload;
+    return select(self->root, index)->payload;
 }
 
 size_t BinaryTree_Rank(const BinaryTree* self, const void* payload)
@@ -478,7 +488,7 @@ size_t BinaryTree_Rank(const BinaryTree* self, const void* payload)
         return RANK_ERROR;
     }
 
-    size_t result = Rank(self->root, payload, self->comparator, 0);
+    size_t result = rank(self->root, payload, self->comparator, 0);
 
     if (result == RANK_ERROR)
         LIST_ERROR("Binary Tree", ListOp_NotFound);
@@ -491,6 +501,27 @@ void BinaryTree_Destroy(BinaryTree* self, freer freer)
     if (self == NULL)
         return;
 
-    FreeNodes(self->root, freer);
+    free_nodes(self->root, freer);
     free(self);
+}
+
+ListOpResult RedBlackTree_Insert(BinaryTree* self, void* payload)
+{
+    if (self == NULL || payload == NULL)
+        return ListOp_NullParameter;
+
+    BinaryTreeNode* node = tree_node_create(payload);
+    if (node == NULL)
+        return ListOp_FailedMalloc;
+
+    if (self->root == &sentinel)
+        self->root = node;
+    else {
+        insert_node(self->root, node, self->comparator);
+        node->color = RED;
+    }
+
+    self->n++;
+    balance(node);
+    return ListOp_Success;
 }

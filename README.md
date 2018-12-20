@@ -67,12 +67,12 @@ Actual run time data
     * [Self Balancing Search
         Trees](list_data_structures/README.md#self-balancing-search-trees)
     * [Red-Black Trees](list_data_structures/README.md#red-black-trees)
-    * [Hash Tables](list_data_structures/README.md#hash-tables)
 * [Data Structures](data_structures/)
     * [Stack](data_structures/README.md#stack-last-in-first-out)
     * [Queue](data_structures/README.md#queue-first-in-first-out)
     * [Priority Queue](data_structures/README.md#priority-queue)
     * [Heap](data_structures/README.md#heap)
+    * [Hash Tables](data_structures/README.md#hash-tables)
 * [Running Median](running_median/)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)

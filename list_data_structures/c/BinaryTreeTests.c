@@ -5,13 +5,19 @@
 #include "CUnit/CUnit.h"
 
 #include "BinaryTree.h"
-#include "TreeTestHelpers.h"
 #include "include/ErrorReporter.h"
 #include "include/TestHelpers.h"
 
 #define SUT(vals, code_block)                                                  \
     {                                                                          \
-        BinaryTree* sut = CreateSut(vals);                                     \
+        BinaryTree* sut = create_sut(vals);                                    \
+        code_block;                                                            \
+        BinaryTree_Destroy(sut, NULL);                                         \
+    }
+
+#define RED_BLACK_SUT(vals, code_block)                                        \
+    {                                                                          \
+        BinaryTree* sut = create_red_black_sut(vals);                          \
         code_block;                                                            \
         BinaryTree_Destroy(sut, NULL);                                         \
     }
@@ -25,7 +31,7 @@ static int mock_vals[]
 static const int mock_ordered[]
     = { 11, 25, 30, 33, 40, 50, 52, 55, 61, 75, 82, 89, 95, TERMINATOR };
 
-static BinaryTree* CreateSut(int* vals)
+static BinaryTree* create_sut(int* vals)
 {
     BinaryTree* tree = BinaryTree_Create(int_comparator);
 
@@ -35,6 +41,159 @@ static BinaryTree* CreateSut(int* vals)
     }
 
     return tree;
+}
+
+static BinaryTree* create_red_black_sut(int* vals)
+{
+    BinaryTree* tree = BinaryTree_Create(int_comparator);
+
+    while (*vals != TERMINATOR) {
+        RedBlackTree_Insert(tree, vals);
+        vals++;
+    }
+
+    return tree;
+}
+
+static size_t node_count(BinaryTreeNode* node)
+{
+    if (node == &sentinel)
+        return 0;
+
+    size_t nc = node_count(node->left) + node_count(node->right) + 1;
+    if (nc != node->size) {
+        int node_id = *(int*)node->payload;
+        printf("invalid size: id=%d expected=%zu, actual=%zu\n", node_id, nc,
+            node->size);
+        CU_FAIL();
+    }
+    return nc;
+}
+
+static void size_equals_node_count(BinaryTree* tree)
+{
+    CU_ASSERT_EQUAL(tree->n, node_count(tree->root));
+}
+
+static void node_is_valid(BinaryTreeNode* node)
+{
+    if (node == &sentinel)
+        return;
+
+    int node_id = *(int*)node->payload;
+
+    if (node->left != &sentinel) {
+        int result = int_comparator(node->payload, node->left->payload);
+        if (result < 0) {
+            printf(
+                "ASSERT FAILURE on node %d - left item is greater than current",
+                node_id);
+            CU_FAIL();
+        }
+    }
+
+    if (node->right != &sentinel) {
+        int result = int_comparator(node->payload, node->right->payload);
+        if (result > 0) {
+            printf(
+                "ASSERT FAILURE on node %d - right item is less than current",
+                node_id);
+            CU_FAIL();
+        }
+    }
+}
+
+static void tree_property_holds(BinaryTreeNode* node)
+{
+    if (node == &sentinel)
+        return;
+
+    tree_property_holds(node->left);
+    node_is_valid(node);
+    tree_property_holds(node->right);
+}
+
+static void tree_is_valid(BinaryTree* tree, size_t n)
+{
+    CU_ASSERT_PTR_NOT_NULL(tree);
+
+    if (n == 0) {
+        CU_ASSERT_PTR_EQUAL(&sentinel, tree->root);
+    } else {
+        CU_ASSERT_EQUAL(tree->n, tree->root->size);
+    }
+
+    CU_ASSERT_EQUAL(n, tree->n);
+    size_equals_node_count(tree);
+    tree_property_holds(tree->root);
+}
+
+static BinaryTree* generate_valid_tree()
+{
+    const size_t n = 10;
+    BinaryTree* sut = BinaryTree_Create(int_comparator);
+    BinaryTreeNode* nodes[n];
+    for (size_t i = 0; i < n; i++) {
+        size_t* val = malloc(sizeof(size_t));
+        *val = i;
+
+        nodes[i] = calloc(sizeof(BinaryTreeNode), 1);
+        nodes[i]->payload = val;
+    }
+
+    nodes[0]->parent = nodes[1];
+    nodes[0]->left = &sentinel;
+    nodes[0]->right = &sentinel;
+    nodes[0]->size = 1;
+
+    nodes[1]->parent = nodes[2];
+    nodes[1]->left = nodes[0];
+    nodes[1]->right = nodes[3];
+    nodes[1]->size = 4;
+
+    nodes[2]->parent = &sentinel;
+    nodes[2]->left = nodes[1];
+    nodes[2]->right = nodes[7];
+    nodes[2]->size = 10;
+
+    nodes[3]->parent = nodes[1];
+    nodes[3]->left = &sentinel;
+    nodes[3]->right = nodes[4];
+    nodes[3]->size = 2;
+
+    nodes[4]->parent = nodes[3];
+    nodes[4]->left = &sentinel;
+    nodes[4]->right = &sentinel;
+    nodes[4]->size = 1;
+
+    nodes[5]->parent = nodes[6];
+    nodes[5]->left = &sentinel;
+    nodes[5]->right = &sentinel;
+    nodes[5]->size = 1;
+
+    nodes[6]->parent = nodes[7];
+    nodes[6]->left = nodes[5];
+    nodes[6]->right = &sentinel;
+    nodes[6]->size = 2;
+
+    nodes[7]->parent = nodes[2];
+    nodes[7]->left = nodes[6];
+    nodes[7]->right = nodes[8];
+    nodes[7]->size = 5;
+
+    nodes[8]->parent = nodes[7];
+    nodes[8]->left = &sentinel;
+    nodes[8]->right = nodes[9];
+    nodes[8]->size = 2;
+
+    nodes[9]->parent = nodes[8];
+    nodes[9]->left = &sentinel;
+    nodes[9]->right = &sentinel;
+    nodes[9]->size = 1;
+
+    sut->root = nodes[2];
+    sut->n = n;
+    return sut;
 }
 
 /*************************** BinaryTree_Create ********************************/
@@ -60,7 +219,7 @@ static void BinaryTree_Create_init_values()
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_PTR_EQUAL(int_comparator, sut->comparator);
-    CU_ASSERT_PTR_NULL(sut->root);
+    CU_ASSERT_PTR_EQUAL(&sentinel, sut->root);
     CU_ASSERT_EQUAL(0, sut->n);
 
     BinaryTree_Destroy(sut, NULL);
@@ -86,9 +245,9 @@ static void BinaryTree_Insert_creates_root()
 
     ListOpResult result = BinaryTree_Insert(sut, &value);
     CU_ASSERT_EQUAL(ListOp_Success, result);
-    CU_ASSERT_PTR_NOT_NULL(sut->root);
+    CU_ASSERT_PTR_NOT_EQUAL(&sentinel, sut->root);
     CU_ASSERT_EQUAL(1, sut->n);
-    TreeIsValid(sut, 1);
+    tree_is_valid(sut, 1);
 
     BinaryTree_Destroy(sut, NULL);
 }
@@ -102,9 +261,9 @@ static void BinaryTree_Insert_inits_values()
 
     BinaryTreeNode* node = sut->root;
     CU_ASSERT_PTR_EQUAL(&value, node->payload);
-    CU_ASSERT_PTR_NULL(node->left);
-    CU_ASSERT_PTR_NULL(node->right);
-    CU_ASSERT_PTR_NULL(node->parent);
+    CU_ASSERT_PTR_EQUAL(&sentinel, node->left);
+    CU_ASSERT_PTR_EQUAL(&sentinel, node->right);
+    CU_ASSERT_PTR_EQUAL(&sentinel, node->parent);
     CU_ASSERT_EQUAL(1, node->size);
 
     BinaryTree_Destroy(sut, NULL);
@@ -112,17 +271,17 @@ static void BinaryTree_Insert_inits_values()
 
 static void BinaryTree_Insert_maintains_tree_property()
 {
-    SUT(mock_vals, { TreePropertyHolds(sut->root); });
+    SUT(mock_vals, { tree_property_holds(sut->root); });
 }
 
 static void BinaryTree_Insert_sets_size()
 {
-    SUT(mock_vals, { TreeSizeEqualsNodeCount(sut); });
+    SUT(mock_vals, { size_equals_node_count(sut); });
 }
 
 static void BinaryTree_Insert_creates_valid_tree()
 {
-    SUT(mock_vals, { TreeIsValid(sut, mock_n); });
+    SUT(mock_vals, { tree_is_valid(sut, mock_n); });
 }
 
 /*************************** BinaryTree_Delete ********************************/
@@ -153,7 +312,7 @@ static void BinaryTree_Delete_not_found()
         void* result = BinaryTree_Delete(sut, &not_found);
         CU_ASSERT_PTR_NULL(result);
         CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
-        TreeIsValid(sut, mock_n);
+        tree_is_valid(sut, mock_n);
     });
 }
 
@@ -162,7 +321,7 @@ static void BinaryTree_DeleteTest(int doomed)
     SUT(mock_vals, {
         void* result = BinaryTree_Delete(sut, &doomed);
         CU_ASSERT_EQUAL(doomed, *(int*)result);
-        TreeIsValid(sut, mock_n - 1);
+        tree_is_valid(sut, mock_n - 1);
 
         ErrorReporter_Clear();
         void* found = BinaryTree_Search(sut, &doomed);
@@ -186,11 +345,11 @@ static void BinaryTree_Delete_last_item()
             int doomed = mock_ordered[i];
             void* result = BinaryTree_Delete(sut, &doomed);
             CU_ASSERT_EQUAL(doomed, *(int*)result);
-            TreeIsValid(sut, mock_n - i - 1);
+            tree_is_valid(sut, mock_n - i - 1);
         }
 
         CU_ASSERT_EQUAL(0, sut->n);
-        CU_ASSERT_PTR_NULL(sut->root);
+        CU_ASSERT_PTR_EQUAL(&sentinel, sut->root);
     });
 }
 
@@ -201,7 +360,7 @@ static void BinaryTree_Delete_standard()
             int doomed = mock_ordered[i];
             void* result = BinaryTree_Delete(sut, &doomed);
             CU_ASSERT_EQUAL(doomed, *(int*)result);
-            TreeIsValid(sut, mock_n - 1);
+            tree_is_valid(sut, mock_n - 1);
 
             ErrorReporter_Clear();
             void* found = BinaryTree_Search(sut, &doomed);
@@ -536,7 +695,7 @@ static void TestFreer(void* val)
 static void BinaryTree_Destroy_runs_freer()
 {
     free_tracker = 0;
-    BinaryTree* sut = CreateSut(mock_vals);
+    BinaryTree* sut = create_sut(mock_vals);
     BinaryTree_Destroy(sut, TestFreer);
     CU_ASSERT_EQUAL(mock_n, free_tracker);
 }
@@ -568,10 +727,96 @@ static void BinaryTree_null_parameters()
 
 static void BinaryTree_validate_validator()
 {
-    BinaryTree* sut = ManuallyGenerateValidTree();
-    TreeIsValid(sut, 10);
+    BinaryTree* sut = generate_valid_tree();
+    tree_is_valid(sut, 10);
     BinaryTree_Destroy(sut, free);
 }
+
+/*************************** RedBlackTree_Insert ******************************/
+// Every node is designated as either red or black
+static void red_black_invaiant_1(BinaryTreeNode* node)
+{
+    if (node == NULL)
+        return;
+
+    red_black_invaiant_1(node->left);
+    CU_ASSERT_TRUE(node->color == RED || node->color == BLACK);
+    red_black_invaiant_1(node->right);
+}
+
+// Root node is black
+static void red_black_invaiant_2(BinaryTree* tree)
+{
+    CU_ASSERT_TRUE(tree->root->color == BLACK);
+}
+
+// No consecutive red nodes
+static void red_black_invaiant_3(BinaryTreeNode* node)
+{
+    if (node == NULL)
+        return;
+
+    red_black_invaiant_3(node->left);
+    if (node->color == RED) {
+        if (node->parent != NULL)
+            CU_ASSERT_TRUE(node->parent->color == BLACK);
+
+        if (node->left != NULL)
+            CU_ASSERT_TRUE(node->left->color == BLACK);
+
+        if (node->right != NULL)
+            CU_ASSERT_TRUE(node->right->color == BLACK);
+    }
+    red_black_invaiant_3(node->right);
+}
+
+// Every path starting at the root node and ending in a NULL pointer must pass
+// through the same number of black nodes
+static void red_black_invaiant_4(BinaryTree* tree) {}
+
+static void red_black_tree_is_valid(BinaryTree* tree, size_t n)
+{
+    tree_is_valid(tree, n);
+    red_black_invaiant_1(tree->root);
+    red_black_invaiant_2(tree);
+    red_black_invaiant_3(tree->root);
+    red_black_invaiant_4(tree);
+}
+
+static void RedBlackTree_Insert_failed_mem_allocation()
+{
+    BinaryTree* sut = BinaryTree_Create(int_comparator);
+    int value = 5;
+    ListOpResult result;
+
+    FAILED_MALLOC_TEST({ result = RedBlackTree_Insert(sut, &value); })
+
+    CU_ASSERT_EQUAL(ListOp_FailedMalloc, result);
+    BinaryTree_Destroy(sut, NULL);
+}
+
+static void RedBlackTree_Insert_creates_root()
+{
+    int vals[] = { 5, TERMINATOR };
+    RED_BLACK_SUT(vals, {
+        CU_ASSERT_PTR_NOT_NULL(sut->root);
+        red_black_tree_is_valid(sut, 1);
+    });
+}
+
+static void RedBlackTree_Insert_sets_first_child_red()
+{
+    int vals[] = { 5, 10, 2, TERMINATOR };
+    RED_BLACK_SUT(vals, {
+        CU_ASSERT_PTR_NOT_NULL(sut->root);
+        CU_ASSERT_EQUAL(RED, sut->root->right->color);
+        red_black_tree_is_valid(sut, 3);
+    });
+}
+
+static void RedBlackTree_Insert_sets_size() { CU_FAIL(); }
+
+static void RedBlackTree_Insert_creates_valid_tree() { CU_FAIL(); }
 
 int register_search_tree_tests()
 {
@@ -641,6 +886,12 @@ int register_search_tree_tests()
     CU_TestInfo common_tests[] = { CU_TEST_INFO(BinaryTree_null_parameters),
         CU_TEST_INFO(BinaryTree_validate_validator), CU_TEST_INFO_NULL };
 
+    CU_TestInfo red_black_insert_tests[]
+        = { CU_TEST_INFO(RedBlackTree_Insert_failed_mem_allocation),
+              CU_TEST_INFO(RedBlackTree_Insert_creates_root),
+              CU_TEST_INFO(RedBlackTree_Insert_sets_first_child_red),
+              CU_TEST_INFO_NULL };
+
     CU_SuiteInfo suites[] = { { .pName = "BinaryTree_Create",
                                   .pInitFunc = noop,
                                   .pCleanupFunc = noop,
@@ -689,6 +940,10 @@ int register_search_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = common_tests },
+        { .pName = "RedBlackTree_Insert",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = red_black_insert_tests },
         CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);

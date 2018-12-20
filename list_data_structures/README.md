@@ -437,7 +437,7 @@ traverse:
 
 As is hopefully clear by now, balance is a major concern with trees. Luckily,
 there are many tree data structures designed to automatically maintain balance.
-These are know as *self balancing search trees*. Examples of such tree include,
+These are know as *self balancing search trees*. Examples of such trees include,
 but are not limited to:
 
 * Red-black trees
@@ -478,7 +478,7 @@ and the concepts are easily translatable to other tree variations.
 #data_structure, #list, #graph
 
 A red-black tree is an enhanced binary search tree. All of the constraints,
-operations, and pseudo code defined in [Binary Tree](#binary-trees) also applies
+operations, and pseudo code defined in [Binary Tree](#binary-trees) also apply
 here. In short, the changes required to make a binary tree a red-black tree are
 additive. Valid red-black trees maintain all Binary Tree properties in addition
 to the following.
@@ -496,7 +496,7 @@ them ensures that the height of the tree is ![
 log(2,(n+1)](https://latex.codecogs.com/gif.latex?\leq&space;2\log_{2}(n&plus;1)).
 Consider the simplest possible case: a tree with three node. It's not possible
 to arrange the nodes in such a way that it is both unbalanced and also a valid
-red black tree. See the image below (The image does not provide an exhaustive
+red-black tree. See the image below (The image does not provide an exhaustive
 account of every invalid variation, the reader is invited to extrapolate).
 
 #### Balance and Red-Black Tree Properties
@@ -518,6 +518,7 @@ Of course, things get more complicated when there are child nodes. Consider the
 rotation depicted in the image below. The red arrows represent pointers that
 will be deleted and the blue arrows represent pointers that will be added.
 
+#### Left Rotation
 ![Complex Left Rotation](complex_left_rotation.png)
 
 In order to rotate the root node (50) to the left, three things must happen:
@@ -531,6 +532,7 @@ In order to rotate the root node (50) to the left, three things must happen:
 A similar process occurs when rotating right. In this example, a branch node
 (75) is rotated. Consult the image below.
 
+#### Right Rotation
 ![Complex Right Rotation](complex_right_rotation.png)
 
 Much like a left rotation, three things happen in a right rotation.
@@ -540,6 +542,8 @@ Much like a left rotation, three things happen in a right rotation.
 1. The rotation node's (75) left pointer is updated to the left node's right
    pointer (NULL)
 1. The left node's (61) right pointer changes to the rotation node (75)
+
+
 
 
 
@@ -556,12 +560,6 @@ than delete, it is considered first.
 1. If parent is red, the 3rd invariant is violated. Three cases
     * Case 1. The grandparent's other child is red
         Recolor grandparent red and grandparent's children black
-
-
-## Hash Tables
-#data_structure, #list
-
-### Coming soon...
 
 ## Actual Run Times
 

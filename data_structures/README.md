@@ -244,3 +244,7 @@ extract:
 peek:
     Return item at heap_data[0] without removing it from the array
 ```
+
+## Hash Tables
+
+### Coming Soon

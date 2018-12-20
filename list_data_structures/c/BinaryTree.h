@@ -10,8 +10,8 @@ typedef struct BinaryTreeNode {
     struct BinaryTreeNode* left;
     struct BinaryTreeNode* right;
     struct BinaryTreeNode* parent;
-    size_t size;
     void* payload;
+    size_t size;
     COLOR color;
 } BinaryTreeNode;
 
@@ -20,6 +20,8 @@ typedef struct {
     BinaryTreeNode* root;
     size_t n;
 } BinaryTree;
+
+BinaryTreeNode sentinel;
 
 BinaryTree* BinaryTree_Create(comparator);
 ListOpResult BinaryTree_Insert(BinaryTree*, void*);
