@@ -323,6 +323,45 @@ static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot)
     pivot->parent->size = pivot->size + pivot->parent->left->size + 1;
 }
 
+static int node_value(BinaryTreeNode* node)
+{
+    if (node == &NULL_NODE)
+        return -1;
+
+    if (node == NULL)
+        return -2;
+
+    return *(int*)node->payload;
+}
+
+static char* color(COLOR color)
+{
+    switch (color) {
+    case RED:
+        return "red";
+    case BLACK:
+        return "black";
+    default:
+        return "invalid";
+    }
+}
+
+void BinaryTree_Print(BinaryTreeNode* node)
+{
+    if (node == &NULL_NODE)
+        return;
+
+    if (node->left == &NULL_NODE && node->right == &NULL_NODE)
+        return;
+
+    printf("root=%d_%s, left=%d_%s, right=%d_%s\n", node_value(node),
+        color(node->color), node_value(node->left), color(node->left->color),
+        node_value(node->right), color(node->right->color));
+
+    BinaryTree_Print(node->left);
+    BinaryTree_Print(node->right);
+}
+
 static void balance(BinaryTree* tree, BinaryTreeNode* root)
 {
     while (root->parent->color == RED) {

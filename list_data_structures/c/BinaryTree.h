@@ -39,7 +39,6 @@ void BinaryTree_Destroy(BinaryTree*, freer);
 ListOpResult BinaryTree_RotateLeft(BinaryTree*, const void*);
 ListOpResult BinaryTree_RotateRight(BinaryTree*, const void*);
 
-// Replace the insert and delete methods above with these to have a self
-// balancing red black tree
+// Replace the insert methods above with these to have a self balancing red
+// black tree
 ListOpResult RedBlackTree_Insert(BinaryTree*, void*);
-void* RedBlackTree_Delete(BinaryTree*, void*);

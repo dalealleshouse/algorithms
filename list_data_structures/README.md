@@ -554,43 +554,75 @@ actual a red-black tree insert operation. There are four primary steps:
 1. Restore red-black tree invariants
 
 The first three steps are self-explanatory while the fourth is fairly complex;
-therefore, step four is the focus for the remainder of this section.  There are
-two scenarios that break the invariants. First, each scenario is examined at a
-high level below. A few details are missing from this section in order to make
-the material more accessible. However, the pseudo code as well as accompanying
-source code is complete and should be studied assiduously.
+therefore, it is the focus for the remainder of this section. Restoring the
+red-black invariants is a recursive process starting at the inserted node. Below
+is an outline for the algorithm.
 
-Scenario one occurs when the inserted node's uncle is red. To restore the
-invariant, the grandparent's color is changed to red, and it's children are
-changed to black.  This is depicted graphically in the image below.
+1. Parent is black
+    * terminate
+    * if root is red, recolor to black
+1. Uncle is red
+    * recolor parent black
+    * recolor uncle black
+    * recolor grandparent red
+    * recurse on grandparent
+1. Uncle is black or NULL
+    * parent is a left branch
+        - node is a right branch
+            * rotate parent left
+            * recurse on parent
+        - node is a left branch
+            * change parent color to black
+            * change grandparent color to red
+            * rotate grandparent right
+            * recurse on node
+    * parent is a right branch or NULL
+        - node is a left branch
+            * rotate parent right
+            * recurse on parent
+        - node is a right branch
+            * change parent color it black
+            * change grandparent color to red
+            * rotate grandparent left
+            * recurse on node
 
-#### Scenario One - Uncle is Red
-![Red-Black Insert Scenario One](red_black_insert_case_1.png)
+Don't worry if this seems a bit overwhelming. It's normal to review red-black
+tree insertions several times before comprehension sets in. It's also difficult
+to fathom without a concrete example. The image below steps through the process
+graphically.
 
-After recoloring, the procedure will recurse on the grandparent. In the case
-above, the grandparent (100) has a black parent so the procedure terminates.
-Consider another example as demonstrated in the image below. In this case, after
-recoloring, the grandparent's (75) parent (100) is red so there is still a
-red-black tree violation. In this case though, the uncle node is black.
+![Red-Black Insert](red_black_insert.png)
 
-#### Scenario Two - Uncle is Black or NULL
+In order to keep these concepts as accessible as possible, a few abstruse
+details were omitted. However, the pseudo code as well as accompanying source
+code are rigorously complete and should be studied assiduously. With a firm
+understanding of the red-black trees from a conceptual level, understanding the
+code should be trivial. Additionally, there are no details of deletions are
+provided. The reader is encouraged to implement delete on their own.
 
+### Pseudo Code
 
+### Asymptotic Complexity
+- Insert\Delete: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Search: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Enumerate: ![O(n + log 2 n)](https://latex.codecogs.com/gif.latex?O(n&plus;\log_{2}n)) 
+- Min: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Max: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Predecessor: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Successor: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Select: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
+- Rank: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
 
+### Advantages
+- *Binary Tree*: Because a red-black tree is essentially an enhanced binary
+    tree, it has the same advantages.
+- *Search*: Optimized for quick search operations. Guaranteed to remain balanced
+    regardless of insertion order.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Disadvantages
+- *Binary Tree*: Because a red-black tree is essentially an enhanced binary
+    tree, it has the same disadvantages.
+- *Complexity*: Added complexity beyond Binary Trees.
 
 ## Actual Run Times
 

@@ -42,34 +42,6 @@ static int node_value(BinaryTreeNode* node)
     return *(int*)node->payload;
 }
 
-static char* color(COLOR color)
-{
-    switch (color) {
-    case RED:
-        return "red";
-    case BLACK:
-        return "black";
-    default:
-        return "invalid";
-    }
-}
-
-static void print(BinaryTreeNode* node)
-{
-    if (node == &NULL_NODE)
-        return;
-
-    if (node->left == &NULL_NODE && node->right == &NULL_NODE)
-        return;
-
-    printf("root=%d_%s, left=%d_%s, right=%d_%s\n", node_value(node),
-        color(node->color), node_value(node->left), color(node->left->color),
-        node_value(node->right), color(node->right->color));
-
-    print(node->left);
-    print(node->right);
-}
-
 static BinaryTree* create_sut(int* vals)
 {
     BinaryTree* tree = BinaryTree_Create(int_comparator);
@@ -915,17 +887,12 @@ static void red_black_invaiant_3(BinaryTreeNode* node)
     red_black_invaiant_3(node->right);
 }
 
-// Every path starting at the root node and ending in a NULL pointer must pass
-// through the same number of black nodes
-static void red_black_invaiant_4(BinaryTree* tree) {}
-
 static void red_black_tree_is_valid(BinaryTree* tree, size_t n)
 {
     tree_is_valid(tree, n);
     red_black_invaiant_1(tree->root);
     red_black_invaiant_2(tree);
     red_black_invaiant_3(tree->root);
-    red_black_invaiant_4(tree);
 }
 
 static void RedBlackTree_Insert_failed_mem_allocation()
@@ -970,8 +937,11 @@ static void RedBlackTree_Insert_recolor()
 
 static void RedBlackTree_Insert_rotations()
 {
-    int vals[] = { 11, 2, 1, 7, 8, 5, 14, 15, 4, TERMINATOR };
-    RED_BLACK_SUT(vals, { red_black_tree_is_valid(sut, 9); });
+    int vals[] = { 11, 2, 1, 7, 8, 5, 14, 15, 4, 16, TERMINATOR };
+    RED_BLACK_SUT(vals, { red_black_tree_is_valid(sut, 10); });
+
+    int vals2[] = { 50, 25, 100, 10, 30, 75, 150, 60, 80, 200, 55, TERMINATOR };
+    RED_BLACK_SUT(vals2, { red_black_tree_is_valid(sut, 11); });
 }
 
 int register_search_tree_tests()
@@ -1059,8 +1029,7 @@ int register_search_tree_tests()
               CU_TEST_INFO(RedBlackTree_Insert_recolor),
               CU_TEST_INFO(RedBlackTree_Insert_rotations), CU_TEST_INFO_NULL };
 
-    CU_SuiteInfo suites[] = {
-        { .pName = "BinaryTree_Create",
+    CU_SuiteInfo suites[] = { { .pName = "BinaryTree_Create",
                                   .pInitFunc = noop,
                                   .pCleanupFunc = noop,
                                   .pTests = create_tests },
@@ -1116,8 +1085,7 @@ int register_search_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = red_black_insert_tests },
-        CU_SUITE_INFO_NULL
-    };
+        CU_SUITE_INFO_NULL };
 
     return CU_register_suites(suites);
 }
