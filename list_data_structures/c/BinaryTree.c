@@ -294,6 +294,9 @@ static void left_rotate(BinaryTree* self, BinaryTreeNode* pivot)
 
     temp->left = pivot;
     pivot->parent = temp;
+
+    pivot->size = pivot->left->size + pivot->right->size + 1;
+    pivot->parent->size = pivot->size + pivot->parent->right->size + 1;
 }
 
 static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot)
@@ -315,6 +318,9 @@ static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot)
 
     temp->right = pivot;
     pivot->parent = temp;
+
+    pivot->size = pivot->left->size + pivot->right->size + 1;
+    pivot->parent->size = pivot->size + pivot->parent->left->size + 1;
 }
 
 static void balance(BinaryTree* tree, BinaryTreeNode* root)
