@@ -601,6 +601,53 @@ code should be trivial. Additionally, there are no details of deletions are
 provided. The reader is encouraged to implement delete on their own.
 
 ### Pseudo Code
+```
+global variables:
+    NULL_NODE = black tree node - replaces all NULL parents and leafs. This
+        simplifies the algorithm
+
+insert:
+    T = binary tree
+    new_node = node to insert into the tree
+
+    binary tree insert (see binary tree pseudo code)
+    new_node->left = NULL_NODE
+    new_node->right = NULL_NODE
+    new_node->color = red
+
+    node = new_node
+    while new->node->parent == red:
+        if node->parent == node->grandparent->left:
+            uncle = node->grandparent->right
+            if uncle->color == red:
+                uncle->color = black
+                node->parent->color = black
+                node->grandparent->color = red
+                node = node->grandparent
+            else if node = node->parent->right
+                node = node->parent
+                left_rotate(node)
+            else
+                node->parent->color = black
+                node->grandparent->color = red
+                right_rotate(node->grandparent)
+        else
+            uncle = node->parent->parent->left
+            if uncle->color == red:
+                uncle->color = black
+                node->parent->color = black
+                node->grandparent->color = red
+                node = node->grandparent
+            else if node = node->parent->left
+                node = node->parent
+                left_rotate(node)
+            else
+                node->parent->color = black
+                node->grandparent->color = red
+                left_rotate(node->grandparent)
+
+    T->root->color = black        
+```
 
 ### Asymptotic Complexity
 - Insert\Delete: ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n))
