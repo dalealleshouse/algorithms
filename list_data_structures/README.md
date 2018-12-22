@@ -483,6 +483,7 @@ here. In short, the changes required to make a binary tree a red-black tree are
 additive. Valid red-black trees maintain all Binary Tree properties in addition
 to the following.
 
+#### Red-Black Tree Properties (aka invariants)
 1. Every node is designated as either red or black
 1. The root node is always black
 1. Red nodes must have black children and parents. Otherwise stated, consecutive
@@ -511,7 +512,7 @@ Conceptually, a rotation is rotating a node to change the number of nodes on
 either side. The image below depicts the most simple rotation operations
 possible.
 
-#### Simple Tree Rotation
+#### Simple Tree Rotations
 ![Rotate](tree_rotate.png)
 
 Of course, things get more complicated when there are child nodes. Consider the
@@ -543,6 +544,36 @@ Much like a left rotation, three things happen in a right rotation.
    pointer (NULL)
 1. The left node's (61) right pointer changes to the rotation node (75)
 
+With the preliminary concepts out of the way, it's finally time to consider an
+actual a red-black tree insert operation. There are four primary steps:
+
+#### Red-Black Insert at a High Level
+1. Insert using the Binary Tree insert algorithm
+1. Color the new node red
+1. If the new node's parent is black, no invariants are broken so terminate
+1. Restore red-black tree invariants
+
+The first three steps are self-explanatory while the fourth is fairly complex;
+therefore, step four is the focus for the remainder of this section.  There are
+two scenarios that break the invariants. First, each scenario is examined at a
+high level below. A few details are missing from this section in order to make
+the material more accessible. However, the pseudo code as well as accompanying
+source code is complete and should be studied assiduously.
+
+Scenario one occurs when the inserted node's uncle is red. To restore the
+invariant, the grandparent's color is changed to red, and it's children are
+changed to black.  This is depicted graphically in the image below.
+
+#### Scenario One - Uncle is Red
+![Red-Black Insert Scenario One](red_black_insert_case_1.png)
+
+After recoloring, the procedure will recurse on the grandparent. In the case
+above, the grandparent (100) has a black parent so the procedure terminates.
+Consider another example as demonstrated in the image below. In this case, after
+recoloring, the grandparent's (75) parent (100) is red so there is still a
+red-black tree violation. In this case though, the uncle node is black.
+
+#### Scenario Two - Uncle is Black or NULL
 
 
 
@@ -550,16 +581,16 @@ Much like a left rotation, three things happen in a right rotation.
 
 
 
-Because insert is more simple
-than delete, it is considered first.
 
 
 
-1. Insert new node as usual
-1. Color node red - if parent is black, we're done
-1. If parent is red, the 3rd invariant is violated. Three cases
-    * Case 1. The grandparent's other child is red
-        Recolor grandparent red and grandparent's children black
+
+
+
+
+
+
+
 
 ## Actual Run Times
 

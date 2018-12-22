@@ -31,6 +31,45 @@ static int mock_vals[]
 static const int mock_ordered[]
     = { 11, 25, 30, 33, 40, 50, 52, 55, 61, 75, 82, 89, 95, TERMINATOR };
 
+static int node_value(BinaryTreeNode* node)
+{
+    if (node == &NULL_NODE)
+        return -1;
+
+    if (node == NULL)
+        return -2;
+
+    return *(int*)node->payload;
+}
+
+static char* color(COLOR color)
+{
+    switch (color) {
+    case RED:
+        return "red";
+    case BLACK:
+        return "black";
+    default:
+        return "invalid";
+    }
+}
+
+static void print(BinaryTreeNode* node)
+{
+    if (node == &NULL_NODE)
+        return;
+
+    if (node->left == &NULL_NODE && node->right == &NULL_NODE)
+        return;
+
+    printf("root=%d_%s, left=%d_%s, right=%d_%s\n", node_value(node),
+        color(node->color), node_value(node->left), color(node->left->color),
+        node_value(node->right), color(node->right->color));
+
+    print(node->left);
+    print(node->right);
+}
+
 static BinaryTree* create_sut(int* vals)
 {
     BinaryTree* tree = BinaryTree_Create(int_comparator);
@@ -57,7 +96,7 @@ static BinaryTree* create_red_black_sut(int* vals)
 
 static size_t node_count(BinaryTreeNode* node)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return 0;
 
     size_t nc = node_count(node->left) + node_count(node->right) + 1;
@@ -77,12 +116,12 @@ static void size_equals_node_count(BinaryTree* tree)
 
 static void node_is_valid(BinaryTreeNode* node)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return;
 
     int node_id = *(int*)node->payload;
 
-    if (node->left != &sentinel) {
+    if (node->left != &NULL_NODE) {
         int result = int_comparator(node->payload, node->left->payload);
         if (result < 0) {
             printf(
@@ -92,7 +131,7 @@ static void node_is_valid(BinaryTreeNode* node)
         }
     }
 
-    if (node->right != &sentinel) {
+    if (node->right != &NULL_NODE) {
         int result = int_comparator(node->payload, node->right->payload);
         if (result > 0) {
             printf(
@@ -105,7 +144,7 @@ static void node_is_valid(BinaryTreeNode* node)
 
 static void tree_property_holds(BinaryTreeNode* node)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return;
 
     tree_property_holds(node->left);
@@ -118,7 +157,7 @@ static void tree_is_valid(BinaryTree* tree, size_t n)
     CU_ASSERT_PTR_NOT_NULL(tree);
 
     if (n == 0) {
-        CU_ASSERT_PTR_EQUAL(&sentinel, tree->root);
+        CU_ASSERT_PTR_EQUAL(&NULL_NODE, tree->root);
     } else {
         CU_ASSERT_EQUAL(tree->n, tree->root->size);
     }
@@ -142,8 +181,8 @@ static BinaryTree* generate_valid_tree()
     }
 
     nodes[0]->parent = nodes[1];
-    nodes[0]->left = &sentinel;
-    nodes[0]->right = &sentinel;
+    nodes[0]->left = &NULL_NODE;
+    nodes[0]->right = &NULL_NODE;
     nodes[0]->size = 1;
 
     nodes[1]->parent = nodes[2];
@@ -151,29 +190,29 @@ static BinaryTree* generate_valid_tree()
     nodes[1]->right = nodes[3];
     nodes[1]->size = 4;
 
-    nodes[2]->parent = &sentinel;
+    nodes[2]->parent = &NULL_NODE;
     nodes[2]->left = nodes[1];
     nodes[2]->right = nodes[7];
     nodes[2]->size = 10;
 
     nodes[3]->parent = nodes[1];
-    nodes[3]->left = &sentinel;
+    nodes[3]->left = &NULL_NODE;
     nodes[3]->right = nodes[4];
     nodes[3]->size = 2;
 
     nodes[4]->parent = nodes[3];
-    nodes[4]->left = &sentinel;
-    nodes[4]->right = &sentinel;
+    nodes[4]->left = &NULL_NODE;
+    nodes[4]->right = &NULL_NODE;
     nodes[4]->size = 1;
 
     nodes[5]->parent = nodes[6];
-    nodes[5]->left = &sentinel;
-    nodes[5]->right = &sentinel;
+    nodes[5]->left = &NULL_NODE;
+    nodes[5]->right = &NULL_NODE;
     nodes[5]->size = 1;
 
     nodes[6]->parent = nodes[7];
     nodes[6]->left = nodes[5];
-    nodes[6]->right = &sentinel;
+    nodes[6]->right = &NULL_NODE;
     nodes[6]->size = 2;
 
     nodes[7]->parent = nodes[2];
@@ -182,13 +221,13 @@ static BinaryTree* generate_valid_tree()
     nodes[7]->size = 5;
 
     nodes[8]->parent = nodes[7];
-    nodes[8]->left = &sentinel;
+    nodes[8]->left = &NULL_NODE;
     nodes[8]->right = nodes[9];
     nodes[8]->size = 2;
 
     nodes[9]->parent = nodes[8];
-    nodes[9]->left = &sentinel;
-    nodes[9]->right = &sentinel;
+    nodes[9]->left = &NULL_NODE;
+    nodes[9]->right = &NULL_NODE;
     nodes[9]->size = 1;
 
     sut->root = nodes[2];
@@ -219,7 +258,7 @@ static void BinaryTree_Create_init_values()
 
     CU_ASSERT_PTR_NOT_NULL(sut);
     CU_ASSERT_PTR_EQUAL(int_comparator, sut->comparator);
-    CU_ASSERT_PTR_EQUAL(&sentinel, sut->root);
+    CU_ASSERT_PTR_EQUAL(&NULL_NODE, sut->root);
     CU_ASSERT_EQUAL(0, sut->n);
 
     BinaryTree_Destroy(sut, NULL);
@@ -245,7 +284,7 @@ static void BinaryTree_Insert_creates_root()
 
     ListOpResult result = BinaryTree_Insert(sut, &value);
     CU_ASSERT_EQUAL(ListOp_Success, result);
-    CU_ASSERT_PTR_NOT_EQUAL(&sentinel, sut->root);
+    CU_ASSERT_PTR_NOT_EQUAL(&NULL_NODE, sut->root);
     CU_ASSERT_EQUAL(1, sut->n);
     tree_is_valid(sut, 1);
 
@@ -261,9 +300,9 @@ static void BinaryTree_Insert_inits_values()
 
     BinaryTreeNode* node = sut->root;
     CU_ASSERT_PTR_EQUAL(&value, node->payload);
-    CU_ASSERT_PTR_EQUAL(&sentinel, node->left);
-    CU_ASSERT_PTR_EQUAL(&sentinel, node->right);
-    CU_ASSERT_PTR_EQUAL(&sentinel, node->parent);
+    CU_ASSERT_PTR_EQUAL(&NULL_NODE, node->left);
+    CU_ASSERT_PTR_EQUAL(&NULL_NODE, node->right);
+    CU_ASSERT_PTR_EQUAL(&NULL_NODE, node->parent);
     CU_ASSERT_EQUAL(1, node->size);
 
     BinaryTree_Destroy(sut, NULL);
@@ -349,7 +388,7 @@ static void BinaryTree_Delete_last_item()
         }
 
         CU_ASSERT_EQUAL(0, sut->n);
-        CU_ASSERT_PTR_EQUAL(&sentinel, sut->root);
+        CU_ASSERT_PTR_EQUAL(&NULL_NODE, sut->root);
     });
 }
 
@@ -732,6 +771,117 @@ static void BinaryTree_validate_validator()
     BinaryTree_Destroy(sut, free);
 }
 
+/*************************** BinaryTree_RotateLeft ****************************/
+static void tree_has_values(BinaryTreeNode* sut, BinaryTreeNode* expected)
+{
+    if (expected == NULL && sut == NULL)
+        return;
+
+    int actual = node_value(sut);
+    int exp = node_value(expected);
+
+    if (exp != actual) {
+        printf("expected=%d, node actual=%d\n", exp, actual);
+        CU_FAIL("Unexpected value");
+    }
+
+    if (expected == &NULL_NODE || sut == &NULL_NODE)
+        return;
+
+    tree_has_values(sut->left, expected->left);
+    tree_has_values(sut->right, expected->right);
+}
+
+static void test_rotate(int* vals, int* expected_vals, int pivot, int n,
+    ListOpResult (*rotate)(BinaryTree*, const void*))
+{
+    SUT(vals, {
+        ListOpResult result = rotate(sut, &pivot);
+        CU_ASSERT_EQUAL(ListOp_Success, result);
+        tree_is_valid(sut, n);
+
+        BinaryTree* expected = create_sut(expected_vals);
+        tree_has_values(sut->root, expected->root);
+        BinaryTree_Destroy(expected, NULL);
+    });
+}
+
+static void BinaryTree_RotateLeft_null_parameter()
+{
+    int search_for = 5;
+    SUT(mock_vals,
+        { BINARY_INT_NULL_TEST(
+            ListOp_NullParameter, sut, &search_for, BinaryTree_RotateLeft) });
+}
+
+static void BinaryTree_RotateLeft_not_found()
+{
+    int not_found = 401;
+
+    SUT(mock_vals, {
+        ListOpResult result = BinaryTree_RotateLeft(sut, &not_found);
+        CU_ASSERT_EQUAL(ListOp_NotFound, result);
+    });
+}
+
+static void BinaryTree_RotateLeft_simple()
+{
+    int vals[] = { 30, 50, 75, TERMINATOR };
+    int expected_vals[] = { 50, 30, 75, TERMINATOR };
+    test_rotate(vals, expected_vals, 30, 3, BinaryTree_RotateLeft);
+}
+
+static void BinaryTree_RotateLeft_happy_path()
+{
+    int vals[]
+        = { 7, 4, 11, 3, 6, 9, 18, 2, 14, 19, 12, 17, 22, 20, TERMINATOR };
+    int expected_vals[]
+        = { 7, 4, 18, 3, 6, 11, 19, 2, 9, 14, 22, 12, 17, 20, TERMINATOR };
+    test_rotate(vals, expected_vals, 11, 14, BinaryTree_RotateLeft);
+
+    int vals2[] = { 50, 25, 75, 61, 89, TERMINATOR };
+    int expected_vals2[] = { 75, 50, 89, 25, 61, TERMINATOR };
+    test_rotate(vals2, expected_vals2, 50, 5, BinaryTree_RotateLeft);
+}
+
+static void BinaryTree_RotateRight_null_parameter()
+{
+    int search_for = 5;
+    SUT(mock_vals,
+        { BINARY_INT_NULL_TEST(
+            ListOp_NullParameter, sut, &search_for, BinaryTree_RotateRight) });
+}
+
+static void BinaryTree_RotateRight_not_found()
+{
+    int not_found = 401;
+
+    SUT(mock_vals, {
+        ListOpResult result = BinaryTree_RotateRight(sut, &not_found);
+        CU_ASSERT_EQUAL(ListOp_NotFound, result);
+    });
+}
+
+static void BinaryTree_RotateRight_simple()
+{
+    int vals[] = { 30, 25, 20, TERMINATOR };
+    int expected_vals[] = { 25, 20, 30, TERMINATOR };
+    test_rotate(vals, expected_vals, 30, 3, BinaryTree_RotateRight);
+}
+
+static void BinaryTree_RotateRight_happy_path()
+{
+    int vals[]
+        = { 7, 4, 18, 3, 6, 11, 19, 2, 9, 14, 22, 12, 17, 20, TERMINATOR };
+    int expected_vals[]
+        = { 7, 4, 11, 3, 6, 9, 18, 2, 14, 19, 12, 17, 22, 20, TERMINATOR };
+    test_rotate(vals, expected_vals, 18, 14, BinaryTree_RotateRight);
+
+    int vals2[] = { 50, 25, 75, 61, 89, 52, 65, TERMINATOR };
+    int expected_vals2[] = { 50, 25, 61, 52, 75, 65, 89, TERMINATOR };
+    test_rotate(vals2, expected_vals2, 75, 7, BinaryTree_RotateRight);
+}
+
 /*************************** RedBlackTree_Insert ******************************/
 // Every node is designated as either red or black
 static void red_black_invaiant_1(BinaryTreeNode* node)
@@ -753,19 +903,14 @@ static void red_black_invaiant_2(BinaryTree* tree)
 // No consecutive red nodes
 static void red_black_invaiant_3(BinaryTreeNode* node)
 {
-    if (node == NULL)
+    if (node == &NULL_NODE)
         return;
 
     red_black_invaiant_3(node->left);
     if (node->color == RED) {
-        if (node->parent != NULL)
-            CU_ASSERT_TRUE(node->parent->color == BLACK);
-
-        if (node->left != NULL)
-            CU_ASSERT_TRUE(node->left->color == BLACK);
-
-        if (node->right != NULL)
-            CU_ASSERT_TRUE(node->right->color == BLACK);
+        CU_ASSERT_TRUE(node->parent->color == BLACK);
+        CU_ASSERT_TRUE(node->left->color == BLACK);
+        CU_ASSERT_TRUE(node->right->color == BLACK);
     }
     red_black_invaiant_3(node->right);
 }
@@ -799,7 +944,7 @@ static void RedBlackTree_Insert_creates_root()
 {
     int vals[] = { 5, TERMINATOR };
     RED_BLACK_SUT(vals, {
-        CU_ASSERT_PTR_NOT_NULL(sut->root);
+        CU_ASSERT_PTR_NOT_EQUAL(&NULL_NODE, sut->root);
         red_black_tree_is_valid(sut, 1);
     });
 }
@@ -808,15 +953,26 @@ static void RedBlackTree_Insert_sets_first_child_red()
 {
     int vals[] = { 5, 10, 2, TERMINATOR };
     RED_BLACK_SUT(vals, {
-        CU_ASSERT_PTR_NOT_NULL(sut->root);
         CU_ASSERT_EQUAL(RED, sut->root->right->color);
+        CU_ASSERT_EQUAL(RED, sut->root->left->color);
         red_black_tree_is_valid(sut, 3);
     });
 }
 
-static void RedBlackTree_Insert_sets_size() { CU_FAIL(); }
+static void RedBlackTree_Insert_recolor()
+{
+    int vals[] = { 10, 5, 15, 12, TERMINATOR };
+    RED_BLACK_SUT(vals, {
+        CU_ASSERT_EQUAL(10, *(int*)sut->root->payload);
+        red_black_tree_is_valid(sut, 4);
+    });
+}
 
-static void RedBlackTree_Insert_creates_valid_tree() { CU_FAIL(); }
+static void RedBlackTree_Insert_rotations()
+{
+    int vals[] = { 11, 2, 1, 7, 8, 5, 14, 15, 4, TERMINATOR };
+    RED_BLACK_SUT(vals, { red_black_tree_is_valid(sut, 9); });
+}
 
 int register_search_tree_tests()
 {
@@ -886,65 +1042,81 @@ int register_search_tree_tests()
     CU_TestInfo common_tests[] = { CU_TEST_INFO(BinaryTree_null_parameters),
         CU_TEST_INFO(BinaryTree_validate_validator), CU_TEST_INFO_NULL };
 
+    CU_TestInfo rotate_tests[] = { CU_TEST_INFO(
+                                       BinaryTree_RotateLeft_null_parameter),
+        CU_TEST_INFO(BinaryTree_RotateLeft_not_found),
+        CU_TEST_INFO(BinaryTree_RotateLeft_simple),
+        CU_TEST_INFO(BinaryTree_RotateLeft_happy_path),
+        CU_TEST_INFO(BinaryTree_RotateRight_null_parameter),
+        CU_TEST_INFO(BinaryTree_RotateRight_not_found),
+        CU_TEST_INFO(BinaryTree_RotateRight_simple),
+        CU_TEST_INFO(BinaryTree_RotateRight_happy_path), CU_TEST_INFO_NULL };
+
     CU_TestInfo red_black_insert_tests[]
         = { CU_TEST_INFO(RedBlackTree_Insert_failed_mem_allocation),
               CU_TEST_INFO(RedBlackTree_Insert_creates_root),
               CU_TEST_INFO(RedBlackTree_Insert_sets_first_child_red),
-              CU_TEST_INFO_NULL };
+              CU_TEST_INFO(RedBlackTree_Insert_recolor),
+              CU_TEST_INFO(RedBlackTree_Insert_rotations), CU_TEST_INFO_NULL };
 
-    CU_SuiteInfo suites[] = { { .pName = "BinaryTree_Create",
-                                  .pInitFunc = noop,
-                                  .pCleanupFunc = noop,
-                                  .pTests = create_tests },
-        { .pName = "BinaryTree_Insert",
+    CU_SuiteInfo suites[] = { /* { .pName = "BinaryTree_Create", */
+        /*                           .pInitFunc = noop, */
+        /*                           .pCleanupFunc = noop, */
+        /*                           .pTests = create_tests }, */
+        /* { .pName = "BinaryTree_Insert", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = insert_tests }, */
+        /* { .pName = "BinaryTree_Delete", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = delete_tests }, */
+        /* { .pName = "BinaryTree_Enumerate", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = enumerate_tests }, */
+        /* { .pName = "BinaryTree_Search", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = search_tests }, */
+        /* { .pName = "BinaryTree_Min and BinaryTree_Max", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = min_max_tests }, */
+        /* { .pName = "BinaryTree_Predecessor", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = predecessor_tests }, */
+        /* { .pName = "BinaryTree_Successor", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = successor_tests }, */
+        /* { .pName = "BinaryTree_Select", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = select_tests }, */
+        /* { .pName = "BinaryTree_Rank", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = rank_tests }, */
+        /* { .pName = "BinaryTree_Destroy", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = destroy_tests }, */
+        /* { .pName = "BinaryTree Common", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = common_tests }, */
+        { .pName = "BinaryTree Rotations",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
-            .pTests = insert_tests },
-        { .pName = "BinaryTree_Delete",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = delete_tests },
-        { .pName = "BinaryTree_Enumerate",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = enumerate_tests },
-        { .pName = "BinaryTree_Search",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = search_tests },
-        { .pName = "BinaryTree_Min and BinaryTree_Max",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = min_max_tests },
-        { .pName = "BinaryTree_Predecessor",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = predecessor_tests },
-        { .pName = "BinaryTree_Successor",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = successor_tests },
-        { .pName = "BinaryTree_Select",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = select_tests },
-        { .pName = "BinaryTree_Rank",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = rank_tests },
-        { .pName = "BinaryTree_Destroy",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = destroy_tests },
-        { .pName = "BinaryTree Common",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = common_tests },
-        { .pName = "RedBlackTree_Insert",
-            .pInitFunc = noop,
-            .pCleanupFunc = noop,
-            .pTests = red_black_insert_tests },
-        CU_SUITE_INFO_NULL };
+            .pTests = rotate_tests },
+        /* { .pName = "RedBlackTree_Insert", */
+        /*     .pInitFunc = noop, */
+        /*     .pCleanupFunc = noop, */
+        /*     .pTests = red_black_insert_tests }, */
+        CU_SUITE_INFO_NULL
+    };
 
     return CU_register_suites(suites);
 }

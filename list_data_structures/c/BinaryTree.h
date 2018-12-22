@@ -21,7 +21,7 @@ typedef struct {
     size_t n;
 } BinaryTree;
 
-BinaryTreeNode sentinel;
+BinaryTreeNode NULL_NODE;
 
 BinaryTree* BinaryTree_Create(comparator);
 ListOpResult BinaryTree_Insert(BinaryTree*, void*);
@@ -35,6 +35,9 @@ void* BinaryTree_Successor(const BinaryTree*, const void*);
 void* BinaryTree_Select(const BinaryTree*, const size_t);
 size_t BinaryTree_Rank(const BinaryTree*, const void*);
 void BinaryTree_Destroy(BinaryTree*, freer);
+
+ListOpResult BinaryTree_RotateLeft(BinaryTree*, const void*);
+ListOpResult BinaryTree_RotateRight(BinaryTree*, const void*);
 
 // Replace the insert and delete methods above with these to have a self
 // balancing red black tree

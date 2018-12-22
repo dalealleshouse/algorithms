@@ -4,14 +4,14 @@
 #include "BinaryTree.h"
 #include "include/MemAllocMock.h"
 
-BinaryTreeNode sentinel = { NULL, NULL, NULL, NULL, 0, BLACK };
+BinaryTreeNode NULL_NODE = { NULL, NULL, NULL, NULL, 0, BLACK };
 
-static void delete(BinaryTreeNode**);
+static void delete (BinaryTreeNode**);
 static BinaryTreeNode* max(BinaryTreeNode*);
 
 static void tree_node_destroy(BinaryTreeNode* node, freer freer)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return;
 
     if (freer != NULL)
@@ -26,9 +26,9 @@ static BinaryTreeNode* tree_node_create(void* payload)
     if (node == NULL)
         return NULL;
 
-    node->parent = &sentinel;
-    node->left = &sentinel;
-    node->right = &sentinel;
+    node->parent = &NULL_NODE;
+    node->left = &NULL_NODE;
+    node->right = &NULL_NODE;
     node->payload = payload;
     node->size = 1;
     node->color = BLACK;
@@ -39,7 +39,7 @@ static BinaryTreeNode* tree_node_create(void* payload)
 static BinaryTreeNode* traverse(
     BinaryTreeNode* node, const void* search_for, comparator comparator)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return NULL;
 
     int result = comparator(search_for, node->payload);
@@ -60,7 +60,7 @@ static void insert_node(
     int result = comparator(new->payload, root->payload);
 
     if (result <= 0) {
-        if (root->left == &sentinel) {
+        if (root->left == &NULL_NODE) {
             root->left = new;
             new->parent = root;
         } else {
@@ -69,7 +69,7 @@ static void insert_node(
         return;
     }
 
-    if (root->right == &sentinel) {
+    if (root->right == &NULL_NODE) {
         root->right = new;
         new->parent = root;
     } else {
@@ -79,7 +79,7 @@ static void insert_node(
 
 static void decrement_size(BinaryTreeNode* node)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return;
 
     decrement_size(node->parent);
@@ -93,7 +93,7 @@ static void delete_leaf(BinaryTreeNode** doomed)
     decrement_size(node);
 
     tree_node_destroy(node, NULL);
-    *doomed = &sentinel;
+    *doomed = &NULL_NODE;
 }
 
 static void delete_degree_one(BinaryTreeNode** doomed)
@@ -102,7 +102,7 @@ static void delete_degree_one(BinaryTreeNode** doomed)
 
     decrement_size(node);
     BinaryTreeNode* child
-        = (node->left != &sentinel) ? node->left : node->right;
+        = (node->left != &NULL_NODE) ? node->left : node->right;
     child->parent = node->parent;
     tree_node_destroy(node, NULL);
     *doomed = child;
@@ -127,15 +127,15 @@ static void delete_degree_two(BinaryTreeNode** doomed)
     void* new_value = largest_left->payload;
     node->payload = new_value;
     BinaryTreeNode** doomed_p = find_parent_pointer(largest_left);
-    delete(doomed_p);
+    delete (doomed_p);
 }
 
 static size_t degree(BinaryTreeNode* node)
 {
-    return (node->left != &sentinel) + (node->right != &sentinel);
+    return (node->left != &NULL_NODE) + (node->right != &NULL_NODE);
 }
 
-static void delete(BinaryTreeNode** doomed)
+static void delete (BinaryTreeNode** doomed)
 {
     BinaryTreeNode* node = *doomed;
 
@@ -156,7 +156,7 @@ static void delete(BinaryTreeNode** doomed)
 
 static void enumerate(BinaryTreeNode* node, item_handler payload_handler)
 {
-    if (node == &sentinel)
+    if (node == &NULL_NODE)
         return;
 
     enumerate(node->left, payload_handler);
@@ -166,7 +166,7 @@ static void enumerate(BinaryTreeNode* node, item_handler payload_handler)
 
 static BinaryTreeNode* min(BinaryTreeNode* root)
 {
-    if (root->left == &sentinel)
+    if (root->left == &NULL_NODE)
         return root;
 
     return min(root->left);
@@ -174,7 +174,7 @@ static BinaryTreeNode* min(BinaryTreeNode* root)
 
 static BinaryTreeNode* max(BinaryTreeNode* root)
 {
-    if (root->right == &sentinel)
+    if (root->right == &NULL_NODE)
         return root;
 
     return max(root->right);
@@ -183,7 +183,7 @@ static BinaryTreeNode* max(BinaryTreeNode* root)
 static const BinaryTreeNode* parent_less_than(
     const BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
-    if (root == &sentinel)
+    if (root == &NULL_NODE)
         return NULL;
 
     int result = comparator(search_for, root->payload);
@@ -203,7 +203,7 @@ static const BinaryTreeNode* predecessor(
         return NULL;
     }
 
-    if (node->left != &sentinel)
+    if (node->left != &NULL_NODE)
         return max(node->left);
 
     return parent_less_than(node->parent, search_for, comparator);
@@ -212,7 +212,7 @@ static const BinaryTreeNode* predecessor(
 static const BinaryTreeNode* parent_greater_than(
     const BinaryTreeNode* root, const void* search_for, comparator comparator)
 {
-    if (root == &sentinel)
+    if (root == &NULL_NODE)
         return NULL;
 
     int result = comparator(search_for, root->payload);
@@ -232,7 +232,7 @@ static const BinaryTreeNode* successor(
         return NULL;
     }
 
-    if (node->right != &sentinel)
+    if (node->right != &NULL_NODE)
         return min(node->right);
 
     return parent_greater_than(node->parent, search_for, comparator);
@@ -260,7 +260,7 @@ static const BinaryTreeNode* select(
 static size_t rank(const BinaryTreeNode* root, const void* payload,
     comparator comparator, size_t offset)
 {
-    if (root == &sentinel)
+    if (root == &NULL_NODE)
         return RANK_ERROR;
 
     int result = comparator(payload, root->payload);
@@ -275,11 +275,92 @@ static size_t rank(const BinaryTreeNode* root, const void* payload,
     return rank(root->right, payload, comparator, offset + left + 1);
 }
 
-static void balance(BinaryTreeNode* node) {}
+static void left_rotate(BinaryTree* self, BinaryTreeNode* pivot)
+{
+    BinaryTreeNode* temp = pivot->right;
+    pivot->right = temp->left;
+
+    if (temp->left != &NULL_NODE)
+        temp->left->parent = pivot;
+
+    temp->parent = pivot->parent;
+
+    if (pivot->parent == &NULL_NODE)
+        self->root = temp;
+    else if (pivot == pivot->parent->left)
+        pivot->parent->left = temp;
+    else
+        pivot->parent->right = temp;
+
+    temp->left = pivot;
+    pivot->parent = temp;
+}
+
+static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot)
+{
+    BinaryTreeNode* temp = pivot->left;
+    pivot->left = temp->right;
+
+    if (temp->right != &NULL_NODE)
+        temp->right->parent = pivot;
+
+    temp->parent = pivot->parent;
+
+    if (pivot->parent == &NULL_NODE)
+        self->root = temp;
+    else if (pivot == pivot->parent->right)
+        pivot->parent->right = temp;
+    else
+        pivot->parent->left = temp;
+
+    temp->right = pivot;
+    pivot->parent = temp;
+}
+
+static void balance(BinaryTree* tree, BinaryTreeNode* root)
+{
+    while (root->parent->color == RED) {
+        // parent->parent will never be null because this method should never be
+        // called on the root node and the root node's parent is NULL_NODE.
+        if (root->parent == root->parent->parent->left) {
+            BinaryTreeNode* uncle = root->parent->parent->right;
+            if (uncle->color == RED) {
+                root->parent->color = BLACK;
+                uncle->color = BLACK;
+                root->parent->parent->color = RED;
+                root = root->parent->parent;
+            } else if (root == root->parent->right) {
+                root = root->parent;
+                left_rotate(tree, root);
+            } else {
+                root->parent->color = BLACK;
+                root->parent->parent->color = RED;
+                right_rotate(tree, root->parent->parent);
+            }
+        } else {
+            BinaryTreeNode* uncle = root->parent->parent->left;
+            if (uncle->color == RED) {
+                root->parent->color = BLACK;
+                uncle->color = BLACK;
+                root->parent->parent->color = RED;
+                root = root->parent->parent;
+            } else if (root == root->parent->left) {
+                root = root->parent;
+                right_rotate(tree, root);
+            } else {
+                root->parent->color = BLACK;
+                root->parent->parent->color = RED;
+                left_rotate(tree, root->parent->parent);
+            }
+        }
+    }
+
+    tree->root->color = BLACK;
+}
 
 static void free_nodes(BinaryTreeNode* node, freer freer)
 {
-    if (node == &sentinel || node == NULL)
+    if (node == &NULL_NODE || node == NULL)
         return;
 
     free_nodes(node->left, freer);
@@ -302,7 +383,7 @@ BinaryTree* BinaryTree_Create(comparator comparator)
     }
 
     tree->comparator = comparator;
-    tree->root = &sentinel;
+    tree->root = &NULL_NODE;
     return tree;
 }
 
@@ -315,7 +396,7 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* payload)
     if (node == NULL)
         return ListOp_FailedMalloc;
 
-    if (self->root == &sentinel)
+    if (self->root == &NULL_NODE)
         self->root = node;
     else
         insert_node(self->root, node, self->comparator);
@@ -345,9 +426,9 @@ void* BinaryTree_Delete(BinaryTree* self, void* payload)
     void* result = doomed->payload;
 
     if (doomed == self->root)
-        delete(&self->root);
+        delete (&self->root);
     else
-        delete(find_parent_pointer(doomed));
+        delete (find_parent_pointer(doomed));
 
     self->n--;
     return result;
@@ -505,6 +586,32 @@ void BinaryTree_Destroy(BinaryTree* self, freer freer)
     free(self);
 }
 
+ListOpResult BinaryTree_RotateLeft(BinaryTree* self, const void* item)
+{
+    if (self == NULL || item == NULL)
+        return ListOp_NullParameter;
+
+    BinaryTreeNode* rotate_node = traverse(self->root, item, self->comparator);
+    if (rotate_node == NULL)
+        return ListOp_NotFound;
+
+    left_rotate(self, rotate_node);
+    return ListOp_Success;
+}
+
+ListOpResult BinaryTree_RotateRight(BinaryTree* self, const void* item)
+{
+    if (self == NULL || item == NULL)
+        return ListOp_NullParameter;
+
+    BinaryTreeNode* rotate_node = traverse(self->root, item, self->comparator);
+    if (rotate_node == NULL)
+        return ListOp_NotFound;
+
+    right_rotate(self, rotate_node);
+    return ListOp_Success;
+}
+
 ListOpResult RedBlackTree_Insert(BinaryTree* self, void* payload)
 {
     if (self == NULL || payload == NULL)
@@ -514,7 +621,7 @@ ListOpResult RedBlackTree_Insert(BinaryTree* self, void* payload)
     if (node == NULL)
         return ListOp_FailedMalloc;
 
-    if (self->root == &sentinel)
+    if (self->root == &NULL_NODE)
         self->root = node;
     else {
         insert_node(self->root, node, self->comparator);
@@ -522,6 +629,6 @@ ListOpResult RedBlackTree_Insert(BinaryTree* self, void* payload)
     }
 
     self->n++;
-    balance(node);
+    balance(self, node);
     return ListOp_Success;
 }
