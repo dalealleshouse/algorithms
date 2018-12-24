@@ -82,11 +82,12 @@ static size_t BinaryTreeSize(void* tree) { return ((BinaryTree*)tree)->n; }
 static void BuildDataStructure_inserts_correct_number_of_items()
 {
     size_t n = 10;
-    sizer sizers[] = { NULL, ArraySize, LinkedListSize, LinkedListSize,
-        BinaryTreeSize, BinaryTreeSize };
+    sizer sizers[] = { NULL, ArraySize, ArraySize, LinkedListSize,
+        LinkedListSize, BinaryTreeSize, BinaryTreeSize, BinaryTreeSize };
 
-    for (int i = 1; i <= BINARY_TREE_UNBALANCED; i++) {
+    for (int i = 1; i <= RED_BLACK_TREE; i++) {
         void* ds = BuildDataStructure(i, n);
+        CU_ASSERT_PTR_NOT_NULL(ds);
         CU_ASSERT_EQUAL(n, sizers[i](ds));
         DestroyStructure(i, ds);
     }

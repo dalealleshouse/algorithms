@@ -20,9 +20,10 @@ particular utility is required. Contrarily, it's possible to choose one that
 will meet the software requirements but have a prodigious negative impact on
 performance.
 
-This section examines five list data structures [Arrays](#arrays), [Sorted
-Arrays](#sorted-arrays), [Linked Lists](#linked-lists), [Binary
-Trees](#binary-trees), and [Hash Tables](#hash-tables).
+This section examines [Arrays](#arrays), [Sorted Arrays](#sorted-arrays),
+[Linked Lists](#linked-lists), [Binary Trees](#binary-trees), [Self Balancing
+Search Trees](#self-balancing-search-trees), and [Red-Black
+Trees](#red-black-trees).
 
 ## Arrays
 #data_structure, #list
@@ -218,10 +219,10 @@ option.
 |Select |![O(1)](https://latex.codecogs.com/gif.latex?O(1)) | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
 |Rank |![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) | ![O(log 2 n)](https://latex.codecogs.com/gif.latex?O(\log_{2}n)) |
 
-<sup>1</sup> While this is technically only a liner run time, array
-insert/delete operations require reallocating larger/smaller chunks of memory
-and rearranging existing data. Therefore, the constant factors hidden by big O
-notation are significant.
+> <sup>1</sup> While this is technically only a liner run time, array
+> insert/delete operations require reallocating larger/smaller chunks of memory
+> and rearranging existing data. Therefore, the constant factors hidden by big O
+> notation are significant.
 
 
 As a side note, a more appropriate name may be *inverted* tree because they look
@@ -688,16 +689,20 @@ on the specified data structures.
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
-|ARRAY |0.000012 sec|0.000074 sec|0.005261 sec|0.890071 sec|
-|LINKED_LIST |0.000005 sec|0.000047 sec|0.000451 sec|0.004580 sec|
-|BINARY_TREE |0.000007 sec|0.000094 sec|0.001416 sec|0.025229 sec|
+|ARRAY |0.000022 sec|0.000150 sec|0.010854 sec|1.392286 sec|
+|LINKED_LIST |0.000008 sec|0.000071 sec|0.000745 sec|0.007119 sec|
+|BINARY_TREE |0.000011 sec|0.000151 sec|0.002571 sec|0.054931 sec|
+|RED_BLACK_TREE |0.000014 sec|0.000184 sec|0.002657 sec|0.050925 sec|
 
 Key Takeaways:
-* Inserting 100,000 items into a array is approximately a half to three
-    quarters of a second slower than inserting the same items into a linked
-    list.
-* *Caveat*: For this demo, the new item is inserted at the head of the array.
-    Inserting an item into the tail of an array *may* be dramatically faster
+* Inserting 100,000 items into a ARRAY is approximately 1.3 seconds slower than
+    inserting the same items into a LINKED_LIST.
+* For a small number of items, BINARY_TREEs are slightly more performant than
+    RED-BLACK_TREEs. However, with 100,000 items RED-BLACK_TREE inserts become
+    slightly more performant because of balancing. In reality, this is an
+    academically interesting result but the difference is insignificant.
+* *Caveat*: For this demo, the new item is inserted at the head of the ARRAY.
+    Inserting an item into the tail of an ARRAY *may* be dramatically faster
     (possibly even faster than linked lists) depending on the language and the
     contents of memory. The interested reader should study the internal working
     of `malloc` to fully understand this.  [Click
@@ -712,19 +717,24 @@ operations on a data structure with `n` items.
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
-|ARRAY |0.000034 sec|0.003165 sec|0.148806 sec|15.389051 sec|
-|LINKED_LIST |0.000016 sec|0.002385 sec|0.196797 sec|16.685011 sec|
-|LINKED_LIST_POOR_LOCALITY |0.000019 sec|0.004976 sec|1.014671 sec|420.594918 sec|
-|BINARY_TREE |0.000006 sec|0.000077 sec|0.001221 sec|0.022148 sec|
-|BINARY_TREE_UNBALANCED |0.000044 sec|0.004681 sec|0.456133 sec|43.199407 sec|
+|ARRAY |0.000019 sec|0.001698 sec|0.150320 sec|14.940123 sec|
+|SORTED_ARRAY |0.000027 sec|0.000291 sec|0.003209 sec|0.036118 sec|
+|LINKED_LIST |0.000014 sec|0.002415 sec|0.201002 sec|16.317374 sec|
+|LINKED_LIST_POOR_LOCALITY |0.000016 sec|0.005042 sec|1.028193 sec|412.821287 sec|
+|BINARY_TREE |0.000027 sec|0.000282 sec|0.003541 sec|0.051235 sec|
+|BINARY_TREE_UNBALANCED |0.000065 sec|0.006761 sec|0.539081 sec|53.615423 sec|
+|RED_BLACK_TREE |0.000023 sec|0.000286 sec|0.003210 sec|0.042365 sec|
 
 Key Takeaways:
-* As predicted, searching a balanced BINARY_TREE is lighting fast.
+* As predicted, searching a SORTED_ARRAY, BINARY_TREE, and RED-BLACK_TREE is
+    lighting fast.
+* 100,000 search operations on an unsorted ARRAY is almost 15 seconds slower
+    than 100,00 search operations on a SORTED_ARRAY.
 * BINARY_TREE_UNBALANCED negates the advantages of the binary search algorithm
-* LINKED_LIST_POOR_LOCALITY has the worst performance by far and it demonstrates
-    the performance implications of not being able to take advantage of the
-    cache. Repeatedly accessing memory that is not stored contiguously in memory
-    causes cache misses, which are expensive.
+* LINKED_LIST_POOR_LOCALITY has the worst performance by far and demonstrates
+    the implications of not being able to take advantage of the cache.
+    Repeatedly accessing memory that is not stored contiguously causes cache
+    misses, which are expensive.
 
 ### Enumerate
 
@@ -735,12 +745,86 @@ items from the specified data structures.
 
 |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
 |--|--|--|--|--|
-|ARRAY |0.000001 sec|0.000002 sec|0.000007 sec|0.000031 sec|
-|LINKED_LIST |0.000001 sec|0.000002 sec|0.000018 sec|0.000222 sec|
-|LINKED_LIST_POOR_LOCALITY |0.000001 sec|0.000005 sec|0.000059 sec|0.003024 sec|
-|BINARY_TREE |0.000001 sec|0.000009 sec|0.000103 sec|0.001312 sec|
-|BINARY_TREE_UNBALANCED |0.000001 sec|0.000003 sec|0.000028 sec|0.000275 sec|
+|ARRAY |0.000000 sec|0.000001 sec|0.000004 sec|0.000031 sec|
+|SORTED_ARRAY |0.000000 sec|0.000001 sec|0.000004 sec|0.000031 sec|
+|LINKED_LIST |0.000000 sec|0.000003 sec|0.000021 sec|0.000225 sec|
+|LINKED_LIST_POOR_LOCALITY |0.000001 sec|0.000005 sec|0.000099 sec|0.002824 sec|
+|BINARY_TREE |0.000001 sec|0.000009 sec|0.000115 sec|0.001941 sec|
+|BINARY_TREE_UNBALANCED |0.000001 sec|0.000005 sec|0.000036 sec|0.000377 sec|
+|RED_BLACK_TREE |0.000001 sec|0.000007 sec|0.000099 sec|0.002121 sec|
 
 Key Takeaways:
 * There is less than .002 seconds difference between each data structure over
     100,000 items.
+
+The following chart and table show the actual run times for `n` max operations
+on a data structure with `n` items. Min run times are omitted; however, they
+will be commiserate.
+
+![MAX RUN TIMES](c/MAX.png "MAX RUN TIMES")
+
+ |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+ |--|--|--|--|--|
+ |SORTED_ARRAY |0.000002 sec|0.000013 sec|0.000102 sec|0.000370 sec|
+ |BINARY_TREE |0.000002 sec|0.000010 sec|0.000095 sec|0.001629 sec|
+ |BINARY_TREE_UNBALANCED |0.000018 sec|0.006236 sec|0.553203 sec|60.256664 sec|
+ |RED_BLACK_TREE |0.000002 sec|0.000011 sec|0.000254 sec|0.002541 sec|
+
+Key Takeaways:
+* These results highlight the importance of search tree balance.
+* Because data was inserted into the BINARY_TREEs in random order, the run times
+    are comparable with RED-BLACK_TREEs.
+
+The following chart and table show the actual run times for `n` predecessor
+operations on a data structure with `n` items. Successor run times are omitted;
+however, they will be commiserate.
+
+![PREDECESSOR RUN TIMES](c/PREDECESSOR.png "PREDESSOR RUN TIMES")
+
+ |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+ |--|--|--|--|--|
+ |SORTED_ARRAY |0.000093 sec|0.000966 sec|0.005484 sec|0.056534 sec|
+ |BINARY_TREE |0.000041 sec|0.000367 sec|0.003705 sec|0.043019 sec|
+ |BINARY_TREE_UNBALANCED |0.000119 sec|0.010361 sec|0.791100 sec|83.576065 sec|
+ |RED_BLACK_TREE |0.000039 sec|0.000435 sec|0.004361 sec|0.049279 sec|
+
+Key Takeaways:
+* These results highlight the importance of search tree balance.
+* Because data was inserted into the BINARY_TREEs in random order, the run times
+    are comparable with RED-BLACK_TREEs.
+
+
+The following chart and table show the actual run times for `n` select
+operations on a data structure with `n` items.
+
+![SELECT RUN TIMES](c/SELECT.png "SELECT RUN TIMES")
+
+ |STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+ |--|--|--|--|--|
+ |SORTED_ARRAY |0.000007 sec|0.000056 sec|0.000550 sec|0.002555 sec|
+ |BINARY_TREE |0.000009 sec|0.000126 sec|0.002517 sec|0.055430 sec|
+ |BINARY_TREE_UNBALANCED |0.000017 sec|0.002758 sec|0.273479 sec|28.200641 sec|
+ |RED_BLACK_TREE |0.000009 sec|0.000118 sec|0.002338 sec|0.044293 sec|
+
+Key Takeaways:
+* These results highlight the importance of search tree balance.
+* Because data was inserted into the BINARY_TREEs in random order, the run times
+    are comparable with RED-BLACK_TREEs.
+
+
+The following chart and table show the actual run times for `n` rank operations
+on a data structure with `n` items.
+
+![RANK RUN TIMES](c/RANK.png "RANK RUN TIMES")
+
+|STRUCTURE|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|SORTED_ARRAY |0.000090 sec|0.001039 sec|0.010266 sec|0.057771 sec|
+|BINARY_TREE |0.000044 sec|0.000409 sec|0.003701 sec|0.038029 sec|
+|BINARY_TREE_UNBALANCED |0.000071 sec|0.006147 sec|0.490152 sec|50.975640 sec|
+|RED_BLACK_TREE |0.000035 sec|0.000430 sec|0.004000 sec|0.045250 sec|
+
+Key Takeaways:
+* These results highlight the importance of search tree balance.
+* Because data was inserted into the BINARY_TREEs in random order, the run times
+    are comparable with RED-BLACK_TREEs.

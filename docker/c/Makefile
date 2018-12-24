@@ -6,7 +6,7 @@ CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 SHAREDFLAGS	 = -std=c11 -O3 -D NDEBUG -fPIC -shared
-LIBFLAGS	 = -std=c11 -O3 -D NDEBUG -fvisibility=hidden
+LIBFLAGS	 = -std=c11 -O3 -D NDEBUG -fvisibility=hidden -fPIC
 LINKFLAGS 	 = -lcunit -flto -lm src/include/libutils.a src/include/libdata_structures.a src/include/libgraph_search.a
 
 TARGET			= src/test_runner
@@ -45,7 +45,7 @@ address-san: CFLAGS += -fsanitize=address,undefined
 address-san: $(TARGET)
 
 library: $(SOURCES)
-	$(CC) $(CFLAGS) $(LIBFLAGS) $(SOURCES) -c
+	$(CC) $(CFLAGS) $(LIBFLAGS) $(SOURCES) -c 
 	ar rcs src/lib$(LIB_NAME).a *.o
 
 clean:
