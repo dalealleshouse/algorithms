@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.com/dalealleshouse/algorithms.svg?branch=master)](https://travis-ci.com/dalealleshouse/algorithms)
 
 # Algorithms
-Examples of popular algorithms in several different languages. The purpose is to
-demonstrate algorithm design and analysis fundamentals. This project is part of
-a book I'm planning to write. I'd be happy to accept any pull requests.
-Contributors will be recognized in the book.
+The purpose of this project is to demonstrate algorithm/data structure design
+and analysis fundamentals. This project is part of a book I'm planning to write.
+I'd be happy to accept any pull requests.  Contributors will be recognized in
+the book.
 
 ## A few things to note about..
 
@@ -13,9 +13,9 @@ Build environments
     examples demonstrate how to use the containers as stored on [Docker
     Hub](https://hub.docker.com). However, the [docker](docker/) folder has all
     files required to build the containers locally if that is the preference.
-- Each folder acts as a stand-alone project. Files are shared between projects
-    with hard links. Soft links would be preferable, but Docker can't deal with
-    them.
+- Each `c` folder acts as a stand-alone project. Files are shared between
+    projects via static libraries which aren't checked into source control. Use
+    the `libs.sh` script to build the static libraries locally.
 
 Implementation Quality
 * Several of the implementations utilize recursion. Recursion provides an
@@ -33,16 +33,16 @@ Implementation Quality
     great article about what this is true. Furthermore, `rand()` is never
     seeded. This ensures that the actual run time comparisons between algorithms
     accepting randomly sorted arrays are using the exact same inputs.  For the
-    purposes of this project, `rand()` it is sufficient. However, a different
+    purposes of this project, `rand()` is sufficient. However, a different
     solution is required for production scenarios.
 
 Actual run time data
-* Actual run time data for the C implementation of the algorithms is included 
-    in each section. C was chosen as the language for showcasing run times
-    because it executes "closest to the metal" and therefore provides the most
-    accurate representation of an algorithm's run time. However, even though the
-    actual run time wont be the same, the comparative difference between the run
-    times should be commiserate in your language of choice.
+* Many sections include actual run time data for the C implementation of the
+    algorithms. C was chosen as the language for showcasing run times because it
+    executes "closest to the metal" and therefore provides the most accurate
+    representation of an algorithm's run time. However, even though the actual
+    run time wont be the same, the comparative difference between the run times
+    should be commiserate in your language of choice.
 * Milliseconds are close to non-consequential for most applications. Remember
     the words of the great Donald Knuth - "pre-mature optimization is the root
     of all evil."
@@ -52,17 +52,28 @@ Actual run time data
 * All run time data was collected using a docker container running on a Surface
     Book 2 Laptop (Intel Core i7, 16GB RAM).
 * Each time value represents the median of 3 separate executions.
-* You can recreate the data using your own hardware by running the
-    time_charts.sh bash script located in each c directory.
+* You can recreate the run time data using your own hardware by navigating to
+    the desired directory and running the `time_charts.sh` bash script located
+    in the root directory.
 
 ## Index
 
+* [Asymptotic Complexity](asymptotic_complexity/)
 * [List Data Structures](list_data_structures/)
     * [Array](list_data_structures/README.md#arrays)
+    * [Sorted Array](list_data_structures/README.md#sorted-arrays)
     * [Linked List](list_data_structures/README.md#linked-lists)
     * [Binary Tree](list_data_structures/README.md#binary-trees)
-    * [Hash Tables](list_data_structures/README.md#hash-tables)
-* [Queue](queue/)
+    * [Self Balancing Search
+        Trees](list_data_structures/README.md#self-balancing-search-trees)
+    * [Red-Black Trees](list_data_structures/README.md#red-black-trees)
+* [Data Structures](data_structures/)
+    * [Stack](data_structures/README.md#stack-last-in-first-out)
+    * [Queue](data_structures/README.md#queue-first-in-first-out)
+    * [Priority Queue](data_structures/README.md#priority-queue)
+    * [Heap](data_structures/README.md#heap)
+    * [Hash Tables](data_structures/README.md#hash-tables)
+* [Running Median](running_median/)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
     * [Insertion Sort](sorting/README.md#insertion-sort)
@@ -70,12 +81,23 @@ Actual run time data
     * [Merge Sort](sorting/README.md#merge-sort)
     * [Quick Sort](sorting/README.md#quick-sort)
 * [Quick Select](quick_select/)
-* [Graph Concepts](graph_concepts/)
-* [Graph Search](graph_search/)
-* [Random Contraction](random_contraction/)
+* [Graphs](graph_concepts/)
+    * [Graph Search](graph_search/)
+    * [Shortest Path](shortest_path/)
+    * [Random Contraction](random_contraction/)
 
 ## Build/Tests
 ### C
+Each directory containing C code is designed to build and run independently.
+Code is shared between projects via static libraries which aren't checked into
+source control and must therefore be built locally. Use the following script to
+build the shared libraries. *The Docker commands below will NOT work until these
+libraries are built*.
+
+``` bash
+./libs.sh
+```
+
 All units tests are written with
 [cunit](http://cunit.sourceforge.net/doc/index.html). To run the tests,
 navigate to the folder containing the C code and run the following command:
@@ -114,3 +136,12 @@ following command:
 ``` bash
 docker run --rm -v $(pwd):/src/ dalealleshouse/algo_test_runner_py
 ```
+
+
+## TODO List:
+1. Hash Table for list data structures
+1. New run times for all list data structures
+1. Update Shortest Path to use a Heap instead of a naive priority queue
+    - requires a re-prioritize method on the heap implementation which in turn
+        requires a hash table
+1. Actual run time for naive shortest path vs. priority queue shortest path

@@ -12,75 +12,6 @@ algorithms:
 1) [Merge Sort](#merge-sort)
 1) [Quick Sort](#quick-sort)
 
-## Actual Run Times
-
-The actual run times for sorting various size integer arrays using the C
-implementation of the algorithms is shown below. All data was collected using a
-docker container running on a Surface Book 2 Laptop (Intel Core i7, 16GB RAM).
-Each time value represents the median of 3 separate executions. For details
-about how the calculations were run, see [compare_times.py](c/compare_times.py)
-and [algo_timer.c](c/algo_timer.c). To recreate the data on your machine,
-navigate to the c directory and execute the [time_charts.sh](c/time_charts.sh)
-bash file.
-
-### Arrays w/ Random Integer Values
-
-![alt text](c/RANDOM.png "RANDOM ARRAY VALUES") 
-
-|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
-|--|--|--|--|--|
-|C_QSORT |0.000012 sec|0.000156 sec|0.000924 sec|0.010486 sec|
-|BUBBLE |0.000048 sec|0.003869 sec|0.379764 sec|38.650331 sec|
-|INSERTION |0.000011 sec|0.000831 sec|0.086706 sec|8.700342 sec|
-|SELECTION |0.000013 sec|0.000846 sec|0.082433 sec|7.896328 sec|
-|QUICK |0.000024 sec|0.000114 sec|0.001562 sec|0.019407 sec|
-|MERGE |0.000007 sec|0.000088 sec|0.001222 sec|0.015161 sec|
-
-Key Takeaways: 
-- *Quick*, *Merge*, and *C's qsort* all perform fairly consistently regardless of
-    the order of the input array.
-- *Bubble*, *Insertion*, and *Selection* perform well when the input size is
-    low; however, the run time increases exponentially as the input size
-    increases
-- *Merge* performs slightly better than *Quick*, however, it has much higher
-    memory requirements.
-    
-### Arrays w/ Pre-Sorted Values
-
-![alt text](c/SORTED.png "SORTED ARRAY VALUES") 
-
-|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
-|--|--|--|--|--|
-|C_QSORT |0.000004 sec|0.000038 sec|0.000471 sec|0.004750 sec|
-|BUBBLE |0.000001 sec|0.000004 sec|0.000030 sec|0.000331 sec|
-|INSERTION |0.000003 sec|0.000026 sec|0.000255 sec|0.002702 sec|
-|SELECTION |0.000019 sec|0.002178 sec|0.080545 sec|7.738967 sec|
-|QUICK |0.000008 sec|0.000095 sec|0.001212 sec|0.014143 sec|
-|MERGE |0.000004 sec|0.000036 sec|0.000431 sec|0.004937 sec|
-
-Key Takeaways of pre-sorted arrays: 
-- *Bubble* clearly performs best
-- *Insertion* outperforms *Selection* by a wide margin (opposite of reverse
-    sorted results)
-
-### Arrays w/ Reverse Sorted Values
-
-![alt text](c/REVERSED.png "REVERSED ARRAY VALUES") 
-
-|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
-|--|--|--|--|--|
-|C_QSORT |0.000004 sec|0.000036 sec|0.000420 sec|0.004646 sec|
-|BUBBLE |0.000085 sec|0.008056 sec|0.439852 sec|43.008788 sec|
-|INSERTION |0.000019 sec|0.001764 sec|0.178411 sec|17.768902 sec|
-|SELECTION |0.000010 sec|0.000900 sec|0.079589 sec|8.197930 sec|
-|QUICK |0.000008 sec|0.000100 sec|0.001345 sec|0.016872 sec|
-|MERGE |0.000004 sec|0.000041 sec|0.000500 sec|0.005606 sec|
-
-Key Takeaways of reverse arrays: 
-- *Bubble* is clearly the worst performer
-- *Selection* outperforms *Insertion* by a wide margin (opposite of
-    pre-sorted results)
-
 ## Bubble Sort
 #sorting
 
@@ -350,3 +281,73 @@ Key Takeaways of reverse arrays:
 
 From this analysis, we can conclude that although *MEDIAN* has a slight edge for
 random and sorted arrays, *RANDOM* is the best general purpose option.
+
+## Actual Run Times
+
+The actual run times for sorting various size integer arrays using the C
+implementation of the algorithms is shown below. All data was collected using a
+docker container running on a Surface Book 2 Laptop (Intel Core i7, 16GB RAM).
+Each time value represents the median of 3 separate executions. For details
+about how the calculations were run, see [compare_times.py](c/compare_times.py)
+and [algo_timer.c](c/algo_timer.c). To recreate the data on your machine,
+navigate to the c directory and execute the [time_charts.sh](c/time_charts.sh)
+bash file.
+
+### Arrays w/ Random Integer Values
+
+![alt text](c/RANDOM.png "RANDOM ARRAY VALUES") 
+
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|C_QSORT |0.000012 sec|0.000156 sec|0.000924 sec|0.010486 sec|
+|BUBBLE |0.000048 sec|0.003869 sec|0.379764 sec|38.650331 sec|
+|INSERTION |0.000011 sec|0.000831 sec|0.086706 sec|8.700342 sec|
+|SELECTION |0.000013 sec|0.000846 sec|0.082433 sec|7.896328 sec|
+|QUICK |0.000024 sec|0.000114 sec|0.001562 sec|0.019407 sec|
+|MERGE |0.000007 sec|0.000088 sec|0.001222 sec|0.015161 sec|
+
+Key Takeaways: 
+- *Quick*, *Merge*, and *C's qsort* all perform fairly consistently regardless of
+    the order of the input array.
+- *Bubble*, *Insertion*, and *Selection* perform well when the input size is
+    low; however, the run time increases exponentially as the input size
+    increases
+- *Merge* performs slightly better than *Quick*, however, it has much higher
+    memory requirements.
+    
+### Arrays w/ Pre-Sorted Values
+
+![alt text](c/SORTED.png "SORTED ARRAY VALUES") 
+
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|C_QSORT |0.000004 sec|0.000038 sec|0.000471 sec|0.004750 sec|
+|BUBBLE |0.000001 sec|0.000004 sec|0.000030 sec|0.000331 sec|
+|INSERTION |0.000003 sec|0.000026 sec|0.000255 sec|0.002702 sec|
+|SELECTION |0.000019 sec|0.002178 sec|0.080545 sec|7.738967 sec|
+|QUICK |0.000008 sec|0.000095 sec|0.001212 sec|0.014143 sec|
+|MERGE |0.000004 sec|0.000036 sec|0.000431 sec|0.004937 sec|
+
+Key Takeaways of pre-sorted arrays: 
+- *Bubble* clearly performs best
+- *Insertion* outperforms *Selection* by a wide margin (opposite of reverse
+    sorted results)
+
+### Arrays w/ Reverse Sorted Values
+
+![alt text](c/REVERSED.png "REVERSED ARRAY VALUES") 
+
+|ALGORITHM|n=100 |n=1000 |n=10000 |n=100000 |
+|--|--|--|--|--|
+|C_QSORT |0.000004 sec|0.000036 sec|0.000420 sec|0.004646 sec|
+|BUBBLE |0.000085 sec|0.008056 sec|0.439852 sec|43.008788 sec|
+|INSERTION |0.000019 sec|0.001764 sec|0.178411 sec|17.768902 sec|
+|SELECTION |0.000010 sec|0.000900 sec|0.079589 sec|8.197930 sec|
+|QUICK |0.000008 sec|0.000100 sec|0.001345 sec|0.016872 sec|
+|MERGE |0.000004 sec|0.000041 sec|0.000500 sec|0.005606 sec|
+
+Key Takeaways of reverse arrays: 
+- *Bubble* is clearly the worst performer
+- *Selection* outperforms *Insertion* by a wide margin (opposite of
+    pre-sorted results)
+

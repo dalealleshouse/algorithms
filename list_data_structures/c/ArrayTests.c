@@ -6,16 +6,11 @@
 #include "CUnit/CUnit.h"
 
 #include "Array.h"
-#include "MemAllocMock.h"
+#include "include/MemAllocMock.h"
+#include "include/TestHelpers.h"
 
 #define INT2VOIDP(i) (void*)(uintptr_t)(i)
 #define VOIDP2INT(i) *(int*)(i)
-#define CU_TEST_INFO(test_func)                                                \
-    {                                                                          \
-#test_func, test_func                                                  \
-    }
-
-static int noop(void) { return 0; }
 
 /*************************** Array_Create *************************************/
 static void Array_Create_bad_malloc()
@@ -272,15 +267,15 @@ int register_array_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Insert_tests },
-        { .pName = "Search_Insert",
+        { .pName = "Array_Search",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Search_tests },
-        { .pName = "Enumerate_Insert",
+        { .pName = "Array_Enumerate",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Enumerate_tests },
-        { .pName = "Destroy_Insert",
+        { .pName = "Array_Destroy",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = Destroy_tests },

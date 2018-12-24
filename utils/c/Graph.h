@@ -17,6 +17,7 @@
     }
 
 typedef enum GraphResult {
+    Graph_DependencyError = -8,
     Graph_FileOpenError = -7,
     Graph_InvalidFilePath = -6,
     Graph_VertexIdExceedsMaxSize = -5,
@@ -32,6 +33,8 @@ typedef struct Edge {
 
     int head;
 
+    int weight;
+
     struct Edge* next;
 } Edge;
 
@@ -42,8 +45,11 @@ typedef struct Vertex {
     // data associated with the vertex
     void* data;
 
-    // Number of edges connected to the vertex
-    size_t degree;
+    // Number of incoming edges
+    size_t in_degree;
+
+    // Number of outgoing edges
+    size_t out_degree;
 
     // Linked list of edges associated with this vertex
     Edge* edges;
@@ -64,7 +70,9 @@ typedef struct Graph {
 
 Graph* Graph_Create(size_t);
 GraphResult Graph_AddEdge(Graph*, int, int);
+GraphResult Graph_AddWeightedEdge(Graph*, int, int, int);
 Graph* Graph_FromFile(const size_t, const char* path);
+Graph* Graph_WeightedFromFile(const size_t, const char* path);
 
 // Function of Mass Destruction
 void Graph_Destroy(Graph*, freer);

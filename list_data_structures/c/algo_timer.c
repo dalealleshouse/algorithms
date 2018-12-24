@@ -6,22 +6,25 @@
 #include "Array.h"
 #include "BinaryTree.h"
 #include "LinkedList.h"
+#include "SortedArray.h"
 #include "algo_timer.h"
 
 void* BuildEmptyDataStructure(Structure str)
 {
     switch (str) {
     case ARRAY:
+    case SORTED_ARRAY:
         return Array_Create(int_comparator, sizeof(uintptr_t));
     case LINKED_LIST:
     case LINKED_LIST_POOR_LOCALITY:
         return LinkedList_Create(NULL, ptr_comparator);
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
-        return BinaryTree_Create(ptr_comparator, NULL);
-    default:
-        return NULL;
+    case RED_BLACK_TREE:
+        return BinaryTree_Create(ptr_comparator);
     }
+
+    return NULL;
 }
 
 void* BuildDataStructure(Structure str, size_t n)
@@ -35,8 +38,16 @@ void* BuildDataStructure(Structure str, size_t n)
     case ARRAY:
     case LINKED_LIST:
     case BINARY_TREE:
+    case RED_BLACK_TREE:
         for (size_t i = 0; i < n; i++)
             op(ds, rand());
+        break;
+    case SORTED_ARRAY:
+        for (size_t i = 0; i < n; i++)
+            op(ds, rand());
+
+        Array* arr = (Array*)ds;
+        qsort(arr->array, arr->n, arr->item_size, arr->comparator);
         break;
     case LINKED_LIST_POOR_LOCALITY:
         for (size_t i = 0; i < n * 4; i++) {
@@ -64,6 +75,7 @@ void DestroyStructure(Structure str, void* structure)
 {
     switch (str) {
     case ARRAY:
+    case SORTED_ARRAY:
         Array_Destroy(structure);
         break;
     case LINKED_LIST:
@@ -72,7 +84,8 @@ void DestroyStructure(Structure str, void* structure)
         break;
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
-        BinaryTree_Destroy(structure);
+    case RED_BLACK_TREE:
+        BinaryTree_Destroy(structure, NULL);
         break;
     }
 }
@@ -110,10 +123,16 @@ ListOpResult BinaryTree_InsertOp(void* tree, uintptr_t item)
     return BinaryTree_Insert(tree, (void*)item);
 }
 
+ListOpResult RedBlackTree_InsertOp(void* tree, uintptr_t item)
+{
+    return RedBlackTree_Insert(tree, (void*)item);
+}
+
 ListOp GetInsertOperation(Structure str)
 {
     switch (str) {
     case ARRAY:
+    case SORTED_ARRAY:
         return Array_InsertOp;
     case LINKED_LIST:
     case LINKED_LIST_POOR_LOCALITY:
@@ -121,14 +140,26 @@ ListOp GetInsertOperation(Structure str)
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
         return BinaryTree_InsertOp;
-    default:
-        return NULL;
+    case RED_BLACK_TREE:
+        return RedBlackTree_InsertOp;
     }
+
+    return NULL;
 }
 
 uintptr_t Array_SearchOp(const void* array, const uintptr_t item)
 {
     void* result = Array_Search(array, &item);
+
+    if (result == NULL)
+        return 0;
+
+    return *(uintptr_t*)result;
+}
+
+uintptr_t SortedArray_SearchOp(const void* array, const uintptr_t item)
+{
+    void* result = SortedArray_Search(array, &item);
 
     if (result == NULL)
         return 0;
@@ -151,15 +182,18 @@ SearchOp GetSearchOperation(Structure str)
     switch (str) {
     case ARRAY:
         return Array_SearchOp;
+    case SORTED_ARRAY:
+        return SortedArray_SearchOp;
     case LINKED_LIST:
     case LINKED_LIST_POOR_LOCALITY:
         return LinkedList_SearchOp;
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
+    case RED_BLACK_TREE:
         return BinaryTree_SearchOp;
-    default:
-        return NULL;
     }
+
+    return NULL;
 }
 
 void Array_EnumerateHandler(void* item) { _enumerate_sum += *(uintptr_t*)item; }
@@ -188,13 +222,111 @@ EnumerateOp GetEnumerateOperation(Structure str)
 {
     switch (str) {
     case ARRAY:
+    case SORTED_ARRAY:
         return Array_EnumerateOp;
     case LINKED_LIST:
     case LINKED_LIST_POOR_LOCALITY:
         return LinkedList_EnumerateOp;
     case BINARY_TREE:
     case BINARY_TREE_UNBALANCED:
+    case RED_BLACK_TREE:
         return BinaryTree_EnumerateOp;
+    }
+
+    return NULL;
+}
+
+uintptr_t SortedArray_MaxOp(const void* array)
+{
+    return (uintptr_t)SortedArray_Max(array);
+}
+
+uintptr_t BinaryTree_MaxOp(const void* tree)
+{
+    return (uintptr_t)BinaryTree_Max(tree);
+}
+
+MaxOp GetMaxOperation(Structure str)
+{
+    switch (str) {
+    case SORTED_ARRAY:
+        return SortedArray_MaxOp;
+    case BINARY_TREE:
+    case BINARY_TREE_UNBALANCED:
+    case RED_BLACK_TREE:
+        return BinaryTree_MaxOp;
+    default:
+        return NULL;
+    }
+}
+
+uintptr_t SortedArray_PredecessorOp(const void* array, const uintptr_t item)
+{
+    return (uintptr_t)SortedArray_Predecessor(array, &item);
+}
+
+uintptr_t BinaryTree_PredecessorOp(const void* tree, const uintptr_t item)
+{
+    return (uintptr_t)BinaryTree_Predecessor(tree, &item);
+}
+
+PredOp GetPredOperation(Structure str)
+{
+    switch (str) {
+    case SORTED_ARRAY:
+        return SortedArray_PredecessorOp;
+    case BINARY_TREE:
+    case BINARY_TREE_UNBALANCED:
+    case RED_BLACK_TREE:
+        return BinaryTree_PredecessorOp;
+    default:
+        return NULL;
+    }
+}
+
+uintptr_t SortedArray_SelectOp(const void* tree, const size_t item)
+{
+    return (uintptr_t)SortedArray_Select(tree, item);
+}
+
+uintptr_t BinaryTree_SelectOp(const void* tree, const size_t item)
+{
+    return (uintptr_t)BinaryTree_Select(tree, item);
+}
+
+SelectOp GetSelectOperation(Structure str)
+{
+    switch (str) {
+    case SORTED_ARRAY:
+        return SortedArray_SelectOp;
+    case BINARY_TREE:
+    case BINARY_TREE_UNBALANCED:
+    case RED_BLACK_TREE:
+        return BinaryTree_SelectOp;
+    default:
+        return NULL;
+    }
+}
+
+size_t SortedArray_RankOp(const void* tree, const size_t item)
+{
+    return (uintptr_t)SortedArray_Rank(tree, &item);
+}
+
+size_t BinaryTree_RankOp(const void* tree, const size_t item)
+{
+    return (uintptr_t)BinaryTree_Rank(tree, &item);
+}
+
+RankOp GetRankOp(Structure str)
+{
+    switch (str) {
+    case SORTED_ARRAY:
+        return SortedArray_RankOp;
+    case BINARY_TREE:
+    case BINARY_TREE_UNBALANCED:
+    case RED_BLACK_TREE:
+        return BinaryTree_RankOp;
     default:
         return NULL;
     }
@@ -238,13 +370,47 @@ double OperationTime(Operation op, Structure st, size_t n)
         t = clock();
         e_op(ds);
         t = clock() - t;
-
-        // print to keep the compiler from optimizing the enumerate away
-        printf("ignore this = %lu\n", _enumerate_sum);
         break;
-    default:
-        return -1;
+    case MAX:
+        ds = BuildDataStructure(st, n);
+        MaxOp m_op = GetMaxOperation(st);
+
+        t = clock();
+        for (size_t i = 0; i < n; i++)
+            m_op(ds);
+        t = clock() - t;
+        break;
+    case PREDECESSOR:
+        ds = BuildDataStructure(st, n);
+        PredOp p_op = GetPredOperation(st);
+
+        t = clock();
+        for (size_t i = 0; i < n; i++)
+            p_op(ds, rand());
+        t = clock() - t;
+        break;
+    case SELECT:
+        ds = BuildDataStructure(st, n);
+        SelectOp se_op = GetSelectOperation(st);
+
+        t = clock();
+        for (size_t i = 0; i < n; i++)
+            se_op(ds, rand() % n);
+        t = clock() - t;
+        break;
+    case RANK:
+        ds = BuildDataStructure(st, n);
+        RankOp r_op = GetRankOp(st);
+
+        t = clock();
+        for (size_t i = 0; i < n; i++)
+            r_op(ds, rand());
+        t = clock() - t;
+        break;
     }
+
+    if (ds == NULL)
+        return -1;
 
     DestroyStructure(st, ds);
     double time = ((double)t) / CLOCKS_PER_SEC;

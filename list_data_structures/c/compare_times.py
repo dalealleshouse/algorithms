@@ -22,15 +22,21 @@ class CtypesEnum(IntEnum):
 class Operations(CtypesEnum):
     INSERT = 1,
     SEARCH = 2,
-    ENUMERATE = 3
+    ENUMERATE = 3,
+    MAX = 4,
+    PREDECESSOR = 5,
+    SELECT = 6,
+    RANK = 7
 
 
 class Structures(CtypesEnum):
     ARRAY = 1,
-    LINKED_LIST = 2,
-    LINKED_LIST_POOR_LOCALITY = 3,
-    BINARY_TREE = 4,
-    BINARY_TREE_UNBALANCED = 5
+    SORTED_ARRAY = 2,
+    LINKED_LIST = 3,
+    LINKED_LIST_POOR_LOCALITY = 4,
+    BINARY_TREE = 5,
+    BINARY_TREE_UNBALANCED = 6,
+    RED_BLACK_TREE = 7
 
 
 lib.OperationTime.argtypes = [Operations, Structures, ctypes.c_size_t]
@@ -107,14 +113,37 @@ def generate_chart(op, structs):
 
 
 if __name__ == "__main__":
-    generate_chart(Operations.INSERT,
-                   [Structures.ARRAY, Structures.LINKED_LIST,
-                    Structures.BINARY_TREE])
-    generate_chart(Operations.SEARCH,
-                   [Structures.ARRAY, Structures.LINKED_LIST,
-                    Structures.LINKED_LIST_POOR_LOCALITY,
-                    Structures.BINARY_TREE, Structures.BINARY_TREE_UNBALANCED])
-    generate_chart(Operations.ENUMERATE,
-                   [Structures.ARRAY, Structures.LINKED_LIST,
-                    Structures.LINKED_LIST_POOR_LOCALITY,
-                    Structures.BINARY_TREE, Structures.BINARY_TREE_UNBALANCED])
+    # generate_chart(Operations.INSERT, [Structures.ARRAY,
+    #                                    Structures.LINKED_LIST,
+    #                                    Structures.BINARY_TREE,
+    #                                    Structures.RED_BLACK_TREE])
+    # generate_chart(Operations.SEARCH, [Structures.ARRAY,
+    #                                    Structures.SORTED_ARRAY,
+    #                                    Structures.LINKED_LIST,
+    #                                    Structures.LINKED_LIST_POOR_LOCALITY,
+    #                                    Structures.BINARY_TREE,
+    #                                    Structures.BINARY_TREE_UNBALANCED,
+    #                                    Structures.RED_BLACK_TREE])
+    # generate_chart(Operations.ENUMERATE, [Structures.ARRAY,
+    #                                       Structures.SORTED_ARRAY,
+    #                                       Structures.LINKED_LIST,
+    #                                       Structures.LINKED_LIST_POOR_LOCALITY,
+    #                                       Structures.BINARY_TREE,
+    #                                       Structures.BINARY_TREE_UNBALANCED,
+    #                                       Structures.RED_BLACK_TREE])
+    generate_chart(Operations.MAX, [Structures.SORTED_ARRAY,
+                                    Structures.BINARY_TREE,
+                                    Structures.BINARY_TREE_UNBALANCED,
+                                    Structures.RED_BLACK_TREE])
+    generate_chart(Operations.PREDECESSOR, [Structures.SORTED_ARRAY,
+                                            Structures.BINARY_TREE,
+                                            Structures.BINARY_TREE_UNBALANCED,
+                                            Structures.RED_BLACK_TREE])
+    generate_chart(Operations.SELECT, [Structures.SORTED_ARRAY,
+                                       Structures.BINARY_TREE,
+                                       Structures.BINARY_TREE_UNBALANCED,
+                                       Structures.RED_BLACK_TREE])
+    generate_chart(Operations.RANK, [Structures.SORTED_ARRAY,
+                                     Structures.BINARY_TREE,
+                                     Structures.BINARY_TREE_UNBALANCED,
+                                     Structures.RED_BLACK_TREE])

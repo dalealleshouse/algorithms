@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "Array.h"
-#include "MemAllocMock.h"
+#include "include/MemAllocMock.h"
 
 Array* Array_Create(comparator comparator, size_t item_size)
 {

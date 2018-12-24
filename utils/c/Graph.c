@@ -1,8 +1,15 @@
+#include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "Graph.h"
 #include "MemAllocMock.h"
+
+typedef struct EdgeTuple {
+    int head;
+    int weight;
+} EdgeTuple;
 
 const static size_t BUFFER_SIZE = 1024;
 
@@ -53,15 +60,12 @@ static GraphResult Graph_AddVertex(Graph* self, int id, void* data)
     if (self->V[id] != NULL)
         return Graph_DuplicateVertexId;
 
-    Vertex* v = malloc(sizeof(Vertex));
+    Vertex* v = calloc(sizeof(Vertex), 1);
     if (v == NULL)
         return Graph_FailedMemoryAllocation;
 
     v->id = id;
     v->data = data;
-    v->degree = 0;
-    v->edges = NULL;
-    v->in_edges = NULL;
 
     self->V[id] = v;
 
@@ -75,11 +79,18 @@ static void AddVertex_PrintError(Graph* self, int id)
         GRAPH_ERROR(result);
 }
 
-static void AddEdge_PrintError(Graph* self, int head, int tail)
+static void AddWeightedEdge_PrintError(
+    Graph* self, int head, int tail, int weight)
 {
-    GraphResult result = Graph_AddEdge(self, head, tail);
+    /* printf("head=%d, tail=%d, weight=%d\n", head, tail, weight); */
+    GraphResult result = Graph_AddWeightedEdge(self, head, tail, weight);
     if (result != Graph_Success)
         GRAPH_ERROR(result);
+}
+
+static void AddEdge_PrintError(Graph* self, int head, int tail)
+{
+    AddWeightedEdge_PrintError(self, head, tail, 1);
 }
 
 Graph* Graph_Create(size_t n)
@@ -101,7 +112,7 @@ Graph* Graph_Create(size_t n)
     return graph;
 }
 
-static Edge* Graph_EdgeInit(int head, int tail)
+static Edge* Graph_EdgeInit(int head, int tail, int weight)
 {
     Edge* edge = calloc(sizeof(Edge), 1);
     if (edge == NULL)
@@ -109,37 +120,40 @@ static Edge* Graph_EdgeInit(int head, int tail)
 
     edge->head = head;
     edge->tail = tail;
+    edge->weight = weight;
 
     return edge;
 }
 
 // It is assumed that all paramters are validated by the caller
-static GraphResult Graph_AddInEdge(Graph* self, int head, int tail)
+static GraphResult Graph_AddInEdge(Graph* self, int head, int tail, int weight)
 {
-    Edge* edge = Graph_EdgeInit(head, tail);
+    Edge* edge = Graph_EdgeInit(head, tail, weight);
     if (edge == NULL)
         return Graph_FailedMemoryAllocation;
 
     edge->next = self->V[head]->in_edges;
+    self->V[head]->in_degree++;
     self->V[head]->in_edges = edge;
 
     return Graph_Success;
 }
 
 // It is assumed that all paramters are validated by the caller
-static GraphResult Graph_AddOutEdge(Graph* self, int head, int tail)
+static GraphResult Graph_AddOutEdge(Graph* self, int head, int tail, int weight)
 {
-    Edge* edge = Graph_EdgeInit(head, tail);
+    Edge* edge = Graph_EdgeInit(head, tail, weight);
     if (edge == NULL)
         return Graph_FailedMemoryAllocation;
 
     edge->next = self->V[tail]->edges;
+    self->V[tail]->out_degree++;
     self->V[tail]->edges = edge;
 
     return Graph_Success;
 }
 
-GraphResult Graph_AddEdge(Graph* self, int head, int tail)
+GraphResult Graph_AddWeightedEdge(Graph* self, int head, int tail, int weight)
 {
     if (self == NULL)
         return Graph_NullParameter;
@@ -156,11 +170,11 @@ GraphResult Graph_AddEdge(Graph* self, int head, int tail)
 
     GraphResult result;
 
-    result = Graph_AddInEdge(self, head, tail);
+    result = Graph_AddInEdge(self, head, tail, weight);
     if (result != Graph_Success)
         return result;
 
-    result = Graph_AddOutEdge(self, head, tail);
+    result = Graph_AddOutEdge(self, head, tail, weight);
     if (result != Graph_Success)
         return result;
 
@@ -169,7 +183,62 @@ GraphResult Graph_AddEdge(Graph* self, int head, int tail)
     return Graph_Success;
 }
 
-Graph* Graph_FromFile(const size_t n, const char* path)
+GraphResult Graph_AddEdge(Graph* self, int head, int tail)
+{
+    return Graph_AddWeightedEdge(self, head, tail, 1);
+}
+
+static void non_weight_parser(Graph* g, FILE* file)
+{
+    char line[BUFFER_SIZE];
+    while (fgets(line, BUFFER_SIZE, file)) {
+        char* remaining;
+        int vertex = strtoul(line, &remaining, 10);
+
+        int edge = strtoul(remaining, &remaining, 10);
+        while (edge != 0) {
+            AddEdge_PrintError(g, edge, vertex);
+            edge = strtoul(remaining, &remaining, 10);
+        }
+    }
+}
+
+static EdgeTuple parse_edge_tuple(char* tuple)
+{
+    char* remaining;
+    int head = strtoul(tuple, &remaining, 10);
+
+    // ignore the comma
+    remaining++;
+    int weight = strtoul(remaining, &remaining, 10);
+
+    EdgeTuple t = { head, weight };
+    return t;
+}
+
+static void weighted_parser(Graph* g, FILE* file)
+{
+    char line[BUFFER_SIZE];
+    while (fgets(line, BUFFER_SIZE, file)) {
+        char* remaining;
+        int vertex = strtoul(line, &remaining, 10);
+
+        const char* seperator = "\t";
+        char* tok;
+
+        tok = strtok(remaining, seperator);
+
+        while (tok != NULL && strcmp(tok, "\n") != 0) {
+            EdgeTuple t = parse_edge_tuple(tok);
+            AddWeightedEdge_PrintError(g, t.head, vertex, t.weight);
+            tok = strtok(0, seperator);
+        }
+    }
+}
+
+typedef void (*line_parser)(Graph*, FILE*);
+static Graph* Graph_Parser(
+    const size_t n, const char* path, line_parser line_parser)
 {
     if (path == NULL) {
         GRAPH_ERROR(Graph_NullParameter);
@@ -193,20 +262,19 @@ Graph* Graph_FromFile(const size_t n, const char* path)
         return NULL;
     }
 
-    char line[BUFFER_SIZE];
-    while (fgets(line, BUFFER_SIZE, file)) {
-        char* remaining;
-        int vertex = strtoul(line, &remaining, 10);
-
-        int edge = strtoul(remaining, &remaining, 10);
-        while (edge != 0) {
-            AddEdge_PrintError(g, edge, vertex);
-            edge = strtoul(remaining, &remaining, 10);
-        }
-    }
-
+    line_parser(g, file);
     fclose(file);
     return g;
+}
+
+Graph* Graph_FromFile(const size_t n, const char* path)
+{
+    return Graph_Parser(n, path, non_weight_parser);
+}
+
+Graph* Graph_WeightedFromFile(const size_t n, const char* path)
+{
+    return Graph_Parser(n, path, weighted_parser);
 }
 
 void Graph_Destroy(Graph* self, freer freer)
@@ -224,6 +292,8 @@ void Graph_Destroy(Graph* self, freer freer)
 char* Graph_ErrorMessage(GraphResult result)
 {
     switch (result) {
+    case Graph_DependencyError:
+        return "One of the Graphs dependencies had an unrecoverable error.";
     case Graph_FileOpenError:
         return "fopen returned NULL";
     case Graph_InvalidFilePath:
@@ -237,7 +307,7 @@ char* Graph_ErrorMessage(GraphResult result)
     case Graph_FailedMemoryAllocation:
         return "Failed to allocate memory";
     case Graph_NullParameter:
-        return "One of the requited parameters passed to the function is NULL";
+        return "One of the required parameters passed to the function is NULL";
     case Graph_Success:
         return "Success";
     default:

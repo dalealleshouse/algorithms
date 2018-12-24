@@ -1,8 +1,7 @@
 #include <stdlib.h>
 
+#include "include/Queue.h"
 #include "GraphSearch.h"
-#include "Queue.h"
-#include "Stack.h"
 
 static bool is_conquered(Vertex* v)
 {
@@ -127,29 +126,6 @@ GraphResult Graph_Reachable(Graph* self, int vertex_id)
     return Graph_BFS(self, vertex_id, &strategy);
 }
 
-static bool shortest_path_conqueror(Vertex* v, Vertex* p)
-{
-    if (v == NULL || v->data != NULL)
-        return false;
-
-    int shortest_path;
-    if (p == NULL)
-        shortest_path = 0;
-    else
-        shortest_path = ((VertexData*)p->data)->value + 1;
-
-    VertexData* d = VertexData_Create(shortest_path);
-    v->data = d;
-
-    return true;
-}
-
-GraphResult Graph_ShortestPath(Graph* self, int vertex_id)
-{
-    SearchStrategy strategy = { shortest_path_conqueror, is_conquered };
-    return Graph_BFS(self, vertex_id, &strategy);
-}
-
 static int component_id = 0;
 static bool connected_conqueror(Vertex* v, Vertex* p)
 {
@@ -178,7 +154,7 @@ GraphResult Graph_Connected(Graph* self)
     return Graph_Success;
 }
 
-// sooooooooo tread unsafe it hurts
+// sooooooooo thread unsafe it hurts
 static int order = 0;
 static void Graph_DFS_TopSort(Graph* self, int vertex_id)
 {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function run_c_tests() {
-    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c \
+    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c:1.12 \
         ./validate.sh > run_result.txt
 
     RESULTS=`tail run_result.txt`
@@ -20,6 +20,8 @@ function run_c_code_coverage() {
     docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c \
         ./coverage.sh
 }
+
+./libs.sh
 
 # Run the dockerized tests inside every subdirectory named c
 for D in `find . -type d -name 'c' ! -path './docker/c'`
