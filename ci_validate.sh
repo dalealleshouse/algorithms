@@ -12,6 +12,7 @@ function run_c_tests() {
         echo `pwd` passed
     else
         echo `pwd` failure
+        cat run_results.txt
         exit -1
     fi
 }
