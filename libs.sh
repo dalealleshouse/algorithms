@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -a libs=(utils data_structures graph_search)
+declare -a libs=(utils list_data_structures data_structures graph_search)
 
 function clean_libs() {
     for D in `find . -type d -name 'c' ! -path './docker/c'`

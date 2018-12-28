@@ -1,5 +1,8 @@
 #pragma once
 
+#include "ErrorReporter.h"
+#include <stdio.h>
+
 // We may need a better way to log errors, but this will work for now
 #define ERROR(source, result)                                                  \
     {                                                                          \
@@ -11,6 +14,7 @@
     }
 
 typedef enum Result {
+    NotFound = -8,
     Empty = -7,
     DependancyError = -6,
     ArgumentOutOfRange = -5,

@@ -8,6 +8,13 @@
 #include "include/MemAllocMock.h"
 #include "include/TestHelpers.h"
 
+#define SUT(code_block)                                                        \
+    {                                                                          \
+        LinkedList* sut = LinkedList_Create(NULL, int_comparator);             \
+        code_block;                                                            \
+        LinkedList_Destroy(sut);                                               \
+    }
+
 static void ListIsValid(
     const LinkedList* list, const size_t n, void* expected[n])
 {
@@ -328,6 +335,82 @@ static void LinkedList_DeleteAt_mid_modifies_links()
     LinkedList_Destroy(list);
 }
 
+/*************************** LinkedList_Delete ********************************/
+static void LinkedList_Delete_null_parameters()
+{
+    int val = 5;
+
+    ListOpResult result = LinkedList_Delete(NULL, NULL);
+    CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+
+    result = LinkedList_Delete(NULL, &val);
+    CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+
+    SUT({
+        result = LinkedList_Delete(sut, NULL);
+        CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+    });
+}
+
+static void LinkedList_Delete_not_found()
+{
+    int val = 5;
+    int not_found = 401;
+    SUT({
+        LinkedList_InsertAt(sut, &val, 0);
+        ListOpResult result = LinkedList_Delete(sut, &not_found);
+        CU_ASSERT_EQUAL(result, ListOp_NotFound);
+    });
+}
+
+static void LinkedList_Delete_head()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    void* expected[] = { &payload[5], &payload[4], &payload[3], &payload[2],
+        &payload[1], &payload[0] };
+
+    SUT({
+        for (size_t i = 0; i < n; i++)
+            LinkedList_InsertAt(sut, &payload[i], 0);
+
+        LinkedList_Delete(sut, &payload[n - 1]);
+        ListIsValid(sut, n - 1, expected);
+    });
+}
+
+static void LinkedList_Delete_tail()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    void* expected[] = { &payload[6], &payload[5], &payload[4], &payload[3],
+        &payload[2], &payload[1] };
+
+    SUT({
+        for (size_t i = 0; i < n; i++)
+            LinkedList_InsertAt(sut, &payload[i], 0);
+
+        LinkedList_Delete(sut, &payload[0]);
+        ListIsValid(sut, n - 1, expected);
+    });
+}
+
+static void LinkedList_Delete_mid()
+{
+    size_t n = 7;
+    int payload[] = { 0, 1, 2, 3, 4, 5, 6 };
+    void* expected[] = { &payload[6], &payload[5], &payload[3], &payload[2],
+        &payload[1], &payload[0] };
+
+    SUT({
+        for (size_t i = 0; i < n; i++)
+            LinkedList_InsertAt(sut, &payload[i], 0);
+
+        LinkedList_Delete(sut, &payload[4]);
+        ListIsValid(sut, n - 1, expected);
+    });
+}
+
 /*************************** LinkedList_Search ********************************/
 static void LinkedList_Search_null_parameters()
 {
@@ -469,7 +552,7 @@ int register_linked_list_tests()
               CU_TEST_INFO(LinkedList_InsertAt_mid_creates_links),
               CU_TEST_INFO_NULL };
 
-    CU_TestInfo delete_tests[]
+    CU_TestInfo delete_at_tests[]
         = { CU_TEST_INFO(LinkedList_DeleteAt_null_parameters),
               CU_TEST_INFO(LinkedList_DeleteAt_invalid_index),
               CU_TEST_INFO(LinkedList_DeleteAt_calls_freer),
@@ -478,6 +561,13 @@ int register_linked_list_tests()
               CU_TEST_INFO(LinkedList_DeleteAt_tail_modifies_links),
               CU_TEST_INFO(LinkedList_DeleteAt_mid_modifies_links),
               CU_TEST_INFO_NULL };
+
+    CU_TestInfo delete_tests[]
+        = { CU_TEST_INFO(LinkedList_Delete_null_parameters),
+              CU_TEST_INFO(LinkedList_Delete_not_found),
+              CU_TEST_INFO(LinkedList_Delete_head),
+              CU_TEST_INFO(LinkedList_Delete_tail),
+              CU_TEST_INFO(LinkedList_Delete_mid), CU_TEST_INFO_NULL };
 
     CU_TestInfo search_tests[]
         = { CU_TEST_INFO(LinkedList_Search_null_parameters),
@@ -503,6 +593,10 @@ int register_linked_list_tests()
             .pCleanupFunc = noop,
             .pTests = insert_tests },
         { .pName = "LinkedList_DeleteAt",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = delete_at_tests },
+        { .pName = "LinkedList_Delete",
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = delete_tests },

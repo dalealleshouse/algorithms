@@ -7,7 +7,7 @@ DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fn
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 SHAREDFLAGS	 = -std=c11 -O3 -D NDEBUG -fPIC -shared
 LIBFLAGS	 = -std=c11 -O3 -D NDEBUG -fvisibility=hidden -fPIC
-LINKFLAGS 	 = -lcunit -flto -lm src/include/libutils.a src/include/libdata_structures.a src/include/libgraph_search.a
+LINKFLAGS 	 = -lcunit -flto -lm src/include/libutils.a src/include/libdata_structures.a src/include/libgraph_search.a src/include/liblist_data_structures.a
 
 TARGET			= src/test_runner
 SHARED_TARGET	= src/algo.so

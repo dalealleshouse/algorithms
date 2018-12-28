@@ -5,13 +5,13 @@ equipped with pre-configured archetypes of all the standard data structures.
 With the exception of C programmers, it's highly unlikely that the average coder
 will every have to implement any data structures from scratch. However, this
 does not preclude the need for understanding how they work. Knowing the runtime
-characteristics and supported operations is absolutely requite to being able to
-complete common programming tasks.
+characteristics and supported operations is absolutely requisite to being able
+to complete common programming tasks.
 
 Choosing the right data structure is all about finding the most efficient
 implementation that supports all the required operations and nothing more.
-Superfluous operations typically equate needless complexity, inflated run times
-and memory consumption. This is so important that it has a name:
+Superfluous operations typically equate to needless complexity, inflated run
+times and memory consumption. This is so important that it has a name:
 
 **Principal of Parsimony**: Choose the simplest data structure that supports all
 the operations required by your application.
@@ -185,6 +185,38 @@ This is a difficult concept to understand without a visual. Please see the image
 below.
 
 ![Heap Indexing](heap-indexing.png)
+
+There are actually many different heap variations. Presented above is a *Binary
+Heap* which is one of the simplest. Other types of heaps vary in run times and
+internal details, but they all operate similarly. An in-depth exploration of
+heap implementations falls outside of scope. It would be easy to write an entire
+book on the subject. To demonstrate the breadth of the topic, below is an
+incomplete list of heap variants.
+
+* 2-3 heap
+* B-heap
+* Beap
+* Binomial heap
+* Brodal queue
+* d-ary heap
+* Fibonacci heap
+* Leaf heap
+* Leftist heap
+* Pairing heap
+* Radix heap
+* Randomized meldable heap
+* Skew heap
+* Soft heap
+* Ternary heap
+* Treap
+* Weak heap
+
+##### Warning
+> This section gives an account of binary heaps only. In the event that the
+> reader has a need to implement a heap for a mission critical application, it's
+> highly recommended they research the topic much more thoroughly. There are
+> many heap variants that may or may not be better suited to specialized
+> scenarios.
 
 ### Asymptotic Time Complexity
 * Insert: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
@@ -391,14 +423,15 @@ fabricate many data sets that will cause this particular hash function to
 generate a single index. The question now is, "is it possible to create a hash
 function that will always generate evenly distributed indices?".
 
-The unfortunate answer to the question above is no. Regardless of the hash
-function, with some advance knowledge of its' inner workings it is possible to
-fabricate any number of *pathological* data sets. A pathological data set is a
-collection of key values that is engineered to prevent even distribution of
-data. What this means is that any user consuming a hash table can produce a set
-of keys that force all items into a single bucket effectively changing the run
-time from constant to linear. Luckily, there is some recourse by using
-*universal hashing*.
+The unfortunate answer to the question above is no. While it's true that some
+hash functions are much better than others, with some advance knowledge of its'
+inner workings it is possible to fabricate any number of *pathological* data
+sets for any hash function. A pathological data set is a collection of key
+values that is engineered to prevent even distribution of data. What this means
+is that any user consuming a hash table can produce a set of keys that forces
+all items into a single bucket effectively changing the run time from constant
+to linear. This will enable malicious actors to mount denial of service or
+similar attacks. Luckily, there is some recourse by using *universal hashing*.
 
 #### Universal Hashing
 Universal hashing eliminates the risk of pathological data sets by randomly
@@ -432,8 +465,7 @@ unparalleled performance. The reward is well worth the risk.
 There are three important decisions when designing a hash table.
 
 1. How to generate hash codes from keys
-1. How to compress the hash code into a number between 0 and the number of
-   bucket
+1. How to compress hash codes into a number between 0 and the count of buckets
 1. How many buckets (the length of the array). This decision has implications on
    maximum load and resizing.
 

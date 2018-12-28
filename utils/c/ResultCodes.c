@@ -3,6 +3,8 @@
 char* Result_ErrorMessage(Result result)
 {
     switch (result) {
+    case NotFound:
+        return "The requested object was not found.";
     case Empty:
         return "List is empty";
     case DependancyError:

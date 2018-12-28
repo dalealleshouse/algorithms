@@ -3,18 +3,6 @@
 #include "LinkedList.h"
 #include "include/MemAllocMock.h"
 
-LinkedList* LinkedList_Create(freer freer, comparator comparator)
-{
-    LinkedList* list = calloc(sizeof(LinkedList), 1);
-
-    if (list == NULL)
-        return NULL;
-
-    list->freer = freer;
-    list->comparator = comparator;
-    return list;
-}
-
 static LinkedListItem* LinkedList_ItemCreate(void* payload)
 {
     LinkedListItem* item = calloc(sizeof(LinkedListItem), 1);
@@ -86,31 +74,6 @@ static void insert_mid(LinkedList* list, LinkedListItem* item, size_t index)
     curr->next = item;
 }
 
-ListOpResult LinkedList_InsertAt(
-    LinkedList* self, void* payload, const size_t index)
-{
-    if (self == NULL || payload == NULL)
-        return ListOp_NullParameter;
-
-    if (index > self->size)
-        return ListOp_InvalidIndex;
-
-    LinkedListItem* item = LinkedList_ItemCreate(payload);
-    if (item == NULL)
-        return ListOp_FailedMalloc;
-
-    if (index == 0)
-        insert_at_head(self, item);
-    else if (index == self->size)
-        insert_at_tail(self, item);
-    else
-        insert_mid(self, item, index);
-
-    self->size++;
-
-    return ListOp_Success;
-}
-
 /*
  * ASSUMPTION: No NULL values
  */
@@ -145,6 +108,16 @@ static void delete_at_tail(LinkedList* list)
     LinkedList_ItemDestroy(list, tail);
 }
 
+static void delete_mid(LinkedList* list, LinkedListItem* doomed)
+{
+    LinkedListItem* prev = doomed->prev;
+    LinkedListItem* next = doomed->next;
+    prev->next = next;
+    next->prev = prev;
+
+    LinkedList_ItemDestroy(list, doomed);
+}
+
 /*
  * ASSUMPTIONS:
  *  - No NULL values
@@ -157,12 +130,58 @@ static void delete_at_mid(LinkedList* list, size_t index)
     for (size_t i = 0; i < index; i++)
         item = item->next;
 
-    LinkedListItem* prev = item->prev;
-    LinkedListItem* next = item->next;
-    prev->next = next;
-    next->prev = prev;
+    delete_mid(list, item);
+}
 
-    LinkedList_ItemDestroy(list, item);
+static LinkedListItem* search(const LinkedList* self, const void* item)
+{
+    LinkedListItem* current = self->head;
+
+    while (current != NULL) {
+        if (self->comparator(item, current->payload) == 0)
+            return current;
+
+        current = current->next;
+    }
+
+    return NULL;
+}
+
+LinkedList* LinkedList_Create(freer freer, comparator comparator)
+{
+    LinkedList* list = calloc(sizeof(LinkedList), 1);
+
+    if (list == NULL)
+        return NULL;
+
+    list->freer = freer;
+    list->comparator = comparator;
+    return list;
+}
+
+ListOpResult LinkedList_InsertAt(
+    LinkedList* self, void* payload, const size_t index)
+{
+    if (self == NULL || payload == NULL)
+        return ListOp_NullParameter;
+
+    if (index > self->size)
+        return ListOp_InvalidIndex;
+
+    LinkedListItem* item = LinkedList_ItemCreate(payload);
+    if (item == NULL)
+        return ListOp_FailedMalloc;
+
+    if (index == 0)
+        insert_at_head(self, item);
+    else if (index == self->size)
+        insert_at_tail(self, item);
+    else
+        insert_mid(self, item, index);
+
+    self->size++;
+
+    return ListOp_Success;
 }
 
 ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index)
@@ -184,21 +203,36 @@ ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index)
     return ListOp_Success;
 }
 
+ListOpResult LinkedList_Delete(LinkedList* self, void* doomed)
+{
+    if (self == NULL || doomed == NULL)
+        return ListOp_NullParameter;
+
+    LinkedListItem* item = search(self, doomed);
+    if (item == NULL)
+        return ListOp_NotFound;
+
+    if (item == self->head)
+        delete_at_head(self);
+    else if (item == self->tail)
+        delete_at_tail(self);
+    else
+        delete_mid(self, item);
+
+    self->size--;
+    return ListOp_Success;
+}
+
 void* LinkedList_Search(const LinkedList* self, const void* item)
 {
     if (self == NULL || item == NULL)
         return NULL;
 
-    LinkedListItem* current = self->head;
+    LinkedListItem* found = search(self, item);
+    if (found == NULL)
+        return NULL;
 
-    while (current != NULL) {
-        if (self->comparator(item, current->payload) == 0)
-            return current->payload;
-
-        current = current->next;
-    }
-
-    return NULL;
+    return found->payload;
 }
 
 ListOpResult LinkedList_Enumerate(const LinkedList* self, item_handler handler)
