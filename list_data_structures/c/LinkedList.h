@@ -31,6 +31,7 @@ typedef struct {
 LinkedList* LinkedList_Create(freer, comparator);
 ListOpResult LinkedList_InsertAt(LinkedList*, void*, const size_t);
 ListOpResult LinkedList_DeleteAt(LinkedList*, const size_t);
+ListOpResult LinkedList_Delete(LinkedList*, void*);
 void* LinkedList_Search(const LinkedList*, const void*);
 ListOpResult LinkedList_Enumerate(const LinkedList*, item_handler);
 void LinkedList_Destroy(LinkedList*);

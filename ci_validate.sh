@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function run_c_tests() {
-    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c:1.12 \
+    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c \
         ./validate.sh > run_result.txt
 
     RESULTS=`tail run_result.txt`
@@ -12,6 +12,7 @@ function run_c_tests() {
         echo `pwd` passed
     else
         echo `pwd` failure
+        cat run_result.txt
         exit -1
     fi
 }

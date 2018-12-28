@@ -35,6 +35,13 @@ memory. The graphic below depicts how an array is arranged in memory.
 #### Array
 ![Array](array.png)
 
+A distinct advantage of Arrays is that any item can be accessed in constant time
+via *direct addressing*. This means that the memory address of any item in an
+array is easily calculable from an index. If `i` is the array index, `sz` is the
+size of individual items, and `a` is the starting address, the formula for
+determining the address of an individual array is: ![(i * sz) +
+a](https://latex.codecogs.com/gif.latex?(i&space;*&space;sz)&space;&plus;&space;a).
+
 ### Asymptotic Complexity
 - Insert\Delete: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
 - Search: ![O(n)](https://latex.codecogs.com/gif.latex?O(n) "O(n)")
