@@ -694,9 +694,30 @@ needs.
 * Lookup: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
 
 ### Pseudo Code
-```
-coming soon
-```
+<pre>
+global variables:
+    k = number of hash functions
+    m = number of bits
+    funcs = array of hash functions of size k
+    filter = bit vector of length m
+
+insert:
+    key = value to insert into the filter
+
+    for func in funcs:
+        index = func(key)
+        set the index<sup>th</sup> bit in filter to 1
+
+lookup:
+    key = value to lookup
+
+    for func in funcs:
+        index = func(key)
+        if the index<sup>th</sup> bit in filter is set:
+            return false
+
+    return true
+</pre>
 
 ### Applications
 * Forbidden Passwords: Passwords that are easy to guess or otherwise prohibited
