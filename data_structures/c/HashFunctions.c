@@ -8,6 +8,10 @@
 static const hash seed_1 = 1480248131514916162;
 static const hash seed_2 = 4129361492271981247;
 static const hash seed_3 = 2522131261608258122;
+const size_t hasher_count = 13;
+const hasher hashers[] = { spooky_hash3, spooky_hash2, spooky_hash, farm_hash3,
+    farm_hash2, farm_hash, elf_hash, oat_hash, fnv_hash, sax_hash, mod_djb_hash,
+    djb_hash, rotating_hash, NULL };
 
 hash rotating_hash(void* key, size_t len)
 {
