@@ -20,7 +20,7 @@ const double EPSILON = 0.0000000000001;
 static void HashTable_Create_failed_malloc()
 {
     FAILED_MALLOC_TEST({
-        HashTable* result = HashTable_Create(10);
+        HashTable* result = HashTable_Create(8);
         CU_ASSERT_PTR_NULL(result);
         CU_ASSERT_EQUAL(FailedMemoryAllocation, ErrorReporter_LastErrorCode());
     });
@@ -30,6 +30,12 @@ static void HashTable_Create_invalid_size()
 {
     ErrorReporter_Clear();
     HashTable* sut = HashTable_Create(0);
+    CU_ASSERT_PTR_NULL(sut);
+    CU_ASSERT_EQUAL(ArgumentOutOfRange, ErrorReporter_LastErrorCode());
+
+    // size is not a power of 2
+    ErrorReporter_Clear();
+    sut = HashTable_Create(10000);
     CU_ASSERT_PTR_NULL(sut);
     CU_ASSERT_EQUAL(ArgumentOutOfRange, ErrorReporter_LastErrorCode());
 }
@@ -87,6 +93,41 @@ static void HashTable_Insert_happy_path()
 
         void* found = HashTable_Find(sut, key);
         CU_ASSERT_PTR_EQUAL(found, &value);
+    });
+}
+
+static void HashTable_Insert_chains()
+{
+    int *one = malloc(sizeof(int)), *two = malloc(sizeof(int)),
+        *three = malloc(sizeof(int));
+    char *one_key = "one", *two_key = "two", *three_key = "three";
+    HashTable* sut = HashTable_Create(2);
+
+    HashTable_Insert(sut, one_key, one);
+    HashTable_Insert(sut, two_key, two);
+    HashTable_Insert(sut, three_key, three);
+
+    CU_ASSERT_EQUAL(HashTable_GetLoadFactor(sut), 1.5);
+    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, one_key), one);
+    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, two_key), two);
+    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, three_key), three);
+
+    HashTable_Destroy(sut, free);
+}
+
+static void HashTable_Insert_updates_existing()
+{
+    char* key = "we are";
+    int first = 138;
+    int second = 1380138;
+    SUT({
+        HashTable_Insert(sut, key, &first);
+        CU_ASSERT_EQUAL(HashTable_Find(sut, key), &first);
+        CU_ASSERT_EQUAL(HashTable_GetN(sut), 1);
+
+        HashTable_Insert(sut, key, &second);
+        CU_ASSERT_EQUAL(HashTable_Find(sut, key), &second);
+        CU_ASSERT_EQUAL(HashTable_GetN(sut), 1);
     });
 }
 
@@ -259,6 +300,8 @@ int register_hash_table_tests()
               CU_TEST_INFO(HashTable_Insert_null_parameter),
               CU_TEST_INFO(HashTable_Insert_failed_malloc),
               CU_TEST_INFO(HashTable_Insert_happy_path),
+              CU_TEST_INFO(HashTable_Insert_chains),
+              CU_TEST_INFO(HashTable_Insert_updates_existing),
               CU_TEST_INFO(HashTable_Delete_not_found),
               CU_TEST_INFO(HashTable_Delete_null_parameter),
               CU_TEST_INFO(HashTable_Delete_happy_path),

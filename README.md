@@ -73,6 +73,7 @@ Actual run time data
     * [Priority Queue](data_structures/README.md#priority-queue)
     * [Heap](data_structures/README.md#heap)
     * [Hash Tables](data_structures/README.md#hash-tables)
+    * [Bloom Filters](data_structures/README.md#bloom-filters)
 * [Running Median](running_median/)
 * [Sorting](sorting/)
     * [Bubble Sort](sorting/README.md#bubble-sort)
@@ -85,6 +86,7 @@ Actual run time data
     * [Graph Search](graph_search/)
     * [Shortest Path](shortest_path/)
     * [Random Contraction](random_contraction/)
+* [Hashing](hashing/)
 
 ## Build/Tests
 ### C

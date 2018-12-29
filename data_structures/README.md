@@ -522,6 +522,53 @@ deletion, and search in constant time.
 
 Assuming non-pathological data and simple uniform hashing
 
+### Pseudo Code
+```
+global variables:
+    hash_table = array for hash table values
+
+insert:
+    key = key used to find value in the future
+    value = value to store in the hash table
+
+    index = hash_function(key)
+
+    if key exists in hash_table:
+        update key with new value
+        return
+
+    list_item = new linked list item
+    list_item->key = key
+    list_item->value = value
+    list_item->next = hash_table[index]
+    hash_table[index] = list_item
+
+delete:
+    key = key to locate the value to delete
+
+    index = hash_function(key)
+    list_item = hash_table[index]
+    while list_item is not NULL:
+        if key = key:
+            delete list_item from list
+            return
+            
+        list_item = list_item->next
+
+find:
+    key = key to locate the value
+    
+    index = hash_function(key)
+    list_item = hash_table[index]
+    while list_item is not NULL:
+        if key = key:
+            return list_item->value
+            
+        list_item = list_item->next
+
+    return NOT FOUND
+```
+
 ### Applications
 * De-Duplication: Inserting items into a hash table automatically removes
     duplicates by nature of the way they work. This has many application such as
@@ -532,3 +579,142 @@ Assuming non-pathological data and simple uniform hashing
 > <sup>1</sup> There are other collision resolution strategies such as *open
 > addressing*.  However, this project only considers chaining. Other options are
 > bound by the same constraints and the concepts are sufficiently transferable.
+
+## Bloom Filters
+Bloom filters are conceptually similar to [Hash Tables](#hash-tables) in that
+they both use hash functions to map keys to indices in constant time. They
+differ in that Hash Tables store/return a value associated with a key while
+Bloom Filters returns a boolean (yes or no) response indicating if a key has
+been previously inserted. In other words, they test if a key exists in a set.
+The general idea is that they accept a list of keys and "remember" them without
+the ability to retrieve, delete, or enumerate them.  Imagine a spell checker
+application<sup>1</sup> with the list of all known words inserted into a Bloom
+Filter. Executing a Bloom filter lookup on any word indicates if it is spelled
+correctly.
+
+What is extraordinary about Bloom filters, aside from guaranteed constant time
+operations, is the scant amount of memory they require: as little as 8 bits per
+32 or 64 bit key. The trade off to the speed and memory paucity is accuracy.
+Bloom filters are known as a *space-efficient probabilistic* data structures
+meaning that there is some probability of incorrect responses. Error rate,
+memory space, and performance act as balancing forces so engineers must choose
+the right combination for their specific application. This will be become more
+obvious after examining their internal workings.
+
+A Bloom filter implementation has two primary components: 1) a list of hash
+functions and 2) a bit vector<sup>2</sup>. When a key is inserted, each hash
+function in the list computes an index between zero and the size of the bit
+vector. Next, the corresponding bits in the vector are set to one. This is best
+demonstrated with an example. Consider a Bloom filter that will hold the set of
+the names of our favorite computer scientists. There is a bit vector of size ten
+and a list of three hypothetical hash functions as depicted in the image below.
+The first name inserted is the venerable Donald Knuth. The initial hash function
+return seven, the second two, and the third five so these bits are set to one.
+When Edward Dykstra is inserted, the first function returns one, the second
+five, and the third eight. An important thing to note is that bit five is
+already set to one. In this case, no change is made to this bit. The only reason
+it is of note is to highlight the fact that different keys can "share" bits.
+
+#### Bloom Filter Insert
+![Bloom Filter Insert](bloom_filter_insert.png)
+
+Looking up a key in a Bloom filter involves computing the index of each hash
+function and return yes if all the corresponding bits are one and no if any one
+of the bits is zero. As mentioned above, Bloom filters are a probabilistic data
+structure, so returning a definitive yes or no is somewhat of a misnomer. More
+accurate responses would be "definite no" and "highly probable". Bloom filters
+will never return no for a key that was inserted. However, false positives (yes
+for a key that was NOT inserted) are a low probabilistic possibility. This image
+below graphically demonstrates Bloom filter lookups. The name Edward Dykstra was
+inserted in the previous example, so it makes sense that it return a "highly
+probable" response. The names Dennis Ritchie and John Von Neumann have not been
+inserted into the Bloom filter as of yet (obviously no list of computer
+scientist would be complete without them). Doing a look up on Dennis Ritchie
+results in "no" because the second hash function returns a three and this bit is
+set to zero. John Von Neumann demonstrates the dreaded false positive result.
+Even though the name does not exist in the data structure, it returns "highly
+probable" because all of the computed bits are set to one. The question now
+becomes, "just how probable are false positives".
+
+#### Bloom Filter Lookup
+![Bloom Filter Lookup](bloom_filter_lookup.png)
+
+As alluded to earlier, it's possible to tune the probability of false positives
+(error rate) by manipulating the number of hash functions (performance) and the
+length of the bit vector (memory space). Determining the correct balance for a
+specific application involves calculating a few formulas. The arcane details
+underlying the math below are out of scope
+([here](https://en.wikipedia.org/wiki/Bloom_filter) is a good place for the
+curious to start). There are several [Bloom Filter
+Calculators](https://hur.st/bloomfilter/) freely available on the internet that
+work wonderfully for the time constrained. 
+
+For the equations below, `P` is the probability of error, `m` is the number of
+bits in the vector, `k` is the number of hash functions, and `n` is the
+number of items inserted into the Bloom filter.
+
+#### Probability of False Positives
+![error
+rate](https://latex.codecogs.com/gif.latex?P=(1-[1-\frac{1}{m}]^{^{kn}})^k)
+
+![bits](https://latex.codecogs.com/gif.latex?m=-\frac{n\ln&space;P}{(\ln2)^2})
+
+![functions](https://latex.codecogs.com/gif.latex?k=\frac{m}{n}\ln&space;2)
+
+As an example, assume a Bloom filter with 50 items and a desired probability of
+false positives of 1% (.01). The size of the bit vector must be:
+
+![bit
+size](https://latex.codecogs.com/gif.latex?m=-\frac{50\ln&space;0.01}{(\ln2)^2}=479.252918868372)
+
+Rounding the number of bits up to 480, the number of functions becomes:
+
+![number of
+functions](https://latex.codecogs.com/gif.latex?k=\frac{\ln&space;480}{50}\ln&space;2=6.6542129333755)
+
+The final verdict is that in order to keep the probability of error under 1%,
+the bit vector must be at least 460 bits long and there must be at least 7
+functions in the hash function list. It should also be noted that all of the
+constraints and recommendations concerning hash functions outlined in the [Hash
+Table](#hash-tables) section also apply here. It is assumed that each hash
+function is capable of simple uniform hashing and indices are also evenly
+distributed between them. Failing any of these requirements results in a higher
+error rate.
+
+In conclusion, Bloom filters are highly useful data structures for testing if
+objects belongs to a pre-defined set. The constant time operations and
+comparatively meager memory space requirement make them highly practical. On the
+down side, Bloom filters produce false positive results occasionally. Increasing
+space and performance requirements can reduce the error rate. Engineers should
+take special care to weigh the trade offs against the specific application's
+needs.
+
+### Asymptotic Time Complexity
+* Insert: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+* Lookup: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+
+### Pseudo Code
+```
+coming soon
+```
+
+### Applications
+* Forbidden Passwords: Passwords that are easy to guess or otherwise prohibited
+    can be inserted into a Bloom Filter and every time a user enters a password
+    the system can verify that it is not contained in the forbidden set.
+* Recommendation Systems: Many websites suggest related content (blog posts,
+    books, music, movies, etc..) based on the content that is currently being
+    consumed. It is often counter productive to suggest previously consumed
+    content. A Bloom filter offers a blazingly fast means of determining if
+    suggestions are new to the user. The occasional false positive is
+    inconsequential.
+
+## Footnotes
+> <sup>1</sup> Although many word processors used Bloom Filters in the 70s, the
+> error rate typically makes them prohibitive for modern spell checking
+> applications.
+
+> <sup>2</sup> A bit vector is nothing more than an array of bit (0 or 1)
+> values. Imagine an area of memory where each bit can be modified like an array
+> element. A typical array is not suitable because they store at least a single
+> byte per array element which is wasteful in this context.
