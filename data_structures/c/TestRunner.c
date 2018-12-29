@@ -5,14 +5,16 @@ extern int register_priority_queue_tests();
 extern int register_stack_tests();
 extern int register_heap_tests();
 extern int register_hash_table_tests();
-extern int register_hasher_tests();
+extern int register_bloom_filter_tests();
+extern int register_hash_function_tests();
 
 int register_tests()
 {
     return (register_stack_tests() != 0 + register_queue_tests()
                != 0 + register_priority_queue_tests()
                != 0 + register_heap_tests() != 0 + register_hash_table_tests()
-               != 0 + register_hasher_tests() != 0)
+               != 0 + register_bloom_filter_tests()
+               != 0 + register_hash_function_tests() != 0)
         * -1;
 }
 

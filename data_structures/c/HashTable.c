@@ -1,18 +1,22 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "HashFunctions.h"
 #include "HashTable.h"
-#include "Hasher.h"
 #include "include/LinkedList.h"
 #include "include/MemAllocMock.h"
 
 const size_t ERROR_VAL = SIZE_MAX;
+const hasher hash_func = farm_hash;
+const hash_compressor compressor = mul_compressor;
 
 typedef struct HashTable {
     size_t m;
     size_t n;
+    size_t collisons;
     LinkedList** table;
 } HashTable;
 
@@ -21,6 +25,14 @@ typedef struct element {
     size_t key_length;
     void* value;
 } element;
+
+static bool is_power_2(size_t n) { return (ceil(log2(n)) == floor(log2(n))); }
+
+static size_t generate_index(char* key, size_t key_length, size_t max_index)
+{
+    hash h = hash_func(key, key_length);
+    return compressor(h, max_index);
+}
 
 static int ele_comparator(const void* x, const void* y)
 {
@@ -76,7 +88,7 @@ static element* search_list(LinkedList* list, char* key, size_t key_length)
 
 HashTable* HashTable_Create(size_t size)
 {
-    if (size == 0) {
+    if (size == 0 || !is_power_2(size)) {
         ERROR("HashTable", ArgumentOutOfRange);
         return NULL;
     }
@@ -94,6 +106,7 @@ HashTable* HashTable_Create(size_t size)
         return NULL;
     }
 
+    ht->collisons = 0;
     ht->m = size;
     return ht;
 }
@@ -107,6 +120,7 @@ Result HashTable_Insert(HashTable* self, char* key, void* value)
     size_t index = generate_index(key, key_length, self->m);
 
     LinkedList* ls = self->table[index];
+    element* el = NULL;
 
     if (ls == NULL) {
         self->table[index] = LinkedList_Create(element_destroy, ele_comparator);
@@ -114,9 +128,20 @@ Result HashTable_Insert(HashTable* self, char* key, void* value)
             return FailedMemoryAllocation;
 
         ls = self->table[index];
+    } else {
+        // search the list if already exists, otherwise, just leave el NULL
+        el = search_list(ls, key, key_length);
+
+        // if the list was found, but the item doesn't exit, it's a collision
+        if (el == NULL)
+            self->collisons++;
+        else {
+            el->value = value;
+            return Success;
+        }
     }
 
-    element* el = search_list(ls, key, key_length);
+    // Insert the value if it exists, otherwise update it
     if (el == NULL) {
         el = element_create(key, key_length, value);
         if (el == NULL)
@@ -125,8 +150,7 @@ Result HashTable_Insert(HashTable* self, char* key, void* value)
         ListOpResult result = LinkedList_InsertAt(ls, el, 0);
         if (result != ListOp_Success)
             return DependancyError;
-    } else
-        el->value = value;
+    }
 
     self->n++;
 
