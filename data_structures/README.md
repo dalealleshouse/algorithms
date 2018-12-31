@@ -434,6 +434,9 @@ to linear. This will enable malicious actors to mount denial of service or
 similar attacks. Luckily, there is some recourse by using *universal hashing*.
 
 #### Universal Hashing
+TO DO: Expand on this - it's not real obvious what it is based on this
+description
+
 Universal hashing eliminates the risk of pathological data sets by randomly
 choosing a hash function independently from the stored keys. Each execution of
 the algorithm chooses a different hash function, even for the same input. This

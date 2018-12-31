@@ -50,19 +50,19 @@ static void div_compressor_happy_path() { test_compressor(div_compressor); }
 
 static void mul_compressor_happy_path()
 {
-    test_compressor(mul_compressor);
+    test_compressor(mul_compressor64);
 
     // example from Introduction to Algorithms p. 264
-    size_t result = mul_compressor(123456, 16384);
+    size_t result = mul_compressor64(123456, 16384);
     CU_ASSERT_EQUAL(67, result);
 
-    result = mul_compressor(15, 8);
+    result = mul_compressor64(15, 8);
     CU_ASSERT_EQUAL(2, result);
 
-    result = mul_compressor(23, 8);
+    result = mul_compressor64(23, 8);
     CU_ASSERT_EQUAL(1, result);
 
-    result = mul_compressor(100, 8);
+    result = mul_compressor64(100, 8);
     CU_ASSERT_EQUAL(6, result);
 }
 

@@ -26,5 +26,4 @@ hash spooky_hash2(void*, size_t);
 hash spooky_hash3(void*, size_t);
 
 size_t div_compressor(hash, size_t);
-// Specifically designed for 64 bit keys and max_val as a power of 2
-size_t mul_compressor(hash, size_t);
+size_t mul_compressor64(hash, size_t);
