@@ -61,7 +61,7 @@ Actual run time data
 
 ## Index
 
-* [Asymptotic Complexity](asymptotic_complexity/)
+* [Introduction](introduction/)
 * [List Data Structures](list_data_structures/)
     * [Array](list_data_structures/README.md#arrays)
     * [Sorted Array](list_data_structures/README.md#sorted-arrays)
@@ -70,7 +70,6 @@ Actual run time data
     * [Self Balancing Search
         Trees](list_data_structures/README.md#self-balancing-search-trees)
     * [Red-Black Trees](list_data_structures/README.md#red-black-trees)
-* [Hashing](hashing/)
 * [Data Structures](data_structures/)
     * [Stack](data_structures/README.md#stack-last-in-first-out)
     * [Queue](data_structures/README.md#queue-first-in-first-out)
