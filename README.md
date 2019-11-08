@@ -149,4 +149,4 @@ docker run --rm -v $(pwd):/src/ dalealleshouse/algo_test_runner_py
     - perhaps it should just use a Fibonacci heap???
 1. Should Hash Tables be moved to the list data structures section?
 1. Should Search Trees be moved to the data structures section?
-1. Actual run time for naive shortest path vs. priority queue shortest path
+1. Actual run time for naive shortest path vs priority queue shortest path

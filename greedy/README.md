@@ -1,4 +1,3 @@
-
 # Greedy Algorithms
     - Iteratively make myopic irrevocable decisions
     - Dijkstra's shortest path
