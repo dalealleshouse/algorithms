@@ -35,6 +35,9 @@ Implementation Quality
     accepting randomly sorted arrays are using the exact same inputs.  For the
     purposes of this project, `rand()` is sufficient. However, a different
     solution is required for production scenarios.
+* There is little to no thought to given to C code portability. It is assumed
+    that it will always run in the supplied docker container on a 64-bit
+    machine.
 
 Actual run time data
 * Many sections include actual run time data for the C implementation of the
@@ -58,7 +61,7 @@ Actual run time data
 
 ## Index
 
-* [Asymptotic Complexity](asymptotic_complexity/)
+* [Introduction](introduction/)
 * [List Data Structures](list_data_structures/)
     * [Array](list_data_structures/README.md#arrays)
     * [Sorted Array](list_data_structures/README.md#sorted-arrays)
@@ -86,7 +89,6 @@ Actual run time data
     * [Graph Search](graph_search/)
     * [Shortest Path](shortest_path/)
     * [Random Contraction](random_contraction/)
-* [Hashing](hashing/)
 
 ## Build/Tests
 ### C
@@ -141,9 +143,10 @@ docker run --rm -v $(pwd):/src/ dalealleshouse/algo_test_runner_py
 
 
 ## TODO List:
-1. Hash Table for list data structures
-1. New run times for all list data structures
 1. Update Shortest Path to use a Heap instead of a naive priority queue
     - requires a re-prioritize method on the heap implementation which in turn
         requires a hash table
-1. Actual run time for naive shortest path vs. priority queue shortest path
+    - perhaps it should just use a Fibonacci heap???
+1. Should Hash Tables be moved to the list data structures section?
+1. Should Search Trees be moved to the data structures section?
+1. Actual run time for naive shortest path vs priority queue shortest path

@@ -66,8 +66,10 @@ Result BloomFilter_Insert(BloomFilter* self, const char* key)
 
     for (size_t i = 0; i < self->funcs; i++) {
         hash hash = hashers[i]((void*)key, len);
-        size_t index = mul_compressor(hash, self->bits);
-        self->filter[index / byte_size] |= 1 << index % byte_size;
+        size_t index = mul_compressor64(hash, self->bits);
+        size_t byte_index = index / byte_size;
+        size_t bit_index = index % byte_size;
+        self->filter[byte_index] |= 1 << bit_index;
     }
 
     self->n++;
@@ -85,9 +87,11 @@ bool BloomFilter_Lookup(const BloomFilter* self, const char* key)
 
     for (size_t i = 0; i < self->funcs; i++) {
         hash hash = hashers[i]((void*)key, len);
-        size_t index = mul_compressor(hash, self->bits);
+        size_t index = mul_compressor64(hash, self->bits);
+        size_t byte_index = index / byte_size;
+        size_t bit_index = index % byte_size;
 
-        if (!(self->filter[index / byte_size] & 1 << index % byte_size))
+        if (!(self->filter[byte_index] & 1 << bit_index))
             return false;
     }
 
