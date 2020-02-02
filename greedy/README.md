@@ -1,6 +1,9 @@
 # Greedy Algorithms
-    - Iteratively make myopic irrevocable decisions
-    - Dijkstra's shortest path
+Common solution to scheduling problems: how should a shared resource be
+allocated
+- Iteratively make myopic irrevocable decisions
+- [Dijkstra's](../shortest_path/README.md#dijkstras-naive) shortest path is an
+    example of a popular greedy algorithm
 
 ### Pros
 - Easy to apply
@@ -8,8 +11,16 @@
 
 ### Cons
 - Difficult to establish correctness
-- Despite intuition, most are NOT correct
-    - Heuristics are often misleading
+- Despite intuition, most are NOT correct and heuristics are often misleading
+
+Example: 
+Dijkstra's shortest path algorithm with negative edge lengths. Consider the
+graph below. Calculate the shortest path from s->w.
+
+![graph](negative-edge-graph.png)
+
+Dijkstra's algorithm will compute 2 (s->w) but 1 (s->v->w) is the correct
+answer. 
 
 Correctness Proofs
 - Induction
@@ -18,11 +29,14 @@ Correctness Proofs
 
 The caching problem
 - Von Neumann architecture memory hierarchy
+- Bélády's theorem (1960s) indicates that a natural greedy algorithm (furthest
+    in the future) is an optimal algorithm for the caching problem.
 - The optimal caching algorithm is a greedy algorithm - furthest in the future
     algorithm
-    * this is unimplementable but serves as a guideline for practical algorithms 
-    * informs that Least Recently Used (LRU) algorithm - gold standard for cache
-        algorithms
+    * this is unimplementable as it would require clairvoyance; however, it
+        serves as a guideline for practical algorithms 
+    * informs that Least Recently Used (LRU) (closest you can get to furthest in
+        the future) algorithm - gold standard for cache algorithms
     * serves as an idealized benchmark
 
 # Dynamic Programming

@@ -119,3 +119,9 @@ time. Not everyone who uses a hammer builds tables.
 Do not interpret these examples as absolutely canonical. There is no one right
 way to do things. Software engineering is all about choosing the right balance
 of trade offs that work best for a particular application.
+
+## Algorithm Design Paradigms
+1. Divide and Concur
+1. Randomized
+1. Greedy
+1. Dynamic Programming
