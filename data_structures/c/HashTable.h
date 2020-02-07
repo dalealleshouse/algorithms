@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "include/CommonTypes.h"
 #include "include/ResultCode.h"
@@ -11,6 +12,7 @@ typedef struct HashTable HashTable;
 HashTable* HashTable_Create(size_t);
 Result HashTable_Insert(HashTable*, void* key, size_t length, void* value);
 Result HashTable_Delete(HashTable*, void* key, size_t length);
+bool HashTable_KeyExists(HashTable*, void* key, size_t length);
 double HashTable_GetLoadFactor(HashTable*);
 size_t HashTable_GetN(HashTable*);
 size_t HashTable_GetCollisions(HashTable*);

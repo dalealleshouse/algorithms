@@ -1,46 +1,86 @@
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "Heap.h"
 #include "include/MemAllocMock.h"
 #include "include/OverflowChecker.h"
 
-static size_t ParentIndex(size_t index)
+static size_t _parentIndex(size_t index)
 {
-    index++;
+    ++index;
     index = index >> 1;
     return index - 1;
 }
 
-static size_t ChildIndex(size_t index)
+static size_t _childIndex(size_t index)
 {
     index++;
     index = index << 1;
     return index - 1;
 }
 
-static void Swap(void* data[], size_t x, size_t y)
+static uintptr_t _getHashKey(void* item) { return (uintptr_t)item; }
+
+static HeapResult _setDataItem(Heap* self, void* item, size_t index)
 {
-    void* temp = data[x];
-    data[x] = data[y];
-    data[y] = temp;
+    uintptr_t key = _getHashKey(item);
+
+    /* printf("Inserting key=%lu, ptr=%p, index=%lu\n", key, item, index); */
+
+    // Clean up whatever is in the current slot
+    void* existing = HashTable_Find(self->item_tracker, &key, sizeof(key));
+    free(existing);
+
+    // Geta a new index
+    size_t* i = malloc(sizeof(index));
+    if (i == NULL)
+        return HeapFailedMemoryAllocation;
+
+    // Set the index in the hash table
+    *i = index;
+    HashTable_Insert(self->item_tracker, &key, sizeof(key), i);
+
+    // Update the data
+    self->data[index] = item;
+    return HeapSuccess;
 }
 
-static void BubbleUp(Heap* self, size_t start)
+static HeapResult _swap(Heap* self, size_t x, size_t y)
+{
+    void* temp = self->data[x];
+    HeapResult result = _setDataItem(self, self->data[y], x);
+    if (result != HeapSuccess)
+        return result;
+
+    result = _setDataItem(self, temp, y);
+    if (result != HeapSuccess)
+        return result;
+    /* data[x] = data[y]; */
+    /* data[y] = temp; */
+    return HeapSuccess;
+}
+
+static HeapResult _bubbleUp(Heap* self, size_t start)
 {
     while (start > 0) {
-        size_t parent_index = ParentIndex(start);
+        size_t parent_index = _parentIndex(start);
         int comp_result
             = self->comparator(self->data[start], self->data[parent_index]);
 
         if (comp_result <= 0)
             break;
 
-        Swap(self->data, start, parent_index);
+        HeapResult result = _swap(self, start, parent_index);
+        if (result != HeapSuccess)
+            return result;
+
         start = parent_index;
     }
+
+    return HeapSuccess;
 }
 
-static size_t GreatestPriority(Heap* self, size_t x, size_t y)
+static size_t _greatestPriority(Heap* self, size_t x, size_t y)
 {
     if (y >= self->n)
         return x;
@@ -56,22 +96,43 @@ static size_t GreatestPriority(Heap* self, size_t x, size_t y)
     return y;
 }
 
-static void BubbleDown(Heap* self, size_t start)
+static HeapResult _bubbleDown(Heap* self, size_t start)
 {
     size_t child;
 
-    while ((child = ChildIndex(start)) < self->n) {
-        child = GreatestPriority(self, child, child + 1);
+    while ((child = _childIndex(start)) < self->n) {
+        child = _greatestPriority(self, child, child + 1);
 
         int comp_result
             = self->comparator(self->data[start], self->data[child]);
 
         if (comp_result >= 0)
-            return;
+            return HeapSuccess;
 
-        Swap(self->data, start, child);
+        HeapResult result = _swap(self, start, child);
+        if (result != HeapSuccess)
+            return result;
+
         start = child;
     }
+
+    return HeapSuccess;
+}
+
+// Find a valid size for the hash table
+static size_t _nextPowerOf2(size_t val)
+{
+    size_t count = 0;
+
+    if (val && !(val & (val - 1)))
+        return val;
+
+    while (val != 0) {
+        val >>= 1;
+        count += 1;
+    }
+
+    return 1 << count;
 }
 
 Heap* Heap_Create(size_t size, comparator comparator)
@@ -106,6 +167,13 @@ Heap* Heap_Create(size_t size, comparator comparator)
         return NULL;
     }
 
+    self->item_tracker = HashTable_Create(_nextPowerOf2(size));
+    if (self->item_tracker == NULL) {
+        HEAP_ERROR(HeapHashTableError);
+        Heap_Destroy(self, NULL);
+        return NULL;
+    }
+
     self->size = size;
     self->n = 0;
     self->comparator = comparator;
@@ -117,6 +185,8 @@ void Heap_Destroy(Heap* self, freer freer)
 {
     if (self == NULL)
         return;
+
+    HashTable_Destroy(self->item_tracker, free);
 
     if (freer != NULL && self->data != NULL) {
         for (size_t i = 0; i < self->n; i++)
@@ -135,8 +205,14 @@ HeapResult Heap_Insert(Heap* self, void* item)
     if (self->size == self->n)
         return HeapOverflow;
 
-    self->data[self->n] = item;
-    BubbleUp(self, self->n);
+    HeapResult result = _setDataItem(self, item, self->n);
+    if (result != HeapSuccess)
+        return result;
+
+    result = _bubbleUp(self, self->n);
+    if (result != HeapSuccess)
+        return result;
+
     self->n++;
 
     return HeapSuccess;
@@ -177,13 +253,20 @@ void* Heap_Extract(Heap* self)
 
     void* item = self->data[0];
     self->n--;
-    Swap(self->data, 0, self->n);
-    BubbleDown(self, 0);
+    HeapResult result = _swap(self, 0, self->n);
+    if (result != HeapSuccess) {
+        HEAP_ERROR(result);
+    }
+
+    result = _bubbleDown(self, 0);
+    if (result != HeapSuccess) {
+        HEAP_ERROR(result);
+    }
 
     return item;
 }
 
-void* Heap_Find(Heap* self)
+void* Heap_Peek(Heap* self)
 {
     if (self == NULL) {
         HEAP_ERROR(HeapNullParameter);
@@ -211,9 +294,55 @@ bool Heap_IsEmpty(Heap* self)
     return false;
 }
 
+bool Heap_Exists(Heap* self, void* findMe)
+{
+    if (self == NULL || findMe == NULL) {
+        HEAP_ERROR(HeapNullParameter);
+        return false;
+    }
+
+    uintptr_t key = _getHashKey(findMe);
+    void* found = HashTable_Find(self->item_tracker, &key, sizeof(key));
+
+    return found != NULL;
+}
+
+HeapResult Heap_Reproiritize(Heap* self, void* item)
+{
+    if (self == NULL || item == NULL)
+        return HeapNullParameter;
+
+    uintptr_t key = _getHashKey(item);
+    size_t* index = HashTable_Find(self->item_tracker, &key, sizeof(key));
+    if (index == NULL)
+        return HeapItemNotFound;
+
+    // Index is the first item in queue, so it can only go down
+    if (*index == 0)
+        return _bubbleDown(self, *index);
+
+    // Figure out if item has a higher priority than it
+    size_t parent_index = _parentIndex(*index);
+    int comp_result
+        = self->comparator(self->data[*index], self->data[parent_index]);
+
+    // If they are equal, no need to move anything
+    if (comp_result == 0)
+        return HeapSuccess;
+
+    // If it is greater, then bubble it up
+    if (comp_result > 0)
+        return _bubbleUp(self, *index);
+
+    // The only other option is less so bubble it down
+    return _bubbleDown(self, *index);
+}
+
 char* Heap_ErrorMessage(HeapResult result)
 {
     switch (result) {
+    case HeapItemNotFound:
+        return "The specified item was not found in the heap";
     case HeapArithmeticOverflow:
         return "An operation caused an arithmetic overflow";
     case HeapOverflow:
@@ -228,6 +357,8 @@ char* Heap_ErrorMessage(HeapResult result)
         return "One of the required parameters passed to the function is NULL";
     case HeapSuccess:
         return "Success";
+    case HeapHashTableError:
+        return "The HashTable object used to locate Heap items caused an error";
     default:
         return "Unknown error code";
     }

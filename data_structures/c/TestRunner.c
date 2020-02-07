@@ -12,9 +12,10 @@ int register_tests()
 {
     return (register_stack_tests() != 0 + register_queue_tests()
                != 0 + register_priority_queue_tests()
-               != 0 + register_heap_tests() != 0 + register_hash_table_tests()
+               != 0 + register_hash_table_tests()
                != 0 + register_bloom_filter_tests()
-               != 0 + register_hash_function_tests() != 0)
+               != 0 + register_hash_function_tests()
+               != 0 + register_heap_tests() != 0)
         * -1;
 }
 

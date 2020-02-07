@@ -26,7 +26,7 @@ static TestHeapObj* TestHeapObj_Create(int priority)
 {
     TestHeapObj* obj = malloc(sizeof(TestHeapObj));
     obj->id = priority;
-    obj->priority = priority;
+    obj->priority = priority * 100;
 
     return obj;
 }
@@ -44,7 +44,7 @@ static void HeapIsValid(Heap* sut)
         TestHeapObj* parent = sut->data[parent_index];
 
         if (parent->priority > item->priority) {
-            printf("parent=%zu-%d, child=%zu-%d\n", parent_index,
+            printf("\nparent=%zu-%d, child=%zu-%d\n", parent_index,
                 parent->priority, i, item->priority);
             CU_FAIL("Invalid Heap Value");
         }
@@ -56,19 +56,13 @@ static int TestComparator(const void* x, const void* y)
     TestHeapObj* _x = (TestHeapObj*)x;
     TestHeapObj* _y = (TestHeapObj*)y;
 
-    if (_x->priority == _y->priority)
-        return 0;
-
-    if (_x->priority < _y->priority)
-        return 1;
-
-    return -1;
+    return _y->priority - _x->priority;
 }
 
 static Heap* CreateSut(size_t size)
 {
     Heap* sut = Heap_Create(size, TestComparator);
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = 1; i <= size; i++)
         Heap_Insert(sut, TestHeapObj_Create(i));
 
     return sut;
@@ -114,6 +108,7 @@ static void Heap_Create_intializes_variables()
     CU_ASSERT_EQUAL(0, sut->n);
     CU_ASSERT_EQUAL(size, sut->size);
     CU_ASSERT_PTR_EQUAL(TestComparator, sut->comparator);
+    CU_ASSERT_PTR_NOT_NULL(sut->item_tracker);
 
     Heap_Destroy(sut, NULL);
 }
@@ -200,10 +195,10 @@ static void Heap_Extract_returns_highest_priority()
     const size_t size = 11;
     Heap* sut = CreateSut(size);
 
-    for (int i = 0; i < (int)size; i++) {
+    for (int i = 1; i <= (int)size; i++) {
         TestHeapObj* obj = Heap_Extract(sut);
-        CU_ASSERT_EQUAL(i, obj->priority);
-        CU_ASSERT_EQUAL(size - i - 1, sut->n);
+        CU_ASSERT_EQUAL(i * 100, obj->priority);
+        CU_ASSERT_EQUAL(size - i, sut->n);
         HeapIsValid(sut);
         TestHeapObj_Destroy(obj);
     }
@@ -236,7 +231,7 @@ static void Heap_IsEmpty_return_true_when_empty()
 
 static void Heap_IsEmpty_return_false_when_not_empty()
 {
-    Heap* sut = CreateSut(1);
+    Heap* sut = CreateSut(2);
 
     bool result = Heap_IsEmpty(sut);
     CU_ASSERT_FALSE(result);
@@ -253,34 +248,34 @@ static void Heap_IsEmpty_null_parameter()
     CU_ASSERT_EQUAL(HeapNullParameter, ErrorReporter_LastErrorCode());
 }
 
-static void Heap_Find_null_parameter()
+static void Heap_Peek_null_parameter()
 {
     ErrorReporter_Clear();
 
-    void* result = Heap_Find(NULL);
+    void* result = Heap_Peek(NULL);
     CU_ASSERT_PTR_NULL(result);
     CU_ASSERT_EQUAL(HeapNullParameter, ErrorReporter_LastErrorCode());
 }
 
-static void Heap_Find_returns_highest_priority()
+static void Heap_Peek_returns_highest_priority()
 {
     const size_t size = 11;
     Heap* sut = CreateSut(size);
 
-    TestHeapObj* obj = Heap_Find(sut);
-    CU_ASSERT_EQUAL(0, obj->priority);
+    TestHeapObj* obj = Heap_Peek(sut);
+    CU_ASSERT_EQUAL(100, obj->priority);
     CU_ASSERT_EQUAL(size, sut->n);
     HeapIsValid(sut);
 
     Heap_Destroy(sut, TestHeapObj_Destroy);
 }
 
-static void Heap_Find_empty()
+static void Heap_Peek_empty()
 {
     ErrorReporter_Clear();
     Heap* sut = Heap_Create(10, TestComparator);
 
-    void* result = Heap_Find(sut);
+    void* result = Heap_Peek(sut);
 
     CU_ASSERT_PTR_NULL(result);
     CU_ASSERT_EQUAL(HeapEmpty, ErrorReporter_LastErrorCode());
@@ -357,6 +352,123 @@ static void Heap_Resize_larger_happy_path()
 
 static void Heap_Destroy_null_parameter() { Heap_Destroy(NULL, free); }
 
+static void Heap_Exists_null_parameter()
+{
+    bool result = Heap_Exists(NULL, NULL);
+    CU_ASSERT_FALSE(result);
+    CU_ASSERT_EQUAL(HeapNullParameter, ErrorReporter_LastErrorCode());
+
+    int somePointer;
+    result = Heap_Exists(NULL, &somePointer);
+    CU_ASSERT_FALSE(result);
+    CU_ASSERT_EQUAL(HeapNullParameter, ErrorReporter_LastErrorCode());
+
+    SUT(10, {
+        result = Heap_Exists(sut, NULL);
+        CU_ASSERT_FALSE(result);
+        CU_ASSERT_EQUAL(HeapNullParameter, ErrorReporter_LastErrorCode());
+    });
+}
+
+static void Heap_Exists_returns_true_when_item_exists()
+{
+    ErrorReporter_Clear();
+    SUT(10, {
+        bool exists = Heap_Exists(sut, sut->data[5]);
+        CU_ASSERT_TRUE(exists);
+        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
+    });
+}
+
+static void Heap_Exists_returns_false_when_item_does_not_exist()
+{
+    ErrorReporter_Clear();
+    SUT(10, {
+        int somePointer;
+        bool exists = Heap_Exists(sut, &somePointer);
+        CU_ASSERT_FALSE(exists);
+        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
+    });
+}
+
+static void Heap_Reproiritize_null_parameter()
+{
+    HeapResult result = Heap_Reproiritize(NULL, NULL);
+    CU_ASSERT_EQUAL(result, HeapNullParameter);
+
+    int somePointer;
+    result = Heap_Reproiritize(NULL, &somePointer);
+    CU_ASSERT_EQUAL(result, HeapNullParameter);
+
+    SUT(10, {
+        result = Heap_Reproiritize(sut, NULL);
+        CU_ASSERT_EQUAL(result, HeapNullParameter);
+    });
+}
+
+static void Heap_Reproiritize_item_not_found()
+{
+    SUT(10, {
+        int somePointer;
+        HeapResult result = Heap_Reproiritize(sut, &somePointer);
+        CU_ASSERT_EQUAL(result, HeapItemNotFound);
+        HeapIsValid(sut);
+    });
+}
+
+static void Heap_Reproiritize_no_change_to_priority()
+{
+    SUT(10, {
+        HeapResult result = Heap_Reproiritize(sut, sut->data[5]);
+        CU_ASSERT_EQUAL(result, HeapSuccess);
+        HeapIsValid(sut);
+    });
+}
+
+static void Heap_Reproiritize_raise_priority()
+{
+    SUT(10, {
+        TestHeapObj* changeMe = sut->data[5];
+        changeMe->priority = 1;
+        HeapResult result = Heap_Reproiritize(sut, changeMe);
+        CU_ASSERT_EQUAL(result, HeapSuccess);
+        HeapIsValid(sut);
+    });
+}
+
+static void Heap_Reproiritize_lower_priority()
+{
+    SUT(10, {
+        TestHeapObj* changeMe = sut->data[2];
+        changeMe->priority = 1200;
+        HeapResult result = Heap_Reproiritize(sut, changeMe);
+        CU_ASSERT_EQUAL(result, HeapSuccess);
+        HeapIsValid(sut);
+    });
+}
+
+static void Heap_Reproiritize_lower_last_item()
+{
+    SUT(10, {
+        TestHeapObj* changeMe = sut->data[9];
+        changeMe->priority = 1200;
+        HeapResult result = Heap_Reproiritize(sut, changeMe);
+        CU_ASSERT_EQUAL(result, HeapSuccess);
+        HeapIsValid(sut);
+    });
+}
+
+static void Heap_Reproiritize_raise_first_item()
+{
+    SUT(10, {
+        TestHeapObj* changeMe = sut->data[0];
+        changeMe->priority = 50;
+        HeapResult result = Heap_Reproiritize(sut, changeMe);
+        CU_ASSERT_EQUAL(result, HeapSuccess);
+        HeapIsValid(sut);
+    });
+}
+
 int register_heap_tests()
 {
     CU_TestInfo Heap_tests[] = { CU_TEST_INFO(Heap_Create_null_parameter),
@@ -374,15 +486,25 @@ int register_heap_tests()
         CU_TEST_INFO(Heap_IsEmpty_return_true_when_empty),
         CU_TEST_INFO(Heap_IsEmpty_return_false_when_not_empty),
         CU_TEST_INFO(Heap_IsEmpty_null_parameter),
-        CU_TEST_INFO(Heap_Find_null_parameter),
-        CU_TEST_INFO(Heap_Find_returns_highest_priority),
-        CU_TEST_INFO(Heap_Find_empty), CU_TEST_INFO(Heap_Extract_empty_heap),
+        CU_TEST_INFO(Heap_Peek_null_parameter),
+        CU_TEST_INFO(Heap_Peek_returns_highest_priority),
+        CU_TEST_INFO(Heap_Peek_empty), CU_TEST_INFO(Heap_Extract_empty_heap),
         CU_TEST_INFO(Heap_Resize_null_parameter),
         CU_TEST_INFO(Heap_Resize_zero), CU_TEST_INFO(Heap_Resize_too_small),
         CU_TEST_INFO(Heap_Resize_arith_overflow),
         CU_TEST_INFO(Heap_Resize_failed_malloc),
         CU_TEST_INFO(Heap_Resize_smaller_happy_path),
-        CU_TEST_INFO(Heap_Resize_larger_happy_path), CU_TEST_INFO_NULL };
+        CU_TEST_INFO(Heap_Resize_larger_happy_path),
+        CU_TEST_INFO(Heap_Exists_null_parameter),
+        CU_TEST_INFO(Heap_Exists_returns_true_when_item_exists),
+        CU_TEST_INFO(Heap_Exists_returns_false_when_item_does_not_exist),
+        CU_TEST_INFO(Heap_Reproiritize_null_parameter),
+        CU_TEST_INFO(Heap_Reproiritize_item_not_found),
+        CU_TEST_INFO(Heap_Reproiritize_no_change_to_priority),
+        CU_TEST_INFO(Heap_Reproiritize_raise_priority),
+        CU_TEST_INFO(Heap_Reproiritize_lower_priority),
+        CU_TEST_INFO(Heap_Reproiritize_lower_last_item),
+        CU_TEST_INFO(Heap_Reproiritize_raise_first_item), CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Heap",
                                   .pInitFunc = noop,

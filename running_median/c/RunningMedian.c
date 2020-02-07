@@ -45,7 +45,7 @@ static int min_comparator(const void* x, const void* y)
 
 static double get_heap_value(Heap* heap)
 {
-    void* val = Heap_Find(heap);
+    void* val = Heap_Peek(heap);
     if (val == NULL) {
         ERROR("RunningMedian", DependancyError);
         return NAN;

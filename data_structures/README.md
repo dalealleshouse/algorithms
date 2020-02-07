@@ -221,6 +221,8 @@ incomplete list of heap variants.
 ### Asymptotic Time Complexity
 * Insert: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
 * Extract: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+* Reprioritize: ![O(log
+    n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
 * Find: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
 
 ### Pseudo Code
@@ -273,6 +275,27 @@ extract:
 
         swap child and bubble_down_item in heap_data
         bubble_down_item = child
+
+reprioritize:
+    // It is assumed that the consumer updated a priority value and now needs to rearrange the heap
+    heap_data = array containing heap items
+    index = index of item to be recalculated
+
+    if (index == 0)
+        bubble down (see extract)
+
+    priority = priority_function(index, parent)
+
+    if(priority = 0):
+        return 
+
+    if (priority > 0):
+        bubble up (see insert)
+        return
+
+    bubble down (see extract)
+    return
+        
 
 peek:
     Return item at heap_data[0] without removing it from the array
