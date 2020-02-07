@@ -7,6 +7,8 @@
 #include "include/CommonTypes.h"
 #include "include/ErrorReporter.h"
 
+#include "HashTable.h"
+
 #define HEAP_ERROR(result)                                                     \
     {                                                                          \
         char str[1000];                                                        \
@@ -17,6 +19,8 @@
     }
 
 typedef enum {
+    HeapItemNotFound = -8,
+    HeapHashTableError = -7,
     HeapArithmeticOverflow = -6,
     HeapOverflow = -5,
     HeapEmpty = -4,
@@ -31,13 +35,16 @@ typedef struct Heap {
     size_t size;
     comparator comparator;
     void** data;
+    HashTable* item_tracker;
 } Heap;
 
 Heap* Heap_Create(size_t, comparator);
 HeapResult Heap_Insert(Heap*, void*);
 HeapResult Heap_Resize(Heap*, size_t);
+HeapResult Heap_Reproiritize(Heap*, void*);
 void* Heap_Extract(Heap*);
 bool Heap_IsEmpty(Heap*);
-void* Heap_Find(Heap*);
+bool Heap_Exists(Heap*, void*);
+void* Heap_Peek(Heap*);
 void Heap_Destroy(Heap*, freer);
 char* Heap_ErrorMessage(HeapResult);

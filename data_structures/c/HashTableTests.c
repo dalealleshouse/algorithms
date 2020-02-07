@@ -259,7 +259,7 @@ static void HashTable_Find_not_found()
         ErrorReporter_Clear();
         void* result = HashTable_Find(sut, not_found, strlen(not_found));
         CU_ASSERT_PTR_NULL(result);
-        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NotFound);
+        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
     });
 }
 
@@ -362,6 +362,51 @@ static void HashTable_GetCollisions_happy_path()
     HashTable_Destroy(sut, free);
 }
 
+static void HashTable_KeyExists_null_parameter()
+{
+    char* key = "we are";
+
+    bool result = HashTable_KeyExists(NULL, NULL, 10);
+    CU_ASSERT_FALSE(result);
+    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+
+    result = HashTable_KeyExists(NULL, key, 10);
+    CU_ASSERT_FALSE(result);
+    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+
+    SUT({
+        result = HashTable_KeyExists(sut, NULL, 10);
+        CU_ASSERT_FALSE(result);
+        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+    });
+}
+
+static void HashTable_KeyExists_returns_true_when_item_exists()
+{
+    char* key = "we are";
+    int value = 138;
+
+    ErrorReporter_Clear();
+    SUT({
+        HashTable_Insert(sut, key, strlen(key), &value);
+
+        bool found = HashTable_KeyExists(sut, key, strlen(key));
+        CU_ASSERT_TRUE(found);
+        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
+    });
+}
+
+static void HashTable_KeyExists_returns_false_when_item_does_not_exist() {
+    char* key = "we are";
+
+    ErrorReporter_Clear();
+    SUT({
+        bool found = HashTable_KeyExists(sut, key, strlen(key));
+        CU_ASSERT_FALSE(found);
+        CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
+    });
+}
+
 int register_hash_table_tests()
 {
     CU_TestInfo hash_table_tests[] = { CU_TEST_INFO(
@@ -386,7 +431,12 @@ int register_hash_table_tests()
         CU_TEST_INFO(HashTable_Destroy_frees_items),
         CU_TEST_INFO(HashTable_int_keys), CU_TEST_INFO(HashTable_long_keys),
         CU_TEST_INFO(HashTable_GetCollisions_null_parameter),
-        CU_TEST_INFO(HashTable_GetCollisions_happy_path), CU_TEST_INFO_NULL };
+        CU_TEST_INFO(HashTable_GetCollisions_happy_path),
+        CU_TEST_INFO(HashTable_KeyExists_null_parameter),
+        CU_TEST_INFO(HashTable_KeyExists_returns_true_when_item_exists),
+        CU_TEST_INFO(
+            HashTable_KeyExists_returns_false_when_item_does_not_exist),
+        CU_TEST_INFO_NULL };
 
     CU_SuiteInfo suites[] = { { .pName = "Hash Table",
                                   .pInitFunc = noop,

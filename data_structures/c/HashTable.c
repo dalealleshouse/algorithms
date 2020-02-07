@@ -207,6 +207,27 @@ double HashTable_GetLoadFactor(HashTable* self)
     return (double)self->n / (double)self->m;
 }
 
+bool HashTable_KeyExists(HashTable* self, void* key, size_t len)
+{
+    if (self == NULL || key == NULL) {
+        ERROR("HashTable", NullParameter);
+        return false;
+    }
+
+    size_t index = generate_index(key, len, self->m);
+    LinkedList* ls = self->table[index];
+    if (ls == NULL) {
+        return false;
+    }
+
+    element* el = search_list(ls, key, len);
+    if (el == NULL) {
+        return false;
+    }
+
+    return true;
+}
+
 void* HashTable_Find(HashTable* self, void* key, size_t len)
 {
     if (self == NULL || key == NULL) {
@@ -217,13 +238,13 @@ void* HashTable_Find(HashTable* self, void* key, size_t len)
     size_t index = generate_index(key, len, self->m);
     LinkedList* ls = self->table[index];
     if (ls == NULL) {
-        ERROR("HashTable", NotFound);
+    /*     ERROR("HashTable", NotFound); */
         return NULL;
     }
 
     element* el = search_list(ls, key, len);
     if (el == NULL) {
-        ERROR("HashTable", NotFound);
+    /*     ERROR("HashTable", NotFound); */
         return NULL;
     }
 
