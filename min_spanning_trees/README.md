@@ -65,32 +65,49 @@ return T and cost
 This version is more complex, but results in a considerable faster run time
 (![O(m\log n))](https://latex.codecogs.com/gif.latex?O(m\log&space;n)))
 
-G = input graph
-T = empty set (will contain edges in MST)
-H = empty heap
-
 Invariants:
 - Heap contains vertices that have that have not yet been spanned
 - Highest priority element in the heap is the next vertex to be conquered
 
-mark vertex 1 conquered
+``` pseudeo
+G = input graph
+T = empty set (will contain edges in MST)
+H = empty heap
+cost = 0
 
-for v that is not 1:
-    if there is an edge with head = 1
-        priority = weight of smallest edge 
-        local_winner = smallest edge
+find_winning_edge:
+    edges = edges to search
+
+    return cheapest edge where head is conquered
+    return NULL if no edges qualify
+
+mark first vertex conquered
+
+for v that is not conquered:
+    winner = find_winning_edge v->edges
+    if winner is NULL:
+        score = infinity
     else
-        priority = infinity
-        local_winner = null
+        score = winner->weight
 
-while H is not empty
-    v = extract min from heap
-    mark v conquered
-    add winner to T
-    for every edge is winner that the head is not conquered
-        re prioritize
+    add v to H using score as the heap key value
+        
+while H is not empty:
+    v = extracted min from H
 
+    mark v as conquered
+    cost += v.score
+    add winner to T (calculated in previous loop)
 
+    for every edge in v where the head is not conquered:
+        winner = cheapest edge in edge->head->edges
+        if winner is NULL:
+            score = infinity
+        else
+            score = winner->weight
+
+        recacluate H for winner->head
+```
 
 ## Kruskal's Algorithm
 Discovered in 1956 by ... Kruskal

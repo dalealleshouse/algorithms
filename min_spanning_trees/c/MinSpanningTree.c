@@ -156,6 +156,17 @@ Result PrimMinSpanTreeNaive(const Graph* graph, MinSpanTree* mst)
     return Success;
 }
 
+void _setWinner(SpanTreeResult* conquered, int vertex_id, Edge* winner)
+{
+    if (winner == NULL) {
+        conquered[vertex_id].score = INT_MAX;
+        conquered[vertex_id].winner = NULL;
+    } else {
+        conquered[vertex_id].score = winner->weight;
+        conquered[vertex_id].winner = winner;
+    }
+}
+
 Edge* _findWinningEdge(SpanTreeResult* conquered, Edge* edges)
 {
     Edge* winner = NULL;
@@ -194,13 +205,7 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst)
         conquered[i].vertex_id = i;
 
         Edge* winner = _findWinningEdge(conquered, graph->V[i]->edges);
-        if (winner == NULL) {
-            conquered[i].score = INT_MAX;
-            conquered[i].winner = NULL;
-        } else {
-            conquered[i].score = winner->weight;
-            conquered[i].winner = winner;
-        }
+        _setWinner(conquered, i, winner);
 
         HeapResult result = Heap_Insert(heap, &conquered[i]);
         if (result != HeapSuccess) {
@@ -227,16 +232,11 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst)
 
         Edge* recalcEdges = graph->V[next->vertex_id]->edges;
         while (recalcEdges != NULL) {
-            if (!conquered[recalcEdges->head].conquered) {
-                Edge* winner = _findWinningEdge(
-                    conquered, graph->V[recalcEdges->head]->edges);
-                if (winner == NULL) {
-                    conquered[recalcEdges->head].score = INT_MAX;
-                    conquered[recalcEdges->head].winner = NULL;
-                } else {
-                    conquered[recalcEdges->head].score = winner->weight;
-                    conquered[recalcEdges->head].winner = winner;
-                }
+            int vertex_id = recalcEdges->head;
+            if (!conquered[vertex_id].conquered) {
+                Edge* winner
+                    = _findWinningEdge(conquered, graph->V[vertex_id]->edges);
+                _setWinner(conquered, vertex_id, winner);
 
                 Heap_Reproiritize(heap, &conquered[recalcEdges->head]);
             }
