@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
@@ -12,6 +13,38 @@
 Graph* SimpleGraph()
 {
     return Graph_WeightedFromFile(5, "src/data/simple.txt");
+}
+
+Graph* ComplicatedGraph()
+{
+    const static int BUFFER_SIZE = 1024;
+    const static char* PATH = "src/data/complicated.txt";
+
+    if (access(PATH, R_OK) != 0) {
+        printf("\nFile does not exist or access denied\n");
+        return NULL;
+    }
+
+    FILE* file = fopen(PATH, "r");
+
+    // Size is the first line of the file
+    char line[BUFFER_SIZE];
+    fgets(line, BUFFER_SIZE, file);
+
+    size_t n, m;
+    sscanf(line, "%lu %lu", &n, &m);
+
+    Graph* graph = Graph_Create(n + 1);
+
+    int node1, node2, weight;
+    while (fgets(line, BUFFER_SIZE, file)) {
+        sscanf(line, "%d %d %d", &node1, &node2, &weight);
+        Graph_AddWeightedEdge(graph, node1, node2, weight);
+        Graph_AddWeightedEdge(graph, node2, node1, weight);
+    }
+
+    fclose(file);
+    return graph;
 }
 
 typedef Result (*min_span_tree)(const Graph* graph, MinSpanTree* mst);
@@ -129,6 +162,20 @@ static void ArithmeticOverflowTest(min_span_tree minSpanTree)
     MinSpanTree_Edges_Destroy(mst.edge_head);
 }
 
+static void ComplicatedGraphTest(min_span_tree minSpanTree)
+{
+    Graph* graph = ComplicatedGraph();
+
+    MinSpanTree mst;
+    Result result = minSpanTree(graph, &mst);
+    CU_ASSERT_EQUAL(result, Success);
+    CU_ASSERT_EQUAL(mst.cost, -3612829);
+    CU_ASSERT_EQUAL(mst.edge_count, 499);
+
+    Graph_Destroy(graph, free);
+    MinSpanTree_Edges_Destroy(mst.edge_head);
+}
+
 // PrimMinSpanTreeNaive
 
 static void PrimMinSpanTreeNaive_NullParameter()
@@ -154,6 +201,11 @@ static void PrimMinSpanTreeNaive_ClearsInitalMstValues()
 static void PrimMinSpanTreeNaive_ArithmeticOverflow()
 {
     ArithmeticOverflowTest(PrimMinSpanTreeNaive);
+}
+
+static void PrimMinSpanTreeNaive_ComplicatedGraph()
+{
+    ComplicatedGraphTest(PrimMinSpanTreeNaive);
 }
 
 // PrimMinSpanTree
@@ -182,6 +234,11 @@ static void PrimMinSpanTree_ArithmeticOverflow()
     ArithmeticOverflowTest(PrimMinSpanTree);
 }
 
+static void PrimMinSpanTree_ComplicatedGraph()
+{
+    ComplicatedGraphTest(PrimMinSpanTree);
+}
+
 static void MinSpanTree_Destroy_NullParameter() { MinSpanTree_Destroy(NULL); }
 
 static void MinSpanTree_Edges_Destroy_NullParameter()
@@ -191,18 +248,21 @@ static void MinSpanTree_Edges_Destroy_NullParameter()
 
 int register_min_spanning_tree_tests()
 {
-    CU_TestInfo PrimTestsNaive[] = { CU_TEST_INFO(
-                                         PrimMinSpanTreeNaive_NullParameter),
-        CU_TEST_INFO(PrimMinSpanTreeNaive_ArithmeticOverflow),
-        CU_TEST_INFO(PrimMinSpanTreeNaive_FailedMalloc),
-        CU_TEST_INFO(PrimMinSpanTreeNaive_ClearsInitalMstValues),
-        CU_TEST_INFO(PrimMinSpanTreeNaive_CalculatesMst), CU_TEST_INFO_NULL };
+    CU_TestInfo PrimTestsNaive[]
+        = { CU_TEST_INFO(PrimMinSpanTreeNaive_NullParameter),
+              CU_TEST_INFO(PrimMinSpanTreeNaive_ArithmeticOverflow),
+              CU_TEST_INFO(PrimMinSpanTreeNaive_FailedMalloc),
+              CU_TEST_INFO(PrimMinSpanTreeNaive_ClearsInitalMstValues),
+              CU_TEST_INFO(PrimMinSpanTreeNaive_CalculatesMst),
+              CU_TEST_INFO(PrimMinSpanTreeNaive_ComplicatedGraph),
+              CU_TEST_INFO_NULL };
 
     CU_TestInfo PrimTests[] = { CU_TEST_INFO(PrimMinSpanTree_NullParameter),
         CU_TEST_INFO(PrimMinSpanTree_ArithmeticOverflow),
         CU_TEST_INFO(PrimMinSpanTree_FailedMalloc),
         CU_TEST_INFO(PrimMinSpanTree_ClearsInitalMstValues),
-        CU_TEST_INFO(PrimMinSpanTree_CalculatesMst), CU_TEST_INFO_NULL };
+        CU_TEST_INFO(PrimMinSpanTree_CalculatesMst),
+        CU_TEST_INFO(PrimMinSpanTree_ComplicatedGraph), CU_TEST_INFO_NULL };
 
     CU_TestInfo DestroyTests[]
         = { CU_TEST_INFO(MinSpanTree_Destroy_NullParameter),

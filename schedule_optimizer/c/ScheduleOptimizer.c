@@ -10,12 +10,16 @@ int ratio_compare(const void* job1, const void* job2)
 {
     double job1_ratio = calc_score((job*)job1);
     double job2_ratio = calc_score((job*)job2);
+    double diff;
 
-    double ratio = job1_ratio - job2_ratio;
+    if (job1_ratio == job2_ratio)
+        diff = ((job*)job1)->weight - ((job*)job2)->weight;
+    else
+        diff = job1_ratio - job2_ratio;
 
-    if (ratio < 0.0)
+    if (diff < 0.0)
         return 1;
-    else if (ratio > 0.0)
+    else if (diff > 0.0)
         return -1;
     else
         return 0;
@@ -27,7 +31,7 @@ Result ScheduleOptimizer_Calc(
     if (jobs == NULL || optimization_score == NULL)
         return NullParameter;
 
-    if(n <= 0)
+    if (n <= 0)
         return Empty;
 
     double running_length = 0;
