@@ -29,7 +29,15 @@ static int _spanTreeResultComparator(const void* x, const void* y)
     SpanTreeResult* _x = (SpanTreeResult*)x;
     SpanTreeResult* _y = (SpanTreeResult*)y;
 
-    return _y->score - _x->score;
+    // The commented code and cause integer overflows (INT_MAX - -1)
+    /* return _y->score - _x->score; */
+
+    if (_x->score > _y->score)
+        return -1;
+    else if (_x->score < _y->score)
+        return 1;
+
+    return 0;
 }
 
 static void _conquer(Vertex* v, char* conqueredList)
@@ -192,7 +200,7 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst)
     _initMst(mst);
 
     SpanTreeResult conquered[graph->n];
-    // initalized to zero
+    // initialized to zero
     memset(&conquered, 0, graph->n * sizeof(conquered[0]));
     conquered[1].conquered = true;
     conquered[1].vertex_id = 1;
