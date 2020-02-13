@@ -223,7 +223,7 @@ incomplete list of heap variants.
 * Extract: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
 * Reprioritize: ![O(log
     n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
-* Find: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
+* Peek: ![O(1)](https://latex.codecogs.com/gif.latex?O(1) "O(1)")
 
 ### Pseudo Code
 
@@ -765,3 +765,21 @@ lookup:
 > values. Imagine an area of memory where each bit can be modified like an array
 > element. A typical array is not suitable because they store at least a single
 > byte per array element which is wasteful in this context.
+
+# Union Find
+The Union-Find data structure (aka Disjoint-Set)
+
+### Asymptotic Time Complexity <sup>1</sup>
+- Initialize: ![O(n)](https://latex.codecogs.com/gif.latex?O(n))
+- Union: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+- Find: ![O(log n)](https://latex.codecogs.com/gif.latex?O(\log&space;n))
+
+### Pseudo Code
+
+### Applications
+
+## Footnotes
+> <sup>1</sup> There are more advanced implementations of Union-Find that have
+> different run time characteristics.  However, they are out of scope. The
+> interested ready should investigate _Union By Rank_, _Path Compression_, and
+> _Inverse Ackermann Function_.

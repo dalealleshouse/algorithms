@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "Dijkstra.h"
+#include "include/Heap.h"
 #include "include/MemAllocMock.h"
-#include "include/PriorityQueue.h"
 
 static GraphResult InitShortestPath(Vertex* v)
 {
@@ -178,16 +178,16 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start)
     if (r != Graph_Success)
         return r;
 
-    PriorityQueue* pq = PQ_Create(path_comparator);
-    if (pq == NULL)
+    Heap* heap = Heap_Create(self->n, path_comparator);
+    if (heap == NULL)
         return Graph_DependencyError;
 
-    PQResult pqr = PQ_Insert(pq, startv);
-    if (pqr != PQ_Success)
+    HeapResult h_result = Heap_Insert(heap, startv);
+    if (h_result != HeapSuccess)
         return Graph_DependencyError;
 
-    while (!PQ_IsEmpty(pq)) {
-        Vertex* v = PQ_Remove(pq);
+    while (!Heap_IsEmpty(heap)) {
+        Vertex* v = Heap_Extract(heap);
 
         // unreachable vertices, time to bail
         if (Distance(v) == INFINITY)
@@ -205,8 +205,8 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start)
 
                 // We only need to re prioritize if the distance changed
                 if (dist == Distance(head)) {
-                    pqr = PQ_Reprioritize(pq, head);
-                    if (pqr != PQ_Success)
+                    h_result = Heap_Reproiritize(heap, head);
+                    if (h_result != HeapSuccess)
                         return Graph_DependencyError;
                 }
             } else {
@@ -214,14 +214,14 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start)
                 if (r != Graph_Success)
                     return r;
 
-                pqr = PQ_Insert(pq, head);
-                if (pqr != PQ_Success)
+                h_result = Heap_Insert(heap, head);
+                if (h_result != HeapSuccess)
                     return Graph_DependencyError;
             }
             e = e->next;
         }
     }
 
-    PQ_Destroy(pq, NULL);
+    Heap_Destroy(heap, NULL);
     return Graph_Success;
 }

@@ -85,10 +85,12 @@ Actual run time data
     * [Merge Sort](sorting/README.md#merge-sort)
     * [Quick Sort](sorting/README.md#quick-sort)
 * [Quick Select](quick_select/)
+* [Schedule Optimization](schedule_optimizer/)
 * [Graphs](graph_concepts/)
     * [Graph Search](graph_search/)
     * [Shortest Path](shortest_path/)
     * [Random Contraction](random_contraction/)
+    * [Minimum Spanning Tree](min_spanning_trees/)
 
 ## Build/Tests
 ### C
