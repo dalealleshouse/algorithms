@@ -7,6 +7,7 @@ extern int register_heap_tests();
 extern int register_hash_table_tests();
 extern int register_bloom_filter_tests();
 extern int register_hash_function_tests();
+extern int register_disjoint_set_tests();
 
 int register_tests()
 {
@@ -15,7 +16,8 @@ int register_tests()
                != 0 + register_hash_table_tests()
                != 0 + register_bloom_filter_tests()
                != 0 + register_hash_function_tests()
-               != 0 + register_heap_tests() != 0)
+               != 0 + register_heap_tests() != 0 + register_disjoint_set_tests()
+               != 0)
         * -1;
 }
 

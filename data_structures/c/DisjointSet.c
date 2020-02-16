@@ -32,7 +32,7 @@ Result DisjointSet_Init(DisjointSet* self, const size_t n)
 
     self->items = HashTable_Create(_nextPowerOf2(n));
     if (self->items == NULL)
-        return DependancyError;
+        return FailedMemoryAllocation;
 
     self->num_sets = 0;
 
