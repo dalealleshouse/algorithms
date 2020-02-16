@@ -419,7 +419,7 @@ static void DisjointSet_Union_ignores_already_joined()
  ******************************************************************************/
 static void DisjointSet_Destory_null_parameter() { DisjointSet_Destory(NULL); }
 
-int register_disjoint_test_tests()
+int register_disjoint_set_tests()
 {
     CU_TestInfo DisjointSetTests[] = { CU_TEST_INFO(
                                            DisjointSet_Init_null_parameter),

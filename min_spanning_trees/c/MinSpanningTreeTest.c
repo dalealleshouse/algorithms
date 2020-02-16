@@ -91,17 +91,26 @@ static void _validateSimpleGraphResults(const MinSpanTree* mst)
     Edge* edge = mst->edge_head;
 
     // first edge
-    CU_ASSERT_PTR_NOT_NULL_FATAL(edge);
+    if (edge == NULL) {
+        CU_FAIL("the first edge is NULL");
+        return;
+    }
     CU_ASSERT_EQUAL(edge->weight, 1);
 
     // second edge
     edge = edge->next;
-    CU_ASSERT_PTR_NOT_NULL_FATAL(edge);
+    if (edge == NULL) {
+        CU_FAIL("the second edge is NULL");
+        return;
+    }
     CU_ASSERT_EQUAL(edge->weight, 2);
 
     // third edge
     edge = edge->next;
-    CU_ASSERT_PTR_NOT_NULL_FATAL(edge);
+    if (edge == NULL) {
+        CU_FAIL("the third edge is NULL");
+        return;
+    }
     CU_ASSERT_EQUAL(edge->weight, 4);
 
     CU_ASSERT_PTR_NULL(edge->next);
@@ -239,6 +248,37 @@ static void PrimMinSpanTree_ComplicatedGraph()
     ComplicatedGraphTest(PrimMinSpanTree);
 }
 
+// KruskalMinSpanTree
+static void KruskalMinSpanTree_NullParameter()
+{
+    NullParameterTest(KruskalMinSpanTree);
+}
+
+static void KruskalMinSpanTree_FailedMalloc()
+{
+    FailedMallocTest(KruskalMinSpanTree);
+}
+
+static void KruskalMinSpanTree_CalculatesMst()
+{
+    CalculatesMstTest(KruskalMinSpanTree);
+}
+
+static void KruskalMinSpanTree_ClearsInitalMstValues()
+{
+    ClearsInitialMstValuesTest(KruskalMinSpanTree);
+}
+
+static void KruskalMinSpanTree_ArithmeticOverflow()
+{
+    ArithmeticOverflowTest(KruskalMinSpanTree);
+}
+
+static void KruskalMinSpanTree_ComplicatedGraph()
+{
+    ComplicatedGraphTest(KruskalMinSpanTree);
+}
+
 static void MinSpanTree_Destroy_NullParameter() { MinSpanTree_Destroy(NULL); }
 
 static void MinSpanTree_Edges_Destroy_NullParameter()
@@ -264,6 +304,14 @@ int register_min_spanning_tree_tests()
         CU_TEST_INFO(PrimMinSpanTree_CalculatesMst),
         CU_TEST_INFO(PrimMinSpanTree_ComplicatedGraph), CU_TEST_INFO_NULL };
 
+    CU_TestInfo KruskalTests[] = { CU_TEST_INFO(
+                                       KruskalMinSpanTree_NullParameter),
+        CU_TEST_INFO(KruskalMinSpanTree_ArithmeticOverflow),
+        CU_TEST_INFO(KruskalMinSpanTree_FailedMalloc),
+        CU_TEST_INFO(KruskalMinSpanTree_ClearsInitalMstValues),
+        CU_TEST_INFO(KruskalMinSpanTree_CalculatesMst),
+        CU_TEST_INFO(KruskalMinSpanTree_ComplicatedGraph), CU_TEST_INFO_NULL };
+
     CU_TestInfo DestroyTests[]
         = { CU_TEST_INFO(MinSpanTree_Destroy_NullParameter),
               CU_TEST_INFO(MinSpanTree_Edges_Destroy_NullParameter),
@@ -277,6 +325,10 @@ int register_min_spanning_tree_tests()
             .pInitFunc = noop,
             .pCleanupFunc = noop,
             .pTests = PrimTests },
+        { .pName = "KruskalMinSpanTree",
+            .pInitFunc = noop,
+            .pCleanupFunc = noop,
+            .pTests = KruskalTests },
         { .pName = "MinSpanTree_Destroy",
             .pInitFunc = noop,
             .pCleanupFunc = noop,

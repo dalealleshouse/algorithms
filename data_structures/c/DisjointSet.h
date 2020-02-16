@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/HashTable.h"
+#include "HashTable.h"
 #include "include/ResultCode.h"
 
 typedef struct SetItem {
