@@ -14,6 +14,7 @@
     }
 
 typedef enum Result {
+    Duplicate = -9,
     NotFound = -8,
     Empty = -7,
     DependancyError = -6,
