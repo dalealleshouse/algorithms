@@ -19,16 +19,10 @@ static size_t _childIndex(size_t index)
     return index - 1;
 }
 
-static uintptr_t _getHashKey(void* item) { return (uintptr_t)item; }
-
 static HeapResult _setDataItem(Heap* self, void* item, size_t index)
 {
-    uintptr_t key = _getHashKey(item);
-
-    /* printf("Inserting key=%lu, ptr=%p, index=%lu\n", key, item, index); */
-
     // Clean up whatever is in the current slot
-    void* existing = HashTable_Find(self->item_tracker, &key, sizeof(key));
+    void* existing = HashTable_Find(self->item_tracker, &item, sizeof(void*));
     free(existing);
 
     // Geta a new index
@@ -38,7 +32,7 @@ static HeapResult _setDataItem(Heap* self, void* item, size_t index)
 
     // Set the index in the hash table
     *i = index;
-    HashTable_Insert(self->item_tracker, &key, sizeof(key), i);
+    HashTable_Insert(self->item_tracker, &item, sizeof(void*), i);
 
     // Update the data
     self->data[index] = item;
@@ -301,8 +295,7 @@ bool Heap_Exists(Heap* self, void* findMe)
         return false;
     }
 
-    uintptr_t key = _getHashKey(findMe);
-    void* found = HashTable_Find(self->item_tracker, &key, sizeof(key));
+    void* found = HashTable_Find(self->item_tracker, &findMe, sizeof(void*));
 
     return found != NULL;
 }
@@ -312,8 +305,7 @@ HeapResult Heap_Reproiritize(Heap* self, void* item)
     if (self == NULL || item == NULL)
         return HeapNullParameter;
 
-    uintptr_t key = _getHashKey(item);
-    size_t* index = HashTable_Find(self->item_tracker, &key, sizeof(key));
+    size_t* index = HashTable_Find(self->item_tracker, &item, sizeof(void*));
     if (index == NULL)
         return HeapItemNotFound;
 

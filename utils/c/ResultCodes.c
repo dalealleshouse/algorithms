@@ -3,6 +3,8 @@
 char* Result_ErrorMessage(Result result)
 {
     switch (result) {
+    case Duplicate:
+        return "The paramerter is a duplicate of an existing item";
     case NotFound:
         return "The requested object was not found.";
     case Empty:
