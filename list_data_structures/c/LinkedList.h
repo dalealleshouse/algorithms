@@ -15,17 +15,17 @@
 typedef void (*freer)(void* x);
 
 typedef struct LinkedListItem {
-    void* payload;
-    struct LinkedListItem* next;
-    struct LinkedListItem* prev;
+  void* payload;
+  struct LinkedListItem* next;
+  struct LinkedListItem* prev;
 } LinkedListItem;
 
 typedef struct {
-    size_t size;
-    freer freer;
-    comparator comparator;
-    LinkedListItem* head;
-    LinkedListItem* tail;
+  size_t size;
+  freer freer;
+  comparator comparator;
+  LinkedListItem* head;
+  LinkedListItem* tail;
 } LinkedList;
 
 LinkedList* LinkedList_Create(freer, comparator);

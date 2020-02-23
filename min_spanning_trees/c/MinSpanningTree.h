@@ -31,7 +31,6 @@ typedef struct {
 // Consumer is responsible for deallocating edges in the MinSpanTree struct
 Result PrimMinSpanTreeNaive(const Graph* graph, MinSpanTree* mst);
 Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst);
-Result KruskalMinSpanTreeNaive(const Graph* graph, MinSpanTree* mst);
 Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst);
 
 // Creates an empty min span tree struct

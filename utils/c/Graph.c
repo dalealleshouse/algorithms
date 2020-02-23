@@ -277,6 +277,58 @@ Graph* Graph_WeightedFromFile(const size_t n, const char* path)
     return Graph_Parser(n, path, weighted_parser);
 }
 
+Graph* Graph_WeightedFromFile2(const char* path)
+{
+    const static int BUFFER_SIZE = 1024;
+
+    if (access(path, R_OK) != 0) {
+        printf("File does not exist or access denied\n");
+        return NULL;
+    }
+
+    FILE* file = fopen(path, "r");
+
+    // Size is the first line of the file
+    char line[BUFFER_SIZE];
+    fgets(line, BUFFER_SIZE, file);
+
+    size_t n = strtoul(line, NULL, 10);
+    if (n == 0) {
+        printf("Failed size_t conversion\n");
+        return NULL;
+    }
+
+    Graph* graph = Graph_Create(n + 1);
+
+    int node1, node2, weight;
+    char* remaining;
+    while (fgets(line, BUFFER_SIZE, file)) {
+        node1 = strtol(line, &remaining, 10);
+        if (node1 == 0) {
+            printf("Failed int conversion\n");
+            return graph;
+        }
+
+        node2 = strtol(remaining, &remaining, 10);
+        if (node1 == 0) {
+            printf("Failed int conversion\n");
+            return graph;
+        }
+
+        weight = strtol(remaining, NULL, 10);
+        if (weight == 0) {
+            printf("Failed int conversion\n");
+            return graph;
+        }
+
+        Graph_AddWeightedEdge(graph, node1, node2, weight);
+        Graph_AddWeightedEdge(graph, node2, node1, weight);
+    }
+
+    fclose(file);
+    return graph;
+}
+
 void Graph_Destroy(Graph* self, freer freer)
 {
     if (self == NULL)
