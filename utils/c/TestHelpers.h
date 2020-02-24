@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+
 #include "MemAllocMock.h"
 
 #define CU_TEST_INFO(test_func)                                                \
@@ -19,8 +20,8 @@
 #define UNARY_NULL_TEST_ENUMERATOR(expected_error, funcs)                      \
     {                                                                          \
         int tracker = 0;                                                       \
-        while (funcs[tracker] != NULL) {                                       \
-            UNARY_NULL_TEST(expected_error, funcs[tracker]);                   \
+        while ((funcs)[tracker] != NULL) {                                     \
+            UNARY_NULL_TEST(expected_error, (funcs)[tracker]);                 \
             tracker++;                                                         \
         }                                                                      \
     }
@@ -46,8 +47,9 @@
 #define BINARY_NULL_TEST_ENUMERATOR(expected_error, param1, param2, funcs)     \
     {                                                                          \
         int tracker = 0;                                                       \
-        while (funcs[tracker] != NULL) {                                       \
-            BINARY_NULL_TEST(expected_error, param1, param2, funcs[tracker]);  \
+        while ((funcs)[tracker] != NULL) {                                     \
+            BINARY_NULL_TEST(                                                  \
+                expected_error, param1, param2, (funcs)[tracker]);             \
             tracker++;                                                         \
         }                                                                      \
     }
@@ -67,9 +69,9 @@
 #define BINARY_INT_NULL_TEST_ENUMERATOR(expected_error, param1, param2, funcs) \
     {                                                                          \
         int tracker = 0;                                                       \
-        while (funcs[tracker] != NULL) {                                       \
+        while ((funcs)[tracker] != NULL) {                                     \
             BINARY_INT_NULL_TEST(                                              \
-                expected_error, param1, param2, funcs[tracker]);               \
+                expected_error, param1, param2, (funcs)[tracker]);             \
             tracker++;                                                         \
         }                                                                      \
     }

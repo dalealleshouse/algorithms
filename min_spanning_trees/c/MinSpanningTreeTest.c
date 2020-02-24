@@ -17,34 +17,8 @@ Graph* SimpleGraph()
 
 Graph* ComplicatedGraph()
 {
-    const static int BUFFER_SIZE = 1024;
     const static char* PATH = "src/data/complicated.txt";
-
-    if (access(PATH, R_OK) != 0) {
-        printf("\nFile does not exist or access denied\n");
-        return NULL;
-    }
-
-    FILE* file = fopen(PATH, "r");
-
-    // Size is the first line of the file
-    char line[BUFFER_SIZE];
-    fgets(line, BUFFER_SIZE, file);
-
-    size_t n, m;
-    sscanf(line, "%lu %lu", &n, &m);
-
-    Graph* graph = Graph_Create(n + 1);
-
-    int node1, node2, weight;
-    while (fgets(line, BUFFER_SIZE, file)) {
-        sscanf(line, "%d %d %d", &node1, &node2, &weight);
-        Graph_AddWeightedEdge(graph, node1, node2, weight);
-        Graph_AddWeightedEdge(graph, node2, node1, weight);
-    }
-
-    fclose(file);
-    return graph;
+    return Graph_WeightedFromFile2(PATH);
 }
 
 typedef Result (*min_span_tree)(const Graph* graph, MinSpanTree* mst);
