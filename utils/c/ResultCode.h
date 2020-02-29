@@ -14,6 +14,7 @@
     }
 
 typedef enum Result {
+    OutputPointerIsNotNull = -10,
     Duplicate = -9,
     NotFound = -8,
     Empty = -7,
@@ -25,5 +26,7 @@ typedef enum Result {
     NullParameter = -1,
     Success = 0
 } Result;
+
+typedef Result ResultCode;
 
 char* Result_ErrorMessage(Result);
