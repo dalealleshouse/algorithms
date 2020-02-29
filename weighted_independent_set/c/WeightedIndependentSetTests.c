@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
@@ -18,12 +19,12 @@ static void _containsId(WeightedVertex* vertices[], const size_t n,
   CU_FAIL("ID not found");
 }
 
-static void _test_NullParameter(wis func) {
+static void _testNullParameter(wis func) {
   Result result = func(NULL, NULL);
   CU_ASSERT_EQUAL(result, NullParameter);
 }
 
-static void _test_EmptySet(wis func) {
+static void _testEmptySet(wis func) {
   WeightedIndependentSet* wis = NULL;
   PathGraph graph;
   graph.n = 0;
@@ -34,9 +35,9 @@ static void _test_EmptySet(wis func) {
   CU_ASSERT_PTR_EQUAL(wis, &EMPTY_SET);
 }
 
-static void _test_SingleVertex(wis func) {
+static void _testSingleVertex(wis func) {
   unsigned int ids[] = {1};
-  int weights[] = {100};
+  unsigned long weights[] = {100};
   PathGraph* graph;
   PathGraph_Create(ids, weights, 1, &graph);
   WeightedIndependentSet* wis = NULL;
@@ -52,9 +53,9 @@ static void _test_SingleVertex(wis func) {
   WeightedIndependentSet_Destroy(wis);
 }
 
-static void _test_TwoVertices(wis func) {
+static void _testTwoVertices(wis func) {
   unsigned int ids[] = {1, 2};
-  int weights[] = {100, 101};
+  unsigned long weights[] = {100, 101};
   PathGraph* graph;
   PathGraph_Create(ids, weights, 2, &graph);
   WeightedIndependentSet* wis = NULL;
@@ -70,9 +71,9 @@ static void _test_TwoVertices(wis func) {
   PathGraph_Destroy(graph);
 }
 
-static void _test_FourVertices(wis func) {
+static void _testFourVertices(wis func) {
   unsigned int ids[] = {0, 1, 2, 3};
-  int weights[] = {1, 4, 5, 4};
+  unsigned long weights[] = {1, 4, 5, 4};
   PathGraph* graph;
   PathGraph_Create(ids, weights, 4, &graph);
   WeightedIndependentSet* wis = NULL;
@@ -88,9 +89,9 @@ static void _test_FourVertices(wis func) {
   PathGraph_Destroy(graph);
 }
 
-static void _test_SixVertices(wis func) {
+static void _testSixVertices(wis func) {
   unsigned int ids[] = {0, 1, 2, 3, 4, 5};
-  int weights[] = {3, 2, 1, 6, 4, 5};
+  unsigned long weights[] = {3, 2, 1, 6, 4, 5};
   PathGraph* graph;
   PathGraph_Create(ids, weights, 6, &graph);
   WeightedIndependentSet* wis = NULL;
@@ -107,9 +108,9 @@ static void _test_SixVertices(wis func) {
   PathGraph_Destroy(graph);
 }
 
-static void _test_ArimiticOverflow(wis func) {
+static void _testArimiticOverflow(wis func) {
   unsigned int ids[] = {0, 1, 2, 3};
-  int weights[] = {1, UINT_MAX, 5, 4};
+  unsigned long weights[] = {1, ULONG_MAX, 5, 4};
   PathGraph* graph;
   PathGraph_Create(ids, weights, 4, &graph);
   WeightedIndependentSet* wis = NULL;
@@ -122,87 +123,177 @@ static void _test_ArimiticOverflow(wis func) {
 }
 
 static void WeightedIndependentSet_Recursive_NullParameter() {
-  _test_NullParameter(WeightedIndependentSet_Recursive);
+  _testNullParameter(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_EmptySet() {
-  _test_EmptySet(WeightedIndependentSet_Recursive);
+  _testEmptySet(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_SingleVertex() {
-  _test_SingleVertex(WeightedIndependentSet_Recursive);
+  _testSingleVertex(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_TwoVertices() {
-  _test_TwoVertices(WeightedIndependentSet_Recursive);
+  _testTwoVertices(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_FourVertices() {
-  _test_FourVertices(WeightedIndependentSet_Recursive);
+  _testFourVertices(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_SixVertices() {
-  _test_SixVertices(WeightedIndependentSet_Recursive);
+  _testSixVertices(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_ArimiticOverflow() {
-  _test_ArimiticOverflow(WeightedIndependentSet_Recursive);
+  _testArimiticOverflow(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Dynamic_NullParameter() {
-  _test_NullParameter(WeightedIndependentSet_Dynamic);
+  _testNullParameter(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_EmptySet() {
-  _test_EmptySet(WeightedIndependentSet_Dynamic);
+  _testEmptySet(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_SingleVertex() {
-  _test_SingleVertex(WeightedIndependentSet_Dynamic);
+  _testSingleVertex(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_TwoVertices() {
-  _test_TwoVertices(WeightedIndependentSet_Dynamic);
+  _testTwoVertices(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_FourVertices() {
-  _test_FourVertices(WeightedIndependentSet_Dynamic);
+  _testFourVertices(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_SixVertices() {
-  _test_SixVertices(WeightedIndependentSet_Dynamic);
+  _testSixVertices(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_ArimiticOverflow() {
-  _test_ArimiticOverflow(WeightedIndependentSet_Dynamic);
+  _testArimiticOverflow(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_NullParameter() {
-  _test_NullParameter(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testNullParameter(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_EmptySet() {
-  _test_EmptySet(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testEmptySet(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_SingleVertex() {
-  _test_SingleVertex(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testSingleVertex(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_TwoVertices() {
-  _test_TwoVertices(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testTwoVertices(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_FourVertices() {
-  _test_FourVertices(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testFourVertices(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_SixVertices() {
-  _test_SixVertices(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testSixVertices(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_ArimiticOverflow() {
-  _test_ArimiticOverflow(WeightedIndependentSet_Dynamic_Reconstruction);
+  _testArimiticOverflow(WeightedIndependentSet_Dynamic_Reconstruction);
+}
+
+static PathGraph* _readFile(const char* path) {
+  const static int BUFFER_SIZE = 1024;
+
+  if (access(path, R_OK) != 0) {
+    printf("File does not exist or access denied\n");
+    return NULL;
+  }
+
+  FILE* file = fopen(path, "r");
+
+  // Size is the first line of the file
+  char line[BUFFER_SIZE];
+  fgets(line, BUFFER_SIZE, file);
+
+  size_t n = strtoul(line, NULL, 10);
+  if (n == 0) {
+    printf("Failed size_t conversion\n");
+    return NULL;
+  }
+
+  PathGraph* graph = malloc(sizeof(PathGraph));
+  graph->n = n;
+  graph->vertices = calloc(sizeof(void*), n);
+
+  size_t weight = 0;
+  size_t curr_id = 1;
+  while (fgets(line, BUFFER_SIZE, file)) {
+    weight = strtol(line, NULL, 10);
+    WeightedVertex_Init(curr_id, weight, &graph->vertices[curr_id - 1]);
+    ++curr_id;
+  }
+
+  fclose(file);
+  return graph;
+}
+
+static void _testFile(const char* path, const char* solution) {
+  WeightedIndependentSet* wis = NULL;
+  PathGraph* graph = _readFile(path);
+
+  Result result = WeightedIndependentSet_Dynamic_Reconstruction(graph, &wis);
+  CU_ASSERT_EQUAL(result, Success);
+
+  char _solution[] = "00000000\0";
+
+  // 1, 2, 3, 4, 17, 117, 517, 997
+  // You could defintly improve on the run time of this, but it's not that
+  // important because it's test code
+  for (size_t i = 0; i < wis->n; i++) {
+    switch (wis->vertices[i]->id) {
+      case 1:
+        _solution[0] = '1';
+        break;
+      case 2:
+        _solution[1] = '1';
+        break;
+      case 3:
+        _solution[2] = '1';
+        break;
+      case 4:
+        _solution[3] = '1';
+        break;
+      case 17:
+        _solution[4] = '1';
+        break;
+      case 117:
+        _solution[5] = '1';
+        break;
+      case 517:
+        _solution[6] = '1';
+        break;
+      case 997:
+        _solution[7] = '1';
+        break;
+    }
+  }
+
+  /* printf("solution=%s, my_solution=%s\n", solution, _solution); */
+  CU_ASSERT_STRING_EQUAL(_solution, solution);
+
+  WeightedIndependentSet_Destroy(wis);
+  PathGraph_Destroy(graph);
+}
+
+static void WeightedIndependentSet_File() {
+  _testFile("src/data/input_random_10_40.txt", "10010000");
+  _testFile("src/data/input_random_48_10000.txt", "10101111");
+  _testFile("src/data/mwis.txt", "10100110");
 }
 
 int registerWeightedIndependentSetTests() {
@@ -237,6 +328,9 @@ int registerWeightedIndependentSetTests() {
           WeightedIndependentSet_Dynamic_Reconstruction_ArimiticOverflow),
       CU_TEST_INFO_NULL};
 
+  CU_TestInfo WeightedIndependentSet_Files[] = {
+      CU_TEST_INFO(WeightedIndependentSet_File), CU_TEST_INFO_NULL};
+
   CU_SuiteInfo suites[] = {
       {.pName = "Weighted Independent Set Recursive",
        .pInitFunc = noop,
@@ -250,6 +344,10 @@ int registerWeightedIndependentSetTests() {
        .pInitFunc = noop,
        .pCleanupFunc = noop,
        .pTests = WeightedIndependentSet_Dynamic_Reconstruction_Tests},
+      {.pName = "File Solutions",
+       .pInitFunc = noop,
+       .pCleanupFunc = noop,
+       .pTests = WeightedIndependentSet_Files},
       CU_SUITE_INFO_NULL};
 
   return CU_register_suites(suites);

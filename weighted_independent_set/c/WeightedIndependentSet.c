@@ -138,7 +138,7 @@ static void _solutionsDestroy(WeightedIndependentSet** solutions,
   for (size_t i = 0; i < n; i++) WeightedIndependentSet_Destroy(solutions[i]);
 }
 
-static Result _reconstruct(unsigned int solutions[], PathGraph* graph,
+static Result _reconstruct(unsigned long solutions[], PathGraph* graph,
                            WeightedIndependentSet** result) {
   WeightedIndependentSet* winner = (WeightedIndependentSet*)&EMPTY_SET;
   size_t i = graph->n;
@@ -171,7 +171,7 @@ static Result _reconstruct(unsigned int solutions[], PathGraph* graph,
   return Success;
 }
 
-Result PathGraph_Create(unsigned int ids[], int weights[], size_t n,
+Result PathGraph_Create(unsigned int ids[], unsigned long weights[], size_t n,
                         PathGraph** graph) {
   if (ids == NULL || weights == NULL || graph == NULL) return NullParameter;
 
@@ -202,7 +202,7 @@ Result PathGraph_Create(unsigned int ids[], int weights[], size_t n,
   return Success;
 }
 
-void PathGraph_Destroy(void* graph) {
+void PathGraph_Destroy(PathGraph* graph) {
   if (graph == NULL) return;
   PathGraph* _graph = graph;
 
@@ -214,7 +214,7 @@ void PathGraph_Destroy(void* graph) {
   free(_graph);
 }
 
-Result WeightedVertex_Init(unsigned int id, const int weight,
+Result WeightedVertex_Init(unsigned int id, const unsigned long weight,
                            WeightedVertex** vw) {
   (*vw) = malloc(sizeof(WeightedVertex));
   if (vw == NULL) return FailedMemoryAllocation;
@@ -249,8 +249,8 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
 
   // Create array to hold solutions
   size_t solutions_n = graph->n + 1;
-  unsigned int solutions[solutions_n];
-  memset(solutions, 0, sizeof(unsigned int) * solutions_n);
+  unsigned long solutions[solutions_n];
+  memset(solutions, 0, sizeof(unsigned long) * solutions_n);
 
   // Solution 0 and 1 are already calculated
   solutions[0] = 0;
@@ -259,11 +259,11 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
   // Calculate the remaining solutions with the assumption that solution[i] =
   // max(solution[i-1], solutions[i-2] + vertex[i])
   for (size_t i = 2; i < graph->n + 1; i++) {
-    unsigned int iminus1 = solutions[i - 1];
-    unsigned int iminus2 = solutions[i - 2];
-    unsigned int w = graph->vertices[i - 1]->weight;
+    unsigned long iminus1 = solutions[i - 1];
+    unsigned long iminus2 = solutions[i - 2];
+    unsigned long w = graph->vertices[i - 1]->weight;
 
-    if (is_add_overflow_uint(iminus1, w)) return ArithmeticOverflow;
+    if (is_add_overflow_ulong(iminus1, w)) return ArithmeticOverflow;
 
     // overflow checked above
     if (iminus1 >= iminus2 + w)

@@ -225,6 +225,7 @@ static void HuffmanCode_Calculate_Files() {
   _validateFile("src/data/input_random_41_8000.txt", 23, 12);
   _validateFile("src/data/input_random_48_10000.txt", 26, 12);
   _validateFile("src/data/input_random_45_10000.txt", 24, 12);
+  _validateFile("src/data/huffman.txt", 19, 9);
 }
 
 int registerHuffmanCodeTests() {

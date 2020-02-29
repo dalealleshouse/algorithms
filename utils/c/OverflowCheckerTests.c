@@ -42,13 +42,20 @@ static void is_add_overflow_int_overflow() {
 
 static void is_add_overflow_uint_no_overflow() {
   CU_ASSERT_FALSE(is_add_overflow_uint(5, 5));
-  CU_ASSERT_FALSE(is_add_overflow_uint(INT_MAX, 1));
   CU_ASSERT_FALSE(is_add_overflow_int(UINT_MAX - 1, 1));
 }
 
 static void is_add_overflow_uint_overflow() {
   CU_ASSERT_TRUE(is_add_overflow_uint(UINT_MAX, 1));
-  CU_ASSERT_TRUE(is_add_overflow_uint(0, -1));
+}
+
+static void is_add_overflow_ulong_no_overflow() {
+  CU_ASSERT_FALSE(is_add_overflow_ulong(5, 5));
+  CU_ASSERT_FALSE(is_add_overflow_ulong(ULONG_MAX - 1, 1));
+}
+
+static void is_add_overflow_ulong_overflow() {
+  CU_ASSERT_TRUE(is_add_overflow_ulong(ULONG_MAX, 1));
 }
 
 int register_overflow_tests() {
@@ -66,6 +73,10 @@ int register_overflow_tests() {
                              CU_TEST_INFO(is_add_overflow_uint_no_overflow),
                              CU_TEST_INFO_NULL};
 
+  CU_TestInfo long_tests[] = {CU_TEST_INFO(is_add_overflow_ulong_overflow),
+                              CU_TEST_INFO(is_add_overflow_ulong_no_overflow),
+                              CU_TEST_INFO_NULL};
+
   CU_SuiteInfo suites[] = {{.pName = "size_t_tests",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
@@ -74,6 +85,10 @@ int register_overflow_tests() {
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
                             .pTests = int_tests},
+                           {.pName = "long",
+                            .pInitFunc = noop,
+                            .pCleanupFunc = noop,
+                            .pTests = long_tests},
                            CU_SUITE_INFO_NULL};
 
   return CU_register_suites(suites);
