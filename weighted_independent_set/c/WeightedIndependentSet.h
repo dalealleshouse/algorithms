@@ -9,10 +9,11 @@
  */
 typedef struct WeightedVertex {
   unsigned int id;
-  unsigned int weight;
+  unsigned long weight;
 } WeightedVertex;
 
-Result WeightedVertex_Init(unsigned int id, int weight, WeightedVertex** vw);
+Result WeightedVertex_Init(unsigned int id, unsigned long weight,
+                           WeightedVertex** vw);
 void WeightedVertex_Destory(WeightedVertex* vw);
 
 /*
@@ -27,16 +28,16 @@ typedef struct PathGraph {
   WeightedVertex** vertices;
 } PathGraph;
 
-Result PathGraph_Create(unsigned int ids[], int weights[], size_t n,
+Result PathGraph_Create(unsigned int ids[], unsigned long weights[], size_t n,
                         PathGraph** graph);
-void PathGraph_Destroy(void*);
+void PathGraph_Destroy(PathGraph*);
 
 /*
  * Defines a weighted independent set
  */
 typedef struct WeightedIndependentSet {
   size_t n;
-  unsigned int weight;
+  unsigned long weight;
   WeightedVertex** vertices;
 } WeightedIndependentSet;
 
