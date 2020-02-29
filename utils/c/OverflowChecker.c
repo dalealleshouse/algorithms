@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "OverflowChecker.h"
 
@@ -30,6 +31,13 @@ bool is_add_overflow_int(int x, int y)
         return true;
 
     if (x < 0 && y < INT_MIN - x)
+        return true;
+
+    return false;
+}
+
+bool is_add_overflow_uint(unsigned int x, unsigned int y) {
+    if (x > 0 && y > UINT_MAX - x)
         return true;
 
     return false;
