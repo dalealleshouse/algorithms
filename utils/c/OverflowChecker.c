@@ -39,3 +39,7 @@ bool is_add_overflow_ulong(unsigned long x, unsigned long y) {
 
   return false;
 }
+
+bool is_mul_overflow_ulong(unsigned long x, unsigned long y) {
+  return (x > ULONG_MAX / y);
+}

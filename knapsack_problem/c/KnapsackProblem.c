@@ -195,7 +195,9 @@ ResultCode Knapsack_Pack_Optimal(const Knapsack* self, value* result) {
           my_solutions[c] = case2;
       }
     }
-    memcpy(solutions, my_solutions, solution_size);
+    value* temp = my_solutions;
+    my_solutions = solutions;
+    solutions = temp;
   }
 
   *result = solutions[self->capacity];
