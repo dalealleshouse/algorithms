@@ -58,6 +58,15 @@ static void is_add_overflow_ulong_overflow() {
   CU_ASSERT_TRUE(is_add_overflow_ulong(ULONG_MAX, 1));
 }
 
+static void is_mul_overflow_ulong_no_overflow() {
+  CU_ASSERT_FALSE(is_mul_overflow_ulong(5, 5));
+  CU_ASSERT_FALSE(is_mul_overflow_ulong(ULONG_MAX / 2, 2));
+}
+
+static void is_mul_overflow_ulong_overflow() {
+  CU_ASSERT_TRUE(is_mul_overflow_ulong(ULONG_MAX / 2, 3));
+}
+
 int register_overflow_tests() {
   CU_TestInfo size_t_tests[] = {
       CU_TEST_INFO(is_mul_overflow_size_t_zero),
@@ -75,6 +84,8 @@ int register_overflow_tests() {
 
   CU_TestInfo long_tests[] = {CU_TEST_INFO(is_add_overflow_ulong_overflow),
                               CU_TEST_INFO(is_add_overflow_ulong_no_overflow),
+                              CU_TEST_INFO(is_mul_overflow_ulong_overflow),
+                              CU_TEST_INFO(is_mul_overflow_ulong_no_overflow),
                               CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "size_t_tests",
