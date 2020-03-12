@@ -7,6 +7,7 @@
 
 #include "SequenceAlignment.h"
 
+const char GAP = '_';
 typedef struct SeqAlign {
   char* x;
   size_t x_n;
@@ -110,10 +111,10 @@ static ResultCode _reconstruct(
         j--;
       } else if (case2 == solution) {
         x[xpos--] = _x;
-        y[ypos--] = '_';
+        y[ypos--] = GAP;
         i--;
       } else if (case3 == solution) {
-        x[xpos--] = '_';
+        x[xpos--] = GAP;
         y[ypos--] = _y;
         j--;
       }

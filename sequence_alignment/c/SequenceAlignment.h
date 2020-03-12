@@ -3,6 +3,7 @@
 #include "include/ResultCode.h"
 
 typedef unsigned long penalty;
+const char GAP;
 
 /*
  * Implementation is private to ensure it is not modified after initialization
