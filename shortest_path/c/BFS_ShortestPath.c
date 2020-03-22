@@ -7,7 +7,7 @@ static VertexData* VertexData_Create(int value)
     VertexData* d = calloc(sizeof(VertexData), 1);
 
     if (d == NULL) {
-        GRAPH_ERROR(Graph_FailedMemoryAllocation);
+        GRAPH_ERROR(Graph_FailedMemoryAllocation); // NOLINT
         return NULL;
     }
 

@@ -47,6 +47,7 @@ static GraphResult Graph_AddVertex(Graph* self, vertex_id id, void* data) {
 
   if (id < 0) return Graph_InvalidVertexId;
 
+  // it's ok to cast to size_t b/c the line above ensures it isn't negative
   if (id >= self->n) return Graph_VertexIdExceedsMaxSize;
 
   if (self->V[id] != NULL) return Graph_DuplicateVertexId;
@@ -64,14 +65,25 @@ static GraphResult Graph_AddVertex(Graph* self, vertex_id id, void* data) {
 
 static void AddVertex_PrintError(Graph* self, vertex_id id) {
   GraphResult result = Graph_AddVertex(self, id, NULL);
-  if (result != Graph_Success) GRAPH_ERROR(result);  // NOLINT
+  if (result != Graph_Success) GRAPH_ERROR(result); // NOLINT
+}
+
+static void AddWeightedEdge_PrintError(Graph* self, vertex_id head,
+                                       vertex_id tail, int weight) {
+  /* printf("head=%d, tail=%d, weight=%d\n", head, tail, weight); */
+  GraphResult result = Graph_AddWeightedEdge(self, head, tail, weight);
+  if (result != Graph_Success) GRAPH_ERROR(result); // NOLINT
+}
+
+static void AddEdge_PrintError(Graph* self, vertex_id head, vertex_id tail) {
+  AddWeightedEdge_PrintError(self, head, tail, 1);
 }
 
 Graph* Graph_Create(size_t n) {
   Graph* graph = malloc(sizeof(Graph));
 
   if (graph == NULL) {
-    GRAPH_ERROR(Graph_FailedMemoryAllocation);  // NOLINT
+    GRAPH_ERROR(Graph_FailedMemoryAllocation); // NOLINT
     return NULL;
   }
 
@@ -125,7 +137,11 @@ GraphResult Graph_AddWeightedEdge(Graph* self, vertex_id head, vertex_id tail,
                                   int weight) {
   if (self == NULL) return Graph_NullParameter;
 
-  if (head >= self->n || tail >= self->n) return Graph_VertexIdExceedsMaxSize;
+  if (head < 0 || tail < 0) return Graph_InvalidVertexId;
+
+  // cast to size_t ok b/c the previous condition ensures it's not negative
+  if ((size_t)head >= self->n || (size_t)tail >= self->n)
+    return Graph_VertexIdExceedsMaxSize;
 
   if (self->V[head] == NULL || self->V[tail] == NULL)
     return Graph_InvalidVertexId;
@@ -147,7 +163,7 @@ GraphResult Graph_AddEdge(Graph* self, vertex_id head, vertex_id tail) {
   return Graph_AddWeightedEdge(self, head, tail, 1);
 }
 
-static GraphResult non_weight_parser(Graph* g, FILE* file) {
+static void non_weight_parser(Graph* g, FILE* file) {
   char line[BUFFER_SIZE];
   while (fgets(line, BUFFER_SIZE, file)) {
     char* remaining;
@@ -155,14 +171,10 @@ static GraphResult non_weight_parser(Graph* g, FILE* file) {
 
     vertex_id edge = strtoul(remaining, &remaining, 10);
     while (edge != 0) {
-      GraphResult result = Graph_AddEdge(g, edge, vertex);
-      if (result != Graph_Success) return result;
-
+      AddEdge_PrintError(g, edge, vertex);
       edge = strtoumax(remaining, &remaining, 10);
     }
   }
-
-  return Graph_Success;
 }
 
 static EdgeTuple parse_edge_tuple(char* tuple) {
@@ -172,12 +184,13 @@ static EdgeTuple parse_edge_tuple(char* tuple) {
   // ignore the comma
   remaining++;
   int weight = strtoimax(remaining, &remaining, 10);
+  printf("INSIDE GRAPH head=%u, weight=%d\n", head, weight);
 
   EdgeTuple t = {head, weight};
   return t;
 }
 
-static GraphResult weighted_parser(Graph* g, FILE* file) {
+static void weighted_parser(Graph* g, FILE* file) {
   char line[BUFFER_SIZE];
   while (fgets(line, BUFFER_SIZE, file)) {
     char* remaining;
@@ -190,17 +203,13 @@ static GraphResult weighted_parser(Graph* g, FILE* file) {
 
     while (tok != NULL && strcmp(tok, "\n") != 0) {
       EdgeTuple t = parse_edge_tuple(tok);
-      GraphResult result = Graph_AddWeightedEdge(g, t.head, vertex, t.weight);
-      if (result != Graph_Success) return result;
-
+      AddWeightedEdge_PrintError(g, t.head, vertex, t.weight);
       tok = strtok(0, seperator);
     }
   }
-
-  return Graph_Success;
 }
 
-typedef GraphResult (*line_parser)(Graph*, FILE*);
+typedef void (*line_parser)(Graph*, FILE*);
 static Graph* Graph_Parser(const size_t n, const char* path,
                            line_parser line_parser) {
   if (path == NULL) {
@@ -225,15 +234,9 @@ static Graph* Graph_Parser(const size_t n, const char* path,
     return NULL;
   }
 
-  GraphResult result = line_parser(g, file);
+  line_parser(g, file);
   fclose(file);
-
-  if (result != Graph_Success) {
-    Graph_Destroy(g, NULL);
-    GRAPH_ERROR(result);  // NOLINT
-    return NULL;
-  }
-
+  printf("\nINSIDE GRAPH n=%zu, m=%zu\n", g->n, g->m);
   return g;
 }
 
@@ -308,10 +311,6 @@ void Graph_Destroy(Graph* self, freer freer) {
 
 char* Graph_ErrorMessage(GraphResult result) {
   switch (result) {
-    case Graph_ArithmeticOverflow:
-      return "An arithmetic overflow occured.";
-    case Graph_NegativeCycle:
-      return "A negative cycle was detected.";
     case Graph_DependencyError:
       return "One of the Graphs dependencies had an unrecoverable error.";
     case Graph_FileOpenError:

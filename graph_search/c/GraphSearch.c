@@ -16,7 +16,7 @@ static VertexData* VertexData_Create(int value)
     VertexData* d = calloc(sizeof(VertexData), 1);
 
     if (d == NULL) {
-        GRAPH_ERROR(Graph_FailedMemoryAllocation);
+        GRAPH_ERROR(Graph_FailedMemoryAllocation); // NOLINT
         return NULL;
     }
 
@@ -170,7 +170,14 @@ static void Graph_DFS_TopSort(Graph* self, int vertex_id)
         e = e->next;
     }
 
-    ((VertexData*)v->data)->value = order;
+    VertexData* vd = v->data;
+
+    // Need a better solution than just bailing out...
+    // However, I don't have time to for that big of a change ATM
+    if(vd == NULL)
+      return;
+
+    vd->value = order;
     order--;
 }
 
@@ -245,7 +252,7 @@ static Stack* Graph_MagicOrdering(Graph* self, int vertex_id, Stack* order)
 Stack* Graph_SCC_MagicOrdering(Graph* self)
 {
     if (self == NULL) {
-        GRAPH_ERROR(Graph_NullParameter);
+        GRAPH_ERROR(Graph_NullParameter); // NOLINT
         return NULL;
     }
 
