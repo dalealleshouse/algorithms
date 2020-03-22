@@ -25,11 +25,19 @@ static void Graph_Create_initalizes_values() {
   size_t n = 10;
   Graph* graph = Graph_Create(n);
 
-  CU_ASSERT_PTR_NOT_NULL_FATAL(graph);
+  if (graph == NULL) {
+    CU_FAIL("graph is NULL");
+    return;
+  }
+
   CU_ASSERT_EQUAL(0, graph->m);
   CU_ASSERT_EQUAL(n, graph->n);
 
-  CU_ASSERT_PTR_NOT_NULL(graph->V);
+  if (graph->V == NULL) {
+    CU_FAIL("graph->V is NULL");
+    return;
+  }
+
   for (size_t i = 0; i < n; i++) CU_ASSERT_PTR_NOT_NULL(graph->V[i]);
 
   Graph_Destroy(graph, NULL);
@@ -55,11 +63,7 @@ static void Graph_AddEdge_null_parameter() {
 static void Graph_AddEdge_invalid_head() {
   Graph* graph = Graph_Create(10);
 
-  // Negative vertex ID
-  GraphResult result = Graph_AddEdge(graph, -1, 1);
-  CU_ASSERT_EQUAL(Graph_InvalidVertexId, result);
-
-  result = Graph_AddEdge(graph, 10, 1);
+  GraphResult result = Graph_AddEdge(graph, 10, 1);
   CU_ASSERT_EQUAL(Graph_VertexIdExceedsMaxSize, result);
 
   Graph_Destroy(graph, NULL);
@@ -68,11 +72,7 @@ static void Graph_AddEdge_invalid_head() {
 static void Graph_AddEdge_invalid_tail() {
   Graph* graph = Graph_Create(10);
 
-  // Negative vertex ID
-  GraphResult result = Graph_AddEdge(graph, 1, -1);
-  CU_ASSERT_EQUAL(Graph_InvalidVertexId, result);
-
-  result = Graph_AddEdge(graph, 1, 10);
+  GraphResult result = Graph_AddEdge(graph, 1, 10);
   CU_ASSERT_EQUAL(Graph_VertexIdExceedsMaxSize, result);
 
   Graph_Destroy(graph, NULL);
@@ -84,7 +84,11 @@ static void Graph_AddEdge_intializes_values() {
   GraphResult result = Graph_AddEdge(graph, 1, 2);
 
   CU_ASSERT_EQUAL(Graph_Success, result);
-  CU_ASSERT_PTR_NOT_NULL(graph->V[2]->edges);
+  if (graph->V[2]->edges == NULL) {
+    CU_FAIL("graph->V[2]->edges is NULL");
+    return;
+  }
+
   CU_ASSERT_EQUAL(1, graph->V[2]->edges->head);
   CU_ASSERT_EQUAL(1, graph->m);
 
@@ -104,7 +108,11 @@ static void Graph_AddEdge_sets_incoming() {
   GraphResult result = Graph_AddEdge(graph, 1, 2);
 
   CU_ASSERT_EQUAL(Graph_Success, result);
-  CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V[1]->in_edges);
+  if (graph->V[1]->in_edges == NULL) {
+    CU_FAIL("graph->V[1]->in_edges is NULL");
+    return;
+  }
+
   CU_ASSERT_EQUAL(2, graph->V[1]->in_edges->tail);
 
   Graph_Destroy(graph, NULL);
@@ -116,11 +124,43 @@ static void Graph_AddEdge_sets_weight_to_1() {
   GraphResult result = Graph_AddEdge(graph, 1, 2);
 
   CU_ASSERT_EQUAL(Graph_Success, result);
-  CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V[1]->in_edges);
+  if (graph->V[1]->in_edges == NULL) {
+    CU_FAIL("graph->V[1]->in_edges is NULL");
+    return;
+  }
+
   CU_ASSERT_PTR_NULL(graph->V[1]->edges);
-  CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V[2]->edges);
+
+  if (graph->V[2]->edges == NULL) {
+    CU_FAIL("graph->V[2]->edges is NULL");
+    return;
+  }
   CU_ASSERT_EQUAL(1, graph->V[1]->in_edges->weight);
   CU_ASSERT_EQUAL(1, graph->V[2]->edges->weight);
+
+  Graph_Destroy(graph, NULL);
+}
+
+static void Graph_AddEdge_two_edges() {
+  Graph* graph = Graph_Create(10);
+
+  GraphResult result = Graph_AddEdge(graph, 1, 2);
+  CU_ASSERT_EQUAL(Graph_Success, result);
+
+  result = Graph_AddEdge(graph, 1, 3);
+  CU_ASSERT_EQUAL(Graph_Success, result);
+
+  CU_ASSERT_EQUAL(graph->V[1]->in_degree, 2);
+
+  // edge 1
+  CU_ASSERT_EQUAL(graph->V[1]->in_edges->next->weight, 1);
+  CU_ASSERT_EQUAL(graph->V[1]->in_edges->next->head, 1);
+  CU_ASSERT_EQUAL(graph->V[1]->in_edges->next->tail, 2);
+
+  // edge 2
+  CU_ASSERT_EQUAL(graph->V[1]->in_edges->weight, 1);
+  CU_ASSERT_EQUAL(graph->V[1]->in_edges->head, 1);
+  CU_ASSERT_EQUAL(graph->V[1]->in_edges->tail, 3);
 
   Graph_Destroy(graph, NULL);
 }
@@ -166,7 +206,7 @@ static void Graph_FromFile_invalid_path() {
 
 static void Graph_FromFile_insufficent_size() {
   Graph* graph = Graph_FromFile(5, "src/graphs/Graph-4-2.txt");
-  CU_ASSERT_PTR_NOT_NULL(graph);
+  CU_ASSERT_PTR_NULL(graph);
   CU_ASSERT_EQUAL(Graph_VertexIdExceedsMaxSize, ErrorReporter_LastErrorCode());
 
   Graph_Destroy(graph, NULL);
@@ -186,11 +226,14 @@ static void AllEdgeWeightsAreOne(Edge* e) {
 }
 
 static void Graph_FromFile_standard() {
-  const int n = 9;
+  const int n = 6;
   Graph* graph = Graph_FromFile(n, "src/graphs/Graph-4-2.txt");
 
-  CU_ASSERT_PTR_NOT_NULL_FATAL(graph); // NOLINT
-  CU_ASSERT_EQUAL(9, graph->n);
+  if (graph == NULL) {
+    CU_FAIL("graph is NULL");
+    return;
+  }
+  CU_ASSERT_EQUAL(6, graph->n);
   CU_ASSERT_EQUAL(10, graph->m);
 
   for (size_t i = 0; i < n; i++) {
@@ -202,7 +245,7 @@ static void Graph_FromFile_standard() {
 }
 
 /*************************** Graph_WeightedFromFile ***************************/
-static void EdgeIsValid(Edge* e, int head, int tail, int weight) {
+static void EdgeIsValid(Edge* e, vertex_id head, vertex_id tail, int weight) {
   /* CU_ASSERT_PTR_NOT_NULL_FATAL(e); */
   CU_ASSERT_EQUAL(head, e->head);
   CU_ASSERT_EQUAL(tail, e->tail);
@@ -214,7 +257,11 @@ static void Graph_WeightedFromFile_standard() {
   const int m = 5;
   Graph* graph = Graph_WeightedFromFile(n, "src/graphs/weighted.txt");
 
-  CU_ASSERT_PTR_NOT_NULL(graph); // NOLINT
+  if (graph == NULL) {
+    CU_FAIL("graph is NULL");
+    return;
+  }
+
   CU_ASSERT_EQUAL(n, graph->n);
   CU_ASSERT_EQUAL(m, graph->m);
 
@@ -270,26 +317,28 @@ static void Graph_Destroy_complex_graph() {
 }
 
 int register_graph_tests() {
-  CU_TestInfo Queue_tests[] = {CU_TEST_INFO(Graph_Create_failed_malloc),
-                               CU_TEST_INFO(Graph_Create_initalizes_values),
-                               CU_TEST_INFO(Graph_AddEdge_failed_malloc),
-                               CU_TEST_INFO(Graph_AddEdge_null_parameter),
-                               CU_TEST_INFO(Graph_AddEdge_invalid_head),
-                               CU_TEST_INFO(Graph_AddEdge_invalid_tail),
-                               CU_TEST_INFO(Graph_AddEdge_intializes_values),
-                               CU_TEST_INFO(Graph_AddEdge_sets_incoming),
-                               CU_TEST_INFO(Graph_AddEdge_sets_weight_to_1),
-                               CU_TEST_INFO(Graph_AddWeightedEdge_sets_weight),
-                               CU_TEST_INFO(Graph_FromFile_failed_malloc),
-                               CU_TEST_INFO(Graph_FromFile_null_parameter),
-                               CU_TEST_INFO(Graph_FromFile_invalid_path),
-                               CU_TEST_INFO(Graph_FromFile_insufficent_size),
-                               CU_TEST_INFO(Graph_FromFile_bad_data),
-                               CU_TEST_INFO(Graph_FromFile_standard),
-                               CU_TEST_INFO(Graph_WeightedFromFile_standard),
-                               CU_TEST_INFO(Graph_WeightedFromFile_big),
-                               CU_TEST_INFO(Graph_Destroy_complex_graph),
-                               CU_TEST_INFO_NULL};
+  CU_TestInfo Queue_tests[] = {
+      CU_TEST_INFO(Graph_Create_failed_malloc),
+      CU_TEST_INFO(Graph_Create_initalizes_values),
+      CU_TEST_INFO(Graph_AddEdge_failed_malloc),
+      CU_TEST_INFO(Graph_AddEdge_null_parameter),
+      CU_TEST_INFO(Graph_AddEdge_invalid_head),
+      CU_TEST_INFO(Graph_AddEdge_invalid_tail),
+      CU_TEST_INFO(Graph_AddEdge_intializes_values),
+      CU_TEST_INFO(Graph_AddEdge_sets_incoming),
+      CU_TEST_INFO(Graph_AddEdge_sets_weight_to_1),
+      CU_TEST_INFO(Graph_AddEdge_two_edges),
+      CU_TEST_INFO(Graph_AddWeightedEdge_sets_weight),
+      CU_TEST_INFO(Graph_FromFile_failed_malloc),
+      CU_TEST_INFO(Graph_FromFile_null_parameter),
+      CU_TEST_INFO(Graph_FromFile_invalid_path),
+      CU_TEST_INFO(Graph_FromFile_insufficent_size),
+      CU_TEST_INFO(Graph_FromFile_bad_data),
+      CU_TEST_INFO(Graph_FromFile_standard),
+      CU_TEST_INFO(Graph_WeightedFromFile_standard),
+      CU_TEST_INFO(Graph_WeightedFromFile_big),
+      CU_TEST_INFO(Graph_Destroy_complex_graph),
+      CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Graph",
                             .pInitFunc = noop,
