@@ -1,5 +1,5 @@
 SHELL 	= /bin/sh
-CC 		= clang-7
+CC 		= clang-9
 
 FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
