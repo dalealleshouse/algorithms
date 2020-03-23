@@ -157,7 +157,7 @@ Result PrimMinSpanTreeNaive(const Graph* graph, MinSpanTree* mst) {
 
   char conquered[graph->n];
   // initalized to zero
-  memset(&conquered, 0, graph->n * sizeof(char));
+  memset(&conquered, 0, graph->n * sizeof(char)); // NOLINT
 
   Vertex* v = graph->V[1];
   _conquer(v, conquered);
@@ -207,7 +207,7 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
 
   SpanTreeResult conquered[graph->n];
   // initialized to zero
-  memset(&conquered, 0, graph->n * sizeof(conquered[0]));
+  memset(&conquered, 0, graph->n * sizeof(conquered[0])); // NOLINT
   conquered[1].conquered = true;
   conquered[1].vertex_id = 1;
 

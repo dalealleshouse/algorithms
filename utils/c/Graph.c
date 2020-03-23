@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
@@ -245,7 +246,7 @@ Graph* Graph_WeightedFromFile(const size_t n, const char* path) {
   return Graph_Parser(n, path, weighted_parser);
 }
 
-Graph* Graph_WeightedFromFile2(const char* path) {
+static Graph* _weightedFromFile(const char* path, bool undirected) {
   const static int BUFFER_SIZE = 1024;
 
   if (access(path, R_OK) != 0) {
@@ -272,29 +273,40 @@ Graph* Graph_WeightedFromFile2(const char* path) {
   char* remaining;
   while (fgets(line, BUFFER_SIZE, file)) {
     node1 = strtol(line, &remaining, 10);
-    if (node1 == 0) {
+    if (line == remaining) {
       printf("Failed int conversion\n");
       return graph;
     }
 
-    node2 = strtol(remaining, &remaining, 10);
-    if (node1 == 0) {
+    char* temp = remaining;
+    node2 = strtol(temp, &remaining, 10);
+    if (temp == remaining) {
       printf("Failed int conversion\n");
       return graph;
     }
 
+    errno = 0;
     weight = strtoimax(remaining, NULL, 10);
-    if (weight == 0) {
+    if (errno != 0) {
       printf("Failed int conversion\n");
+      printf("%s\n", strerror(errno));
       return graph;
     }
 
-    Graph_AddWeightedEdge(graph, node1, node2, weight);
+    if (undirected) Graph_AddWeightedEdge(graph, node1, node2, weight);
     Graph_AddWeightedEdge(graph, node2, node1, weight);
   }
 
   fclose(file);
   return graph;
+}
+
+Graph* Graph_WeightedFromFileUndirected(const char* path) {
+  return _weightedFromFile(path, true);
+}
+
+Graph* Graph_WeightedFromFileDirected(const char* path) {
+  return _weightedFromFile(path, false);
 }
 
 void Graph_Destroy(Graph* self, freer freer) {

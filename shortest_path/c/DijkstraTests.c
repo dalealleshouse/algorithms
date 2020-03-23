@@ -83,16 +83,6 @@ Graph* sut;
   static void ALGO##_medium() {                                            \
     Graph* sut = Graph_WeightedFromFile(med_n, med_path);                  \
                                                                            \
-    printf("\nn=%zu, m=%zu\n", sut->n, sut->m);                            \
-    for (size_t i = 0; i < sut->n; i++) {                                  \
-      printf("Vertex=%zu\n", i);                                           \
-      Vertex* v = sut->V[i];                                               \
-      for (size_t i = 0; i < v->in_degree; i++) {                          \
-        Edge edge = v->in_edges[i];                                        \
-        printf("\t%u->%u weight=%d\n", edge.tail, edge.head, edge.weight); \
-      }                                                                    \
-    }                                                                      \
-                                                                           \
     GraphResult result = ALGO(sut, 1);                                     \
                                                                            \
     CU_ASSERT_EQUAL(Graph_Success, result);                                \
