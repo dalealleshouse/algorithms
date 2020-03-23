@@ -1,0 +1,96 @@
+#include <limits.h>
+#include <math.h>
+#include <stdlib.h>
+
+#include "include/OverflowChecker.h"
+
+#include "FloydWarshall.h"
+
+const path_length UINIT_PATH = INFINITY;
+
+static void _printSolutions(size_t n, path_length* solutions) {
+  printf("\n");
+  for (size_t v = 0; v < n; v++) {
+    printf("Vertex %zu=", v);
+    for (size_t w = 0; w < n; w++) {
+      printf("%12f ", solutions[v + n * w]);
+    }
+    printf("\n");
+  }
+
+  printf("         ");
+  for (size_t w = 0; w < n; w++) printf("%12zu ", w);
+}
+
+path_length _findEdge(Graph* graph, vertex_id v, vertex_id w) {
+  Edge* e = graph->V[v]->in_edges;
+  path_length weight = UINIT_PATH;
+
+  // There can be multiple edge with the same head and tail so we have to find
+  // the shortest one
+  while (e != NULL) {
+    if (e->tail == w) weight = (weight < e->weight) ? weight : e->weight;
+
+    e = e->next;
+  }
+
+  return weight;
+}
+
+static bool _isNegativeCycle(size_t n, path_length* solutions) {
+  for (size_t v = 0; v < n; v++)
+    if (solutions[v + v * n] < 0) return true;
+
+  return false;
+}
+
+GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
+  if (graph == NULL) return Graph_NullParameter;
+
+  size_t n = graph->n;
+
+  path_length* current = malloc(sizeof(path_length) * n * n);
+  path_length* previous = malloc(sizeof(path_length) * n * n);
+
+  for (size_t v = 0; v < graph->n; v++) {
+    for (size_t w = 0; w < graph->n; w++) {
+      if (v == w) {
+        current[v + n * w] = 0;
+        continue;
+      }
+
+      current[v + n * w] = _findEdge(graph, v, w);
+    }
+  }
+
+  for (size_t k = 0; k < n; k++) {
+    path_length* temp = current;
+    current = previous;
+    previous = temp;
+
+    for (size_t v = 0; v < n; v++) {
+      for (size_t w = 0; w < n; w++) {
+        path_length case1 = previous[v + n * w];
+        path_length case2 = UINIT_PATH;
+
+        if (previous[v + n * k] != UINIT_PATH &&
+            previous[k + n * w] != UINIT_PATH) {
+          case2 = previous[v + n * k] + previous[k + n * w];
+        }
+
+        current[v + n * w] = (case1 < case2) ? case1 : case2;
+      }
+    }
+  }
+  free(previous);
+
+  if (_isNegativeCycle(n, current)) {
+    free(current);
+    return Graph_NegativeCycle;
+  }
+
+  *solutions = current;
+  (void)_printSolutions;
+
+  return Graph_Success;
+}

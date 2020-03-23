@@ -1,12 +1,22 @@
 #pragma once
 
-#include "include/ResultCode.h"
 #include "include/Graph.h"
+#include "include/ResultCode.h"
 
-const int UNINITIALIZED;
+#include "constants.h"
 
-typedef struct Distance {
-    int distance;
-} Distance;
+typedef struct BFData {
+  int distance;
+  Vertex* prev;
+} BFData;
+
+typedef struct Path {
+  vertex_id vertex;
+  struct Path* next;
+  size_t n;
+} Path;
 
 GraphResult BellmanFordShortestPath(Graph* graph, const vertex_id start_vertex);
+GraphResult BellmandFordTracePath(const Graph* graph, const vertex_id start,
+                                  Path** path);
+void Path_Destroy(Path* path);

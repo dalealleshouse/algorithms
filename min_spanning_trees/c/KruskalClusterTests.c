@@ -16,17 +16,17 @@ static Graph* SmallGraph() {
 
 static Graph* MediumCluster() {
   const static char* PATH = "src/data/cluster_med.txt";
-  return Graph_WeightedFromFile2(PATH);
+  return Graph_WeightedFromFileUndirected(PATH);
 }
 
 static Graph* BigCluster() {
   const static char* PATH = "src/data/cluster_20_128.txt";
-  return Graph_WeightedFromFile2(PATH);
+  return Graph_WeightedFromFileUndirected(PATH);
 }
 
 static Graph* GiantCluster() {
   const static char* PATH = "src/data/clustering1.txt";
-  return Graph_WeightedFromFile2(PATH);
+  return Graph_WeightedFromFileUndirected(PATH);
 }
 
 // Common Test Functions
@@ -64,8 +64,6 @@ static void KruskalCluster_CalcsMaxSpacingForGiantCluster() {
   Result result = KruskalCluster(graph, 4, &max_space);
   CU_ASSERT_EQUAL(result, Success);
   CU_ASSERT_EQUAL(max_space, 106);
-
-  printf("\n%d\n", max_space);
 
   Graph_Destroy(graph, NULL);
 }

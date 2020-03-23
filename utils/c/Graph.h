@@ -78,7 +78,8 @@ GraphResult Graph_AddEdge(Graph*, vertex_id, vertex_id);
 GraphResult Graph_AddWeightedEdge(Graph*, vertex_id, vertex_id, int);
 Graph* Graph_FromFile(const size_t, const char* path);
 Graph* Graph_WeightedFromFile(const size_t, const char* path);
-Graph* Graph_WeightedFromFile2(const char* path);
+Graph* Graph_WeightedFromFileUndirected(const char* path);
+Graph* Graph_WeightedFromFileDirected(const char* path);
 
 // Function of Mass Destruction
 void Graph_Destroy(Graph*, freer);

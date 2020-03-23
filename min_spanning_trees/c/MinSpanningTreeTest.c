@@ -18,7 +18,7 @@ Graph* SimpleGraph()
 Graph* ComplicatedGraph()
 {
     const static char* PATH = "src/data/complicated.txt";
-    return Graph_WeightedFromFile2(PATH);
+    return Graph_WeightedFromFileUndirected(PATH);
 }
 
 typedef Result (*min_span_tree)(const Graph* graph, MinSpanTree* mst);
