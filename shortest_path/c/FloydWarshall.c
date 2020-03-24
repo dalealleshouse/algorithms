@@ -6,14 +6,12 @@
 
 #include "FloydWarshall.h"
 
-const path_length UINIT_PATH = INFINITY;
-
 static void _printSolutions(size_t n, path_length* solutions) {
   printf("\n");
   for (size_t v = 0; v < n; v++) {
     printf("Vertex %zu=", v);
     for (size_t w = 0; w < n; w++) {
-      printf("%12f ", solutions[v + n * w]);
+      printf("%12d ", solutions[v + n * w]);
     }
     printf("\n");
   }
@@ -24,7 +22,7 @@ static void _printSolutions(size_t n, path_length* solutions) {
 
 path_length _findEdge(Graph* graph, vertex_id v, vertex_id w) {
   Edge* e = graph->V[v]->in_edges;
-  path_length weight = UINIT_PATH;
+  path_length weight = UNINITIALIZED;
 
   // There can be multiple edge with the same head and tail so we have to find
   // the shortest one
@@ -35,13 +33,6 @@ path_length _findEdge(Graph* graph, vertex_id v, vertex_id w) {
   }
 
   return weight;
-}
-
-static bool _isNegativeCycle(size_t n, path_length* solutions) {
-  for (size_t v = 0; v < n; v++)
-    if (solutions[v + v * n] < 0) return true;
-
-  return false;
 }
 
 GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
@@ -71,24 +62,28 @@ GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
     for (size_t v = 0; v < n; v++) {
       for (size_t w = 0; w < n; w++) {
         path_length case1 = previous[v + n * w];
-        path_length case2 = UINIT_PATH;
+        path_length case2 = UNINITIALIZED;
 
-        if (previous[v + n * k] != UINIT_PATH &&
-            previous[k + n * w] != UINIT_PATH) {
+        if (previous[v + n * k] != UNINITIALIZED &&
+            previous[k + n * w] != UNINITIALIZED) {
+          if (is_add_overflow_int(previous[v + n * k], previous[k + n * w])) {
+            free(previous);
+            free(current);
+            return Graph_ArithmeticOverflow;
+          }
           case2 = previous[v + n * k] + previous[k + n * w];
         }
 
         current[v + n * w] = (case1 < case2) ? case1 : case2;
+        if (v == w && current[v + n * w] < 0) {
+          free(previous);
+          free(current);
+          return Graph_NegativeCycle;
+        }
       }
     }
   }
   free(previous);
-
-  if (_isNegativeCycle(n, current)) {
-    free(current);
-    return Graph_NegativeCycle;
-  }
-
   *solutions = current;
   (void)_printSolutions;
 
