@@ -72,7 +72,7 @@ static void FloydWarshallShortestPath_HappyPath() {
   GraphResult result = FloydWarshallShortestPath(sut, &solutions);
   CU_ASSERT_EQUAL(result, Graph_Success);
 
-  CU_ASSERT_EQUAL(UINIT_PATH, solutions[1 + small_n * 0]);
+  CU_ASSERT_EQUAL(UNINITIALIZED, solutions[1 + small_n * 0]);
   CU_ASSERT_EQUAL(0, solutions[1 + small_n * 1]);
   CU_ASSERT_EQUAL(1, solutions[2 + small_n * 1]);
   CU_ASSERT_EQUAL(5, solutions[3 + small_n * 1]);
@@ -83,23 +83,34 @@ static void FloydWarshallShortestPath_HappyPath() {
   Graph_Destroy(sut, free);
 }
 
-static void FloydWarshallShortestPath_NegativeCycle() {
+static void FloydWarshallShortestPath_ArithmeticOverflow() {
+  Graph* sut = Graph_WeightedFromFile(small_n, small_path);
+
+  sut->V[3]->in_edges->weight = INT_MAX - 1;
+
   path_length* solutions = NULL;
-  Graph* sut = Graph_WeightedFromFile(neg_n, neg_path);
+  GraphResult result = FloydWarshallShortestPath(sut, &solutions);
+  CU_ASSERT_EQUAL(result, Graph_ArithmeticOverflow);
+
+  Graph_Destroy(sut, free);
+}
+
+static void _testNegativeCycle(Graph* sut) {
+  path_length* solutions = NULL;
 
   GraphResult result = FloydWarshallShortestPath(sut, &solutions);
   CU_ASSERT_EQUAL(result, Graph_NegativeCycle);
 
   free(solutions);
   Graph_Destroy(sut, NULL);
+}
 
-  sut = Graph_WeightedFromFileDirected("src/graphs/17_32.txt");
-
-  result = FloydWarshallShortestPath(sut, &solutions);
-  CU_ASSERT_EQUAL(result, Graph_NegativeCycle);
-
-  free(solutions);
-  Graph_Destroy(sut, NULL);
+static void FloydWarshallShortestPath_NegativeCycle() {
+  _testNegativeCycle(Graph_WeightedFromFile(neg_n, neg_path));
+  _testNegativeCycle(Graph_WeightedFromFileDirected("src/graphs/17_32.txt"));
+  // Slow tests, no need to execute everytime
+  /* _testNegativeCycle(Graph_WeightedFromFileDirected("src/graphs/g1.txt")); */
+  /* _testNegativeCycle(Graph_WeightedFromFileDirected("src/graphs/g2.txt")); */
 }
 
 static void FloydWarshallShortestPath_Files() {
@@ -129,6 +140,7 @@ static void FloydWarshallShortestPath_Files() {
                                  173, 189, 192, 197, 242, 251};
   _testFile("src/graphs/32_256.txt", -778, 13, expected8);
 
+  // Slow tests, no need to execute everytime
   /* const vertex_id expected9[] = { */
   /*     7,    44,   78,   91,   140,  173,  239,  291,  294,  324,  370, */
   /*     376,  449,  580,  605,  632,  640,  664,  737,  806,  825,  848, */
@@ -140,11 +152,13 @@ static void FloydWarshallShortestPath_Files() {
 }
 
 int register_fw_tests() {
-  CU_TestInfo tests[] = {CU_TEST_INFO(FloydWarshallShortestPath_NullParamter),
-                         CU_TEST_INFO(FloydWarshallShortestPath_HappyPath),
-                         CU_TEST_INFO(FloydWarshallShortestPath_NegativeCycle),
-                         CU_TEST_INFO(FloydWarshallShortestPath_Files),
-                         CU_TEST_INFO_NULL};
+  CU_TestInfo tests[] = {
+      CU_TEST_INFO(FloydWarshallShortestPath_NullParamter),
+      CU_TEST_INFO(FloydWarshallShortestPath_HappyPath),
+      CU_TEST_INFO(FloydWarshallShortestPath_ArithmeticOverflow),
+      CU_TEST_INFO(FloydWarshallShortestPath_NegativeCycle),
+      CU_TEST_INFO(FloydWarshallShortestPath_Files),
+      CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Floyd Warshall",
                             .pInitFunc = noop,

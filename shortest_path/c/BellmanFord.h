@@ -6,7 +6,7 @@
 #include "constants.h"
 
 typedef struct BFData {
-  int distance;
+  path_length distance;
   Vertex* prev;
 } BFData;
 
