@@ -2,8 +2,12 @@
 
 #include "include/Graph.h"
 
+#include "constants.h"
+
+typedef int pos_path_length;
+
 typedef struct ShortestPath {
-    double distance;
+    pos_path_length distance;
     Vertex* previous;
     bool conquered;
 } ShortestPath;

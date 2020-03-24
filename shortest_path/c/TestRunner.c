@@ -6,12 +6,8 @@ extern int register_bf_tests();
 extern int register_fw_tests();
 
 int register_tests() {
-  return (
-      /* register_sp_tests() != 0 + */ 
-	  /* register_dijkstra_tests() != 0 + */ 
-	  register_bf_tests() != 0 
-      + register_fw_tests() != 0
-	  ) *
+  return (register_sp_tests() != 0 + register_dijkstra_tests() !=
+          0 + register_bf_tests() != 0 + register_fw_tests() != 0) *
          -1;
 }
 
