@@ -316,7 +316,7 @@ static void Graph_Destroy_complex_graph() {
   Graph_Destroy(graph, free);
 }
 
-int register_graph_tests() {
+int registerGraphTests() {
   CU_TestInfo Queue_tests[] = {
       CU_TEST_INFO(Graph_Create_failed_malloc),
       CU_TEST_INFO(Graph_Create_initalizes_values),

@@ -67,7 +67,7 @@ static void is_mul_overflow_ulong_overflow() {
   CU_ASSERT_TRUE(is_mul_overflow_ulong(ULONG_MAX / 2, 3));
 }
 
-int register_overflow_tests() {
+int registerOverflowTests() {
   CU_TestInfo size_t_tests[] = {
       CU_TEST_INFO(is_mul_overflow_size_t_zero),
       CU_TEST_INFO(is_mul_overflow_size_t_no_overflow),

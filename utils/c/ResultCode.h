@@ -14,6 +14,8 @@
     }
 
 typedef enum Result {
+    SystemError = -12,
+    SecurityError = -11,
     OutputPointerIsNotNull = -10,
     Duplicate = -9,
     NotFound = -8,
