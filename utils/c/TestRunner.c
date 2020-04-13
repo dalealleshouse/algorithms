@@ -3,11 +3,14 @@
 
 #include "TestHelpers.h"
 
-int register_graph_tests();
-int register_overflow_tests();
+int registerGraphTests();
+int registerOverflowTests();
+int registerMathTests();
 
 int register_tests() {
-  return (register_graph_tests() != 0 + register_overflow_tests() != 0) * -1;
+  return (registerGraphTests() != 0 + registerOverflowTests() !=
+          0 + registerMathTests() != 0) *
+         -1;
 }
 
 int main(void) { TestRunner(register_tests); }

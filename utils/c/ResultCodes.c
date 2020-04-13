@@ -2,6 +2,10 @@
 
 char* Result_ErrorMessage(Result result) {
   switch (result) {
+    case SystemError:
+      return "Underlying OS error";
+    case SecurityError:
+      return "There was a security related error";
     case OutputPointerIsNotNull:
       return "An output parameter pointer is not null. These are intented to "
              "be populated by the function.";
