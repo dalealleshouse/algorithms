@@ -5,13 +5,19 @@
 
 #include "TravelingSalesman.h"
 
+static double squared_dist(const point* p1, const point* p2) {
+  return ((p2->x - p1->x) * (p2->x - p1->x)) +
+         ((p2->y - p1->y) * (p2->y - p1->y));
+}
+
+static double _dist(const point* p1, const point* p2) {
+  return sqrt(squared_dist(p1, p2));
+}
+
 ResultCode dist(const point* p1, const point* p2, double* result) {
   if (p1 == NULL || p2 == NULL || result == NULL) return NullParameter;
 
-  double _dist =
-      ((p2->x - p1->x) * (p2->x - p1->x)) + ((p2->y - p1->y) * (p2->y - p1->y));
-
-  *result = sqrt(_dist);
+  *result = _dist(p1, p2);
   return Success;
 }
 
@@ -76,6 +82,48 @@ ResultCode TravelingSalesman(size_t n, double graph[n][n],
 
   free(best);
   *shortest_path = answer;
+
+  return Success;
+}
+
+static city* find_closest(city* cities, size_t n, city* the_city) {
+  city* result = NULL;
+  double shortest_dist = INFINITY;
+
+  for (size_t i = 0; i < n; i++) {
+    if (cities[i].visted) continue;
+
+    double dist = squared_dist(&the_city->coordinates, &cities[i].coordinates);
+
+    if (dist < shortest_dist) {
+      result = &cities[i];
+      shortest_dist = dist;
+    }
+  }
+
+  return result;
+}
+
+ResultCode TravelingSalesmanApprox(size_t n, city* cities,
+                                   double* shortest_path) {
+  if (cities == NULL || shortest_path == NULL) return NullParameter;
+  if (n < 2) return ArgumentOutOfRange;
+
+  city* here_now = &cities[0];
+  here_now->visted = true;
+  double dist_so_far = 0;
+
+  for (size_t i = 1; i < n; i++) {
+    city* closest = find_closest(cities, n, here_now);
+
+    dist_so_far += _dist(&closest->coordinates, &here_now->coordinates);
+
+    closest->visted = true;
+    here_now = closest;
+  }
+
+  dist_so_far += _dist(&cities[0].coordinates, &here_now->coordinates);
+  *shortest_path = dist_so_far;
 
   return Success;
 }
