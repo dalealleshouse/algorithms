@@ -34,8 +34,8 @@ static void dist_NullParamter() {
   CU_ASSERT_EQUAL(result, NullParameter);
 }
 
-static ResultCode readCitiesFromFile(const char* path, size_t* n,
-                                     city** cities) {
+static ResultCode readCitiesFromFile(const char* path, size_t* n, city** cities,
+                                     bool has_ids) {
   if (path == NULL || cities == NULL) return NullParameter;
   if (*cities != NULL) return OutputPointerIsNotNull;
   if (access(path, R_OK) != 0) return SecurityError;
@@ -57,15 +57,25 @@ static ResultCode readCitiesFromFile(const char* path, size_t* n,
   while (fgets(line, BUFFER_SIZE, file)) {
     char* end = NULL;
 
+    if (has_ids) {
+      size_t _id = strtoul(line, &end, 10);
+      if (_id == 0) return SystemError;
+      result[tracker].id = _id;
+    } else {
+      result[tracker].id = tracker + 1;
+      end = line;
+    }
+
     // TODO: Add error checking
-    double x = strtod(line, &end);
+    double x = strtod(end, &end);
     double y = strtod(end, NULL);
 
-    result[tracker].id = tracker + 1;
     result[tracker].coordinates.x = x;
     result[tracker].coordinates.y = y;
+    result[tracker].visted = false;
     ++tracker;
   }
+  result[0].visted = true;
 
   *n = _n;
   *cities = result;
@@ -82,7 +92,7 @@ static void adjacencyMatrix_HappyPath() {
   size_t n = 0;
 
   ResultCode result =
-      readCitiesFromFile("src/data/input_float_10_4.txt", &n, &cities);
+      readCitiesFromFile("src/data/input_float_10_4.txt", &n, &cities, false);
   CU_ASSERT_EQUAL(result, Success);
 
   double* graph = NULL;
@@ -104,7 +114,7 @@ static void TravelingSalesman_InvalidInput() {
   double val;
 
   ResultCode result =
-      readCitiesFromFile("src/data/input_float_10_4.txt", &n, &cities);
+      readCitiesFromFile("src/data/input_float_10_4.txt", &n, &cities, false);
   CU_ASSERT_EQUAL(result, Success);
 
   double* pGraph = NULL;
@@ -128,7 +138,7 @@ static void _testFile(const char* path, const int expected) {
   double* pGraph = NULL;
   double shortest_path = 0;
 
-  ResultCode result = readCitiesFromFile(path, &n, &cities);
+  ResultCode result = readCitiesFromFile(path, &n, &cities, false);
   CU_ASSERT_EQUAL(result, Success);
 
   result = adjacencyMatrix(cities, n, &pGraph);
@@ -153,6 +163,30 @@ static void TravelingSalesman_SolveFile() {
   /* _testFile("src/data/input_float_25.txt", 26442); */
 }
 
+static void _testFileApprox(const char* path, const int expected) {
+  city* cities = NULL;
+  size_t n = 0;
+  double shortest_path = 0;
+
+  ResultCode result = readCitiesFromFile(path, &n, &cities, true);
+  CU_ASSERT_EQUAL(result, Success);
+
+  result = TravelingSalesmanApprox(n, cities, &shortest_path);
+  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(floor(shortest_path), expected);
+
+  free(cities);
+  cities = NULL;
+}
+
+static void TravelingSalesmanApprox_SolveFile() {
+  _testFileApprox("src/data/input_simple_10_8.txt", 23);
+  _testFileApprox("src/data/input_simple_20_20.txt", 74);
+  _testFileApprox("src/data/input_simple_37_400.txt", 7520);
+  /* _testFileApprox("src/data/input_simple_68_20000.txt", 2506548); */
+  /* _testFileApprox("src/data/input_simple_nn.txt", 1203406); */
+}
+
 int registerTravelingSalesmanTests() {
   CU_TestInfo TravelingSalesman_Tests[] = {
       CU_TEST_INFO(dist_happyPath),
@@ -162,6 +196,7 @@ int registerTravelingSalesmanTests() {
       CU_TEST_INFO(TravelingSalesman_NullParameter),
       CU_TEST_INFO(TravelingSalesman_InvalidInput),
       CU_TEST_INFO(TravelingSalesman_SolveFile),
+      CU_TEST_INFO(TravelingSalesmanApprox_SolveFile),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Traveling Salesman",
