@@ -1,5 +1,7 @@
 #include "./bfs_shortest_path.h"
+
 #include <stdlib.h>
+
 #include "../graph_search/graph_search.h"
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"

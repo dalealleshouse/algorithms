@@ -22,13 +22,12 @@
 
 #include "farmhash.h"
 
-#include <string.h>
-
 #include <assert.h>
+#include <string.h>
 
 // PLATFORM-SPECIFIC CONFIGURATION
 
-#if defined (__x86_64) || defined (__x86_64__)
+#if defined(__x86_64) || defined(__x86_64__)
 #define x86_64 1
 #else
 #define x86_64 0
@@ -56,7 +55,9 @@
 
 #if defined(__SSE4_2__)
 #include <nmmintrin.h>
-#define CAN_USE_SSE42 1  // Now we can use _mm_crc32_u{32,16,8}.  And on 64-bit platforms, _mm_crc32_u64.
+#define CAN_USE_SSE42 \
+  1  // Now we can use _mm_crc32_u{32,16,8}.  And on 64-bit platforms,
+     // _mm_crc32_u64.
 #else
 #define CAN_USE_SSE42 0
 #endif
@@ -85,17 +86,17 @@
 #define uint64_t_in_expected_order(x) (bswap64(x))
 #endif
 
-#define PERMUTE3(a, b, c)                                                      \
-  do {                                                                         \
-    swap32(a, b);                                                              \
-    swap32(a, c);                                                              \
+#define PERMUTE3(a, b, c) \
+  do {                    \
+    swap32(a, b);         \
+    swap32(a, c);         \
   } while (0)
 
 static inline uint32_t bswap32(const uint32_t x) {
   uint32_t y = x;
 
-  for (size_t i = 0; i < sizeof(uint32_t) >> 1; i++) {
-
+  // clang-format off
+  for (size_t i = 0; i<sizeof(uint32_t)>> 1; i++) {
     uint32_t d = sizeof(uint32_t) - i - 1;
 
     uint32_t mh = ((uint32_t)0xff) << (d << 3);
@@ -108,6 +109,7 @@ static inline uint32_t bswap32(const uint32_t x) {
 
     y = t | (y & ~(mh | ml));
   }
+  // clang-format on
 
   return y;
 }
@@ -115,8 +117,7 @@ static inline uint32_t bswap32(const uint32_t x) {
 static inline uint64_t bswap64(const uint64_t x) {
   uint64_t y = x;
 
-  for (size_t i = 0; i < sizeof(uint64_t) >> 1; i++) {
-
+  for (size_t i = 0; i<sizeof(uint64_t)>> 1; i++) {
     uint64_t d = sizeof(uint64_t) - i - 1;
 
     uint64_t mh = ((uint64_t)0xff) << (d << 3);
@@ -133,29 +134,30 @@ static inline uint64_t bswap64(const uint64_t x) {
   return y;
 }
 
-static inline uint64_t fetch64(const char* p) {
+static inline uint64_t fetch64(const char *p) {
   uint64_t result;
   memcpy(&result, p, sizeof(result));
 
   return uint64_t_in_expected_order(result);
 }
 
-static inline uint32_t fetch32(const char* p) {
+static inline uint32_t fetch32(const char *p) {
   uint32_t result;
   memcpy(&result, p, sizeof(result));
 
   return uint32_t_in_expected_order(result);
 }
 
-#if CAN_USE_SSSE3 || CAN_USE_SSE41 || CAN_USE_SSE42 || CAN_USE_AESNI || CAN_USE_AVX
+#if CAN_USE_SSSE3 || CAN_USE_SSE41 || CAN_USE_SSE42 || CAN_USE_AESNI || \
+    CAN_USE_AVX
 
-static inline __m128i fetch128(const char* s) {
-  return _mm_loadu_si128((const __m128i*) s);
+static inline __m128i fetch128(const char *s) {
+  return _mm_loadu_si128((const __m128i *)s);
 }
 
 #endif
 
-static inline void swap32(uint32_t* a, uint32_t* b) {
+static inline void swap32(uint32_t *a, uint32_t *b) {
   uint32_t t;
 
   t = *a;
@@ -163,7 +165,7 @@ static inline void swap32(uint32_t* a, uint32_t* b) {
   *b = t;
 }
 
-static inline void swap64(uint64_t* a, uint64_t* b) {
+static inline void swap64(uint64_t *a, uint64_t *b) {
   uint64_t t;
 
   t = *a;
@@ -171,9 +173,10 @@ static inline void swap64(uint64_t* a, uint64_t* b) {
   *b = t;
 }
 
-#if CAN_USE_SSSE3 || CAN_USE_SSE41 || CAN_USE_SSE42 || CAN_USE_AESNI || CAN_USE_AVX
+#if CAN_USE_SSSE3 || CAN_USE_SSE41 || CAN_USE_SSE42 || CAN_USE_AESNI || \
+    CAN_USE_AVX
 
-static inline void swap128(__m128i* a, __m128i* b) {
+static inline void swap128(__m128i *a, __m128i *b) {
   __m128i t;
 
   t = *a;
@@ -195,19 +198,27 @@ static inline uint64_t ror64(uint64_t val, size_t shift) {
 
 // Helpers for data-parallel operations (1x 128 bits or 2x64 or 4x32 or 8x16).
 
-#if CAN_USE_SSSE3 || CAN_USE_SSE41 || CAN_USE_SSE42 || CAN_USE_AESNI || CAN_USE_AVX
+#if CAN_USE_SSSE3 || CAN_USE_SSE41 || CAN_USE_SSE42 || CAN_USE_AESNI || \
+    CAN_USE_AVX
 
-static inline __m128i add64x2(__m128i x, __m128i y) { return _mm_add_epi64(x, y); }
-static inline __m128i add32x4(__m128i x, __m128i y) { return _mm_add_epi32(x, y); }
+static inline __m128i add64x2(__m128i x, __m128i y) {
+  return _mm_add_epi64(x, y);
+}
+static inline __m128i add32x4(__m128i x, __m128i y) {
+  return _mm_add_epi32(x, y);
+}
 
-static inline __m128i xor128(__m128i x, __m128i y) { return _mm_xor_si128(x, y); }
+static inline __m128i xor128(__m128i x, __m128i y) {
+  return _mm_xor_si128(x, y);
+}
 static inline __m128i or128(__m128i x, __m128i y) { return _mm_or_si128(x, y); }
 
-static inline __m128i mul32x4_5(__m128i x) { return add32x4(x, _mm_slli_epi32(x, 2)); }
+static inline __m128i mul32x4_5(__m128i x) {
+  return add32x4(x, _mm_slli_epi32(x, 2));
+}
 
 static inline __m128i rol32x4(__m128i x, int c) {
-  return or128(_mm_slli_epi32(x, c),
-            _mm_srli_epi32(x, 32 - c));
+  return or128(_mm_slli_epi32(x, c), _mm_srli_epi32(x, 32 - c));
 }
 
 static inline __m128i rol32x4_17(__m128i x) { return rol32x4(x, 17); }
@@ -221,24 +232,22 @@ static inline __m128i shuf32x4_0_3_2_1(__m128i x) {
 
 #if CAN_USE_SSSE3
 
-static inline __m128i shuf8x16(__m128i x, __m128i y) { return _mm_shuffle_epi8(y, x); }
+static inline __m128i shuf8x16(__m128i x, __m128i y) {
+  return _mm_shuffle_epi8(y, x);
+}
 
 #endif
 
 #if CAN_USE_SSE41
 
-static inline __m128i mul32x4(__m128i x, __m128i y) { return _mm_mullo_epi32(x, y); }
+static inline __m128i mul32x4(__m128i x, __m128i y) {
+  return _mm_mullo_epi32(x, y);
+}
 
-static inline __m128i murk(__m128i a, __m128i b, __m128i c, __m128i d, __m128i e) {
-
-  return add32x4(e,
-             mul32x4_5(
-                 rol32x4_19(
-                     xor128(
-                         mul32x4(d,
-                             rol32x4_17(
-                                 mul32x4(c, a))),
-                         (b)))));
+static inline __m128i murk(__m128i a, __m128i b, __m128i c, __m128i d,
+                           __m128i e) {
+  return add32x4(e, mul32x4_5(rol32x4_19(
+                        xor128(mul32x4(d, rol32x4_17(mul32x4(c, a))), (b)))));
 }
 
 #endif
@@ -264,9 +273,7 @@ static inline uint32_t fmix(uint32_t h) {
   return h;
 }
 
-static inline uint64_t smix(uint64_t val) {
-  return val ^ (val >> 47);
-}
+static inline uint64_t smix(uint64_t val) { return val ^ (val >> 47); }
 
 static inline uint32_t mur(uint32_t a, uint32_t h) {
   // Helper from Murmur3 for combining two 32-bit values.
@@ -280,7 +287,7 @@ static inline uint32_t mur(uint32_t a, uint32_t h) {
 
 static inline uint32_t debug_tweak32(uint32_t x) {
 #ifndef NDEBUG
-    x = ~bswap32(x * c1);
+  x = ~bswap32(x * c1);
 #endif
 
   return x;
@@ -288,7 +295,7 @@ static inline uint32_t debug_tweak32(uint32_t x) {
 
 static inline uint64_t debug_tweak64(uint64_t x) {
 #ifndef NDEBUG
-    x = ~bswap64(x * k1);
+  x = ~bswap64(x * k1);
 #endif
 
   return x;
@@ -310,7 +317,8 @@ static inline uint64_t farmhash_len_16(uint64_t u, uint64_t v) {
   return farmhash128_to_64(make_uint128_t(u, v));
 }
 
-static inline uint64_t farmhash_len_16_mul(uint64_t u, uint64_t v, uint64_t mul) {
+static inline uint64_t farmhash_len_16_mul(uint64_t u, uint64_t v,
+                                           uint64_t mul) {
   // Murmur-inspired hashing.
   uint64_t a = (u ^ v) * mul;
   a ^= (a >> 47);
@@ -340,8 +348,8 @@ static inline uint64_t farmhash_na_len_0_to_16(const char *s, size_t len) {
     uint8_t a = s[0];
     uint8_t b = s[len >> 1];
     uint8_t c = s[len - 1];
-    uint32_t y = (uint32_t) a + ((uint32_t) b << 8);
-    uint32_t z = len + ((uint32_t) c << 2);
+    uint32_t y = (uint32_t)a + ((uint32_t)b << 8);
+    uint32_t z = len + ((uint32_t)c << 2);
     return smix(y * k2 ^ z * k0) * k2;
   }
   return k2;
@@ -356,7 +364,7 @@ static inline uint64_t farmhash_na_len_17_to_32(const char *s, size_t len) {
   uint64_t c = fetch64(s + len - 8) * mul;
   uint64_t d = fetch64(s + len - 16) * k2;
   return farmhash_len_16_mul(ror64(a + b, 43) + ror64(c, 30) + d,
-                   a + ror64(b + k2, 18) + c, mul);
+                             a + ror64(b + k2, 18) + c, mul);
 }
 
 // Return a 16-byte hash for 48 bytes.  Quick and dirty.
@@ -373,14 +381,11 @@ static inline uint128_t weak_farmhash_na_len_32_with_seeds_vals(
 }
 
 // Return a 16-byte hash for s[0] ... s[31], a, and b.  Quick and dirty.
-static inline uint128_t weak_farmhash_na_len_32_with_seeds(
-    const char* s, uint64_t a, uint64_t b) {
-  return weak_farmhash_na_len_32_with_seeds_vals(fetch64(s),
-                                fetch64(s + 8),
-                                fetch64(s + 16),
-                                fetch64(s + 24),
-                                a,
-                                b);
+static inline uint128_t weak_farmhash_na_len_32_with_seeds(const char *s,
+                                                           uint64_t a,
+                                                           uint64_t b) {
+  return weak_farmhash_na_len_32_with_seeds_vals(
+      fetch64(s), fetch64(s + 8), fetch64(s + 16), fetch64(s + 24), a, b);
 }
 
 // Return an 8-byte hash for 33 to 64 bytes.
@@ -397,7 +402,7 @@ static inline uint64_t farmhash_na_len_33_to_64(const char *s, size_t len) {
   uint64_t g = (y + fetch64(s + len - 32)) * mul;
   uint64_t h = (z + fetch64(s + len - 24)) * mul;
   return farmhash_len_16_mul(ror64(e + f, 43) + ror64(g, 30) + h,
-                   e + ror64(f + a, 18) + g, mul);
+                             e + ror64(f + a, 18) + g, mul);
 }
 
 uint64_t farmhash64_na(const char *s, size_t len) {
@@ -422,8 +427,8 @@ uint64_t farmhash64_na(const char *s, size_t len) {
   x = x * k2 + fetch64(s);
 
   // Set end so that after the loop we have 1 to 64 bytes left to process.
-  const char* end = s + ((len - 1) / 64) * 64;
-  const char* last64 = end + ((len - 1) & 63) - 63;
+  const char *end = s + ((len - 1) / 64) * 64;
+  const char *last64 = end + ((len - 1) & 63) - 63;
   assert(s + len - 64 == last64);
   do {
     x = ror64(x + y + v.a + fetch64(s + 8), 37) * k1;
@@ -432,7 +437,8 @@ uint64_t farmhash64_na(const char *s, size_t len) {
     y += v.a + fetch64(s + 40);
     z = ror64(z + w.a, 33) * k1;
     v = weak_farmhash_na_len_32_with_seeds(s, v.b * k1, x + w.a);
-    w = weak_farmhash_na_len_32_with_seeds(s + 32, z + w.b, y + fetch64(s + 16));
+    w = weak_farmhash_na_len_32_with_seeds(s + 32, z + w.b,
+                                           y + fetch64(s + 16));
     swap64(&z, &x);
     s += 64;
   } while (s != end);
@@ -450,12 +456,13 @@ uint64_t farmhash64_na(const char *s, size_t len) {
   v = weak_farmhash_na_len_32_with_seeds(s, v.b * mul, x + w.a);
   w = weak_farmhash_na_len_32_with_seeds(s + 32, z + w.b, y + fetch64(s + 16));
   swap64(&z, &x);
-  return farmhash_len_16_mul(farmhash_len_16_mul(v.a, w.a, mul) + smix(y) * k0 + z,
-                   farmhash_len_16_mul(v.b, w.b, mul) + x,
-                   mul);
+  return farmhash_len_16_mul(
+      farmhash_len_16_mul(v.a, w.a, mul) + smix(y) * k0 + z,
+      farmhash_len_16_mul(v.b, w.b, mul) + x, mul);
 }
 
-uint64_t farmhash64_na_with_seeds(const char *s, size_t len, uint64_t seed0, uint64_t seed1) {
+uint64_t farmhash64_na_with_seeds(const char *s, size_t len, uint64_t seed0,
+                                  uint64_t seed1) {
   return farmhash_len_16(farmhash64_na(s, len) - seed0, seed1);
 }
 
@@ -465,15 +472,16 @@ uint64_t farmhash64_na_with_seed(const char *s, size_t len, uint64_t seed) {
 
 // farmhash uo
 
-static inline uint64_t farmhash_uo_h(uint64_t x, uint64_t y, uint64_t mul, int r) {
+static inline uint64_t farmhash_uo_h(uint64_t x, uint64_t y, uint64_t mul,
+                                     int r) {
   uint64_t a = (x ^ y) * mul;
   a ^= (a >> 47);
   uint64_t b = (y ^ a) * mul;
   return ror64(b, r) * mul;
 }
 
-uint64_t farmhash64_uo_with_seeds(const char *s, size_t len,
-                         uint64_t seed0, uint64_t seed1) {
+uint64_t farmhash64_uo_with_seeds(const char *s, size_t len, uint64_t seed0,
+                                  uint64_t seed1) {
   if (len <= 64) {
     return farmhash64_na_with_seeds(s, len, seed0, seed1);
   }
@@ -490,8 +498,8 @@ uint64_t farmhash64_uo_with_seeds(const char *s, size_t len,
   uint64_t mul = k2 + (u & 0x82);
 
   // Set end so that after the loop we have 1 to 64 bytes left to process.
-  const char* end = s + ((len - 1) / 64) * 64;
-  const char* last64 = end + ((len - 1) & 63) - 63;
+  const char *end = s + ((len - 1) / 64) * 64;
+  const char *last64 = end + ((len - 1) & 63) - 63;
   assert(s + len - 64 == last64);
   do {
     uint64_t a0 = fetch64(s);
@@ -558,25 +566,23 @@ uint64_t farmhash64_uo_with_seeds(const char *s, size_t len,
   v = weak_farmhash_na_len_32_with_seeds(s, v.b * mul, x + w.a);
   w = weak_farmhash_na_len_32_with_seeds(s + 32, z + w.b, y + fetch64(s + 16));
   return farmhash_uo_h(farmhash_len_16_mul(v.a + x, w.a ^ y, mul) + z - u,
-           farmhash_uo_h(v.b + y, w.b + z, k2, 30) ^ x,
-           k2,
-           31);
+                       farmhash_uo_h(v.b + y, w.b + z, k2, 30) ^ x, k2, 31);
 }
 
 uint64_t farmhash64_uo_with_seed(const char *s, size_t len, uint64_t seed) {
-  return len <= 64 ? farmhash64_na_with_seed(s, len, seed) :
-      farmhash64_uo_with_seeds(s, len, 0, seed);
+  return len <= 64 ? farmhash64_na_with_seed(s, len, seed)
+                   : farmhash64_uo_with_seeds(s, len, 0, seed);
 }
 
 uint64_t farmhash64_uo(const char *s, size_t len) {
-  return len <= 64 ? farmhash64_na(s, len) :
-      farmhash64_uo_with_seeds(s, len, 81, 0);
+  return len <= 64 ? farmhash64_na(s, len)
+                   : farmhash64_uo_with_seeds(s, len, 81, 0);
 }
 
 // farmhash xo
 
 static inline uint64_t farmhash_xo_h32(const char *s, size_t len, uint64_t mul,
-                           uint64_t seed0, uint64_t seed1) {
+                                       uint64_t seed0, uint64_t seed1) {
   uint64_t a = fetch64(s) * k1;
   uint64_t b = fetch64(s + 8);
   uint64_t c = fetch64(s + len - 8) * mul;
@@ -625,7 +631,8 @@ uint64_t farmhash64_xo(const char *s, size_t len) {
   }
 }
 
-uint64_t farmhash64_xo_with_seeds(const char *s, size_t len, uint64_t seed0, uint64_t seed1) {
+uint64_t farmhash64_xo_with_seeds(const char *s, size_t len, uint64_t seed0,
+                                  uint64_t seed1) {
   return farmhash64_uo_with_seeds(s, len, seed0, seed1);
 }
 
@@ -639,13 +646,13 @@ uint64_t farmhash64_xo_with_seed(const char *s, size_t len, uint64_t seed) {
 
 // Requires n >= 256.  Requires SSE4.1. Should be slightly faster if the
 // compiler uses AVX instructions (e.g., use the -mavx flag with GCC).
-static inline uint64_t farmhash64_te_long(const char* s, size_t n,
-                                  uint64_t seed0, uint64_t seed1) {
+static inline uint64_t farmhash64_te_long(const char *s, size_t n,
+                                          uint64_t seed0, uint64_t seed1) {
   const __m128i k_shuf =
       _mm_set_epi8(4, 11, 10, 5, 8, 15, 6, 9, 12, 2, 14, 13, 0, 7, 3, 1);
   const __m128i k_mult =
-      _mm_set_epi8(0xbd, 0xd6, 0x33, 0x39, 0x45, 0x54, 0xfa, 0x03,
-                   0x34, 0x3e, 0x33, 0xed, 0xcc, 0x9e, 0x2d, 0x51);
+      _mm_set_epi8(0xbd, 0xd6, 0x33, 0x39, 0x45, 0x54, 0xfa, 0x03, 0x34, 0x3e,
+                   0x33, 0xed, 0xcc, 0x9e, 0x2d, 0x51);
   uint64_t seed2 = (seed0 + 113) * (seed1 + 9);
   uint64_t seed3 = (ror64(seed0, 23) + 27) * (ror64(seed1, 30) + 111);
   __m128i d0 = _mm_cvtsi64_si128(seed0);
@@ -660,7 +667,7 @@ static inline uint64_t farmhash64_te_long(const char* s, size_t n,
   __m128i d9 = _mm_set1_epi32(seed3 >> 32);
   __m128i d10 = _mm_set1_epi32(seed3);
   __m128i d11 = add64x2(d2, _mm_set1_epi32(seed2));
-  const char* end = s + (n & ~((size_t) 255));
+  const char *end = s + (n & ~((size_t)255));
   do {
     __m128i z;
     z = fetch128(s);
@@ -789,8 +796,10 @@ static inline uint64_t farmhash64_te_long(const char* s, size_t n,
   } while (s != end);
   d6 = add64x2(mul32x4(k_mult, d6), _mm_cvtsi64_si128(n));
   if (n % 256 != 0) {
-    d7 = add64x2(_mm_shuffle_epi32(d8, (0 << 6) + (3 << 4) + (2 << 2) + (1 << 0)), d7);
-    d8 = add64x2(mul32x4(k_mult, d8), _mm_cvtsi64_si128(farmhash64_xo(s, n % 256)));
+    d7 = add64x2(
+        _mm_shuffle_epi32(d8, (0 << 6) + (3 << 4) + (2 << 2) + (1 << 0)), d7);
+    d8 = add64x2(mul32x4(k_mult, d8),
+                 _mm_cvtsi64_si128(farmhash64_xo(s, n % 256)));
   }
   __m128i t[8];
   d0 = mul32x4(k_mult, shuf8x16(k_shuf, mul32x4(k_mult, d0)));
@@ -813,22 +822,24 @@ static inline uint64_t farmhash64_te_long(const char* s, size_t n,
   t[5] = d5;
   t[6] = d6;
   t[7] = d2;
-  return farmhash64_xo((const char*) t, sizeof(t));
+  return farmhash64_xo((const char *)t, sizeof(t));
 }
 
 uint64_t farmhash64_te(const char *s, size_t len) {
   // Empirically, farmhash xo seems faster until length 512.
-  return len >= 512 ? farmhash64_te_long(s, len, k2, k1) : farmhash64_xo(s, len);
+  return len >= 512 ? farmhash64_te_long(s, len, k2, k1)
+                    : farmhash64_xo(s, len);
 }
 
 uint64_t farmhash64_te_with_seed(const char *s, size_t len, uint64_t seed) {
-  return len >= 512 ? farmhash64_te_long(s, len, k1, seed) :
-      farmhash64_xo_with_seed(s, len, seed);
+  return len >= 512 ? farmhash64_te_long(s, len, k1, seed)
+                    : farmhash64_xo_with_seed(s, len, seed);
 }
 
-uint64_t farmhash64_te_with_seeds(const char *s, size_t len, uint64_t seed0, uint64_t seed1) {
-  return len >= 512 ? farmhash64_te_long(s, len, seed0, seed1) :
-      farmhash64_xo_with_seeds(s, len, seed0, seed1);
+uint64_t farmhash64_te_with_seeds(const char *s, size_t len, uint64_t seed0,
+                                  uint64_t seed1) {
+  return len >= 512 ? farmhash64_te_long(s, len, seed0, seed1)
+                    : farmhash64_xo_with_seeds(s, len, seed0, seed1);
 }
 
 #endif
@@ -838,18 +849,19 @@ uint64_t farmhash64_te_with_seeds(const char *s, size_t len, uint64_t seed0, uin
 #if x86_64 && CAN_USE_SSE41
 
 uint32_t farmhash32_nt(const char *s, size_t len) {
-  return (uint32_t) farmhash64_te(s, len);
+  return (uint32_t)farmhash64_te(s, len);
 }
 
 uint32_t farmhash32_nt_with_seed(const char *s, size_t len, uint32_t seed) {
-  return (uint32_t) farmhash64_te_with_seed(s, len, seed);
+  return (uint32_t)farmhash64_te_with_seed(s, len, seed);
 }
 
 #endif
 
 // farmhash mk
 
-static inline uint32_t farmhash32_mk_len_13_to_24(const char *s, size_t len, uint32_t seed) {
+static inline uint32_t farmhash32_mk_len_13_to_24(const char *s, size_t len,
+                                                  uint32_t seed) {
   uint32_t a = fetch32(s - 4 + (len >> 1));
   uint32_t b = fetch32(s + 4);
   uint32_t c = fetch32(s + len - 8);
@@ -866,7 +878,8 @@ static inline uint32_t farmhash32_mk_len_13_to_24(const char *s, size_t len, uin
   return fmix(h);
 }
 
-static inline uint32_t farmhash32_mk_len_0_to_4(const char *s, size_t len, uint32_t seed) {
+static inline uint32_t farmhash32_mk_len_0_to_4(const char *s, size_t len,
+                                                uint32_t seed) {
   uint32_t b = seed;
   uint32_t c = 9;
   for (size_t i = 0; i < len; i++) {
@@ -877,7 +890,8 @@ static inline uint32_t farmhash32_mk_len_0_to_4(const char *s, size_t len, uint3
   return fmix(mur(b, mur(len, c)));
 }
 
-static inline uint32_t farmhash32_mk_len_5_to_12(const char *s, size_t len, uint32_t seed) {
+static inline uint32_t farmhash32_mk_len_5_to_12(const char *s, size_t len,
+                                                 uint32_t seed) {
   uint32_t a = len, b = len * 5, c = 9, d = b + seed;
   a += fetch32(s);
   b += fetch32(s + len - 4);
@@ -887,9 +901,9 @@ static inline uint32_t farmhash32_mk_len_5_to_12(const char *s, size_t len, uint
 
 uint32_t farmhash32_mk(const char *s, size_t len) {
   if (len <= 24) {
-    return len <= 12 ?
-        (len <= 4 ? farmhash32_mk_len_0_to_4(s, len, 0) : farmhash32_mk_len_5_to_12(s, len, 0)) :
-        farmhash32_mk_len_13_to_24(s, len, 0);
+    return len <= 12 ? (len <= 4 ? farmhash32_mk_len_0_to_4(s, len, 0)
+                                 : farmhash32_mk_len_5_to_12(s, len, 0))
+                     : farmhash32_mk_len_13_to_24(s, len, 0);
   }
 
   // len > 24
@@ -945,9 +959,12 @@ uint32_t farmhash32_mk(const char *s, size_t len) {
 
 uint32_t farmhash32_mk_with_seed(const char *s, size_t len, uint32_t seed) {
   if (len <= 24) {
-    if (len >= 13) return farmhash32_mk_len_13_to_24(s, len, seed * c1);
-    else if (len >= 5) return farmhash32_mk_len_5_to_12(s, len, seed);
-    else return farmhash32_mk_len_0_to_4(s, len, seed);
+    if (len >= 13)
+      return farmhash32_mk_len_13_to_24(s, len, seed * c1);
+    else if (len >= 5)
+      return farmhash32_mk_len_5_to_12(s, len, seed);
+    else
+      return farmhash32_mk_len_0_to_4(s, len, seed);
   }
   uint32_t h = farmhash32_mk_len_13_to_24(s, 24, seed ^ len);
   return mur(farmhash32_mk(s + 24, len - 24) + seed, h);
@@ -960,11 +977,9 @@ uint32_t farmhash32_mk_with_seed(const char *s, size_t len, uint32_t seed) {
 uint32_t farmhash32_su(const char *s, size_t len) {
   const uint32_t seed = 81;
   if (len <= 24) {
-    return len <= 12 ?
-        (len <= 4 ?
-         farmhash32_mk_len_0_to_4(s, len, 0) :
-         farmhash32_mk_len_5_to_12(s, len, 0)) :
-        farmhash32_mk_len_13_to_24(s, len, 0);
+    return len <= 12 ? (len <= 4 ? farmhash32_mk_len_0_to_4(s, len, 0)
+                                 : farmhash32_mk_len_5_to_12(s, len, 0))
+                     : farmhash32_mk_len_13_to_24(s, len, 0);
   }
 
   if (len < 40) {
@@ -1020,34 +1035,35 @@ uint32_t farmhash32_su(const char *s, size_t len) {
     size_t iters = (len - 1) / 80;
     len -= iters * 80;
 
-#define CHUNK_AES() do {                        \
-  __m128i a = fetch128(s);                      \
-  __m128i b = fetch128(s + 16);                 \
-  __m128i c = fetch128(s + 32);                 \
-  __m128i d = fetch128(s + 48);                 \
-  __m128i e = fetch128(s + 64);                 \
-  h = add32x4(h, a);                            \
-  g = add32x4(g, b);                            \
-  g = shuf32x4_0_3_2_1(g);                      \
-  f = add32x4(f, c);                            \
-  __m128i be = add32x4(b, mul32x4(e, cc1));     \
-  h = add32x4(h, f);                            \
-  f = add32x4(f, h);                            \
-  h = add32x4(h, d);                            \
-  q = add32x4(q, e);                            \
-  h = rol32x4_17(h);                            \
-  h = mul32x4(h, cc1);                          \
-  k = xor128(k, _mm_shuffle_epi8(g, f));        \
-  g = add32x4(xor128(c, g), a);                 \
-  f = add32x4(xor128(be, f), d);                \
-  swap128(&f, &q);                              \
-  q = _mm_aesimc_si128(q);                      \
-  k = add32x4(k, be);                           \
-  k = add32x4(k, _mm_shuffle_epi8(f, h));       \
-  f = add32x4(f, g);                            \
-  g = add32x4(g, f);                            \
-  f = mul32x4(f, cc1);                          \
-} while (0)
+#define CHUNK_AES()                           \
+  do {                                        \
+    __m128i a = fetch128(s);                  \
+    __m128i b = fetch128(s + 16);             \
+    __m128i c = fetch128(s + 32);             \
+    __m128i d = fetch128(s + 48);             \
+    __m128i e = fetch128(s + 64);             \
+    h = add32x4(h, a);                        \
+    g = add32x4(g, b);                        \
+    g = shuf32x4_0_3_2_1(g);                  \
+    f = add32x4(f, c);                        \
+    __m128i be = add32x4(b, mul32x4(e, cc1)); \
+    h = add32x4(h, f);                        \
+    f = add32x4(f, h);                        \
+    h = add32x4(h, d);                        \
+    q = add32x4(q, e);                        \
+    h = rol32x4_17(h);                        \
+    h = mul32x4(h, cc1);                      \
+    k = xor128(k, _mm_shuffle_epi8(g, f));    \
+    g = add32x4(xor128(c, g), a);             \
+    f = add32x4(xor128(be, f), d);            \
+    swap128(&f, &q);                          \
+    q = _mm_aesimc_si128(q);                  \
+    k = add32x4(k, be);                       \
+    k = add32x4(k, _mm_shuffle_epi8(f, h));   \
+    f = add32x4(f, g);                        \
+    g = add32x4(g, f);                        \
+    f = mul32x4(f, cc1);                      \
+  } while (0)
 
     q = g;
     while (iters-- != 0) {
@@ -1081,32 +1097,35 @@ uint32_t farmhash32_su(const char *s, size_t len) {
   buf[1] = g;
   buf[2] = k;
   buf[3] = h;
-  s = (char*) buf;
+  s = (char *)buf;
   uint32_t x = fetch32(s);
-  uint32_t y = fetch32(s+4);
-  uint32_t z = fetch32(s+8);
-  x = _mm_crc32_u32(x, fetch32(s+12));
-  y = _mm_crc32_u32(y, fetch32(s+16));
-  z = _mm_crc32_u32(z * c1, fetch32(s+20));
-  x = _mm_crc32_u32(x, fetch32(s+24));
-  y = _mm_crc32_u32(y * c1, fetch32(s+28));
+  uint32_t y = fetch32(s + 4);
+  uint32_t z = fetch32(s + 8);
+  x = _mm_crc32_u32(x, fetch32(s + 12));
+  y = _mm_crc32_u32(y, fetch32(s + 16));
+  z = _mm_crc32_u32(z * c1, fetch32(s + 20));
+  x = _mm_crc32_u32(x, fetch32(s + 24));
+  y = _mm_crc32_u32(y * c1, fetch32(s + 28));
   uint32_t o = y;
-  z = _mm_crc32_u32(z, fetch32(s+32));
-  x = _mm_crc32_u32(x * c1, fetch32(s+36));
-  y = _mm_crc32_u32(y, fetch32(s+40));
-  z = _mm_crc32_u32(z * c1, fetch32(s+44));
-  x = _mm_crc32_u32(x, fetch32(s+48));
-  y = _mm_crc32_u32(y * c1, fetch32(s+52));
-  z = _mm_crc32_u32(z, fetch32(s+56));
-  x = _mm_crc32_u32(x, fetch32(s+60));
+  z = _mm_crc32_u32(z, fetch32(s + 32));
+  x = _mm_crc32_u32(x * c1, fetch32(s + 36));
+  y = _mm_crc32_u32(y, fetch32(s + 40));
+  z = _mm_crc32_u32(z * c1, fetch32(s + 44));
+  x = _mm_crc32_u32(x, fetch32(s + 48));
+  y = _mm_crc32_u32(y * c1, fetch32(s + 52));
+  z = _mm_crc32_u32(z, fetch32(s + 56));
+  x = _mm_crc32_u32(x, fetch32(s + 60));
   return (o - x + y - z) * c1;
 }
 
 uint32_t farmhash32_su_with_seed(const char *s, size_t len, uint32_t seed) {
   if (len <= 24) {
-    if (len >= 13) return farmhash32_mk_len_13_to_24(s, len, seed * c1);
-    else if (len >= 5) return farmhash32_mk_len_5_to_12(s, len, seed);
-    else return farmhash32_mk_len_0_to_4(s, len, seed);
+    if (len >= 13)
+      return farmhash32_mk_len_13_to_24(s, len, seed * c1);
+    else if (len >= 5)
+      return farmhash32_mk_len_5_to_12(s, len, seed);
+    else
+      return farmhash32_mk_len_0_to_4(s, len, seed);
   }
   uint32_t h = farmhash32_mk_len_13_to_24(s, 24, seed ^ len);
   return _mm_crc32_u32(farmhash32_su(s + 24, len - 24) + seed, h);
@@ -1121,11 +1140,9 @@ uint32_t farmhash32_su_with_seed(const char *s, size_t len, uint32_t seed) {
 uint32_t farmhash32_sa(const char *s, size_t len) {
   const uint32_t seed = 81;
   if (len <= 24) {
-    return len <= 12 ?
-        (len <= 4 ?
-         farmhash32_mk_len_0_to_4(s, len, 0) :
-         farmhash32_mk_len_5_to_12(s, len, 0)) :
-        farmhash32_mk_len_13_to_24(s, len, 0);
+    return len <= 12 ? (len <= 4 ? farmhash32_mk_len_0_to_4(s, len, 0)
+                                 : farmhash32_mk_len_5_to_12(s, len, 0))
+                     : farmhash32_mk_len_13_to_24(s, len, 0);
   }
 
   if (len < 40) {
@@ -1179,29 +1196,30 @@ uint32_t farmhash32_sa(const char *s, size_t len) {
     size_t iters = (len - 1) / 80;
     len -= iters * 80;
 
-#define CHUNK() do {                             \
-  __m128i a = fetch128(s);                       \
-  __m128i b = fetch128(s + 16);                  \
-  __m128i c = fetch128(s + 32);                  \
-  __m128i d = fetch128(s + 48);                  \
-  __m128i e = fetch128(s + 64);                  \
-  h = add32x4(h, a);                             \
-  g = add32x4(g, b);                             \
-  g = shuf32x4_0_3_2_1(g);                       \
-  f = add32x4(f, c);                             \
-  __m128i be = add32x4(b, mul32x4(e, cc1));      \
-  h = add32x4(h, f);                             \
-  f = add32x4(f, h);                             \
-  h = add32x4(murk(d, h, cc1, cc2, k), e);       \
-  k = xor128(k, _mm_shuffle_epi8(g, f));         \
-  g = add32x4(xor128(c, g), a);                  \
-  f = add32x4(xor128(be, f), d);                 \
-  k = add32x4(k, be);                            \
-  k = add32x4(k, _mm_shuffle_epi8(f, h));        \
-  f = add32x4(f, g);                             \
-  g = add32x4(g, f);                             \
-  f = mul32x4(f, cc1);                           \
-} while (0)
+#define CHUNK()                               \
+  do {                                        \
+    __m128i a = fetch128(s);                  \
+    __m128i b = fetch128(s + 16);             \
+    __m128i c = fetch128(s + 32);             \
+    __m128i d = fetch128(s + 48);             \
+    __m128i e = fetch128(s + 64);             \
+    h = add32x4(h, a);                        \
+    g = add32x4(g, b);                        \
+    g = shuf32x4_0_3_2_1(g);                  \
+    f = add32x4(f, c);                        \
+    __m128i be = add32x4(b, mul32x4(e, cc1)); \
+    h = add32x4(h, f);                        \
+    f = add32x4(f, h);                        \
+    h = add32x4(murk(d, h, cc1, cc2, k), e);  \
+    k = xor128(k, _mm_shuffle_epi8(g, f));    \
+    g = add32x4(xor128(c, g), a);             \
+    f = add32x4(xor128(be, f), d);            \
+    k = add32x4(k, be);                       \
+    k = add32x4(k, _mm_shuffle_epi8(f, h));   \
+    f = add32x4(f, g);                        \
+    g = add32x4(g, f);                        \
+    f = mul32x4(f, cc1);                      \
+  } while (0)
 
     while (iters-- != 0) {
       CHUNK();
@@ -1232,32 +1250,35 @@ uint32_t farmhash32_sa(const char *s, size_t len) {
   buf[1] = g;
   buf[2] = k;
   buf[3] = h;
-  s = (char*) buf;
+  s = (char *)buf;
   uint32_t x = fetch32(s);
-  uint32_t y = fetch32(s+4);
-  uint32_t z = fetch32(s+8);
-  x = _mm_crc32_u32(x, fetch32(s+12));
-  y = _mm_crc32_u32(y, fetch32(s+16));
-  z = _mm_crc32_u32(z * c1, fetch32(s+20));
-  x = _mm_crc32_u32(x, fetch32(s+24));
-  y = _mm_crc32_u32(y * c1, fetch32(s+28));
+  uint32_t y = fetch32(s + 4);
+  uint32_t z = fetch32(s + 8);
+  x = _mm_crc32_u32(x, fetch32(s + 12));
+  y = _mm_crc32_u32(y, fetch32(s + 16));
+  z = _mm_crc32_u32(z * c1, fetch32(s + 20));
+  x = _mm_crc32_u32(x, fetch32(s + 24));
+  y = _mm_crc32_u32(y * c1, fetch32(s + 28));
   uint32_t o = y;
-  z = _mm_crc32_u32(z, fetch32(s+32));
-  x = _mm_crc32_u32(x * c1, fetch32(s+36));
-  y = _mm_crc32_u32(y, fetch32(s+40));
-  z = _mm_crc32_u32(z * c1, fetch32(s+44));
-  x = _mm_crc32_u32(x, fetch32(s+48));
-  y = _mm_crc32_u32(y * c1, fetch32(s+52));
-  z = _mm_crc32_u32(z, fetch32(s+56));
-  x = _mm_crc32_u32(x, fetch32(s+60));
+  z = _mm_crc32_u32(z, fetch32(s + 32));
+  x = _mm_crc32_u32(x * c1, fetch32(s + 36));
+  y = _mm_crc32_u32(y, fetch32(s + 40));
+  z = _mm_crc32_u32(z * c1, fetch32(s + 44));
+  x = _mm_crc32_u32(x, fetch32(s + 48));
+  y = _mm_crc32_u32(y * c1, fetch32(s + 52));
+  z = _mm_crc32_u32(z, fetch32(s + 56));
+  x = _mm_crc32_u32(x, fetch32(s + 60));
   return (o - x + y - z) * c1;
 }
 
 uint32_t farmhash32_sa_with_seed(const char *s, size_t len, uint32_t seed) {
   if (len <= 24) {
-    if (len >= 13) return farmhash32_mk_len_13_to_24(s, len, seed * c1);
-    else if (len >= 5) return farmhash32_mk_len_5_to_12(s, len, seed);
-    else return farmhash32_mk_len_0_to_4(s, len, seed);
+    if (len >= 13)
+      return farmhash32_mk_len_13_to_24(s, len, seed * c1);
+    else if (len >= 5)
+      return farmhash32_mk_len_5_to_12(s, len, seed);
+    else
+      return farmhash32_mk_len_0_to_4(s, len, seed);
   }
   uint32_t h = farmhash32_mk_len_13_to_24(s, 24, seed ^ len);
   return _mm_crc32_u32(farmhash32_sa(s + 24, len - 24) + seed, h);
@@ -1304,9 +1325,9 @@ static inline uint32_t farmhash32_cc_len_5_to_12(const char *s, size_t len) {
 
 uint32_t farmhash32_cc(const char *s, size_t len) {
   if (len <= 24) {
-    return len <= 12 ?
-        (len <= 4 ? farmhash32_cc_len_0_to_4(s, len) : farmhash32_cc_len_5_to_12(s, len)) :
-        farmhash32_cc_len_13_to_24(s, len);
+    return len <= 12 ? (len <= 4 ? farmhash32_cc_len_0_to_4(s, len)
+                                 : farmhash32_cc_len_5_to_12(s, len))
+                     : farmhash32_cc_len_13_to_24(s, len);
   }
 
   // len > 24
@@ -1373,9 +1394,12 @@ uint32_t farmhash32_cc(const char *s, size_t len) {
 
 uint32_t farmhash32_cc_with_seed(const char *s, size_t len, uint32_t seed) {
   if (len <= 24) {
-    if (len >= 13) return farmhash32_mk_len_13_to_24(s, len, seed * c1);
-    else if (len >= 5) return farmhash32_mk_len_5_to_12(s, len, seed);
-    else return farmhash32_mk_len_0_to_4(s, len, seed);
+    if (len >= 13)
+      return farmhash32_mk_len_13_to_24(s, len, seed * c1);
+    else if (len >= 5)
+      return farmhash32_mk_len_5_to_12(s, len, seed);
+    else
+      return farmhash32_mk_len_0_to_4(s, len, seed);
   }
   uint32_t h = farmhash32_mk_len_13_to_24(s, 24, seed ^ len);
   return mur(farmhash32_cc(s + 24, len - 24) + seed, h);
@@ -1399,8 +1423,8 @@ static inline uint64_t farmhash_cc_len_0_to_16(const char *s, size_t len) {
     uint8_t a = s[0];
     uint8_t b = s[len >> 1];
     uint8_t c = s[len - 1];
-    uint32_t y = ((uint32_t) a) + (((uint32_t) b) << 8);
-    uint32_t z = len + (((uint32_t) c) << 2);
+    uint32_t y = ((uint32_t)a) + (((uint32_t)b) << 8);
+    uint32_t z = len + (((uint32_t)c) << 2);
     return smix(y * k2 ^ z * k0) * k2;
   }
   return k2;
@@ -1420,21 +1444,17 @@ static inline uint128_t weak_farmhash_cc_len_32_with_seeds_vals(
 }
 
 // Return a 16-byte hash for s[0] ... s[31], a, and b.  Quick and dirty.
-static inline uint128_t weak_farmhash_cc_len_32_with_seeds(
-    const char* s, uint64_t a, uint64_t b) {
-  return weak_farmhash_cc_len_32_with_seeds_vals(fetch64(s),
-                                fetch64(s + 8),
-                                fetch64(s + 16),
-                                fetch64(s + 24),
-                                a,
-                                b);
+static inline uint128_t weak_farmhash_cc_len_32_with_seeds(const char *s,
+                                                           uint64_t a,
+                                                           uint64_t b) {
+  return weak_farmhash_cc_len_32_with_seeds_vals(
+      fetch64(s), fetch64(s + 8), fetch64(s + 16), fetch64(s + 24), a, b);
 }
-
-
 
 // A subroutine for cityhash128().  Returns a decent 128-bit hash for strings
 // of any length representable in signed long.  Based on City and Murmur.
-static inline uint128_t farmhash_cc_city_murmur(const char *s, size_t len, uint128_t seed) {
+static inline uint128_t farmhash_cc_city_murmur(const char *s, size_t len,
+                                                uint128_t seed) {
   uint64_t a = uint128_t_low64(seed);
   uint64_t b = uint128_t_high64(seed);
   uint64_t c = 0;
@@ -1464,7 +1484,8 @@ static inline uint128_t farmhash_cc_city_murmur(const char *s, size_t len, uint1
   return make_uint128_t(a ^ b, farmhash_len_16(b, a));
 }
 
-uint128_t farmhash128_cc_city_with_seed(const char *s, size_t len, uint128_t seed) {
+uint128_t farmhash128_cc_city_with_seed(const char *s, size_t len,
+                                        uint128_t seed) {
   if (len < 128) {
     return farmhash_cc_city_murmur(s, len, seed);
   }
@@ -1488,7 +1509,8 @@ uint128_t farmhash128_cc_city_with_seed(const char *s, size_t len, uint128_t see
     y += v.a + fetch64(s + 40);
     z = ror64(z + w.a, 33) * k1;
     v = weak_farmhash_cc_len_32_with_seeds(s, v.b * k1, x + w.a);
-    w = weak_farmhash_cc_len_32_with_seeds(s + 32, z + w.b, y + fetch64(s + 16));
+    w = weak_farmhash_cc_len_32_with_seeds(s + 32, z + w.b,
+                                           y + fetch64(s + 16));
     swap64(&z, &x);
     s += 64;
     x = ror64(x + y + v.a + fetch64(s + 8), 37) * k1;
@@ -1497,7 +1519,8 @@ uint128_t farmhash128_cc_city_with_seed(const char *s, size_t len, uint128_t see
     y += v.a + fetch64(s + 40);
     z = ror64(z + w.a, 33) * k1;
     v = weak_farmhash_cc_len_32_with_seeds(s, v.b * k1, x + w.a);
-    w = weak_farmhash_cc_len_32_with_seeds(s + 32, z + w.b, y + fetch64(s + 16));
+    w = weak_farmhash_cc_len_32_with_seeds(s + 32, z + w.b,
+                                           y + fetch64(s + 16));
     swap64(&z, &x);
     s += 64;
     len -= 128;
@@ -1508,7 +1531,7 @@ uint128_t farmhash128_cc_city_with_seed(const char *s, size_t len, uint128_t see
   w.a *= 9;
   v.a *= k0;
   // If 0 < len < 128, hash up to 4 chunks of 32 bytes each from the end of s.
-  for (size_t tail_done = 0; tail_done < len; ) {
+  for (size_t tail_done = 0; tail_done < len;) {
     tail_done += 32;
     y = ror64(x + y, 42) * k0 + v.b;
     w.a += fetch64(s + len - tail_done + 16);
@@ -1524,17 +1547,18 @@ uint128_t farmhash128_cc_city_with_seed(const char *s, size_t len, uint128_t see
   x = farmhash_len_16(x, v.a);
   y = farmhash_len_16(y + z, w.a);
   return make_uint128_t(farmhash_len_16(x + v.b, w.b) + y,
-                   farmhash_len_16(x + w.b, y + v.b));
+                        farmhash_len_16(x + w.b, y + v.b));
 }
 
 static inline uint128_t farmhash128_cc_city(const char *s, size_t len) {
-  return len >= 16 ?
-      farmhash128_cc_city_with_seed(s + 16, len - 16,
-                          make_uint128_t(fetch64(s), fetch64(s + 8) + k0)) :
-      farmhash128_cc_city_with_seed(s, len, make_uint128_t(k0, k1));
+  return len >= 16
+             ? farmhash128_cc_city_with_seed(
+                   s + 16, len - 16,
+                   make_uint128_t(fetch64(s), fetch64(s + 8) + k0))
+             : farmhash128_cc_city_with_seed(s, len, make_uint128_t(k0, k1));
 }
 
-uint128_t farmhash_cc_fingerprint128(const char* s, size_t len) {
+uint128_t farmhash_cc_fingerprint128(const char *s, size_t len) {
   return farmhash128_cc_city(s, len);
 }
 
@@ -1543,7 +1567,7 @@ uint128_t farmhash_cc_fingerprint128(const char* s, size_t len) {
 // farmhash function for a byte array.  See also Hash(), below.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint32_t farmhash32(const char* s, size_t len) {
+uint32_t farmhash32(const char *s, size_t len) {
   return debug_tweak32(
 
 #if x86_64 && CAN_USE_SSE41
@@ -1563,7 +1587,7 @@ uint32_t farmhash32(const char* s, size_t len) {
 // hashed into the result.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint32_t farmhash32_with_seed(const char* s, size_t len, uint32_t seed) {
+uint32_t farmhash32_with_seed(const char *s, size_t len, uint32_t seed) {
   return debug_tweak32(
 
 #if x86_64 && CAN_USE_SSE41
@@ -1583,7 +1607,7 @@ uint32_t farmhash32_with_seed(const char* s, size_t len, uint32_t seed) {
 // hashed into the result.  See also farmhash(), below.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint64_t farmhash64(const char* s, size_t len) {
+uint64_t farmhash64(const char *s, size_t len) {
   return debug_tweak64(
 #if x86_64 && CAN_USE_SSSE3 && CAN_USE_SSE41
       farmhash64_te(s, len)
@@ -1596,7 +1620,7 @@ uint64_t farmhash64(const char* s, size_t len) {
 // Hash function for a byte array.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-size_t farmhash(const char* s, size_t len) {
+size_t farmhash(const char *s, size_t len) {
   return sizeof(size_t) == 8 ? farmhash64(s, len) : farmhash32(s, len);
 }
 
@@ -1604,7 +1628,7 @@ size_t farmhash(const char* s, size_t len) {
 // hashed into the result.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint64_t farmhash64_with_seed(const char* s, size_t len, uint64_t seed) {
+uint64_t farmhash64_with_seed(const char *s, size_t len, uint64_t seed) {
   return debug_tweak64(farmhash64_na_with_seed(s, len, seed));
 }
 
@@ -1612,14 +1636,15 @@ uint64_t farmhash64_with_seed(const char* s, size_t len, uint64_t seed) {
 // hashed into the result.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint64_t farmhash64_with_seeds(const char* s, size_t len, uint64_t seed0, uint64_t seed1) {
+uint64_t farmhash64_with_seeds(const char *s, size_t len, uint64_t seed0,
+                               uint64_t seed1) {
   return debug_tweak64(farmhash64_na_with_seeds(s, len, seed0, seed1));
 }
 
 // Hash function for a byte array.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint128_t farmhash128(const char* s, size_t len) {
+uint128_t farmhash128(const char *s, size_t len) {
   return debug_tweak128(farmhash_cc_fingerprint128(s, len));
 }
 
@@ -1627,7 +1652,7 @@ uint128_t farmhash128(const char* s, size_t len) {
 // hashed into the result.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint128_t farmhash128_with_seed(const char* s, size_t len, uint128_t seed) {
+uint128_t farmhash128_with_seed(const char *s, size_t len, uint128_t seed) {
   return debug_tweak128(farmhash128_cc_city_with_seed(s, len, seed));
 }
 
@@ -1636,16 +1661,16 @@ uint128_t farmhash128_with_seed(const char* s, size_t len, uint128_t seed) {
 // FINGERPRINTING (i.e., good, portable, forever-fixed hash functions)
 
 // Fingerprint function for a byte array.  Most useful in 32-bit binaries.
-uint32_t farmhash_fingerprint32(const char* s, size_t len) {
+uint32_t farmhash_fingerprint32(const char *s, size_t len) {
   return farmhash32_mk(s, len);
 }
 
 // Fingerprint function for a byte array.
-uint64_t farmhash_fingerprint64(const char* s, size_t len) {
+uint64_t farmhash_fingerprint64(const char *s, size_t len) {
   return farmhash64_na(s, len);
 }
 
 // Fingerprint function for a byte array.
-uint128_t farmhash_fingerprint128(const char* s, size_t len) {
+uint128_t farmhash_fingerprint128(const char *s, size_t len) {
   return farmhash_cc_fingerprint128(s, len);
 }

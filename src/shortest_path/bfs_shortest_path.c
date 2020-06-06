@@ -1,4 +1,5 @@
 #include "./bfs_shortest_path.h"
+
 #include <stdlib.h>
 
 static VertexData* VertexData_Create(int value) {

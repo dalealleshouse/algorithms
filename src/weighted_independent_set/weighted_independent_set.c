@@ -1,6 +1,8 @@
 #include "./weighted_independent_set.h"
+
 #include <stdlib.h>
 #include <string.h>
+
 #include "../utils/overflow_checker.h"
 
 const WeightedIndependentSet EMPTY_SET = {

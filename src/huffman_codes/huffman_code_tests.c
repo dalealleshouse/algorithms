@@ -202,8 +202,7 @@ static void HuffmanCode_Calculate_SmallCode() {
   char* one_symbol = code->zero->one->zero->one->symbol->symbol;
   CU_ASSERT_TRUE(strcmp(zero_symbol, "E") == 0 ||
                  strcmp(zero_symbol, "B") == 0);
-  CU_ASSERT_TRUE(strcmp(one_symbol, "E") == 0 ||
-                 strcmp(one_symbol, "B") == 0);
+  CU_ASSERT_TRUE(strcmp(one_symbol, "E") == 0 || strcmp(one_symbol, "B") == 0);
 
   HuffmanCode_Destory(code);
   SymbolFreq_Destroy(freqs);

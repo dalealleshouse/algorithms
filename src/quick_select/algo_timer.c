@@ -1,8 +1,10 @@
 #include "./algo_timer.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #include "../utils/math.h"
 #include "./quick_select.h"
 

@@ -1,6 +1,8 @@
 #include "./malloc_test_wrapper.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
+
 #include "./test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

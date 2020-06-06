@@ -1,4 +1,5 @@
 #include "./inversions.h"
+
 #include <string.h>
 
 unsigned long _count_inversions(const void* arr, void* output,

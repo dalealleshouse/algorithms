@@ -1,5 +1,7 @@
 #include "./inversions.h"
+
 #include <stdio.h>
+
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

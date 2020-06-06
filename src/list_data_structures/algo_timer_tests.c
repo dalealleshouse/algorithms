@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+
 #include "./algo_timer.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

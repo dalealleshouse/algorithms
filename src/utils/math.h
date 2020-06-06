@@ -2,6 +2,7 @@
 
 #include <limits.h>
 #include <stddef.h>
+
 #include "./common.h"
 
 int Min(const size_t count, ...);

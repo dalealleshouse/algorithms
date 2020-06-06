@@ -1,8 +1,10 @@
 #include "./min_spanning_tree.h"
+
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "../data_structures/disjoint_set.h"
 #include "../data_structures/heap.h"
 #include "../utils/overflow_checker.h"

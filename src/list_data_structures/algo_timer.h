@@ -1,6 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+
 #include "./array.h"
 #include "./binary_tree.h"
 #include "./linked_list.h"

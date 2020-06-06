@@ -1,6 +1,8 @@
 #include "./traveling_salesman.h"
+
 #include <math.h>
 #include <stdlib.h>
+
 #include "../utils/math.h"
 
 static double squared_dist(const point* p1, const point* p2) {

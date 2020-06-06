@@ -7,6 +7,6 @@ compiler: clang
 services:
   - docker
 
-install: docker pull dalealleshouse/algo_test_runner_c:latest
+install: docker pull dalealleshouse/algo_test_runner_c:2.2
 
 script: ./ci_validate.sh

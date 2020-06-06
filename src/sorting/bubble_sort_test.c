@@ -1,5 +1,7 @@
 #include "./bubble_sort.h"
+
 #include <stdlib.h>
+
 #include "./sorting_test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

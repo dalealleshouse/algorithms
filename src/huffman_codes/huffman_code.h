@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+
 #include "../utils/result_code.h"
 
 enum { MAX_SYMBOL_LENGTH = 10 };

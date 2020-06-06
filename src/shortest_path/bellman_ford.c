@@ -1,6 +1,8 @@
 #include "./bellman_ford.h"
+
 #include <limits.h>
 #include <stdlib.h>
+
 #include "../utils/overflow_checker.h"
 
 static GraphResult _initPath(vertex_id vertex, Path* next, Path** path) {

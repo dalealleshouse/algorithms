@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+
 #include "../utils/math.h"
 #include "./sorting.h"
 

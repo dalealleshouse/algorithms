@@ -1,6 +1,8 @@
 #include "./quick_select.h"
+
 #include <stdlib.h>
 #include <time.h>
+
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

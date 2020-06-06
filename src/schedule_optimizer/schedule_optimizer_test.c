@@ -1,6 +1,8 @@
 #include "./schedule_optimizer.h"
+
 #include <stdlib.h>
 #include <unistd.h>
+
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

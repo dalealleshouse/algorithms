@@ -1,6 +1,6 @@
-#include <stdlib.h>
-
 #include "./schedule_optimizer.h"
+
+#include <stdlib.h>
 
 // TODO: This entire file requires arithmetic overflow checking
 

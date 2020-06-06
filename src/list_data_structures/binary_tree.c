@@ -1,4 +1,5 @@
 #include "./binary_tree.h"
+
 #include <stdint.h>
 #include <stdlib.h>
 

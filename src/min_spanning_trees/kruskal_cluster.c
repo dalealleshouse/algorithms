@@ -1,5 +1,7 @@
 #include "./kruskal_cluster.h"
+
 #include <stdlib.h>
+
 #include "../data_structures/disjoint_set.h"
 #include "../utils/overflow_checker.h"
 

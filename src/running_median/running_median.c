@@ -1,6 +1,8 @@
 #include "./running_median.h"
+
 #include <math.h>
 #include <stdlib.h>
+
 #include "../data_structures/heap.h"
 
 const size_t INITAL_HEAP_SIZE = 500;

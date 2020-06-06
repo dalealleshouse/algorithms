@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+
 #include "../utils/result_code.h"
 
 typedef struct job {

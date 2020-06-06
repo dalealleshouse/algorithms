@@ -1,6 +1,8 @@
 #include "./heap.h"
+
 #include <stdint.h>
 #include <stdlib.h>
+
 #include "../utils/overflow_checker.h"
 
 static size_t _parentIndex(size_t index) {

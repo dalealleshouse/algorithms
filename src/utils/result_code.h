@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+
 #include "./error_reporter.h"
 
 // We may need a better way to log errors, but this will work for now

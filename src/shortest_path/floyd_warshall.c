@@ -1,7 +1,9 @@
 #include "./floyd_warshall.h"
+
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+
 #include "../utils/overflow_checker.h"
 
 static void _printSolutions(size_t n, path_length* solutions) {

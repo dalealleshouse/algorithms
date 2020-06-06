@@ -1,8 +1,10 @@
 #include "./sequence_alignment.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "../utils/overflow_checker.h"
 
 const char GAP = '_';

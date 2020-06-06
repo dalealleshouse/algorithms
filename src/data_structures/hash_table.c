@@ -1,9 +1,11 @@
 #include "./hash_table.h"
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "../hashing/hash_functions.h"
 #include "../list_data_structures/linked_list.h"
 

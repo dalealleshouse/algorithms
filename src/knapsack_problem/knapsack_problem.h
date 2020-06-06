@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+
 #include "../utils/result_code.h"
 
 typedef unsigned int id;

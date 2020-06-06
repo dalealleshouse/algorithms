@@ -1,5 +1,7 @@
 #include "./sorted_array.h"
+
 #include <stdlib.h>
+
 #include "../utils/error_reporter.h"
 #include "../utils/math.h"
 #include "../utils/test_helpers.h"

@@ -23,5 +23,6 @@ COPY .clang-format /build/.clang-format
 COPY .clang-tidy /build/.clang-tidy
 COPY CPPLINT.cfg /build/CPPLINT.cfg
 COPY llvm-gcov.sh /build/llv-gcov.sh
+COPY validate_format.py /build/validate_format.py
 
 CMD ["make", "-B"]

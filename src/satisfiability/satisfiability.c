@@ -1,5 +1,7 @@
 #include "./satisfiability.h"
+
 #include <stdlib.h>
+
 #include "../data_structures/hash_table.h"
 
 ResultCode Sat_EvalClause(clause* clause, bool a, bool b, bool* satified) {

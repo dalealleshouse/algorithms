@@ -1,6 +1,6 @@
-#include <stdio.h>
-
 #include "./sorted_array.h"
+
+#include <stdio.h>
 
 static void* BinarySearch(const void* arr, comparator comparator,
                           const void* search_for, const size_t n,

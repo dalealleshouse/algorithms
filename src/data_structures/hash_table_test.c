@@ -1,5 +1,7 @@
 #include "./hash_table.h"
+
 #include <stdlib.h>
+
 #include "../utils/error_reporter.h"
 #include "../utils/malloc_test_wrapper.h"
 #include "../utils/test_helpers.h"

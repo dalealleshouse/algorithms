@@ -1,4 +1,5 @@
 #include "./list_operations.h"
+
 #include <stdint.h>
 
 const size_t RANK_ERROR = SIZE_MAX;

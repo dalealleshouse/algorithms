@@ -1,4 +1,5 @@
 #include "./queue.h"
+
 #include <stdlib.h>
 
 Queue* Queue_Create() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+
 #include "../utils/common.h"
 
 unsigned long count_inversions(const void* arr, const size_t length,

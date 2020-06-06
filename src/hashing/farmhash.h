@@ -43,8 +43,8 @@
 #ifndef FARMHASH_H
 #define FARMHASH_H
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 struct uint128_t {
   uint64_t a;
@@ -53,11 +53,13 @@ struct uint128_t {
 
 typedef struct uint128_t uint128_t;
 
-
 static inline uint64_t uint128_t_low64(const uint128_t x) { return x.a; }
 static inline uint64_t uint128_t_high64(const uint128_t x) { return x.b; }
 
-static inline uint128_t make_uint128_t(uint64_t lo, uint64_t hi) { uint128_t x = {lo, hi}; return x; }
+static inline uint128_t make_uint128_t(uint64_t lo, uint64_t hi) {
+  uint128_t x = {lo, hi};
+  return x;
+}
 
 // BASIC STRING HASHING
 
@@ -93,8 +95,8 @@ uint64_t farmhash64_with_seed(const char* s, size_t len, uint64_t seed);
 // hashed into the result.
 // May change from time to time, may differ on different platforms, may differ
 // depending on NDEBUG.
-uint64_t farmhash64_with_seeds(const char* s, size_t len,
-                       uint64_t seed0, uint64_t seed1);
+uint64_t farmhash64_with_seeds(const char* s, size_t len, uint64_t seed0,
+                               uint64_t seed1);
 
 // Hash function for a byte array.
 // May change from time to time, may differ on different platforms, may differ

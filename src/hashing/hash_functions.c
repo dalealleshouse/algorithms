@@ -1,6 +1,8 @@
 #include "./hash_functions.h"
+
 #include <math.h>
 #include <stdio.h>
+
 #include "./farmhash.h"
 #include "./spooky.h"
 

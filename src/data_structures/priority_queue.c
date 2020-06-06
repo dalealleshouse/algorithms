@@ -1,4 +1,5 @@
 #include "./priority_queue.h"
+
 #include <stdlib.h>
 
 PriorityQueue* PQ_Create(comparator comparator) {

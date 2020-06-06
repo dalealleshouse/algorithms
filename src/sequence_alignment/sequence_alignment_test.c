@@ -1,6 +1,8 @@
 #include "./sequence_alignment.h"
+
 #include <limits.h>
 #include <stdlib.h>
+
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

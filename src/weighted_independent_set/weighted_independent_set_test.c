@@ -1,7 +1,9 @@
 #include "./weighted_independent_set.h"
+
 #include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

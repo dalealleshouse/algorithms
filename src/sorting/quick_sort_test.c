@@ -1,6 +1,8 @@
 #include "./quick_sort.h"
+
 #include <stdlib.h>
 #include <unistd.h>
+
 #include "../utils/test_helpers.h"
 #include "./sorting_test_helpers.h"
 #include "CUnit/Basic.h"

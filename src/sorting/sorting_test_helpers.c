@@ -1,6 +1,8 @@
 #include "./sorting_test_helpers.h"
+
 #include <stdlib.h>
 #include <string.h>
+
 #include "CUnit/CUnit.h"
 
 void* Malloc(size_t size) {

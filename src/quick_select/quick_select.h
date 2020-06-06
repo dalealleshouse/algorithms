@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+
 #include "../utils/common.h"
 
 typedef int (*choose_pivot)(const size_t n);

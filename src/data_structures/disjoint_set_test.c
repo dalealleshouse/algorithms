@@ -1,8 +1,10 @@
 #include "./disjoint_set.h"
+
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 #include "../utils/malloc_test_wrapper.h"
 #include "../utils/result_code.h"
 #include "../utils/test_helpers.h"

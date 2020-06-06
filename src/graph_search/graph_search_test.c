@@ -1,5 +1,7 @@
 #include "graph_search.h"
+
 #include <stdlib.h>
+
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

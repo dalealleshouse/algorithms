@@ -1,4 +1,5 @@
 #include "./strassen.h"
+
 #include <stdio.h>
 
 bool ispowerof2(unsigned int x) { return x && !(x & (x - 1)); }

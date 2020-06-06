@@ -1,5 +1,7 @@
 #include "./merge_sort.h"
+
 #include <stdlib.h>  // for printf
+
 #include "./sorting_test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"

@@ -1,4 +1,5 @@
 #include "./random_contraction.h"
+
 #include <math.h>
 #include <stdlib.h>
 

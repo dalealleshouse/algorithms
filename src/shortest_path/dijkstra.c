@@ -1,6 +1,8 @@
 #include "./dijkstra.h"
+
 #include <stdlib.h>
 #include <string.h>
+
 #include "../data_structures/heap.h"
 
 static GraphResult InitShortestPath(Vertex* v) {

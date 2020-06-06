@@ -1,7 +1,9 @@
 #include "./min_spanning_tree.h"
+
 #include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 #include "../utils/malloc_test_wrapper.h"
 #include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
