@@ -27,8 +27,9 @@ static VertexData* VertexData_Create(int value) {
 static GraphResult SearchIsValid(Graph* self, int vertex_id,
                                  SearchStrategy* strategy) {
   if (self == NULL || strategy == NULL || strategy->conqueror == NULL ||
-      strategy->is_conquered == NULL)
+      strategy->is_conquered == NULL) {
     return Graph_NullParameter;
+  }
 
   if (vertex_id < 0) return Graph_InvalidVertexId;
 

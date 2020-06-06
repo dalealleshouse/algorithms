@@ -73,9 +73,9 @@ Result DisjointSet_Union(DisjointSet* self, const void* x, const void* y) {
 
   if (x_set == y_set) return Success;
 
-  if (x_set->rank > y_set->rank)
+  if (x_set->rank > y_set->rank) {
     y_set->parent = x_set;
-  else {
+  } else {
     x_set->parent = y_set;
     if (x_set->rank == y_set->rank) ++y_set->rank;
   }

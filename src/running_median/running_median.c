@@ -48,10 +48,11 @@ static double get_heap_value(Heap* heap) {
 }
 
 static bool heap_is_balanced(RunningMedian* self) {
-  if (is_even(self->n))
+  if (is_even(self->n)) {
     return self->upper->n == self->lower->n;
-  else
+  } else {
     return self->upper->n + 1 == self->lower->n;
+  }
 }
 
 static HeapResult heap_insert(Heap* heap, double* value) {
@@ -104,10 +105,11 @@ static Heap* find_insert_heap(RunningMedian* self, double value) {
   double low_value = get_heap_value(self->lower);
   if (isnan(low_value)) return NULL;
 
-  if (value > low_value)
+  if (value > low_value) {
     return self->upper;
-  else
+  } else {
     return self->lower;
+  }
 }
 
 RunningMedian* RunningMedian_Create() {
@@ -187,8 +189,9 @@ double RunningMedian_Median(RunningMedian* self) {
     if (isinf(result)) ERROR("RunningMedian", ArithmeticOverflow);
 
     return result;
-  } else
+  } else {
     return get_heap_value(self->lower);
+  }
 
   return 0;
 }

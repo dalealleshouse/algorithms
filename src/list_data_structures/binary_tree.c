@@ -242,12 +242,13 @@ static void left_rotate(BinaryTree* self, BinaryTreeNode* pivot) {
 
   temp->parent = pivot->parent;
 
-  if (pivot->parent == &NULL_NODE)
+  if (pivot->parent == &NULL_NODE) {
     self->root = temp;
-  else if (pivot == pivot->parent->left)
+  } else if (pivot == pivot->parent->left) {
     pivot->parent->left = temp;
-  else
+  } else {
     pivot->parent->right = temp;
+  }
 
   temp->left = pivot;
   pivot->parent = temp;
@@ -264,12 +265,13 @@ static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot) {
 
   temp->parent = pivot->parent;
 
-  if (pivot->parent == &NULL_NODE)
+  if (pivot->parent == &NULL_NODE) {
     self->root = temp;
-  else if (pivot == pivot->parent->right)
+  } else if (pivot == pivot->parent->right) {
     pivot->parent->right = temp;
-  else
+  } else {
     pivot->parent->left = temp;
+  }
 
   temp->right = pivot;
   pivot->parent = temp;
@@ -382,10 +384,11 @@ ListOpResult BinaryTree_Insert(BinaryTree* self, void* payload) {
   BinaryTreeNode* node = tree_node_create(payload);
   if (node == NULL) return ListOp_FailedMalloc;
 
-  if (self->root == &NULL_NODE)
+  if (self->root == &NULL_NODE) {
     self->root = node;
-  else
+  } else {
     insert_node(self->root, node, self->comparator);
+  }
 
   self->n++;
   return ListOp_Success;
@@ -410,10 +413,11 @@ void* BinaryTree_Delete(BinaryTree* self, void* payload) {
 
   void* result = doomed->payload;
 
-  if (doomed == self->root)
+  if (doomed == self->root) {
     delete (&self->root);
-  else
+  } else {
     delete (find_parent_pointer(doomed));
+  }
 
   self->n--;
   return result;
@@ -582,9 +586,9 @@ ListOpResult RedBlackTree_Insert(BinaryTree* self, void* payload) {
   BinaryTreeNode* node = tree_node_create(payload);
   if (node == NULL) return ListOp_FailedMalloc;
 
-  if (self->root == &NULL_NODE)
+  if (self->root == &NULL_NODE) {
     self->root = node;
-  else {
+  } else {
     insert_node(self->root, node, self->comparator);
     node->color = RED;
   }

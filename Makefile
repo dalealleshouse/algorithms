@@ -51,15 +51,14 @@ comp-db:
 	bear make -B release
 
 lint:
-	cpplint src/*.c src/*.h
+	cpplint src/*.[ch] src/*/*.[ch]
 
 format:
-	clang-format -i src/*.c
-	clang-format -i src/*.h
+	clang-format -i src/*.[ch]
 
-static-ana: comp-db
-static-ana:
-	clang-tidy src/*.[ch] 
+tidy: comp-db
+tidy:
+	clang-tidy src/*.[ch] src/*/*.[ch]
 
 clean:
 	-rm -f $(OBJECTS)
@@ -69,11 +68,10 @@ clean:
 	-rm -f src/*.a
 	-rm -f src/gmon.out
 	-rm -rf src/output
+	-rm -f src/*/*.gcda
 	-rm -f src/*.gcda
-	-rm -f src/include/*.gcda
-	-rm -f src/*.gcov
+	-rm -f src/*/*.gcov
+	-rm -f src/*/*.gcno
 	-rm -f src/*.gcno
-	-rm -f src/include/*.gcno
 	-rm -f src/*.info
 	-rm -f src/run_result.txt
-

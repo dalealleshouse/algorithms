@@ -22,8 +22,9 @@ static GraphResult _initPath(vertex_id vertex, Path* next, Path** path) {
 static vertex_id _getPrevious(Vertex* v) {
   BFData* data = v->data;
 
-  if (data == NULL || data->prev == NULL || v->id == data->prev->id)
+  if (data == NULL || data->prev == NULL || v->id == data->prev->id) {
     return UINT_MAX;
+  }
   return data->prev->id;
 }
 
@@ -36,8 +37,9 @@ static GraphResult _shortest(Graph* graph, Vertex* v, BFData cache[graph->n],
     BFData contender = {UNINITIALIZED, NULL};
 
     if (cache[e->tail].distance != UNINITIALIZED) {
-      if (is_add_overflow_int(cache[e->tail].distance, e->weight))
+      if (is_add_overflow_int(cache[e->tail].distance, e->weight)) {
         return Graph_ArithmeticOverflow;
+      }
 
       contender.distance = cache[e->tail].distance + e->weight;
       contender.prev = graph->V[e->tail];
@@ -73,8 +75,9 @@ GraphResult BellmanFordShortestPath(Graph* graph,
   BFData* previous = &cache1[0];
   BFData* current = &cache2[0];
 
-  for (size_t i = 0; i < graph->n; i++)
+  for (size_t i = 0; i < graph->n; i++) {
     previous[i] = (BFData){.distance = UNINITIALIZED, .prev = NULL};
+  };
 
   previous[start_vertex] =
       (BFData){.distance = 0, .prev = graph->V[start_vertex]};
@@ -89,8 +92,8 @@ GraphResult BellmanFordShortestPath(Graph* graph,
       GraphResult result = _shortest(graph, graph->V[j], previous, &case2);
       if (result != Graph_Success) return result;
 
-      // TODO: cache both the predecessor node and the value so consumers can
-      // decipher the shortest path instead of just it's value
+      // TODO(dalealleshouse): cache both the predecessor node and the value so
+      // consumers can decipher the shortest path instead of just it's value
       current[j] = (case1.distance < case2.distance) ? case1 : case2;
 
       if (current[j].distance != previous[j].distance) stable = false;

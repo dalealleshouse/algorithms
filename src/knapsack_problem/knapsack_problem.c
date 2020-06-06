@@ -70,8 +70,9 @@ static ResultCode _reconstruct(
     const Knapsack* knapsack,
     value solutions[knapsack->n + 1][knapsack->capacity + 1],
     PackedKnapsack** solution) {
-  if (knapsack == NULL || solutions == NULL || solution == NULL)
+  if (knapsack == NULL || solutions == NULL || solution == NULL) {
     return NullParameter;
+  }
   if (*solution != NULL) return OutputPointerIsNotNull;
 
   Item* items[knapsack->n];
@@ -99,8 +100,9 @@ static ResultCode _reconstruct(
 ResultCode Knapsack_Init(const id ids[], const value values[],
                          const size sizes[], const size_t n,
                          const size capacity, Knapsack** knapsack) {
-  if (ids == NULL || values == NULL || sizes == NULL || knapsack == NULL)
+  if (ids == NULL || values == NULL || sizes == NULL || knapsack == NULL) {
     return NullParameter;
+  }
   if (n == 0 || capacity == 0) return ArgumentOutOfRange;
   if (*knapsack != NULL) return OutputPointerIsNotNull;
 
@@ -131,8 +133,9 @@ ResultCode Knapsack_Init(const id ids[], const value values[],
 void Knapsack_Destory(Knapsack* self) {
   if (self == NULL) return;
 
-  if (self->items != NULL)
+  if (self->items != NULL) {
     for (size_t i = 0; i < self->n; i++) _itemDestroy(self->items[i]);
+  }
 
   free(self->items);
   free(self);
@@ -155,15 +158,16 @@ ResultCode Knapsack_Pack(const Knapsack* self, PackedKnapsack** result) {
   for (size_t i = 1; i <= self->n; i++) {
     Item* item = self->items[i - 1];
     for (size_t c = 0; c <= self->capacity; c++) {
-      if (item->size > c)
+      if (item->size > c) {
         solutions[i][c] = solutions[i - 1][c];
-      else {
+      } else {
         value case1 = solutions[i - 1][c];
         value case2 = solutions[i - 1][c - item->size] + item->value;
-        if (case1 > case2)
+        if (case1 > case2) {
           solutions[i][c] = case1;
-        else
+        } else {
           solutions[i][c] = case2;
+        }
       }
     }
   }
@@ -184,15 +188,16 @@ ResultCode Knapsack_Pack_Optimal(const Knapsack* self, value* result) {
   for (size_t i = 1; i <= self->n; i++) {
     Item* item = self->items[i - 1];
     for (size_t c = 0; c <= self->capacity; c++) {
-      if (item->size > c)
+      if (item->size > c) {
         my_solutions[c] = solutions[c];
-      else {
+      } else {
         value case1 = solutions[c];
         value case2 = solutions[c - item->size] + item->value;
-        if (case1 > case2)
+        if (case1 > case2) {
           my_solutions[c] = case1;
-        else
+        } else {
           my_solutions[c] = case2;
+        }
       }
     }
     value* temp = my_solutions;

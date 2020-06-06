@@ -103,8 +103,9 @@ void* SortedArray_Successor(const Array* self, const void* item) {
   void* found = SortedArray_Search(self, item);
   if (found == NULL) return NULL;
 
-  if (found == (char*)self->array + ((self->n - 1) * self->item_size))
+  if (found == (char*)self->array + ((self->n - 1) * self->item_size)) {
     return NULL;
+  }
 
   return (char*)found + self->item_size;
 }

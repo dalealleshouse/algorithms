@@ -9,10 +9,11 @@ static int _edgeComparator(const void* x, const void* y) {
   Edge* _x = (Edge*)x;
   Edge* _y = (Edge*)y;
 
-  if (_x->weight < _y->weight)
+  if (_x->weight < _y->weight) {
     return -1;
-  else if (_x->weight > _y->weight)
+  } else if (_x->weight > _y->weight) {
     return 1;
+  }
 
   return 0;
 }
@@ -74,9 +75,9 @@ Result KruskalCluster(const Graph* graph, const size_t num_clusters,
       return result;
     }
 
-    if (hasCycle)
+    if (hasCycle) {
       continue;
-    else {
+    } else {
       result = DisjointSet_Union(&ds, graph->V[edges[i].head],
                                  graph->V[edges[i].tail]);
       if (result != Success) {

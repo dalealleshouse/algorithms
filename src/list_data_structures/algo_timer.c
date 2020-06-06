@@ -51,8 +51,9 @@ void* BuildDataStructure(Structure str, size_t n) {
       }
 
       LinkedList* list = (LinkedList*)ds;
-      for (size_t i = 0; i < n * 3; i++)
+      for (size_t i = 0; i < n * 3; i++) {
         LinkedList_DeleteAt(list, rand() % list->size);
+      }
       break;
     case BINARY_TREE_UNBALANCED:
       for (size_t i = 1; i <= n; i++) op(ds, i);

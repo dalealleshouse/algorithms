@@ -50,8 +50,9 @@ GraphResult Deprecated_Graph_AddEdge(Deprecated_Graph* self,
   if (tail == head) return Graph_EdgeIsSelfLoop;
 
   if (tail >= self->n_allocated || head >= self->n_allocated ||
-      self->V[tail].initalized == false || self->V[head].initalized == false)
+      self->V[tail].initalized == false || self->V[head].initalized == false) {
     return Graph_InvalidVertex;
+  }
 
   self->m++;
 
@@ -131,8 +132,9 @@ GraphResult Graph_CollapseEdge(Deprecated_Graph* self, size_t edge_index) {
 }
 
 static void _AddVertexIfMissing(Deprecated_Graph* self, unsigned vertex) {
-  if (vertex > self->n_allocated || !self->V[vertex].initalized)
+  if (vertex > self->n_allocated || !self->V[vertex].initalized) {
     Graph_AddVertex(self, vertex);
+  }
 }
 
 Deprecated_Graph* Deprecated_Graph_FromFile(const char* path) {

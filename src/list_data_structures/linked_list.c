@@ -74,8 +74,9 @@ static void delete_at_head(LinkedList* list) {
   if (head == list->tail) {
     list->head = NULL;
     list->tail = NULL;
-  } else
+  } else {
     list->head = head->next;
+  }
 
   if (list->head != NULL) list->head->prev = NULL;
 
@@ -149,12 +150,13 @@ ListOpResult LinkedList_InsertAt(LinkedList* self, void* payload,
   LinkedListItem* item = LinkedList_ItemCreate(payload);
   if (item == NULL) return ListOp_FailedMalloc;
 
-  if (index == 0)
+  if (index == 0) {
     insert_at_head(self, item);
-  else if (index == self->size)
+  } else if (index == self->size) {
     insert_at_tail(self, item);
-  else
+  } else {
     insert_mid(self, item, index);
+  }
 
   self->size++;
 
@@ -166,12 +168,13 @@ ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index) {
 
   if (index >= self->size) return ListOp_InvalidIndex;
 
-  if (index == 0)
+  if (index == 0) {
     delete_at_head(self);
-  else if (index == self->size - 1)
+  } else if (index == self->size - 1) {
     delete_at_tail(self);
-  else
+  } else {
     delete_at_mid(self, index);
+  }
 
   self->size--;
   return ListOp_Success;
@@ -183,12 +186,13 @@ ListOpResult LinkedList_Delete(LinkedList* self, void* doomed) {
   LinkedListItem* item = search(self, doomed);
   if (item == NULL) return ListOp_NotFound;
 
-  if (item == self->head)
+  if (item == self->head) {
     delete_at_head(self);
-  else if (item == self->tail)
+  } else if (item == self->tail) {
     delete_at_tail(self);
-  else
+  } else {
     delete_mid(self, item);
+  }
 
   self->size--;
   return ListOp_Success;

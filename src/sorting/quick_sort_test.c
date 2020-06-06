@@ -111,8 +111,9 @@ int RegisterQuickSortTests() {
       NULL == CU_add_test(pSuite, "pivot on median finds last",
                           pivot_on_median_finds_last) ||
       NULL == CU_add_test(pSuite, "pivot on median finds middle",
-                          pivot_on_median_finds_middle))
+                          pivot_on_median_finds_middle)) {
     return CU_get_error();
+  }
 
   return 0;
 }

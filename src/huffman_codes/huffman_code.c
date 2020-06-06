@@ -21,15 +21,17 @@ static int _codeNodeComparer(const void* x, const void* y) {
   const HuffmanCode* _y = y;
 
   if (_y->frequency == _x->frequency) return 0;
-  if (_y->frequency > _x->frequency)
+  if (_y->frequency > _x->frequency) {
     return 1;
-  else
+  } else {
     return -1;
+  }
 }
 
 static Result _combineNodes(HuffmanCode* x, HuffmanCode* y, HuffmanCode** new) {
-  if (is_add_overflow_size_t(x->frequency, y->frequency))
+  if (is_add_overflow_size_t(x->frequency, y->frequency)) {
     return ArithmeticOverflow;
+  }
 
   Result result = _huffmanCode_Init(NULL, x->frequency + y->frequency, new);
   if (result != Success) return result;

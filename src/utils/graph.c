@@ -127,8 +127,9 @@ GraphResult Graph_AddWeightedEdge(Graph* self, vertex_id head, vertex_id tail,
 
   if (head >= self->n || tail >= self->n) return Graph_VertexIdExceedsMaxSize;
 
-  if (self->V[head] == NULL || self->V[tail] == NULL)
+  if (self->V[head] == NULL || self->V[tail] == NULL) {
     return Graph_InvalidVertexId;
+  }
 
   GraphResult result;
 

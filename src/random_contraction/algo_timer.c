@@ -45,8 +45,9 @@ double AlgoTime(const size_t n, const size_t m, const algo algo) {
 
     GraphResult result = Deprecated_Graph_AddEdge(graph, x, y);
 
-    if (result != Graph_Success)
+    if (result != Graph_Success) {
       printf("edge fail %d, %d, %d \n", result, x, y);
+    }
   }
 
   clock_t t = clock();

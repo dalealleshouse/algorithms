@@ -2,5 +2,5 @@
 
 docker run --privileged --rm --tty \
     -v $(pwd)/src:/build/src \
-    dalealleshouse/algo_test_runner_c:2.2 \
+    dalealleshouse/algo_test_runner_c:latest \
     ./validate.sh

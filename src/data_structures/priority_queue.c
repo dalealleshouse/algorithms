@@ -48,10 +48,11 @@ static void* PQ_RemoveTail(PriorityQueue* self) {
   void* item = qitem->payload;
 
   self->tail = qitem->prev;
-  if (self->tail == NULL)
+  if (self->tail == NULL) {
     self->head = NULL;
-  else
+  } else {
     self->tail->next = NULL;
+  }
 
   self->n--;
   free(qitem);
@@ -92,18 +93,19 @@ PQResult PQ_Insert(PriorityQueue* self, void* item) {
 
   qitem->payload = item;
 
-  if (self->n == 0)
+  if (self->n == 0) {
     InsertHead(self, qitem);
-  else {
+  } else {
     bool found = false;
     PQ_Item* i = self->head;
 
     while (i != NULL) {
       if (self->comparator(qitem->payload, i->payload) >= 0) {
-        if (i->prev == NULL)
+        if (i->prev == NULL) {
           InsertHead(self, qitem);
-        else
+        } else {
           InsertMid(qitem, i);
+        }
 
         found = true;
         break;
@@ -170,10 +172,11 @@ void* PQ_Remove(PriorityQueue* self) {
   void* item = qitem->payload;
 
   self->head = qitem->next;
-  if (self->head == NULL)
+  if (self->head == NULL) {
     self->tail = NULL;
-  else
+  } else {
     self->head->prev = NULL;
+  }
 
   self->n--;
   free(qitem);

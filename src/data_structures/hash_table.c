@@ -128,9 +128,9 @@ Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
     el = search_list(ls, key, len);
 
     // if the list was found, but the item doesn't exit, it's a collision
-    if (el == NULL)
+    if (el == NULL) {
       self->collisons++;
-    else {
+    } else {
       el->value = value;
       return Success;
     }

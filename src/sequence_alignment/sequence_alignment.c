@@ -67,8 +67,9 @@ static penalty _min(penalty x, penalty y, penalty z) {
 static ResultCode _reconstruct(
     SeqAlign* problem, penalty solutions[problem->x_n + 1][problem->y_n + 1],
     SeqAlignSolution** solution) {
-  if (is_add_overflow_size_t(problem->x_n, problem->y_n))
+  if (is_add_overflow_size_t(problem->x_n, problem->y_n)) {
     return ArithmeticOverflow;
+  }
 
   // Max possible size of aligned string
   size_t size = problem->y_n + problem->x_n;
@@ -186,14 +187,16 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
   penalty solutions[problem->x_n + 1][problem->y_n + 1];
 
   for (size_t i = 0; i <= problem->x_n; i++) {
-    if (is_mul_overflow_ulong(i, problem->gap_penalty))
+    if (is_mul_overflow_ulong(i, problem->gap_penalty)) {
       return ArithmeticOverflow;
+    }
     solutions[i][0] = i * problem->gap_penalty;
   }
 
   for (size_t j = 0; j <= problem->y_n; j++) {
-    if (is_mul_overflow_ulong(j, problem->gap_penalty))
+    if (is_mul_overflow_ulong(j, problem->gap_penalty)) {
       return ArithmeticOverflow;
+    }
     solutions[0][j] = j * problem->gap_penalty;
   }
 
@@ -202,20 +205,23 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
       char x = problem->x[i - 1];
       char y = problem->y[j - 1];
 
-      if (x == y)
+      if (x == y) {
         solutions[i][j] = solutions[i - 1][j - 1];
-      else {
+      } else {
         if (is_add_overflow_ulong(solutions[i - 1][j - 1],
-                                  problem->mismatch_penalty))
+                                  problem->mismatch_penalty)) {
           return ArithmeticOverflow;
+        }
         penalty case1 = solutions[i - 1][j - 1] + problem->mismatch_penalty;
 
-        if (is_add_overflow_ulong(solutions[i - 1][j], problem->gap_penalty))
+        if (is_add_overflow_ulong(solutions[i - 1][j], problem->gap_penalty)) {
           return ArithmeticOverflow;
+        }
         penalty case2 = solutions[i - 1][j] + problem->gap_penalty;
 
-        if (is_add_overflow_ulong(solutions[i][j - 1], problem->gap_penalty))
+        if (is_add_overflow_ulong(solutions[i][j - 1], problem->gap_penalty)) {
           return ArithmeticOverflow;
+        }
         penalty case3 = solutions[i][j - 1] + problem->gap_penalty;
 
         solutions[i][j] = _min(case1, case2, case3);

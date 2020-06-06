@@ -149,7 +149,7 @@ int RegisterClosestDistanceTests() {
     return -1;
   }
 
-  // TODO: This is failing periodically, this must be fixed
+  // TODO(dalealleshouse): This is failing periodically, this must be fixed
   CU_pTest needs_rework =
       CU_add_test(pSuite, "large random array matches slow result",
                   closest_distance_matches_slow);

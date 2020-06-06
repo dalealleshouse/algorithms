@@ -42,10 +42,11 @@ int pivot_on_median(const size_t n, const size_t size, const void* arr,
 
   size_t mid_point = 0;
 
-  if (n % 2 == 0)
+  if (n % 2 == 0) {
     mid_point = n / 2 - 1;
-  else
+  } else {
     mid_point = n / 2;
+  }
 
   const void* first = arr;
   const void* last = (char*)arr + size * (n - 1);
@@ -53,13 +54,15 @@ int pivot_on_median(const size_t n, const size_t size, const void* arr,
 
   // first
   if ((comparator(first, last) >= 0 && comparator(first, middle) <= 0) ||
-      (comparator(first, last) <= 0 && comparator(first, middle) >= 0))
+      (comparator(first, last) <= 0 && comparator(first, middle) >= 0)) {
     return 0;
+  }
 
   // middle
   if ((comparator(middle, first) >= 0 && comparator(middle, last) <= 0) ||
-      (comparator(middle, first) <= 0 && comparator(middle, last) >= 0))
+      (comparator(middle, first) <= 0 && comparator(middle, last) >= 0)) {
     return mid_point;
+  }
 
   // the only choice left is last
   return n - 1;
@@ -80,8 +83,9 @@ int _swap(const size_t size, void* x, void* y) {
 int partition(const size_t n, const size_t size, void* arr,
               const comparator comparator, size_t* pivot_index) {
   if (arr == NULL || comparator == NULL || pivot_index == NULL || n == 0 ||
-      size == 0)
+      size == 0) {
     return -1;
+  }
 
   char* t_arr = (char*)arr;
   char* pivot_value = t_arr;
@@ -101,9 +105,11 @@ int partition(const size_t n, const size_t size, void* arr,
     t_arr += size;
   }
 
-  if (*pivot_index > 0)
-    if (_swap(size, pivot_value, pivot_value + *pivot_index * size) < 0)
+  if (*pivot_index > 0) {
+    if (_swap(size, pivot_value, pivot_value + *pivot_index * size) < 0) {
       return -1;
+    }
+  }
 
   return 0;
 }
@@ -132,18 +138,22 @@ int quick_sort_pivot(const size_t n, const size_t size, void* arr,
 
   int result;
   // items to the left of the partition
-  if (pivot_index > 0)
+  if (pivot_index > 0) {
     if ((result = quick_sort_pivot(pivot_index, size, arr, comparator,
-                                   choose_pivot)) != 0)
+                                   choose_pivot)) != 0) {
       return result;
+    }
+  }
 
   // items to the right of the partition
   pivot_index++;
-  if (pivot_index < n)
+  if (pivot_index < n) {
     if ((result = quick_sort_pivot(n - pivot_index, size,
                                    (char*)arr + pivot_index * size, comparator,
-                                   choose_pivot)) != 0)
+                                   choose_pivot)) != 0) {
       return result;
+    }
+  }
 
   return 0;
 }

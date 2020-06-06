@@ -29,8 +29,9 @@ int insertion_sort(const size_t n, const size_t size, void* arr,
       if (result > 0) {
         shift_array(size, jth);
         open_index--;
-      } else
+      } else {
         break;
+      }
     }
 
     memcpy((char*)arr + (open_index * size), ith, size);

@@ -8,8 +8,9 @@
 #include "CUnit/CUnit.h"
 
 static void _containsId(Item** items, size_t n, id id) {
-  for (size_t i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++) {
     if (items[i]->id == id) return;
+  }
 
   CU_FAIL("Item id not found");
 }

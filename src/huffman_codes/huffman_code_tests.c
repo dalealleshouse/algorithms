@@ -121,8 +121,9 @@ static SymbolFreq* _createSymbolFreq(char* input) {
       freq = malloc(sizeof(size_t));
       *freq = 1;
       HashTable_Insert(ht, &input[i], 1, freq);
-    } else
+    } else {
       ++*freq;
+    }
   }
 
   SymbolFreq* freqs = NULL;

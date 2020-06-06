@@ -36,18 +36,20 @@ int select_partition(const size_t n, const size_t size, void* arr,
   char* right_ptr = t_arr + size * (n - 1);
 
   while (1) {
-    while (left_ptr < right_ptr && comparator(left_ptr, pivot_value) < 0)
+    while (left_ptr < right_ptr && comparator(left_ptr, pivot_value) < 0) {
       left_ptr += size;
+    }
 
     while (right_ptr > t_arr && comparator(right_ptr, pivot_value) >= 0) {
       right_ptr -= size;
       pivot_index = pivot_index - 1;
     }
 
-    if (left_ptr >= right_ptr)
+    if (left_ptr >= right_ptr) {
       break;
-    else
+    } else {
       _swap(size, left_ptr, right_ptr);
+    }
   }
 
   _swap(size, pivot_value, right_ptr);
@@ -76,21 +78,23 @@ void* quick_select_pivot(const size_t nth, const size_t n, const size_t size,
   // move the partition value to the first position
   _swap(size, arr, (char*)arr + pivot * size);
 
-  if ((pivot_index = select_partition(n, size, arr, comparator)) < 0)
+  if ((pivot_index = select_partition(n, size, arr, comparator)) < 0) {
     return NULL;
+  }
 
   // Normally, it is not a good idea to cast from int to size_t. However, in
   // this case we know pivot_index is positive b/c of the check above, so we
   // can do so without compunction
-  if ((size_t)pivot_index == nth)
+  if ((size_t)pivot_index == nth) {
     return (char*)arr + pivot_index * size;
-  else if ((size_t)pivot_index < nth)
+  } else if ((size_t)pivot_index < nth) {
     return quick_select_pivot(nth - pivot_index, n - pivot_index, size,
                               (char*)arr + pivot_index * size, comparator,
                               choose_pivot);
-  else
+  } else {
     return quick_select_pivot(nth, pivot_index, size, arr, comparator,
                               choose_pivot);
+  }
 }
 
 void* sort_select(const size_t nth, const size_t n, const size_t size,

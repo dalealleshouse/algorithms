@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-// TODO: This entire file requires arithmetic overflow checking
+// TODO(dalealleshouse): This entire file requires arithmetic overflow checking
 
 double calc_score(const job* job1) { return job1->weight / job1->length; }
 
@@ -11,17 +11,19 @@ int ratio_compare(const void* job1, const void* job2) {
   double job2_ratio = calc_score((job*)job2);
   double diff;
 
-  if (job1_ratio == job2_ratio)
+  if (job1_ratio == job2_ratio) {
     diff = ((job*)job1)->weight - ((job*)job2)->weight;
-  else
+  } else {
     diff = job1_ratio - job2_ratio;
+  }
 
-  if (diff < 0.0)
+  if (diff < 0.0) {
     return 1;
-  else if (diff > 0.0)
+  } else if (diff > 0.0) {
     return -1;
-  else
+  } else {
     return 0;
+  }
 }
 
 Result ScheduleOptimizer_Calc(job* jobs, const size_t n,

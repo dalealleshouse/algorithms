@@ -26,10 +26,11 @@ static bool shortest_path_conqueror(Vertex* v, Vertex* p) {
   if (v == NULL || v->data != NULL) return false;
 
   int shortest_path;
-  if (p == NULL)
+  if (p == NULL) {
     shortest_path = 0;
-  else
+  } else {
     shortest_path = ((VertexData*)p->data)->value + 1;
+  }
 
   VertexData* d = VertexData_Create(shortest_path);
   v->data = d;

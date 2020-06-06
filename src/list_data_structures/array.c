@@ -52,8 +52,9 @@ void* Array_Search(const Array* self, const void* item) {
 ListOpResult Array_Enumerate(const Array* self, item_handler item_handler) {
   if (self == NULL || item_handler == NULL) return ListOp_NullParameter;
 
-  for (size_t pos = 0; pos < self->n; pos++)
+  for (size_t pos = 0; pos < self->n; pos++) {
     item_handler((char*)self->array + (self->item_size * pos));
+  }
 
   return ListOp_Success;
 }

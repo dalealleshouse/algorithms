@@ -959,12 +959,13 @@ uint32_t farmhash32_mk(const char *s, size_t len) {
 
 uint32_t farmhash32_mk_with_seed(const char *s, size_t len, uint32_t seed) {
   if (len <= 24) {
-    if (len >= 13)
+    if (len >= 13) {
       return farmhash32_mk_len_13_to_24(s, len, seed * c1);
-    else if (len >= 5)
+    } else if (len >= 5) {
       return farmhash32_mk_len_5_to_12(s, len, seed);
-    else
+    } else {
       return farmhash32_mk_len_0_to_4(s, len, seed);
+    }
   }
   uint32_t h = farmhash32_mk_len_13_to_24(s, 24, seed ^ len);
   return mur(farmhash32_mk(s + 24, len - 24) + seed, h);
@@ -1394,12 +1395,13 @@ uint32_t farmhash32_cc(const char *s, size_t len) {
 
 uint32_t farmhash32_cc_with_seed(const char *s, size_t len, uint32_t seed) {
   if (len <= 24) {
-    if (len >= 13)
+    if (len >= 13) {
       return farmhash32_mk_len_13_to_24(s, len, seed * c1);
-    else if (len >= 5)
+    } else if (len >= 5) {
       return farmhash32_mk_len_5_to_12(s, len, seed);
-    else
+    } else {
       return farmhash32_mk_len_0_to_4(s, len, seed);
+    }
   }
   uint32_t h = farmhash32_mk_len_13_to_24(s, 24, seed ^ len);
   return mur(farmhash32_cc(s + 24, len - 24) + seed, h);

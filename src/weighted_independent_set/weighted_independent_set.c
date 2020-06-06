@@ -42,8 +42,9 @@ static Result WeightedIndependentSet_Union(
   WeightedVertex** vertices = calloc(sizeof(WeightedVertex*), wis->n + 1);
   if (vertices == NULL) return FailedMemoryAllocation;
 
-  if (wis != &EMPTY_SET)
+  if (wis != &EMPTY_SET) {
     memcpy(vertices, wis->vertices, sizeof(void*) * wis->n);
+  }
 
   vertices[wis->n] = wv;
 
@@ -144,9 +145,9 @@ static Result _reconstruct(unsigned long solutions[], PathGraph* graph,
   size_t i = graph->n;
   while (i >= 2) {
     WeightedVertex* w = graph->vertices[i - 1];
-    if (solutions[i - 1] > solutions[i - 2] + w->weight)
+    if (solutions[i - 1] > solutions[i - 2] + w->weight) {
       i = i - 1;
-    else {
+    } else {
       WeightedIndependentSet* new;
       Result r = WeightedIndependentSet_Union(winner, w, &new);
       WeightedIndependentSet_Destroy(winner);
@@ -244,8 +245,9 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
   }
 
   // If there is only 1 vertex, return it
-  if (graph->n == 1)
+  if (graph->n == 1) {
     return _weightedIndependentSetFromVertex(graph->vertices[0], conclusion);
+  }
 
   // Create array to hold solutions
   size_t solutions_n = graph->n + 1;
@@ -266,10 +268,11 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
     if (is_add_overflow_ulong(iminus1, w)) return ArithmeticOverflow;
 
     // overflow checked above
-    if (iminus1 >= iminus2 + w)
+    if (iminus1 >= iminus2 + w) {
       solutions[i] = iminus1;
-    else
+    } else {
       solutions[i] = iminus2 + w;
+    }
   }
 
   return _reconstruct(solutions, graph, conclusion);
@@ -321,10 +324,11 @@ Result WeightedIndependentSet_Dynamic(PathGraph* graph,
 
     Result r;
     // overflow checked above
-    if (iminus1->weight >= iminus2->weight + w->weight)
+    if (iminus1->weight >= iminus2->weight + w->weight) {
       r = _dupWeightedIndependentSet(iminus1, &solutions[i]);
-    else
+    } else {
       r = WeightedIndependentSet_Union(iminus2, w, &solutions[i]);
+    }
 
     if (r != Success) {
       _solutionsDestroy(solutions, solutions_n);

@@ -55,7 +55,7 @@ dkms.conf
 *.gcda
 *.gcno
 cov.info
-output/
+code_coverage/
 test_runner
 compile_commands.json
 run_result.txt

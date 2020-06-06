@@ -31,8 +31,9 @@ Deprecated_Graph* RC_KargerMinCut(const Deprecated_Graph* input) {
     if (min == NULL || graph->m < min->m) {
       Deprecated_Graph_Destroy(min);
       min = graph;
-    } else
+    } else {
       Deprecated_Graph_Destroy(graph);
+    }
   }
 
   return min;
@@ -73,8 +74,9 @@ Deprecated_Graph* RC_KargerSteinMinCut(const Deprecated_Graph* input) {
     if (min == NULL || result->m < min->m) {
       Deprecated_Graph_Destroy(min);
       min = result;
-    } else
+    } else {
       Deprecated_Graph_Destroy(result);
+    }
   }
 
   return min;

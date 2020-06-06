@@ -27,10 +27,11 @@ static int _edgeComparator(const void* x, const void* y) {
   Edge* _x = (Edge*)x;
   Edge* _y = (Edge*)y;
 
-  if (_x->weight < _y->weight)
+  if (_x->weight < _y->weight) {
     return -1;
-  else if (_x->weight > _y->weight)
+  } else if (_x->weight > _y->weight) {
     return 1;
+  }
 
   return 0;
 }
@@ -42,10 +43,11 @@ static int _spanTreeResultComparator(const void* x, const void* y) {
   // The commented code and cause integer overflows (INT_MAX - -1)
   /* return _y->score - _x->score; */
 
-  if (_x->score > _y->score)
+  if (_x->score > _y->score) {
     return -1;
-  else if (_x->score < _y->score)
+  } else if (_x->score < _y->score) {
     return 1;
+  }
 
   return 0;
 }
@@ -298,9 +300,9 @@ Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst) {
       return result;
     }
 
-    if (hasCycle)
+    if (hasCycle) {
       continue;
-    else {
+    } else {
       result = DisjointSet_Union(&ds, graph->V[edges[i].head],
                                  graph->V[edges[i].tail]);
       if (result != Success) {

@@ -27,8 +27,9 @@ void _add_matrices(const size_t n, const int x[n][n], const int y[n][n],
 
 int subtract_matrices(const size_t n, const int x[n][n], const int y[n][n],
                       int output[n][n]) {
-  for (size_t i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++) {
     for (size_t j = 0; j < n; j++) output[i][j] = x[i][j] - y[i][j];
+  }
 
   return 0;
 }

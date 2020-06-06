@@ -450,8 +450,9 @@ static void LinkedList_Enumerate_empty() {
 static void LinkedList_Enumerate_standard() {
   LinkedList* list = LinkedList_Create(NULL, PIntComparator);
 
-  for (size_t i = 0; i < mock_n; i++)
+  for (size_t i = 0; i < mock_n; i++) {
     LinkedList_InsertAt(list, &mock_vals[i], list->size);
+  }
 
   mock_pos = 0;
   ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);

@@ -188,8 +188,9 @@ HeapResult Heap_Resize(Heap* self, size_t size) {
 
   if (size < self->n) return HeapInvalidSize;
 
-  if (is_mul_overflow_size_t(size, sizeof(void*)))
+  if (is_mul_overflow_size_t(size, sizeof(void*))) {
     return HeapArithmeticOverflow;
+  }
 
   void* new_data = realloc(self->data, sizeof(void*) * size);
   if (new_data == NULL) return HeapFailedMemoryAllocation;

@@ -66,7 +66,7 @@ static ResultCode readCitiesFromFile(const char* path, size_t* n, city** cities,
       end = line;
     }
 
-    // TODO: Add error checking
+    // TODO(dalealleshouse): Add error checking
     double x = strtod(end, &end);
     double y = strtod(end, NULL);
 

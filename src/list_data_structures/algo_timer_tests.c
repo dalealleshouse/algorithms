@@ -29,8 +29,8 @@ typedef void (*checker)(void* ds);
 
 static void Array_Checker(void* ds) {
   Array* array = (Array*)ds;
-  uintptr_t actual = (uintptr_t)((uintptr_t*)array->array)[0];
-  uintptr_t actual_2 = (uintptr_t)((uintptr_t*)array->array)[1];
+  uintptr_t actual = ((uintptr_t*)array->array)[0];
+  uintptr_t actual_2 = ((uintptr_t*)array->array)[1];
 
   CU_ASSERT_EQUAL(expected, actual_2);
   CU_ASSERT_EQUAL(expected_2, actual);

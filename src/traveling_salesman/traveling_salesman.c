@@ -30,8 +30,9 @@ ResultCode adjacencyMatrix(const city* cities, const size_t n,
   if (result == NULL) return FailedMemoryAllocation;
 
   for (size_t i = 0; i < n; ++i) {
-    for (size_t j = 0; j < n; ++j)
+    for (size_t j = 0; j < n; ++j) {
       dist(&cities[i].coordinates, &cities[j].coordinates, &result[i * n + j]);
+    }
   }
 
   *matrix = result;
@@ -77,8 +78,9 @@ ResultCode TravelingSalesman(size_t n, double graph[n][n],
   }
 
   double answer = INFINITY;
-  for (size_t last = 0; last < n - 1; ++last)
+  for (size_t last = 0; last < n - 1; ++last) {
     answer = MinDouble(2, answer, graph[last][n - 1] + best[(size - 1)][last]);
+  }
 
   free(best);
   *shortest_path = answer;

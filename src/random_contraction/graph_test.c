@@ -208,8 +208,9 @@ static void Graph_AddEdge_bad_realloc() {
 
   for (size_t i = 0; i < INITIAL_ALLOC + 1; i++) Graph_AddVertex(graph, i);
 
-  for (size_t i = 0; i < INITIAL_ALLOC; i++)
+  for (size_t i = 0; i < INITIAL_ALLOC; i++) {
     Deprecated_Graph_AddEdge(graph, i, i + 1);
+  }
 
   FAILED_MALLOC_TEST({
     int result = Deprecated_Graph_AddEdge(graph, 2, 1);

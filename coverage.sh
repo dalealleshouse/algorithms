@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-make clean > /dev/null
 make -B code-coverage > /dev/null
 
 lcov --no-external \
@@ -9,7 +8,7 @@ lcov --no-external \
     --gcov-tool ./llvm-gcov.sh \
     --capture -o ./src/cov.info
 
-lcov --remove ./src/cov.info '/src/*test*' '/src/*Test*' '/src/algo*' '/src/MemAllocMock*' \
+lcov --remove ./src/cov.info '*test.c' '*algo_timer.c' \
     -o ./src/cov.info
 
-genhtml ./src/cov.info -o ./src/output
+genhtml ./src/cov.info -o ./code_coverage

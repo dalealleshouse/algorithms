@@ -103,8 +103,9 @@ int _closest_split(const size_t n, const point_t by_x[n], const point_t by_y[n],
   const double low_x = x_bar - delta->dist;
   int length = 0;
   point_t strip[n];
-  for (size_t i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++) {
     if (by_y[i].x < high_x && by_y[i].x > low_x) strip[length++] = by_y[i];
+  }
 
   *result = *delta;
   for (int i = 0; i < length - 1; i++) {
@@ -164,27 +165,32 @@ int _closest_distance(const size_t n, const point_t by_x[n],
   point_t right_y[right_half];
 
   int left = 0, right = 0;
-  for (size_t i = 0; i < n; i++)
-    if (by_y[i].x < mid_point)
+  for (size_t i = 0; i < n; i++) {
+    if (by_y[i].x < mid_point) {
       left_y[left++] = by_y[i];
-    else
+    } else {
       right_y[right++] = by_y[i];
+    }
+  }
 
   point_dist_t left_closest = {.dist = 0};
   point_dist_t right_closest = {.dist = 0};
 
   int result_r;
   if ((result_r =
-           _closest_distance(left_half, left_x, left_y, &left_closest)) != 0)
+           _closest_distance(left_half, left_x, left_y, &left_closest)) != 0) {
     return result_r;
+  }
 
   if ((result_r = _closest_distance(right_half, right_x, right_y,
-                                    &right_closest)) != 0)
+                                    &right_closest)) != 0) {
     return result_r;
+  }
 
   point_dist_t l_delta = *min(&left_closest, &right_closest);
-  if ((result_r = _closest_split(n, by_x, by_y, &l_delta, result)) != 0)
+  if ((result_r = _closest_split(n, by_x, by_y, &l_delta, result)) != 0) {
     return result_r;
+  }
 
   return 0;
 }
