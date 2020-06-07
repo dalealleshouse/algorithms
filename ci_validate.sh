@@ -1,35 +1,6 @@
 #!/usr/bin/env bash
 
-function run_c_tests() {
-    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c \
-        ./validate.sh > run_result.txt
-
-    RESULTS=`tail run_result.txt`
-    RESULTS=${RESULTS: -20}
-
-    if [[ $RESULTS = *Success* ]]
-    then
-        echo `pwd` passed
-    else
-        echo `pwd` failure
-        cat run_result.txt
-        exit -1
-    fi
-}
-
-function run_c_code_coverage() {
-    docker run --privileged --rm -v $(pwd):/src dalealleshouse/algo_test_runner_c \
-        ./coverage.sh
-}
-
-./libs.sh
-
-# Run the dockerized tests inside every subdirectory named c
-for D in `find . -type d -name 'c' ! -path './docker/c'`
-do
-    cd $D
-    run_c_tests
-    cd ../../
-done
-
-exit 0
+docker run --privileged --rm --tty \
+    -v $(pwd)/src:/build/src \
+    dalealleshouse/algo_test_runner_c:latest \
+    ./validate.sh
