@@ -5,7 +5,6 @@
 extern int RegisterGraphTests();
 extern int RegisterOverflowTests();
 extern int RegisterMathTests();
-
 // Common
 extern int RegisterCommonTests();
 
@@ -202,7 +201,7 @@ int TestRunner(int (*register_tests)()) {
 
   // You must get this value before CU_cleanup_registry() or it will revert to
   // zero
-  int ret = CU_get_number_of_failures();
+  int ret = CU_get_number_of_failures() != 0;
 
   /* Clean up registry and return */
   CU_cleanup_registry();

@@ -1,5 +1,5 @@
 SHELL 	= /bin/sh
-CC 		= clang
+CC 		= clang-10
 
 FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
@@ -17,7 +17,7 @@ all: $(TARGET)
 all: CFLAGS += -fsanitize=safe-stack,undefined
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) -o $(TARGET) 
+	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) -o $(TARGET)
 	ASAN_OPTIONS=detect_leaks=1 ./$(TARGET)
 
 release: $(SOURCES)
@@ -54,24 +54,23 @@ lint:
 	cpplint src/*.[ch] src/*/*.[ch]
 
 format:
-	clang-format -i src/*.[ch]
+	clang-format-10 -i src/*.[ch]
 
-tidy: comp-db
 tidy:
-	clang-tidy src/*.[ch] src/*/*.[ch]
+	clang-tidy-10 src/*.[ch] src/*/*.[ch]
 
 clean:
 	-rm -f $(OBJECTS)
 	-rm -f $(DEPS)
 	-rm -f $(TARGET)
 	-rm -f $(SHARED_TARGET)
-	-rm -f src/*.a
-	-rm -f src/gmon.out
-	-rm -rf src/output
-	-rm -f src/*/*.gcda
+	-rm -f gmon.out
+	-rm -rf code_coverage
 	-rm -f src/*.gcda
+	-rm -f src/*/*.gcda
+	-rm -f src/*.gcov
 	-rm -f src/*/*.gcov
-	-rm -f src/*/*.gcno
 	-rm -f src/*.gcno
+	-rm -f src/*/*.gcno
 	-rm -f src/*.info
 	-rm -f src/run_result.txt
