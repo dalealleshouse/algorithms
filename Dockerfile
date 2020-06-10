@@ -12,17 +12,8 @@ RUN mkdir build/ && \
 
 RUN pip3 install cpplint
 
-VOLUME ["/build/src"]
+VOLUME ["/build"]
 
 WORKDIR /build
-
-COPY Makefile /build/Makefile
-COPY validate.sh /build/validate.sh
-COPY coverage.sh /build/coverage.sh
-COPY .clang-format /build/.clang-format
-COPY .clang-tidy /build/.clang-tidy
-COPY CPPLINT.cfg /build/CPPLINT.cfg
-COPY llvm-gcov.sh /build/llvm-gcov.sh
-COPY validate_format.py /build/validate_format.py
 
 CMD ["make", "-B"]
