@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "./array.h"
 
 #include <stdbool.h>

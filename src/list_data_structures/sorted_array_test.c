@@ -1,6 +1,10 @@
+// Copyright 2020 Dale Alleshouse
 #include "./sorted_array.h"
 
+#include <pthread.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "../utils/error_reporter.h"
 #include "../utils/math.h"
@@ -151,7 +155,9 @@ static void SortedArray_Max_standard() {
   Array* sut = CreateSut(10);
 
   void* result = SortedArray_Max(sut);
-  CU_ASSERT_EQUAL(&((int*)sut->array)[9], result);
+  int* arr = sut->array;
+
+  CU_ASSERT_EQUAL(&arr[9], result);
 
   Array_Destroy(sut);
 }
