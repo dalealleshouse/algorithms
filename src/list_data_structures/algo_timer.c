@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "./algo_timer.h"
 
 #include <stdint.h>

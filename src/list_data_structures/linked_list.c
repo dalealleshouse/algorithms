@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "./linked_list.h"
 
 #include <stdlib.h>
@@ -231,7 +232,7 @@ void LinkedList_Destroy(LinkedList* list) {
     curr = curr->next;
 
     LinkedList_ItemDestroy(list, doomed);
-  };
+  }
 
   free(list);
 }

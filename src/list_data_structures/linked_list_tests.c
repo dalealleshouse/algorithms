@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -25,9 +26,9 @@ static void ListIsValid(const LinkedList* list, const size_t n,
 
   LinkedListItem* item = list->head;
   for (size_t i = 0; i < n; i++) {
-    if (item == NULL || item->payload == NULL)
+    if (item == NULL || item->payload == NULL) {
       CU_FAIL("null item")
-    else {
+    } else {
       CU_ASSERT_PTR_EQUAL(item->payload, expected[i]);
       item = item->next;
     }
@@ -36,9 +37,9 @@ static void ListIsValid(const LinkedList* list, const size_t n,
 
   item = list->tail;
   for (size_t i = 1; i <= n; i++) {
-    if (item == NULL || item->payload == NULL)
+    if (item == NULL || item->payload == NULL) {
       CU_FAIL("null item")
-    else {
+    } else {
       CU_ASSERT_PTR_EQUAL(item->payload, expected[n - i]);
       item = item->prev;
     }

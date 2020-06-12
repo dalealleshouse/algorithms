@@ -14,12 +14,13 @@
 
 typedef void* (*SortedArrayOp)(const Array*, const void*);
 typedef void* (*SortedArrayOpUnary)(const Array*);
+static unsigned int seed;
 
 static Array* CreateSut(size_t n) {
   Array* sut = Array_Create(PIntComparator, sizeof(int));
   sut->array = calloc(sizeof(int), n);
 
-  for (size_t i = 0; i < n; i++) ((int*)sut->array)[i] = rand();
+  for (size_t i = 0; i < n; i++) ((int*)sut->array)[i] = rand_r(&seed);
 
   qsort(sut->array, n, sizeof(int), PIntComparator);
   sut->n = n;
@@ -326,6 +327,8 @@ static void SortedArray_Rank_standard() {
 }
 
 int RegisterSortedArrayTests() {
+  seed = time(NULL);
+
   CU_TestInfo Common_tests[] = {CU_TEST_INFO(SortedArray_null_parameter),
                                 CU_TEST_INFO_NULL};
 

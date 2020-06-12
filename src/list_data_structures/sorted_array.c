@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "./sorted_array.h"
 
 #include <stdio.h>

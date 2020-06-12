@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "./binary_tree.h"
 
 #include <stdint.h>

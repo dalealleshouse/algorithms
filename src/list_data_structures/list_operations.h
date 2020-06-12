@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #pragma once
 
 #include <stddef.h>
@@ -7,13 +8,13 @@
 
 const size_t RANK_ERROR;
 
-#define LIST_ERROR(list_type, result)                                       \
-  {                                                                         \
-    char str[1000];                                                         \
-    sprintf(str, "%s Error: %s, %s, %s, %d\n", list_type,                   \
-            ListOp_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
-                                                                            \
-    ErrorReporter_Report(result, str);                                      \
+#define LIST_ERROR(list_type, result)                                        \
+  {                                                                          \
+    char str[1000];                                                          \
+    snprintf(str, sizeof(str), "%s Error: %s, %s, %s, %d\n", list_type,      \
+             ListOp_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
+                                                                             \
+    ErrorReporter_Report(result, str);                                       \
   }
 
 typedef void (*item_handler)(void* x);

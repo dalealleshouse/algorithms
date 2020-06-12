@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include <stdbool.h>
 #include <stdlib.h>
 
