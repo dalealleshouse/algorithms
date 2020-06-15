@@ -9,7 +9,7 @@ LINKFLAGS 	 = -lcunit -flto -lm -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=r
 
 TARGET			= src/test_runner
 LIB_NAME	 	?=utils
-SOURCES			= $(wildcard */*.c */*/*.c)
+SOURCES			= $(wildcard src/*.c src/*/*.c)
 OBJECTS			= $(SOURCES:.c=.o)
 DEPS			= $(OBJECTS:.o=.d)
 
