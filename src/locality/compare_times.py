@@ -1,9 +1,8 @@
 import ctypes
-import sys
 from enum import IntEnum
-import statistics
 
 lib = ctypes.CDLL('./algo.so')
+
 
 class CtypesEnum(IntEnum):
     """A ctypes-compatible IntEnum superclass."""
@@ -20,6 +19,7 @@ class IterationType(CtypesEnum):
 lib.EnumerateMultiDimArray.argtypes = [ctypes.c_size_t, IterationType]
 lib.EnumerateMultiDimArray.restype = ctypes.c_double
 
+
 def calculate_runtime(n):
     print('enumerating a {:,} X {:,} array in row order'.format(n, n))
     time = lib.EnumerateMultiDimArray(n, IterationType.kRowOrder)
@@ -27,9 +27,10 @@ def calculate_runtime(n):
 
     print()
 
-    print('enumerating a {:,} X {:,} array in row order'.format(n, n))
+    print('enumerating a {:,} X {:,} array in column order'.format(n, n))
     time = lib.EnumerateMultiDimArray(n, IterationType.kColumnOrder)
     print('completed in {:.6f} sec'.format(time))
 
+
 if __name__ == "__main__":
-    calculate_runtime(100000000000);
+    calculate_runtime(100000000000)
