@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,clang-analyzer-*,cert-*,google-*'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
 WarningsAsErrors: 'google-*,bugprone-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

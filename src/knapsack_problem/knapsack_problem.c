@@ -4,18 +4,18 @@
 #include <string.h>
 
 static ResultCode _itemInit(id id, value value, size size, Item** item) {
-  if (item == NULL) return NullParameter;
-  if (*item != NULL) return OutputPointerIsNotNull;
+  if (item == NULL) return kNullParameter;
+  if (*item != NULL) return kOutputPointerIsNotNull;
 
   Item* _item = malloc(sizeof(Item));
-  if (_item == NULL) return FailedMemoryAllocation;
+  if (_item == NULL) return kFailedMemoryAllocation;
 
   _item->id = id;
   _item->value = value;
   _item->size = size;
 
   *item = _item;
-  return Success;
+  return kSuccess;
 }
 
 static void _itemDestroy(Item* item) { free(item); }
@@ -41,11 +41,11 @@ static void _printSolutions(size_t n, size capacity,
 ResultCode _packSolution(const Knapsack* orginal, const size_t n,
                          Item* items[n], size usedCapacity, value totalValue,
                          PackedKnapsack** packed) {
-  if (orginal == NULL || items == NULL || packed == NULL) return NullParameter;
-  if (*packed != NULL) return OutputPointerIsNotNull;
+  if (orginal == NULL || items == NULL || packed == NULL) return kNullParameter;
+  if (*packed != NULL) return kOutputPointerIsNotNull;
 
   PackedKnapsack* _knapsack = malloc(sizeof(PackedKnapsack));
-  if (_knapsack == NULL) return FailedMemoryAllocation;
+  if (_knapsack == NULL) return kFailedMemoryAllocation;
 
   _knapsack->used_capacity = usedCapacity;
   _knapsack->total_value = totalValue;
@@ -56,14 +56,14 @@ ResultCode _packSolution(const Knapsack* orginal, const size_t n,
     _knapsack->items = calloc(sizeof(void*), n);
     if (_knapsack->items == NULL) {
       PackedKnapsack_Destory(_knapsack);
-      return FailedMemoryAllocation;
+      return kFailedMemoryAllocation;
     }
 
     memcpy(_knapsack->items, items, sizeof(void*) * n);
   }
 
   *packed = _knapsack;
-  return Success;
+  return kSuccess;
 }
 
 static ResultCode _reconstruct(
@@ -71,9 +71,9 @@ static ResultCode _reconstruct(
     value solutions[knapsack->n + 1][knapsack->capacity + 1],
     PackedKnapsack** solution) {
   if (knapsack == NULL || solutions == NULL || solution == NULL) {
-    return NullParameter;
+    return kNullParameter;
   }
-  if (*solution != NULL) return OutputPointerIsNotNull;
+  if (*solution != NULL) return kOutputPointerIsNotNull;
 
   Item* items[knapsack->n];
   value runningTotal = 0;
@@ -101,13 +101,13 @@ ResultCode Knapsack_Init(const id ids[], const value values[],
                          const size sizes[], const size_t n,
                          const size capacity, Knapsack** knapsack) {
   if (ids == NULL || values == NULL || sizes == NULL || knapsack == NULL) {
-    return NullParameter;
+    return kNullParameter;
   }
-  if (n == 0 || capacity == 0) return ArgumentOutOfRange;
-  if (*knapsack != NULL) return OutputPointerIsNotNull;
+  if (n == 0 || capacity == 0) return kArgumentOutOfRange;
+  if (*knapsack != NULL) return kOutputPointerIsNotNull;
 
   Knapsack* _knapsack = malloc(sizeof(Knapsack));
-  if (_knapsack == NULL) return FailedMemoryAllocation;
+  if (_knapsack == NULL) return kFailedMemoryAllocation;
 
   _knapsack->capacity = capacity;
   _knapsack->n = n;
@@ -115,19 +115,19 @@ ResultCode Knapsack_Init(const id ids[], const value values[],
   _knapsack->items = calloc(sizeof(void*), n);
   if (_knapsack->items == NULL) {
     Knapsack_Destory(_knapsack);
-    return FailedMemoryAllocation;
+    return kFailedMemoryAllocation;
   }
 
   for (size_t i = 0; i < n; i++) {
     ResultCode r = _itemInit(ids[i], values[i], sizes[i], &_knapsack->items[i]);
-    if (r != Success) {
+    if (r != kSuccess) {
       Knapsack_Destory(_knapsack);
       return r;
     }
   }
 
   *knapsack = _knapsack;
-  return Success;
+  return kSuccess;
 }
 
 void Knapsack_Destory(Knapsack* self) {
@@ -148,9 +148,9 @@ void PackedKnapsack_Destory(PackedKnapsack* self) {
 }
 
 ResultCode Knapsack_Pack(const Knapsack* self, PackedKnapsack** result) {
-  if (self == NULL || result == NULL) return NullParameter;
-  if (*result != NULL) return OutputPointerIsNotNull;
-  if (self->n == 0 || self->capacity == 0) return ArgumentOutOfRange;
+  if (self == NULL || result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+  if (self->n == 0 || self->capacity == 0) return kArgumentOutOfRange;
 
   value solutions[self->n + 1][self->capacity + 1];
   memset(solutions, 0, sizeof(solutions));
@@ -178,8 +178,8 @@ ResultCode Knapsack_Pack(const Knapsack* self, PackedKnapsack** result) {
 }
 
 ResultCode Knapsack_Pack_Optimal(const Knapsack* self, value* result) {
-  if (self == NULL || result == NULL) return NullParameter;
-  if (self->n == 0 || self->capacity == 0) return ArgumentOutOfRange;
+  if (self == NULL || result == NULL) return kNullParameter;
+  if (self->n == 0 || self->capacity == 0) return kArgumentOutOfRange;
 
   size_t solution_size = (self->capacity + 1) * sizeof(value);
   value* solutions = calloc(1, solution_size);
@@ -208,5 +208,5 @@ ResultCode Knapsack_Pack_Optimal(const Knapsack* self, value* result) {
   *result = solutions[self->capacity];
   free(solutions);
   free(my_solutions);
-  return Success;
+  return kSuccess;
 }

@@ -10,7 +10,7 @@ Queue* Queue_Create() {
 }
 
 QueueResult Queue_Enqueue(Queue* self, void* item) {
-  if (self == NULL || item == NULL) return Queue_NullParameter;
+  if (self == NULL || item == NULL) return Queue_kNullParameter;
 
   Queue_Item* q_item = calloc(sizeof(Queue_Item), 1);
 
@@ -27,7 +27,7 @@ QueueResult Queue_Enqueue(Queue* self, void* item) {
 
   self->n++;
 
-  return Queue_Success;
+  return Queue_kSuccess;
 }
 
 void* Queue_Dequeue(Queue* self) {
@@ -48,7 +48,7 @@ void* Queue_Dequeue(Queue* self) {
   return item;
 }
 
-bool Queue_IsEmpty(Queue* self) {
+bool Queue_IskEmpty(Queue* self) {
   if (self == NULL) return true;
 
   return self->n == 0;

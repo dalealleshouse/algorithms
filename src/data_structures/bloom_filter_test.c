@@ -22,7 +22,7 @@ static void BloomFilter_Create_failed_malloc() {
     ErrorReporter_Clear();
     BloomFilter* result = BloomFilter_Create(bits, funcs);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(FailedMemoryAllocation, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -31,13 +31,13 @@ static void BloomFilter_Create_invalid_bits() {
   ErrorReporter_Clear();
   BloomFilter* sut = BloomFilter_Create(4, funcs);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
 
   // Not a power of 2
   ErrorReporter_Clear();
   sut = BloomFilter_Create(1050, funcs);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
 }
 
 static void BloomFilter_Create_invalid_funcs() {
@@ -45,13 +45,13 @@ static void BloomFilter_Create_invalid_funcs() {
   ErrorReporter_Clear();
   BloomFilter* sut = BloomFilter_Create(bits, 0);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
 
   // more than available
   ErrorReporter_Clear();
   sut = BloomFilter_Create(bits, hasher_count + 1);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
 }
 
 static void BloomFilter_Create_happy_path() {
@@ -62,11 +62,11 @@ static void BloomFilter_Insert_null_parameter() {
   char* key = "life is pain";
 
   Result result = BloomFilter_Insert(NULL, key);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   SUT({
     result = BloomFilter_Insert(sut, NULL);
-    CU_ASSERT_EQUAL(NullParameter, result);
+    CU_ASSERT_EQUAL(kNullParameter, result);
   });
 }
 
@@ -75,7 +75,7 @@ static void BloomFilter_Insert_happy_path() {
 
   SUT({
     Result result = BloomFilter_Insert(sut, key);
-    CU_ASSERT_EQUAL(Success, result);
+    CU_ASSERT_EQUAL(kSuccess, result);
   });
 }
 
@@ -85,13 +85,13 @@ static void BloomFilter_Lookup_null_parameter() {
   ErrorReporter_Clear();
   Result result = BloomFilter_Lookup(NULL, key);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   SUT({
     ErrorReporter_Clear();
     result = BloomFilter_Lookup(sut, NULL);
     CU_ASSERT_FALSE(result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
   });
 }
 
@@ -132,7 +132,7 @@ static void BloomFilter_GetN_null_parameter() {
   ErrorReporter_Clear();
   size_t result = BloomFilter_GetN(NULL);
   CU_ASSERT_EQUAL(result, N_ERROR);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 }
 
 static void BloomFilter_GetN_happy_path() {

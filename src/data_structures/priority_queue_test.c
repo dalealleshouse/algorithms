@@ -73,7 +73,7 @@ static void PQ_Create_initalizes_values() {
 static void PQ_Create_null_parameter() {
   PriorityQueue* sut = PQ_Create(NULL);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(PQ_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(PQ_kNullParameter, ErrorReporter_LastErrorCode());
   PQ_Destroy(sut, NULL);
 }
 
@@ -96,10 +96,10 @@ static void PQ_Insert_null_parameter() {
   PriorityQueue* sut = PQ_Create(test_comparator);
 
   PQResult result = PQ_Insert(NULL, &t);
-  CU_ASSERT_EQUAL(PQ_NullParameter, result);
+  CU_ASSERT_EQUAL(PQ_kNullParameter, result);
 
   result = PQ_Insert(sut, NULL);
-  CU_ASSERT_EQUAL(PQ_NullParameter, result);
+  CU_ASSERT_EQUAL(PQ_kNullParameter, result);
 
   PQ_Destroy(sut, NULL);
 }
@@ -109,7 +109,7 @@ static void PQ_Insert_first_item() {
   PriorityQueue* sut = PQ_Create(test_comparator);
 
   PQResult result = PQ_Insert(sut, t);
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
 
   CU_ASSERT_PTR_EQUAL(t, sut->head->payload);
   CU_ASSERT_PTR_EQUAL(t, sut->tail->payload);
@@ -124,10 +124,10 @@ static void PQ_Insert_two_items() {
   PriorityQueue* sut = PQ_Create(test_comparator);
 
   PQResult result = PQ_Insert(sut, t2);
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
 
   result = PQ_Insert(sut, t1);
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
 
   CU_ASSERT_PTR_EQUAL(t1, sut->head->payload);
   CU_ASSERT_PTR_EQUAL(t2, sut->tail->payload);
@@ -182,7 +182,7 @@ static void PQ_Remove_null_parameter() {
 
   void* result = PQ_Remove(NULL);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(PQ_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(PQ_kNullParameter, ErrorReporter_LastErrorCode());
 
   PQ_Destroy(sut, NULL);
 }
@@ -193,7 +193,7 @@ static void PQ_Remove_empty() {
 
   void* result = PQ_Remove(sut);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(PQ_EmptyQueue, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(PQ_kEmptyQueue, ErrorReporter_LastErrorCode());
 
   PQ_Destroy(sut, NULL);
 }
@@ -243,24 +243,24 @@ static void PQ_Remove_priority_order() {
   for (size_t i = 0; i < n; i++) test_obj_destroy(expected[i]);
 }
 
-static void PQ_IsEmpty_null_parameter() {
+static void PQ_IskEmpty_null_parameter() {
   ErrorReporter_Clear();
-  bool result = PQ_IsEmpty(NULL);
+  bool result = PQ_IskEmpty(NULL);
   CU_ASSERT_TRUE(result);
-  CU_ASSERT_EQUAL(PQ_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(PQ_kNullParameter, ErrorReporter_LastErrorCode());
 }
 
-static void PQ_IsEmpty_empty() {
+static void PQ_IskEmpty_empty() {
   PriorityQueue* sut = PQ_Create(NULL);
-  CU_ASSERT_TRUE(PQ_IsEmpty(sut));
+  CU_ASSERT_TRUE(PQ_IskEmpty(sut));
   PQ_Destroy(sut, NULL);
 }
 
-static void PQ_IsEmpty_not_empty() {
+static void PQ_IskEmpty_not_empty() {
   TestThingy* t = test_obj_init(1);
   PriorityQueue* sut = PQ_Create(test_comparator);
   PQ_Insert(sut, t);
-  CU_ASSERT_FALSE(PQ_IsEmpty(sut));
+  CU_ASSERT_FALSE(PQ_IskEmpty(sut));
   PQ_Destroy(sut, test_obj_destroy);
 }
 
@@ -270,7 +270,7 @@ static void PQ_Peek_null_parameter() {
 
   void* result = PQ_Peek(NULL);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(PQ_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(PQ_kNullParameter, ErrorReporter_LastErrorCode());
 
   PQ_Destroy(sut, NULL);
 }
@@ -281,7 +281,7 @@ static void PQ_Peek_empty() {
 
   void* result = PQ_Peek(sut);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(PQ_EmptyQueue, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(PQ_kEmptyQueue, ErrorReporter_LastErrorCode());
 
   PQ_Destroy(sut, NULL);
 }
@@ -303,11 +303,11 @@ static void PQ_Reprioritize_null_parameter() {
   TestThingy* t = test_obj_init(1);
 
   PQResult result = PQ_Reprioritize(NULL, t);
-  CU_ASSERT_EQUAL(PQ_NullParameter, result);
+  CU_ASSERT_EQUAL(PQ_kNullParameter, result);
 
   PriorityQueue* sut = PQ_Create(test_comparator);
   result = PQ_Reprioritize(sut, NULL);
-  CU_ASSERT_EQUAL(PQ_NullParameter, result);
+  CU_ASSERT_EQUAL(PQ_kNullParameter, result);
 
   PQ_Destroy(sut, NULL);
   test_obj_destroy(t);
@@ -320,7 +320,7 @@ static void PQ_Reprioritize_not_found() {
   PQ_Insert(sut, t);
 
   PQResult result = PQ_Reprioritize(sut, not_found);
-  CU_ASSERT_EQUAL(PQ_ItemNotFound, result);
+  CU_ASSERT_EQUAL(PQ_ItemkNotFound, result);
 
   PQ_Destroy(sut, test_obj_destroy);
   test_obj_destroy(not_found);
@@ -335,7 +335,7 @@ static void PQ_Reprioritize_first_item() {
   _items[0]->x = 10;
   PQResult result = PQ_Reprioritize(sut, _items[0]);
 
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
   CU_ASSERT_PTR_EQUAL(_items[1], sut->head->payload);
   CU_ASSERT_PTR_EQUAL(_items[0], sut->tail->payload);
 
@@ -351,7 +351,7 @@ static void PQ_Reprioritize_last_item() {
   _items[_n - 1]->x = 0;
   PQResult result = PQ_Reprioritize(sut, _items[_n - 1]);
 
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
   CU_ASSERT_PTR_EQUAL(_items[_n - 1], sut->head->payload);
   CU_ASSERT_PTR_EQUAL(_items[_n - 2], sut->tail->payload);
 
@@ -369,13 +369,13 @@ static void PQ_Reprioritize_standard() {
   _items[head]->x = 0;
   PQResult result = PQ_Reprioritize(sut, _items[head]);
 
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
   CU_ASSERT_PTR_EQUAL(_items[head], sut->head->payload);
 
   _items[tail]->x = _n * 2;
   result = PQ_Reprioritize(sut, _items[tail]);
 
-  CU_ASSERT_EQUAL(PQ_Success, result);
+  CU_ASSERT_EQUAL(PQ_kSuccess, result);
   CU_ASSERT_PTR_EQUAL(_items[tail], sut->tail->payload);
 
   PQ_Destroy(sut, test_obj_destroy);
@@ -399,9 +399,9 @@ int RegisterPriorityQueueTests() {
                                CU_TEST_INFO(PQ_Remove_empty),
                                CU_TEST_INFO(PQ_Remove_last_item),
                                CU_TEST_INFO(PQ_Remove_priority_order),
-                               CU_TEST_INFO(PQ_IsEmpty_null_parameter),
-                               CU_TEST_INFO(PQ_IsEmpty_empty),
-                               CU_TEST_INFO(PQ_IsEmpty_not_empty),
+                               CU_TEST_INFO(PQ_IskEmpty_null_parameter),
+                               CU_TEST_INFO(PQ_IskEmpty_empty),
+                               CU_TEST_INFO(PQ_IskEmpty_not_empty),
                                CU_TEST_INFO(PQ_Destroy_null),
                                CU_TEST_INFO(PQ_Peek_null_parameter),
                                CU_TEST_INFO(PQ_Peek_empty),

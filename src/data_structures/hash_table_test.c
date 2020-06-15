@@ -22,7 +22,7 @@ static void HashTable_Create_failed_malloc() {
   FAILED_MALLOC_TEST({
     HashTable* result = HashTable_Create(8);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(FailedMemoryAllocation, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -30,7 +30,7 @@ static void HashTable_Create_invalid_size() {
   ErrorReporter_Clear();
   HashTable* sut = HashTable_Create(0);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ArgumentOutOfRange, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kArgumentOutOfRange, ErrorReporter_LastErrorCode());
 }
 
 static void HashTable_Create_happy_path() {
@@ -44,17 +44,17 @@ static void HashTable_Insert_null_parameter() {
   int value = 138;
 
   Result result = HashTable_Insert(NULL, NULL, 10, NULL);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   result = HashTable_Insert(NULL, key, strlen(key), &value);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   SUT({
     result = HashTable_Insert(sut, NULL, 10, &value);
-    CU_ASSERT_EQUAL(NullParameter, result);
+    CU_ASSERT_EQUAL(kNullParameter, result);
 
     result = HashTable_Insert(sut, key, strlen(key), NULL);
-    CU_ASSERT_EQUAL(NullParameter, result);
+    CU_ASSERT_EQUAL(kNullParameter, result);
   });
 }
 
@@ -65,7 +65,7 @@ static void HashTable_Insert_failed_malloc() {
   SUT({
     FAILED_MALLOC_TEST({
       Result result = HashTable_Insert(sut, key, strlen(key), &value);
-      CU_ASSERT_EQUAL(result, FailedMemoryAllocation);
+      CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
     });
   });
 }
@@ -77,7 +77,7 @@ static void HashTable_Insert_happy_path() {
   SUT({
     CU_ASSERT_EQUAL(0, HashTable_GetN(sut));
     Result result = HashTable_Insert(sut, key, strlen(key), &value);
-    CU_ASSERT_EQUAL(Success, result);
+    CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(1, HashTable_GetN(sut));
 
     void* found = HashTable_Find(sut, key, strlen(key));
@@ -122,14 +122,14 @@ static void HashTable_Delete_null_parameter() {
   char* key = "we are";
 
   Result result = HashTable_Delete(NULL, NULL, 10);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   result = HashTable_Delete(NULL, key, 10);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   SUT({
     result = HashTable_Delete(sut, NULL, 10);
-    CU_ASSERT_EQUAL(NullParameter, result);
+    CU_ASSERT_EQUAL(kNullParameter, result);
   });
 }
 
@@ -147,7 +147,7 @@ static void HashTable_Delete_not_found() {
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 3);
 
     Result result = HashTable_Delete(sut, key4, strlen(key4));
-    CU_ASSERT_EQUAL(result, NotFound);
+    CU_ASSERT_EQUAL(result, kNotFound);
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 3);
   });
 }
@@ -167,7 +167,7 @@ static void HashTable_Delete_happy_path() {
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 4);
 
     Result result = HashTable_Delete(sut, key, strlen(key));
-    CU_ASSERT_EQUAL(result, Success);
+    CU_ASSERT_EQUAL(result, kSuccess);
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 3);
     void* found = HashTable_Find(sut, key, strlen(key));
     CU_ASSERT_PTR_NULL(found);
@@ -178,7 +178,7 @@ static void HashTable_GetLoadFactor_null_parameter() {
   ErrorReporter_Clear();
   double result = HashTable_GetLoadFactor(NULL);
   CU_ASSERT(isnan(result));
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 }
 
 static void HashTable_GetLoadFactor_happy_path() {
@@ -207,7 +207,7 @@ static void HashTable_GetN_null_paramter() {
   ErrorReporter_Clear();
   size_t result = HashTable_GetN(NULL);
   CU_ASSERT_EQUAL(result, ERROR_VAL);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 }
 
 static void HashTable_Find_null_parameter() {
@@ -216,18 +216,18 @@ static void HashTable_Find_null_parameter() {
   ErrorReporter_Clear();
   void* result = HashTable_Find(NULL, NULL, 10);
   CU_ASSERT_EQUAL(NULL, result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   ErrorReporter_Clear();
   result = HashTable_Find(NULL, key, 10);
   CU_ASSERT_EQUAL(NULL, result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   SUT({
     ErrorReporter_Clear();
     void* result = HashTable_Find(sut, NULL, 10);
     CU_ASSERT_EQUAL(NULL, result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
   });
 }
 
@@ -283,9 +283,9 @@ static void HashTable_int_keys() {
 
   SUT({
     Result result = HashTable_Insert(sut, &key, sizeof(int), value);
-    CU_ASSERT_EQUAL(result, Success);
+    CU_ASSERT_EQUAL(result, kSuccess);
     result = HashTable_Insert(sut, &key2, sizeof(int), value2);
-    CU_ASSERT_EQUAL(result, Success);
+    CU_ASSERT_EQUAL(result, kSuccess);
 
     CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key, sizeof(int)), value);
     CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key2, sizeof(int)), value2);
@@ -300,9 +300,9 @@ static void HashTable_long_keys() {
 
   SUT({
     Result result = HashTable_Insert(sut, &key, sizeof(long long int), value);
-    CU_ASSERT_EQUAL(result, Success);
+    CU_ASSERT_EQUAL(result, kSuccess);
     result = HashTable_Insert(sut, &key2, sizeof(long long int), value2);
-    CU_ASSERT_EQUAL(result, Success);
+    CU_ASSERT_EQUAL(result, kSuccess);
 
     CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key, sizeof(long long int)),
                         value);
@@ -315,7 +315,7 @@ static void HashTable_GetCollisions_null_parameter() {
   ErrorReporter_Clear();
   size_t result = HashTable_GetCollisions(NULL);
   CU_ASSERT_EQUAL(result, ERROR_VAL);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 }
 
 static void HashTable_GetCollisions_happy_path() {
@@ -338,16 +338,16 @@ static void HashTable_KeyExists_null_parameter() {
 
   bool result = HashTable_KeyExists(NULL, NULL, 10);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   result = HashTable_KeyExists(NULL, key, 10);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   SUT({
     result = HashTable_KeyExists(sut, NULL, 10);
     CU_ASSERT_FALSE(result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), NullParameter);
+    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
   });
 }
 
@@ -378,7 +378,7 @@ static void HashTable_KeyExists_returns_false_when_item_does_not_exist() {
 
 static void HashTable_Enumerate_null_parameter() {
   Result result = HashTable_Enumerate(NULL, NULL, NULL);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 }
 
 static void _itemHandler(const KeyValuePair* item, const size_t index,

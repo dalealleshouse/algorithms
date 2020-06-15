@@ -42,7 +42,7 @@ Graph* sut;
 #define SHORTEST_PATH_TESTS(ALGO)                                    \
   static void ALGO##_null_parameter() {                              \
     GraphResult result = ALGO(NULL, 1);                              \
-    CU_ASSERT_EQUAL(Graph_NullParameter, result);                    \
+    CU_ASSERT_EQUAL(Graph_kNullParameter, result);                   \
   }                                                                  \
                                                                      \
   static void ALGO##_invalid_vertex() {                              \
@@ -59,7 +59,7 @@ Graph* sut;
                                                                      \
   static void ALGO##_malloc_tester(void) {                           \
     GraphResult result = ALGO(sut, 1);                               \
-    CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);           \
+    CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);          \
   }                                                                  \
                                                                      \
   static void ALGO##_failed_malloc() {                               \
@@ -72,7 +72,7 @@ Graph* sut;
     Graph* sut = Graph_WeightedFromFile(small_n, small_path);        \
     GraphResult result = ALGO(sut, 1);                               \
                                                                      \
-    CU_ASSERT_EQUAL(Graph_Success, result);                          \
+    CU_ASSERT_EQUAL(Graph_kSuccess, result);                         \
     NodeHasDistance(sut->V[1], 0);                                   \
     NodeHasDistance(sut->V[2], 1);                                   \
     NodeHasDistance(sut->V[3], 6);                                   \
@@ -86,7 +86,7 @@ Graph* sut;
                                                                      \
     GraphResult result = ALGO(sut, 1);                               \
                                                                      \
-    CU_ASSERT_EQUAL(Graph_Success, result);                          \
+    CU_ASSERT_EQUAL(Graph_kSuccess, result);                         \
     NodeHasDistance(sut->V[1], 0);                                   \
     NodeHasDistance(sut->V[2], 1);                                   \
     NodeHasDistance(sut->V[3], 2);                                   \
@@ -103,7 +103,7 @@ Graph* sut;
     Graph* sut = Graph_WeightedFromFile(big_n, big_path);            \
                                                                      \
     GraphResult result = ALGO(sut, 1);                               \
-    CU_ASSERT_EQUAL(Graph_Success, result);                          \
+    CU_ASSERT_EQUAL(Graph_kSuccess, result);                         \
     CU_ASSERT_EQUAL(Distance(sut->V[7]), 2599);                      \
     CU_ASSERT_EQUAL(Distance(sut->V[37]), 2610);                     \
     CU_ASSERT_EQUAL(Distance(sut->V[59]), 2947);                     \

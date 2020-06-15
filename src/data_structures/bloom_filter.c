@@ -22,20 +22,20 @@ static bool is_power_2(size_t n) { return (ceil(log2(n)) == floor(log2(n))); }
 BloomFilter* BloomFilter_Create(size_t bits, size_t funcs) {
   if (bits < byte_size || !is_power_2(bits) || funcs == 0 ||
       funcs > hasher_count) {
-    ERROR(module_name, ArgumentOutOfRange);
+    ERROR(module_name, kArgumentOutOfRange);
     return NULL;
   }
 
   BloomFilter* filter = malloc(sizeof(BloomFilter));
   if (filter == NULL) {
-    ERROR(module_name, FailedMemoryAllocation);
+    ERROR(module_name, kFailedMemoryAllocation);
     return NULL;
   }
 
   filter->filter = calloc(1, bits / byte_size);
   if (filter->filter == NULL) {
     BloomFilter_Destroy(filter);
-    ERROR(module_name, FailedMemoryAllocation);
+    ERROR(module_name, kFailedMemoryAllocation);
     return NULL;
   }
 
@@ -48,7 +48,7 @@ BloomFilter* BloomFilter_Create(size_t bits, size_t funcs) {
 
 size_t BloomFilter_GetN(const BloomFilter* self) {
   if (self == NULL) {
-    ERROR(module_name, NullParameter);
+    ERROR(module_name, kNullParameter);
     return N_ERROR;
   }
 
@@ -56,7 +56,7 @@ size_t BloomFilter_GetN(const BloomFilter* self) {
 }
 
 ResultCode BloomFilter_Insert(BloomFilter* self, const char* key) {
-  if (self == NULL || key == NULL) return NullParameter;
+  if (self == NULL || key == NULL) return kNullParameter;
 
   size_t len = strlen(key);
 
@@ -69,12 +69,12 @@ ResultCode BloomFilter_Insert(BloomFilter* self, const char* key) {
   }
 
   self->n++;
-  return Success;
+  return kSuccess;
 }
 
 bool BloomFilter_Lookup(const BloomFilter* self, const char* key) {
   if (self == NULL || key == NULL) {
-    ERROR(module_name, NullParameter);
+    ERROR(module_name, kNullParameter);
     return false;
   }
 

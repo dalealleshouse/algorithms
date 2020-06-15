@@ -14,7 +14,7 @@ static Graph* _graph;
 static void Graph_Create_malloc_tester(void) {
   Graph* graph = Graph_Create(1);
   CU_ASSERT_PTR_NULL(graph);
-  CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
 }
 
 static void Graph_Create_failed_malloc() {
@@ -46,7 +46,7 @@ static void Graph_Create_initalizes_values() {
 /*************************** Graph_AddEdge ************************************/
 static void Graph_AddEdge_malloc_tester(void) {
   GraphResult result = Graph_AddEdge(_graph, 1, 2);
-  CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
+  CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);
 }
 
 static void Graph_AddEdge_failed_malloc() {
@@ -57,7 +57,7 @@ static void Graph_AddEdge_failed_malloc() {
 
 static void Graph_AddEdge_null_parameter() {
   GraphResult result = Graph_AddEdge(NULL, 1, 2);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 }
 
 static void Graph_AddEdge_invalid_head() {
@@ -83,7 +83,7 @@ static void Graph_AddEdge_intializes_values() {
 
   GraphResult result = Graph_AddEdge(graph, 1, 2);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   if (graph->V[2]->edges == NULL) {
     CU_FAIL("graph->V[2]->edges is NULL");
     return;
@@ -107,7 +107,7 @@ static void Graph_AddEdge_sets_incoming() {
 
   GraphResult result = Graph_AddEdge(graph, 1, 2);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   if (graph->V[1]->in_edges == NULL) {
     CU_FAIL("graph->V[1]->in_edges is NULL");
     return;
@@ -123,7 +123,7 @@ static void Graph_AddEdge_sets_weight_to_1() {
 
   GraphResult result = Graph_AddEdge(graph, 1, 2);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   if (graph->V[1]->in_edges == NULL) {
     CU_FAIL("graph->V[1]->in_edges is NULL");
     return;
@@ -145,10 +145,10 @@ static void Graph_AddEdge_two_edges() {
   Graph* graph = Graph_Create(10);
 
   GraphResult result = Graph_AddEdge(graph, 1, 2);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   result = Graph_AddEdge(graph, 1, 3);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   CU_ASSERT_EQUAL(graph->V[1]->in_degree, 2);
 
@@ -174,7 +174,7 @@ static void Graph_AddWeightedEdge_sets_weight() {
 
   GraphResult result = Graph_AddWeightedEdge(graph, 1, 2, expected);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   CU_ASSERT_EQUAL(expected, graph->V[1]->in_edges->weight);
   CU_ASSERT_EQUAL(expected, graph->V[2]->edges->weight);
 
@@ -184,13 +184,13 @@ static void Graph_AddWeightedEdge_sets_weight() {
 /*************************** Graph_FromFile ***********************************/
 static void Graph_FromFile_null_parameter() {
   Graph* graph = Graph_FromFile(10, NULL);
-  CU_ASSERT_EQUAL(Graph_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(Graph_kNullParameter, ErrorReporter_LastErrorCode());
   CU_ASSERT_PTR_NULL(graph);
 }
 
 static void Graph_FromFile_malloc_tester(void) {
   Graph* graph = Graph_FromFile(6, "src/utils/test_data/graph-4-2.txt");
-  CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
   CU_ASSERT_PTR_NULL(graph);
 }
 
@@ -307,7 +307,7 @@ static void Graph_Destroy_complex_graph() {
       if (j == i) continue;
 
       GraphResult result = Graph_AddEdge(graph, i, j);
-      CU_ASSERT_EQUAL(Graph_Success, result);
+      CU_ASSERT_EQUAL(Graph_kSuccess, result);
     }
   }
 

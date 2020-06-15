@@ -24,7 +24,7 @@ static HeapResult _setDataItem(Heap* self, void* item, size_t index) {
 
   // Geta a new index
   size_t* i = malloc(sizeof(index));
-  if (i == NULL) return HeapFailedMemoryAllocation;
+  if (i == NULL) return HeapkFailedMemoryAllocation;
 
   // Set the index in the hash table
   *i = index;
@@ -32,19 +32,19 @@ static HeapResult _setDataItem(Heap* self, void* item, size_t index) {
 
   // Update the data
   self->data[index] = item;
-  return HeapSuccess;
+  return HeapkSuccess;
 }
 
 static HeapResult _swap(Heap* self, size_t x, size_t y) {
   void* temp = self->data[x];
   HeapResult result = _setDataItem(self, self->data[y], x);
-  if (result != HeapSuccess) return result;
+  if (result != HeapkSuccess) return result;
 
   result = _setDataItem(self, temp, y);
-  if (result != HeapSuccess) return result;
+  if (result != HeapkSuccess) return result;
   /* data[x] = data[y]; */
   /* data[y] = temp; */
-  return HeapSuccess;
+  return HeapkSuccess;
 }
 
 static HeapResult _bubbleUp(Heap* self, size_t start) {
@@ -56,12 +56,12 @@ static HeapResult _bubbleUp(Heap* self, size_t start) {
     if (comp_result <= 0) break;
 
     HeapResult result = _swap(self, start, parent_index);
-    if (result != HeapSuccess) return result;
+    if (result != HeapkSuccess) return result;
 
     start = parent_index;
   }
 
-  return HeapSuccess;
+  return HeapkSuccess;
 }
 
 static size_t _greatestPriority(Heap* self, size_t x, size_t y) {
@@ -84,15 +84,15 @@ static HeapResult _bubbleDown(Heap* self, size_t start) {
 
     int comp_result = self->comparator(self->data[start], self->data[child]);
 
-    if (comp_result >= 0) return HeapSuccess;
+    if (comp_result >= 0) return HeapkSuccess;
 
     HeapResult result = _swap(self, start, child);
-    if (result != HeapSuccess) return result;
+    if (result != HeapkSuccess) return result;
 
     start = child;
   }
 
-  return HeapSuccess;
+  return HeapkSuccess;
 }
 
 // Find a valid size for the hash table
@@ -111,7 +111,7 @@ static size_t _nextPowerOf2(size_t val) {
 
 Heap* Heap_Create(size_t size, comparator comparator) {
   if (comparator == NULL) {
-    HEAP_ERROR(HeapNullParameter);
+    HEAP_ERROR(HeapkNullParameter);
     return NULL;
   }
 
@@ -121,21 +121,21 @@ Heap* Heap_Create(size_t size, comparator comparator) {
   }
 
   if (is_mul_overflow_size_t(sizeof(void*), size)) {
-    HEAP_ERROR(HeapArithmeticOverflow);
+    HEAP_ERROR(HeapkArithmeticOverflow);
     return NULL;
   }
 
   Heap* self = malloc(sizeof(Heap));
 
   if (self == NULL) {
-    HEAP_ERROR(HeapFailedMemoryAllocation);
+    HEAP_ERROR(HeapkFailedMemoryAllocation);
     return NULL;
   }
 
   self->data = malloc(sizeof(void*) * size);
 
   if (self->data == NULL) {
-    HEAP_ERROR(HeapFailedMemoryAllocation);
+    HEAP_ERROR(HeapkFailedMemoryAllocation);
     Heap_Destroy(self, NULL);
     return NULL;
   }
@@ -168,59 +168,59 @@ void Heap_Destroy(Heap* self, freer freer) {
 }
 
 HeapResult Heap_Insert(Heap* self, void* item) {
-  if (self == NULL || item == NULL) return HeapNullParameter;
+  if (self == NULL || item == NULL) return HeapkNullParameter;
 
   if (self->size == self->n) return HeapOverflow;
 
   HeapResult result = _setDataItem(self, item, self->n);
-  if (result != HeapSuccess) return result;
+  if (result != HeapkSuccess) return result;
 
   result = _bubbleUp(self, self->n);
-  if (result != HeapSuccess) return result;
+  if (result != HeapkSuccess) return result;
 
   self->n++;
 
-  return HeapSuccess;
+  return HeapkSuccess;
 }
 
 HeapResult Heap_Resize(Heap* self, size_t size) {
-  if (self == NULL) return HeapNullParameter;
+  if (self == NULL) return HeapkNullParameter;
 
   if (size < self->n) return HeapInvalidSize;
 
   if (is_mul_overflow_size_t(size, sizeof(void*))) {
-    return HeapArithmeticOverflow;
+    return HeapkArithmeticOverflow;
   }
 
   void* new_data = realloc(self->data, sizeof(void*) * size);
-  if (new_data == NULL) return HeapFailedMemoryAllocation;
+  if (new_data == NULL) return HeapkFailedMemoryAllocation;
 
   self->data = new_data;
   self->size = size;
 
-  return HeapSuccess;
+  return HeapkSuccess;
 }
 
 void* Heap_Extract(Heap* self) {
   if (self == NULL) {
-    HEAP_ERROR(HeapNullParameter);
+    HEAP_ERROR(HeapkNullParameter);
     return NULL;
   }
 
-  if (Heap_IsEmpty(self)) {
-    HEAP_ERROR(HeapEmpty);
+  if (Heap_IskEmpty(self)) {
+    HEAP_ERROR(HeapkEmpty);
     return NULL;
   }
 
   void* item = self->data[0];
   self->n--;
   HeapResult result = _swap(self, 0, self->n);
-  if (result != HeapSuccess) {
+  if (result != HeapkSuccess) {
     HEAP_ERROR(result);
   }
 
   result = _bubbleDown(self, 0);
-  if (result != HeapSuccess) {
+  if (result != HeapkSuccess) {
     HEAP_ERROR(result);
   }
 
@@ -229,21 +229,21 @@ void* Heap_Extract(Heap* self) {
 
 void* Heap_Peek(Heap* self) {
   if (self == NULL) {
-    HEAP_ERROR(HeapNullParameter);
+    HEAP_ERROR(HeapkNullParameter);
     return NULL;
   }
 
-  if (Heap_IsEmpty(self)) {
-    HEAP_ERROR(HeapEmpty);
+  if (Heap_IskEmpty(self)) {
+    HEAP_ERROR(HeapkEmpty);
     return NULL;
   }
 
   return self->data[0];
 }
 
-bool Heap_IsEmpty(Heap* self) {
+bool Heap_IskEmpty(Heap* self) {
   if (self == NULL) {
-    HEAP_ERROR(HeapNullParameter);
+    HEAP_ERROR(HeapkNullParameter);
     return true;
   }
 
@@ -254,7 +254,7 @@ bool Heap_IsEmpty(Heap* self) {
 
 bool Heap_Exists(Heap* self, void* findMe) {
   if (self == NULL || findMe == NULL) {
-    HEAP_ERROR(HeapNullParameter);
+    HEAP_ERROR(HeapkNullParameter);
     return false;
   }
 
@@ -264,10 +264,10 @@ bool Heap_Exists(Heap* self, void* findMe) {
 }
 
 HeapResult Heap_Reproiritize(Heap* self, void* item) {
-  if (self == NULL || item == NULL) return HeapNullParameter;
+  if (self == NULL || item == NULL) return HeapkNullParameter;
 
   size_t* index = HashTable_Find(self->item_tracker, &item, sizeof(void*));
-  if (index == NULL) return HeapItemNotFound;
+  if (index == NULL) return HeapItemkNotFound;
 
   // Index is the first item in queue, so it can only go down
   if (*index == 0) return _bubbleDown(self, *index);
@@ -278,7 +278,7 @@ HeapResult Heap_Reproiritize(Heap* self, void* item) {
       self->comparator(self->data[*index], self->data[parent_index]);
 
   // If they are equal, no need to move anything
-  if (comp_result == 0) return HeapSuccess;
+  if (comp_result == 0) return HeapkSuccess;
 
   // If it is greater, then bubble it up
   if (comp_result > 0) return _bubbleUp(self, *index);
@@ -289,22 +289,22 @@ HeapResult Heap_Reproiritize(Heap* self, void* item) {
 
 char* Heap_ErrorMessage(HeapResult result) {
   switch (result) {
-    case HeapItemNotFound:
+    case HeapItemkNotFound:
       return "The specified item was not found in the heap";
-    case HeapArithmeticOverflow:
+    case HeapkArithmeticOverflow:
       return "An operation caused an arithmetic overflow";
     case HeapOverflow:
       return "Attempted to place more items in the heap than it is sized for";
-    case HeapEmpty:
+    case HeapkEmpty:
       return "Attempted operation on an empty heap";
-    case HeapFailedMemoryAllocation:
+    case HeapkFailedMemoryAllocation:
       return "Failed to allocate memory";
     case HeapInvalidSize:
       return "n must be greater than zero.";
-    case HeapNullParameter:
+    case HeapkNullParameter:
       return "One of the required parameters passed to the function is NULL";
-    case HeapSuccess:
-      return "Success";
+    case HeapkSuccess:
+      return "kSuccess";
     case HeapHashTableError:
       return "The HashTable object used to locate Heap items caused an error";
     default:

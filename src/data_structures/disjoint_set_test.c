@@ -15,7 +15,7 @@
   {                                             \
     DisjointSet sut;                            \
     Result result = DisjointSet_Init(&sut, 10); \
-    CU_ASSERT_EQUAL(result, Success);           \
+    CU_ASSERT_EQUAL(result, kSuccess);          \
                                                 \
     code_block;                                 \
                                                 \
@@ -27,14 +27,14 @@
  ******************************************************************************/
 static void DisjointSet_Init_null_parameter() {
   Result result = DisjointSet_Init(NULL, 0);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 }
 
 static void DisjointSet_Init_invalid_size() {
   DisjointSet sut;
 
   Result result = DisjointSet_Init(&sut, 0);
-  CU_ASSERT_EQUAL(result, ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(result, kArgumentOutOfRange);
 }
 
 static void DisjointSet_Init_hash_table() {
@@ -56,20 +56,20 @@ static void DisjointSet_MakeSet_null_parameter() {
   SetItem* set;
 
   Result _result = DisjointSet_MakeSet(NULL, NULL, NULL);
-  CU_ASSERT_EQUAL(_result, NullParameter);
+  CU_ASSERT_EQUAL(_result, kNullParameter);
 
   _result = DisjointSet_MakeSet(NULL, &some_pointer, &set);
-  CU_ASSERT_EQUAL(_result, NullParameter);
+  CU_ASSERT_EQUAL(_result, kNullParameter);
 
   SUT(10, {
     _result = DisjointSet_MakeSet(&sut, NULL, NULL);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
 
     _result = DisjointSet_MakeSet(&sut, &some_pointer, NULL);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
 
     _result = DisjointSet_MakeSet(&sut, NULL, &set);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
   });
 }
 
@@ -78,10 +78,10 @@ static void DisjointSet_MakeSet_item_exists() {
     int some_pointer;
     SetItem* set;
     Result _result = DisjointSet_MakeSet(&sut, &some_pointer, &set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
 
     _result = DisjointSet_MakeSet(&sut, &some_pointer, &set);
-    CU_ASSERT_EQUAL(_result, Duplicate);
+    CU_ASSERT_EQUAL(_result, kDuplicate);
   });
 }
 
@@ -91,7 +91,7 @@ static void DisjointSet_MakeSet_failed_malloc() {
   SUT(10, {
     FAILED_MALLOC_TEST({
       Result _result = DisjointSet_MakeSet(&sut, &some_pointer, &item);
-      CU_ASSERT_EQUAL(_result, FailedMemoryAllocation);
+      CU_ASSERT_EQUAL(_result, kFailedMemoryAllocation);
     });
   });
 }
@@ -101,7 +101,7 @@ static void DisjointSet_MakeSet_inits_set_values() {
     int some_pointer;
     SetItem* set;
     Result _result = DisjointSet_MakeSet(&sut, &some_pointer, &set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
 
     CU_ASSERT_PTR_EQUAL(set->parent, set);
     CU_ASSERT_PTR_EQUAL(set->payload, &some_pointer);
@@ -115,7 +115,7 @@ static void DisjointSet_MakeSet_increments_num_sets() {
     int some_pointer;
     SetItem* set;
     Result _result = DisjointSet_MakeSet(&sut, &some_pointer, &set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_EQUAL(sut.num_sets, 1);
   });
 }
@@ -128,20 +128,20 @@ static void DisjointSet_FindSet_null_parameter() {
   SetItem* set;
 
   Result _result = DisjointSet_FindSet(NULL, NULL, NULL);
-  CU_ASSERT_EQUAL(_result, NullParameter);
+  CU_ASSERT_EQUAL(_result, kNullParameter);
 
   _result = DisjointSet_FindSet(NULL, &some_pointer, &set);
-  CU_ASSERT_EQUAL(_result, NullParameter);
+  CU_ASSERT_EQUAL(_result, kNullParameter);
 
   SUT(10, {
     _result = DisjointSet_FindSet(&sut, NULL, NULL);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
 
     _result = DisjointSet_FindSet(&sut, &some_pointer, NULL);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
 
     _result = DisjointSet_FindSet(&sut, NULL, &set);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
   });
 }
 
@@ -150,7 +150,7 @@ static void DisjointSet_FindSet_not_found() {
     int some_pointer;
     SetItem* set;
     Result _result = DisjointSet_FindSet(&sut, &some_pointer, &set);
-    CU_ASSERT_EQUAL(_result, NotFound);
+    CU_ASSERT_EQUAL(_result, kNotFound);
   });
 }
 
@@ -159,12 +159,12 @@ static void DisjointSet_FindSet_returns_self() {
     int some_pointer;
     SetItem* set = NULL;
     Result _result = DisjointSet_MakeSet(&sut, &some_pointer, &set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(set);
 
     SetItem* found_set = NULL;
     _result = DisjointSet_FindSet(&sut, &some_pointer, &found_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_EQUAL(set, found_set);
   });
 }
@@ -189,18 +189,18 @@ static void DisjointSet_FindSet_compresses_paths() {
   SUT(10, {
     for (size_t i = 0; i < 10; i++) {
       _result = DisjointSet_MakeSet(&sut, &vals[i], &set);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
       CU_ASSERT_PTR_NOT_NULL(set);
     }
 
     for (size_t i = 1; i < 10; i++) {
       _result = DisjointSet_Union(&sut, &vals[i - 1], &vals[i]);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
     }
 
     // Find the representative set
     _result = DisjointSet_FindSet(&sut, &vals[0], &rep);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
 
     // If the paths are properly compressed, the rep will have a path length
     // of 0 and all others will have a path length of 1
@@ -225,20 +225,20 @@ static void DisjointSet_Union_null_parameter() {
   int x = 1, y = 2;
 
   Result _result = DisjointSet_Union(NULL, NULL, NULL);
-  CU_ASSERT_EQUAL(_result, NullParameter);
+  CU_ASSERT_EQUAL(_result, kNullParameter);
 
   _result = DisjointSet_Union(NULL, &x, &y);
-  CU_ASSERT_EQUAL(_result, NullParameter);
+  CU_ASSERT_EQUAL(_result, kNullParameter);
 
   SUT(10, {
     _result = DisjointSet_Union(&sut, NULL, NULL);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
 
     _result = DisjointSet_Union(&sut, &x, NULL);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
 
     _result = DisjointSet_Union(&sut, NULL, &y);
-    CU_ASSERT_EQUAL(_result, NullParameter);
+    CU_ASSERT_EQUAL(_result, kNullParameter);
   });
 }
 
@@ -248,16 +248,16 @@ static void DisjointSet_Union_not_found() {
 
   SUT(10, {
     Result _result = DisjointSet_Union(&sut, &x, &y);
-    CU_ASSERT_EQUAL(_result, NotFound);
+    CU_ASSERT_EQUAL(_result, kNotFound);
 
     _result = DisjointSet_MakeSet(&sut, &x, &set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
 
     _result = DisjointSet_Union(&sut, &x, &y);
-    CU_ASSERT_EQUAL(_result, NotFound);
+    CU_ASSERT_EQUAL(_result, kNotFound);
 
     _result = DisjointSet_Union(&sut, &y, &x);
-    CU_ASSERT_EQUAL(_result, NotFound);
+    CU_ASSERT_EQUAL(_result, kNotFound);
   });
 }
 
@@ -268,27 +268,27 @@ static void DisjointSet_Union_unions_sets() {
 
   SUT(10, {
     Result _result = DisjointSet_MakeSet(&sut, &x, &x_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(x_set);
 
     _result = DisjointSet_MakeSet(&sut, &y, &y_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(y_set);
 
     CU_ASSERT_EQUAL(sut.num_sets, 2);
 
     _result = DisjointSet_Union(&sut, &x, &y);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
 
     x_set = NULL;
     y_set = NULL;
 
     _result = DisjointSet_FindSet(&sut, &x, &x_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(x_set);
 
     _result = DisjointSet_FindSet(&sut, &y, &y_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(y_set);
 
     CU_ASSERT_PTR_EQUAL(x_set, y_set);
@@ -305,7 +305,7 @@ static void DisjointSet_Union_unions_several() {
   SUT(10, {
     for (size_t i = 0; i < 10; i++) {
       _result = DisjointSet_MakeSet(&sut, &vals[i], &set);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
       CU_ASSERT_PTR_NOT_NULL(set);
     }
 
@@ -313,7 +313,7 @@ static void DisjointSet_Union_unions_several() {
 
     for (size_t i = 1; i < 10; i++) {
       _result = DisjointSet_Union(&sut, &vals[i - 1], &vals[i]);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
     }
 
     CU_ASSERT_EQUAL(sut.num_sets, 1);
@@ -321,7 +321,7 @@ static void DisjointSet_Union_unions_several() {
 
     for (size_t i = 0; i < 10; i++) {
       _result = DisjointSet_FindSet(&sut, &vals[i], &set);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
       CU_ASSERT_PTR_EQUAL(set, should);
     }
   });
@@ -336,7 +336,7 @@ static void DisjointSet_Union_two_sets() {
   SUT(10, {
     for (size_t i = 0; i < 10; i++) {
       _result = DisjointSet_MakeSet(&sut, &vals[i], &set);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
       CU_ASSERT_PTR_NOT_NULL(set);
     }
 
@@ -344,12 +344,12 @@ static void DisjointSet_Union_two_sets() {
 
     for (size_t i = 1; i < 5; i++) {
       _result = DisjointSet_Union(&sut, &vals[i - 1], &vals[i]);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
     }
 
     for (size_t i = 6; i < 10; i++) {
       _result = DisjointSet_Union(&sut, &vals[i - 1], &vals[i]);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
     }
 
     CU_ASSERT_EQUAL(sut.num_sets, 2);
@@ -357,14 +357,14 @@ static void DisjointSet_Union_two_sets() {
     _result = DisjointSet_FindSet(&sut, &vals[0], &should);
     for (size_t i = 0; i < 5; i++) {
       _result = DisjointSet_FindSet(&sut, &vals[i], &set);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
       CU_ASSERT_PTR_EQUAL(set, should);
     }
 
     _result = DisjointSet_FindSet(&sut, &vals[5], &should);
     for (size_t i = 6; i < 10; i++) {
       _result = DisjointSet_FindSet(&sut, &vals[i], &set);
-      CU_ASSERT_EQUAL(_result, Success);
+      CU_ASSERT_EQUAL(_result, kSuccess);
       CU_ASSERT_PTR_EQUAL(set, should);
     }
   });
@@ -377,19 +377,19 @@ static void DisjointSet_Union_ignores_already_joined() {
 
   SUT(10, {
     Result _result = DisjointSet_MakeSet(&sut, &x, &x_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(x_set);
 
     _result = DisjointSet_MakeSet(&sut, &y, &y_set);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_PTR_NOT_NULL(y_set);
 
     _result = DisjointSet_Union(&sut, &x, &y);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_EQUAL(sut.num_sets, 1);
 
     _result = DisjointSet_Union(&sut, &x, &y);
-    CU_ASSERT_EQUAL(_result, Success);
+    CU_ASSERT_EQUAL(_result, kSuccess);
     CU_ASSERT_EQUAL(sut.num_sets, 1);
   });
 }

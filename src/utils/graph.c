@@ -43,35 +43,35 @@ static void VertexDestroy(Vertex* vertex, freer freer) {
  * and such.
  */
 static GraphResult Graph_AddVertex(Graph* self, vertex_id id, void* data) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   if (id < 0) return Graph_InvalidVertexId;
 
   if (id >= self->n) return Graph_VertexIdExceedsMaxSize;
 
-  if (self->V[id] != NULL) return Graph_DuplicateVertexId;
+  if (self->V[id] != NULL) return Graph_kDuplicateVertexId;
 
   Vertex* v = calloc(sizeof(Vertex), 1);
-  if (v == NULL) return Graph_FailedMemoryAllocation;
+  if (v == NULL) return Graph_kFailedMemoryAllocation;
 
   v->id = id;
   v->data = data;
 
   self->V[id] = v;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 static void AddVertex_PrintError(Graph* self, vertex_id id) {
   GraphResult result = Graph_AddVertex(self, id, NULL);
-  if (result != Graph_Success) GRAPH_ERROR(result);  // NOLINT
+  if (result != Graph_kSuccess) GRAPH_ERROR(result);  // NOLINT
 }
 
 Graph* Graph_Create(size_t n) {
   Graph* graph = malloc(sizeof(Graph));
 
   if (graph == NULL) {
-    GRAPH_ERROR(Graph_FailedMemoryAllocation);  // NOLINT
+    GRAPH_ERROR(Graph_kFailedMemoryAllocation);  // NOLINT
     return NULL;
   }
 
@@ -99,31 +99,31 @@ static Edge* Graph_EdgeInit(vertex_id head, vertex_id tail, int weight) {
 static GraphResult Graph_AddInEdge(Graph* self, vertex_id head, vertex_id tail,
                                    int weight) {
   Edge* edge = Graph_EdgeInit(head, tail, weight);
-  if (edge == NULL) return Graph_FailedMemoryAllocation;
+  if (edge == NULL) return Graph_kFailedMemoryAllocation;
 
   edge->next = self->V[head]->in_edges;
   self->V[head]->in_degree++;
   self->V[head]->in_edges = edge;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 // It is assumed that all parameters are validated by the caller
 static GraphResult Graph_AddOutEdge(Graph* self, vertex_id head, vertex_id tail,
                                     int weight) {
   Edge* edge = Graph_EdgeInit(head, tail, weight);
-  if (edge == NULL) return Graph_FailedMemoryAllocation;
+  if (edge == NULL) return Graph_kFailedMemoryAllocation;
 
   edge->next = self->V[tail]->edges;
   self->V[tail]->out_degree++;
   self->V[tail]->edges = edge;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 GraphResult Graph_AddWeightedEdge(Graph* self, vertex_id head, vertex_id tail,
                                   int weight) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   if (head >= self->n || tail >= self->n) return Graph_VertexIdExceedsMaxSize;
 
@@ -134,14 +134,14 @@ GraphResult Graph_AddWeightedEdge(Graph* self, vertex_id head, vertex_id tail,
   GraphResult result;
 
   result = Graph_AddInEdge(self, head, tail, weight);
-  if (result != Graph_Success) return result;
+  if (result != Graph_kSuccess) return result;
 
   result = Graph_AddOutEdge(self, head, tail, weight);
-  if (result != Graph_Success) return result;
+  if (result != Graph_kSuccess) return result;
 
   self->m++;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 GraphResult Graph_AddEdge(Graph* self, vertex_id head, vertex_id tail) {
@@ -157,13 +157,13 @@ static GraphResult non_weight_parser(Graph* g, FILE* file) {
     vertex_id edge = strtoul(remaining, &remaining, 10);
     while (edge != 0) {
       GraphResult result = Graph_AddEdge(g, edge, vertex);
-      if (result != Graph_Success) return result;
+      if (result != Graph_kSuccess) return result;
 
       edge = strtoumax(remaining, &remaining, 10);
     }
   }
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 static EdgeTuple parse_edge_tuple(char* tuple) {
@@ -192,20 +192,20 @@ static GraphResult weighted_parser(Graph* g, FILE* file) {
     while (tok != NULL && strcmp(tok, "\n") != 0) {
       EdgeTuple t = parse_edge_tuple(tok);
       GraphResult result = Graph_AddWeightedEdge(g, t.head, vertex, t.weight);
-      if (result != Graph_Success) return result;
+      if (result != Graph_kSuccess) return result;
 
       tok = strtok(0, seperator);
     }
   }
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 typedef GraphResult (*line_parser)(Graph*, FILE*);
 static Graph* Graph_Parser(const size_t n, const char* path,
                            line_parser line_parser) {
   if (path == NULL) {
-    GRAPH_ERROR(Graph_NullParameter);  // NOLINT
+    GRAPH_ERROR(Graph_kNullParameter);  // NOLINT
     return NULL;
   }
 
@@ -221,7 +221,7 @@ static Graph* Graph_Parser(const size_t n, const char* path,
 
   Graph* g = Graph_Create(n);
   if (g == NULL) {
-    GRAPH_ERROR(Graph_FailedMemoryAllocation);  // NOLINT
+    GRAPH_ERROR(Graph_kFailedMemoryAllocation);  // NOLINT
     fclose(file);
     return NULL;
   }
@@ -229,7 +229,7 @@ static Graph* Graph_Parser(const size_t n, const char* path,
   GraphResult result = line_parser(g, file);
   fclose(file);
 
-  if (result != Graph_Success) {
+  if (result != Graph_kSuccess) {
     Graph_Destroy(g, NULL);
     GRAPH_ERROR(result);  // NOLINT
     return NULL;
@@ -320,7 +320,7 @@ void Graph_Destroy(Graph* self, freer freer) {
 
 char* Graph_ErrorMessage(GraphResult result) {
   switch (result) {
-    case Graph_ArithmeticOverflow:
+    case Graph_kArithmeticOverflow:
       return "An arithmetic overflow occured.";
     case Graph_NegativeCycle:
       return "A negative cycle was detected.";
@@ -332,16 +332,16 @@ char* Graph_ErrorMessage(GraphResult result) {
       return "Invalid file path";
     case Graph_VertexIdExceedsMaxSize:
       return "The ID of the vertex is greater than max size";
-    case Graph_DuplicateVertexId:
+    case Graph_kDuplicateVertexId:
       return "Attempt to add two vertices with the same id";
     case Graph_InvalidVertexId:
       return "Invalid vertex ID";
-    case Graph_FailedMemoryAllocation:
+    case Graph_kFailedMemoryAllocation:
       return "Failed to allocate memory";
-    case Graph_NullParameter:
+    case Graph_kNullParameter:
       return "One of the required parameters passed to the function is NULL";
-    case Graph_Success:
-      return "Success";
+    case Graph_kSuccess:
+      return "kSuccess";
     default:
       return "Unknown error code";
   }

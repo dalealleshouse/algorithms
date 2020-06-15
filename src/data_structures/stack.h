@@ -4,9 +4,9 @@
 #include <stddef.h>
 
 typedef enum {
-  Stack_NullParameter = -2,
+  Stack_kNullParameter = -2,
   Stack_FailedMalloc = -1,
-  Stack_Success = 0
+  Stack_kSuccess = 0
 } StackResult;
 
 typedef struct Stack_Item {
@@ -22,5 +22,5 @@ typedef struct Stack {
 Stack* Stack_Create();
 StackResult Stack_Push(Stack*, void*);
 void* Stack_Pop(Stack*);
-bool Stack_IsEmpty(Stack*);
+bool Stack_IskEmpty(Stack*);
 void Stack_Destroy(Stack*);

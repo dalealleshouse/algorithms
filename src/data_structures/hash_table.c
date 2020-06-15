@@ -85,7 +85,7 @@ static KeyValuePair* search_list(LinkedList* list, void* key,
 
 HashTable* HashTable_Create(size_t size) {
   if (size == 0) {
-    ERROR("HashTable", ArgumentOutOfRange);
+    ERROR("HashTable", kArgumentOutOfRange);
     return NULL;
   }
 
@@ -93,13 +93,13 @@ HashTable* HashTable_Create(size_t size) {
 
   HashTable* ht = calloc(sizeof(HashTable), 1);
   if (ht == NULL) {
-    ERROR("HashTable", FailedMemoryAllocation);
+    ERROR("HashTable", kFailedMemoryAllocation);
     return NULL;
   }
 
   ht->table = calloc(sizeof(void*), valid_size);
   if (ht->table == NULL) {
-    ERROR("HashTable", FailedMemoryAllocation);
+    ERROR("HashTable", kFailedMemoryAllocation);
     HashTable_Destroy(ht, NULL);
     return NULL;
   }
@@ -110,7 +110,7 @@ HashTable* HashTable_Create(size_t size) {
 }
 
 Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
-  if (self == NULL || key == NULL || value == NULL) return NullParameter;
+  if (self == NULL || key == NULL || value == NULL) return kNullParameter;
 
   size_t index = generate_index(key, len, self->m);
 
@@ -120,7 +120,7 @@ Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
   if (ls == NULL) {
     self->table[index] =
         LinkedList_Create(KeyValuePair_destroy, ele_comparator);
-    if (self->table[index] == NULL) return FailedMemoryAllocation;
+    if (self->table[index] == NULL) return kFailedMemoryAllocation;
 
     ls = self->table[index];
   } else {
@@ -132,27 +132,27 @@ Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
       self->collisons++;
     } else {
       el->value = value;
-      return Success;
+      return kSuccess;
     }
   }
 
   // Insert the value if it exists, otherwise update it
   if (el == NULL) {
     el = KeyValuePair_create(key, len, value);
-    if (el == NULL) return FailedMemoryAllocation;
+    if (el == NULL) return kFailedMemoryAllocation;
 
     ListOpResult result = LinkedList_InsertAt(ls, el, 0);
-    if (result != ListOp_Success) return DependancyError;
+    if (result != kkSuccess) return kDependancyError;
   }
 
   self->n++;
 
-  return Success;
+  return kSuccess;
 }
 
 size_t HashTable_GetN(HashTable* self) {
   if (self == NULL) {
-    ERROR("HashTable", NullParameter);
+    ERROR("HashTable", kNullParameter);
     return ERROR_VAL;
   }
 
@@ -161,7 +161,7 @@ size_t HashTable_GetN(HashTable* self) {
 
 size_t HashTable_GetCollisions(HashTable* self) {
   if (self == NULL) {
-    ERROR("HashTable", NullParameter);
+    ERROR("HashTable", kNullParameter);
     return ERROR_VAL;
   }
 
@@ -169,27 +169,27 @@ size_t HashTable_GetCollisions(HashTable* self) {
 }
 
 Result HashTable_Delete(HashTable* self, void* key, size_t len) {
-  if (self == NULL || key == NULL) return NullParameter;
+  if (self == NULL || key == NULL) return kNullParameter;
 
   size_t index = generate_index(key, len, self->m);
   LinkedList* ls = self->table[index];
 
-  if (ls == NULL) return NotFound;
+  if (ls == NULL) return kNotFound;
 
   KeyValuePair* el = search_list(ls, key, len);
-  if (el == NULL) return NotFound;
+  if (el == NULL) return kNotFound;
 
   KeyValuePair temp = {key, len, NULL};
   ListOpResult result = LinkedList_Delete(ls, &temp);
-  if (result != ListOp_Success) return DependancyError;
+  if (result != kkSuccess) return kDependancyError;
 
   self->n--;
-  return Success;
+  return kSuccess;
 }
 
 double HashTable_GetLoadFactor(HashTable* self) {
   if (self == NULL) {
-    ERROR("HashTable", NullParameter);
+    ERROR("HashTable", kNullParameter);
     return NAN;
   }
 
@@ -198,7 +198,7 @@ double HashTable_GetLoadFactor(HashTable* self) {
 
 bool HashTable_KeyExists(HashTable* self, void* key, size_t len) {
   if (self == NULL || key == NULL) {
-    ERROR("HashTable", NullParameter);
+    ERROR("HashTable", kNullParameter);
     return false;
   }
 
@@ -218,20 +218,20 @@ bool HashTable_KeyExists(HashTable* self, void* key, size_t len) {
 
 void* HashTable_Find(HashTable* self, void* key, size_t len) {
   if (self == NULL || key == NULL) {
-    ERROR("HashTable", NullParameter);
+    ERROR("HashTable", kNullParameter);
     return NULL;
   }
 
   size_t index = generate_index(key, len, self->m);
   LinkedList* ls = self->table[index];
   if (ls == NULL) {
-    /*     ERROR("HashTable", NotFound); */
+    /*     ERROR("HashTable", kNotFound); */
     return NULL;
   }
 
   KeyValuePair* el = search_list(ls, key, len);
   if (el == NULL) {
-    /*     ERROR("HashTable", NotFound); */
+    /*     ERROR("HashTable", kNotFound); */
     return NULL;
   }
 
@@ -240,7 +240,7 @@ void* HashTable_Find(HashTable* self, void* key, size_t len) {
 
 Result HashTable_Enumerate(HashTable* self, keyvaluehandler func,
                            void* context) {
-  if (self == NULL || func == NULL) return NullParameter;
+  if (self == NULL || func == NULL) return kNullParameter;
 
   size_t index = 0;
   for (size_t i = 0; i < self->m; i++) {
@@ -256,7 +256,7 @@ Result HashTable_Enumerate(HashTable* self, keyvaluehandler func,
       item = item->next;
     }
   }
-  return Success;
+  return kSuccess;
 }
 
 void HashTable_Destroy(HashTable* self, freer freer) {

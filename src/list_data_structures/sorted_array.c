@@ -1,5 +1,5 @@
 // Copyright 2020 Dale Alleshouse
-#include "./sorted_array.h"
+#include "sorted_array.h"
 
 #include <stdio.h>
 
@@ -7,7 +7,7 @@ static void* BinarySearch(const void* arr, comparator comparator,
                           const void* search_for, const size_t n,
                           const size_t item_size) {
   if (n <= 0) {
-    LIST_ERROR("Sorted Array", ListOp_NotFound);
+    LIST_ERROR("Sorted Array", kkNotFound);
     return NULL;
   }
 
@@ -35,7 +35,7 @@ static size_t FindIndex(const Array* sut, void* ptr) {
 
 void* SortedArray_Search(const Array* self, const void* item) {
   if (self == NULL || item == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return NULL;
   }
 
@@ -45,12 +45,12 @@ void* SortedArray_Search(const Array* self, const void* item) {
 
 void* SortedArray_Min(const Array* self) {
   if (self == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return NULL;
   }
 
   if (self->n == 0) {
-    LIST_ERROR("Sorted Array", ListOp_EmptyList);
+    LIST_ERROR("Sorted Array", kkEmptyList);
     return NULL;
   }
 
@@ -59,12 +59,12 @@ void* SortedArray_Min(const Array* self) {
 
 void* SortedArray_Max(const Array* self) {
   if (self == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return NULL;
   }
 
   if (self->n == 0) {
-    LIST_ERROR("Sorted Array", ListOp_EmptyList);
+    LIST_ERROR("Sorted Array", kkEmptyList);
     return NULL;
   }
 
@@ -73,12 +73,12 @@ void* SortedArray_Max(const Array* self) {
 
 void* SortedArray_Predecessor(const Array* self, const void* item) {
   if (self == NULL || item == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return NULL;
   }
 
   if (self->n == 0) {
-    LIST_ERROR("Sorted Array", ListOp_EmptyList);
+    LIST_ERROR("Sorted Array", kkEmptyList);
     return NULL;
   }
 
@@ -92,12 +92,12 @@ void* SortedArray_Predecessor(const Array* self, const void* item) {
 
 void* SortedArray_Successor(const Array* self, const void* item) {
   if (self == NULL || item == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return NULL;
   }
 
   if (self->n == 0) {
-    LIST_ERROR("Sorted Array", ListOp_EmptyList);
+    LIST_ERROR("Sorted Array", kkEmptyList);
     return NULL;
   }
 
@@ -113,12 +113,12 @@ void* SortedArray_Successor(const Array* self, const void* item) {
 
 void* SortedArray_Select(const Array* self, const size_t index) {
   if (self == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return NULL;
   }
 
   if (index >= self->n) {
-    LIST_ERROR("Sorted Array", ListOp_InvalidIndex);
+    LIST_ERROR("Sorted Array", kkInvalidIndex);
     return NULL;
   }
 
@@ -128,12 +128,12 @@ void* SortedArray_Select(const Array* self, const size_t index) {
 // Returns RANK_ERROR for item not found or error
 size_t SortedArray_Rank(const Array* self, const void* item) {
   if (self == NULL || item == NULL) {
-    LIST_ERROR("Sorted Array", ListOp_NullParameter);
+    LIST_ERROR("Sorted Array", kkNullParameter);
     return RANK_ERROR;
   }
 
   if (self->n == 0) {
-    LIST_ERROR("Sorted Array", ListOp_EmptyList);
+    LIST_ERROR("Sorted Array", kkEmptyList);
     return RANK_ERROR;
   }
 

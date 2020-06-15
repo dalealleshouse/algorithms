@@ -24,7 +24,7 @@ static Knapsack* _smallKnapsack() {
   Knapsack* problem = NULL;
 
   ResultCode code = Knapsack_Init(ids, values, sizes, n, capacity, &problem);
-  if (code != Success) {
+  if (code != kSuccess) {
     printf("/n%s/.", Result_ErrorMessage(code));
     CU_FAIL("Failed to intalize the small knapsack");
   }
@@ -32,9 +32,9 @@ static Knapsack* _smallKnapsack() {
   return problem;
 }
 
-static void Knapsack_Init_NullParameter() {
+static void Knapsack_Init_kNullParameter() {
   ResultCode code = Knapsack_Init(NULL, NULL, NULL, 5, 0, NULL);
-  CU_ASSERT_EQUAL(code, NullParameter);
+  CU_ASSERT_EQUAL(code, kNullParameter);
 }
 
 static void Knapsack_Init_InvalidParameters() {
@@ -45,16 +45,16 @@ static void Knapsack_Init_InvalidParameters() {
 
   // invalid n
   ResultCode code = Knapsack_Init(ids, values, sizes, 0, 5, &solution);
-  CU_ASSERT_EQUAL(code, ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(code, kArgumentOutOfRange);
 
   // invalid size
   code = Knapsack_Init(ids, values, sizes, 1, 0, &solution);
-  CU_ASSERT_EQUAL(code, ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(code, kArgumentOutOfRange);
 
   // invalid pointer
   Knapsack* initalized = malloc(sizeof(Knapsack));
   code = Knapsack_Init(ids, values, sizes, 1, 5, &initalized);
-  CU_ASSERT_EQUAL(code, OutputPointerIsNotNull);
+  CU_ASSERT_EQUAL(code, kOutputPointerIsNotNull);
 
   free(initalized);
 }
@@ -70,7 +70,7 @@ static void Knapsack_Init_HappyPath() {
 
   ResultCode code = Knapsack_Init(ids, values, sizes, n, capacity, &problem);
 
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
   CU_ASSERT_EQUAL(problem->capacity, capacity);
   CU_ASSERT_EQUAL(problem->n, n);
 
@@ -83,19 +83,19 @@ static void Knapsack_Init_HappyPath() {
   Knapsack_Destory(problem);
 }
 
-static void Knapsack_Pack_NullParameter() {
+static void Knapsack_Pack_kNullParameter() {
   ResultCode code = Knapsack_Pack(NULL, NULL);
-  CU_ASSERT_EQUAL(code, NullParameter);
+  CU_ASSERT_EQUAL(code, kNullParameter);
 }
 
 static void Knapsack_Pack_InvalidOutputPointer() {
   Knapsack* small = _smallKnapsack();
   ResultCode code = Knapsack_Pack(small, NULL);
-  CU_ASSERT_EQUAL(code, NullParameter);
+  CU_ASSERT_EQUAL(code, kNullParameter);
 
   PackedKnapsack* temp = malloc(sizeof(PackedKnapsack));
   code = Knapsack_Pack(small, &temp);
-  CU_ASSERT_EQUAL(code, OutputPointerIsNotNull);
+  CU_ASSERT_EQUAL(code, kOutputPointerIsNotNull);
 
   Knapsack_Destory(small);
   free(temp);
@@ -107,7 +107,7 @@ static void Knapsack_Pack_HappyPath() {
 
   ResultCode code = Knapsack_Pack(small, &solution);
 
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
   CU_ASSERT_EQUAL(solution->orginal_capacity, small->capacity);
   CU_ASSERT_EQUAL(solution->n, 2);
   CU_ASSERT_EQUAL(solution->used_capacity, 5);
@@ -170,7 +170,7 @@ static void _testFile(const char* path, const value expected_value) {
   value solution = 0;
 
   ResultCode code = Knapsack_Pack_Optimal(knapsack, &solution);
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
   CU_ASSERT_EQUAL(solution, expected_value);
 
   Knapsack_Destory(knapsack);
@@ -187,10 +187,10 @@ static void Knapsack_SolveFiles() {
 
 int RegisterKnapsackProblemTests() {
   CU_TestInfo KnapsackProblem_Tests[] = {
-      CU_TEST_INFO(Knapsack_Init_NullParameter),
+      CU_TEST_INFO(Knapsack_Init_kNullParameter),
       CU_TEST_INFO(Knapsack_Init_InvalidParameters),
       CU_TEST_INFO(Knapsack_Init_HappyPath),
-      CU_TEST_INFO(Knapsack_Pack_NullParameter),
+      CU_TEST_INFO(Knapsack_Pack_kNullParameter),
       CU_TEST_INFO(Knapsack_Pack_InvalidOutputPointer),
       CU_TEST_INFO(Knapsack_Pack_HappyPath),
       CU_TEST_INFO(Knapsack_SolveFiles),

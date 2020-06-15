@@ -14,7 +14,7 @@ static VertexData* VertexData_Create(int value) {
   VertexData* d = calloc(sizeof(VertexData), 1);
 
   if (d == NULL) {
-    GRAPH_ERROR(Graph_FailedMemoryAllocation);  // NOLINT
+    GRAPH_ERROR(Graph_kFailedMemoryAllocation);  // NOLINT
     return NULL;
   }
 
@@ -28,26 +28,26 @@ static GraphResult SearchIsValid(Graph* self, int vertex_id,
                                  SearchStrategy* strategy) {
   if (self == NULL || strategy == NULL || strategy->conqueror == NULL ||
       strategy->is_conquered == NULL) {
-    return Graph_NullParameter;
+    return Graph_kNullParameter;
   }
 
   if (vertex_id < 0) return Graph_InvalidVertexId;
 
   if ((size_t)vertex_id >= self->n) return Graph_VertexIdExceedsMaxSize;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
   GraphResult result = SearchIsValid(self, vertex_id, strategy);
-  if (result != Graph_Success) return result;
+  if (result != Graph_kSuccess) return result;
 
   Queue* q = Queue_Create();
   Queue_Enqueue(q, self->V[vertex_id]);
   bool con_result = strategy->conqueror(self->V[vertex_id], NULL);
-  if (!con_result) return Graph_Success;
+  if (!con_result) return Graph_kSuccess;
 
-  while (!Queue_IsEmpty(q)) {
+  while (!Queue_IskEmpty(q)) {
     Vertex* v = Queue_Dequeue(q);
     Edge* e = v->edges;
     while (e != NULL) {
@@ -56,7 +56,7 @@ GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
         con_result = strategy->conqueror(w, v);
         if (!con_result) {
           Queue_Destroy(q);
-          return Graph_Success;
+          return Graph_kSuccess;
         }
 
         Queue_Enqueue(q, w);
@@ -71,19 +71,19 @@ GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
 
 GraphResult Graph_DFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
   GraphResult result = SearchIsValid(self, vertex_id, strategy);
-  if (result != Graph_Success) return result;
+  if (result != Graph_kSuccess) return result;
 
   Stack* s = Stack_Create();
   Stack_Push(s, self->V[vertex_id]);
 
   Vertex* prev = NULL;
-  while (!Stack_IsEmpty(s)) {
+  while (!Stack_IskEmpty(s)) {
     Vertex* v = Stack_Pop(s);
     if (!strategy->is_conquered(v)) {
       bool con_result = strategy->conqueror(v, prev);
       if (!con_result) {
         Stack_Destroy(s);
-        return Graph_Success;
+        return Graph_kSuccess;
       }
 
       Edge* e = v->edges;
@@ -131,11 +131,11 @@ GraphResult Graph_Connected(Graph* self) {
       component_id++;
       GraphResult result = Graph_BFS(self, i, &strategy);
 
-      if (result != Graph_Success) return result;
+      if (result != Graph_kSuccess) return result;
     }
   }
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 // sooooooooo thread unsafe it hurts
@@ -163,7 +163,7 @@ static void Graph_DFS_TopSort(Graph* self, int vertex_id) {
 }
 
 GraphResult Graph_TopSort(Graph* self) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   order = self->n;
 
@@ -171,7 +171,7 @@ GraphResult Graph_TopSort(Graph* self) {
     if (!is_conquered(self->V[i])) Graph_DFS_TopSort(self, i);
   }
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 static bool magic_ordering_conqueror(Vertex* v, Vertex* p) {
@@ -221,7 +221,7 @@ static Stack* Graph_MagicOrdering(Graph* self, int vertex_id, Stack* order) {
 
 Stack* Graph_SCC_MagicOrdering(Graph* self) {
   if (self == NULL) {
-    GRAPH_ERROR(Graph_NullParameter);  // NOLINT
+    GRAPH_ERROR(Graph_kNullParameter);  // NOLINT
     return NULL;
   }
 
@@ -235,7 +235,7 @@ Stack* Graph_SCC_MagicOrdering(Graph* self) {
 }
 
 GraphResult Graph_SCC(Graph* self) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   Stack* mo = Graph_SCC_MagicOrdering(self);
 
@@ -250,5 +250,5 @@ GraphResult Graph_SCC(Graph* self) {
   }
 
   Stack_Destroy(mo);
-  return Graph_Success;
+  return Graph_kSuccess;
 }

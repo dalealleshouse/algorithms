@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
@@ -149,8 +150,7 @@ int RegisterTests() {
       RegisterInversionCountTests() != 0 +
       RegisterIsPowerOfTwoTests() != 0 +
       RegisterMultiplySquareMatricesTests() != 0 +
-      RegisterQuickSelectPartitionTests() != 0
-      ) *
+      RegisterQuickSelectPartitionTests() != 0) *
       -1;
   // clang-format on
 }

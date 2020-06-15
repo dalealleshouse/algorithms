@@ -4,7 +4,7 @@
 
 PriorityQueue* PQ_Create(comparator comparator) {
   if (comparator == NULL) {
-    PQ_ERROR(PQ_NullParameter);
+    PQ_ERROR(PQ_kNullParameter);
     return NULL;
   }
 
@@ -86,7 +86,7 @@ static void InsertMid(PQ_Item* item, PQ_Item* after) {
 }
 
 PQResult PQ_Insert(PriorityQueue* self, void* item) {
-  if (self == NULL || item == NULL) return PQ_NullParameter;
+  if (self == NULL || item == NULL) return PQ_kNullParameter;
 
   PQ_Item* qitem = calloc(sizeof(PQ_Item), 1);
   if (qitem == NULL) return PQ_FailedMalloc;
@@ -120,7 +120,7 @@ PQResult PQ_Insert(PriorityQueue* self, void* item) {
 
   self->n++;
 
-  return PQ_Success;
+  return PQ_kSuccess;
 }
 
 static PQ_Item* FindItem(PriorityQueue* self, void* item) {
@@ -136,10 +136,10 @@ static PQ_Item* FindItem(PriorityQueue* self, void* item) {
 }
 
 PQResult PQ_Reprioritize(PriorityQueue* self, void* item) {
-  if (self == NULL || item == NULL) return PQ_NullParameter;
+  if (self == NULL || item == NULL) return PQ_kNullParameter;
 
   PQ_Item* i = FindItem(self, item);
-  if (i == NULL) return PQ_ItemNotFound;
+  if (i == NULL) return PQ_ItemkNotFound;
 
   if (i == self->head) {
     void* x = PQ_Remove(self);
@@ -154,17 +154,17 @@ PQResult PQ_Reprioritize(PriorityQueue* self, void* item) {
   void* x = PQ_RemoveMid(self, i);
   return PQ_Insert(self, x);
 
-  return PQ_Success;
+  return PQ_kSuccess;
 }
 
 void* PQ_Remove(PriorityQueue* self) {
   if (self == NULL) {
-    PQ_ERROR(PQ_NullParameter);
+    PQ_ERROR(PQ_kNullParameter);
     return NULL;
   }
 
-  if (PQ_IsEmpty(self)) {
-    PQ_ERROR(PQ_EmptyQueue);
+  if (PQ_IskEmpty(self)) {
+    PQ_ERROR(PQ_kEmptyQueue);
     return NULL;
   }
 
@@ -185,21 +185,21 @@ void* PQ_Remove(PriorityQueue* self) {
 
 void* PQ_Peek(PriorityQueue* self) {
   if (self == NULL) {
-    PQ_ERROR(PQ_NullParameter);
+    PQ_ERROR(PQ_kNullParameter);
     return NULL;
   }
 
-  if (PQ_IsEmpty(self)) {
-    PQ_ERROR(PQ_EmptyQueue);
+  if (PQ_IskEmpty(self)) {
+    PQ_ERROR(PQ_kEmptyQueue);
     return NULL;
   }
 
   return self->head->payload;
 }
 
-bool PQ_IsEmpty(PriorityQueue* self) {
+bool PQ_IskEmpty(PriorityQueue* self) {
   if (self == NULL) {
-    PQ_ERROR(PQ_NullParameter);
+    PQ_ERROR(PQ_kNullParameter);
     return true;
   }
 
@@ -221,16 +221,16 @@ void PQ_Destroy(PriorityQueue* self, freer freer) {
 
 char* PQ_ErrorMessage(PQResult result) {
   switch (result) {
-    case PQ_ItemNotFound:
+    case PQ_ItemkNotFound:
       return "Unable to find the specified item";
-    case PQ_EmptyQueue:
+    case PQ_kEmptyQueue:
       return "Attempt to remove an item from an empty priority queue";
     case PQ_FailedMalloc:
       return "Failed to allocate memory";
-    case PQ_NullParameter:
+    case PQ_kNullParameter:
       return "One of the required parameters passed to the function is NULL";
-    case PQ_Success:
-      return "Success";
+    case PQ_kSuccess:
+      return "kSuccess";
     default:
       return "Unknown error code";
   }

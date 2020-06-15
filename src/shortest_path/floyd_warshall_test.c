@@ -24,7 +24,7 @@ static void _testFile(const char* path, const int expected, const size_t path_n,
   // Find the smallest path length
   path_length* solutions;
   GraphResult result = FloydWarshallShortestPath(sut, &solutions);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   int shortest = UNINITIALIZED;
   for (size_t v = 0; v < sut->n; v++) {
@@ -40,10 +40,10 @@ static void _testFile(const char* path, const int expected, const size_t path_n,
   // Validate the path for the shortest length
   Path* actual_path = NULL;
   result = BellmanFordShortestPath(sut, expected_path[0]);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   result = BellmandFordTracePath(sut, expected_path[path_n - 1], &actual_path);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   size_t tracker = path_n;
   Path* p = actual_path;
@@ -63,7 +63,7 @@ static void _testFile(const char* path, const int expected, const size_t path_n,
 
 static void FloydWarshallShortestPath_NullParamter() {
   GraphResult result = FloydWarshallShortestPath(NULL, NULL);
-  CU_ASSERT_EQUAL(result, Graph_NullParameter);
+  CU_ASSERT_EQUAL(result, Graph_kNullParameter);
 }
 
 static void FloydWarshallShortestPath_HappyPath() {
@@ -71,7 +71,7 @@ static void FloydWarshallShortestPath_HappyPath() {
 
   path_length* solutions = NULL;
   GraphResult result = FloydWarshallShortestPath(sut, &solutions);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   CU_ASSERT_EQUAL(UNINITIALIZED, solutions[1 + small_n * 0]);
   CU_ASSERT_EQUAL(0, solutions[1 + small_n * 1]);
@@ -84,14 +84,14 @@ static void FloydWarshallShortestPath_HappyPath() {
   Graph_Destroy(sut, free);
 }
 
-static void FloydWarshallShortestPath_ArithmeticOverflow() {
+static void FloydWarshallShortestPath_kArithmeticOverflow() {
   Graph* sut = Graph_WeightedFromFile(small_n, small_path);
 
   sut->V[3]->in_edges->weight = INT_MAX - 1;
 
   path_length* solutions = NULL;
   GraphResult result = FloydWarshallShortestPath(sut, &solutions);
-  CU_ASSERT_EQUAL(result, Graph_ArithmeticOverflow);
+  CU_ASSERT_EQUAL(result, Graph_kArithmeticOverflow);
 
   Graph_Destroy(sut, free);
 }
@@ -157,7 +157,7 @@ int RegisterFloydWarshallTests() {
   CU_TestInfo tests[] = {
       CU_TEST_INFO(FloydWarshallShortestPath_NullParamter),
       CU_TEST_INFO(FloydWarshallShortestPath_HappyPath),
-      CU_TEST_INFO(FloydWarshallShortestPath_ArithmeticOverflow),
+      CU_TEST_INFO(FloydWarshallShortestPath_kArithmeticOverflow),
       CU_TEST_INFO(FloydWarshallShortestPath_NegativeCycle),
       CU_TEST_INFO(FloydWarshallShortestPath_Files),
       CU_TEST_INFO_NULL};

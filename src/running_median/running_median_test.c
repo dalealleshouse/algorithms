@@ -25,7 +25,7 @@ static void RunningMedian_Create_failed_mem_allocation() {
 
   FAILED_MALLOC_TEST({ sut = RunningMedian_Create(); });
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(FailedMemoryAllocation, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
 }
 
 static void RunningMedian_Create_happy_path() {
@@ -40,7 +40,7 @@ static void RunningMedian_Create_happy_path() {
 
 static void RunningMedian_Insert_null_parameter() {
   Result result = RunningMedian_Insert(NULL, 0.0);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 }
 
 static void RunningMedian_Insert_failed_mem_allocation() {
@@ -48,7 +48,7 @@ static void RunningMedian_Insert_failed_mem_allocation() {
     ErrorReporter_Clear();
     FAILED_MALLOC_TEST({
       Result result = RunningMedian_Insert(sut, 5.0);
-      CU_ASSERT_EQUAL(FailedMemoryAllocation, result);
+      CU_ASSERT_EQUAL(kFailedMemoryAllocation, result);
     });
   });
 }
@@ -56,10 +56,10 @@ static void RunningMedian_Insert_failed_mem_allocation() {
 static void RunningMedian_Insert_nan_or_inf() {
   SUT({
     Result result = RunningMedian_Insert(sut, NAN);
-    CU_ASSERT_EQUAL(ArgumentOutOfRange, result);
+    CU_ASSERT_EQUAL(kArgumentOutOfRange, result);
 
     result = RunningMedian_Insert(sut, INFINITY);
-    CU_ASSERT_EQUAL(ArgumentOutOfRange, result);
+    CU_ASSERT_EQUAL(kArgumentOutOfRange, result);
   });
 }
 
@@ -67,7 +67,7 @@ static void RunningMedian_Insert_happy_path() {
   SUT({
     for (size_t i = 1; i <= 10; i++) {
       Result result = RunningMedian_Insert(sut, i);
-      CU_ASSERT_EQUAL(Success, result);
+      CU_ASSERT_EQUAL(kSuccess, result);
 
       CU_ASSERT_EQUAL(i, RunningMedian_GetN(sut));
     }
@@ -83,7 +83,7 @@ static void RunningMedian_Median_null_parameter() {
   ErrorReporter_Clear();
   double result = RunningMedian_Median(NULL);
   CU_ASSERT_TRUE(isnan(result));
-  CU_ASSERT_EQUAL(NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kNullParameter, ErrorReporter_LastErrorCode());
 }
 
 static void RunningMedian_Median_empty() {
@@ -91,7 +91,7 @@ static void RunningMedian_Median_empty() {
     ErrorReporter_Clear();
     double result = RunningMedian_Median(sut);
     CU_ASSERT_TRUE(isnan(result));
-    CU_ASSERT_EQUAL(Empty, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kEmpty, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -137,7 +137,7 @@ static void RunningMedian_Median_arit_overflow() {
     double result = RunningMedian_Median(sut);
 
     CU_ASSERT_TRUE(isinf(result));
-    CU_ASSERT_EQUAL(ArithmeticOverflow, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kArithmeticOverflow, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -155,7 +155,7 @@ static void RunningMedian_Stress() {
       sscanf(line, "%lf", &d);
 
       Result result = RunningMedian_Insert(sut, d);
-      CU_ASSERT_EQUAL(Success, result);
+      CU_ASSERT_EQUAL(kSuccess, result);
 
       running_total += RunningMedian_Median(sut);
     }

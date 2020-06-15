@@ -11,27 +11,27 @@ const WeightedIndependentSet EMPTY_SET = {
 static Result _weightedIndependentSet_Init(const size_t n, const int weight,
                                            WeightedVertex* vertices[],
                                            WeightedIndependentSet** wis) {
-  if (wis == NULL || vertices == NULL) return NullParameter;
+  if (wis == NULL || vertices == NULL) return kNullParameter;
 
   (*wis) = calloc(sizeof(WeightedIndependentSet), 1);
-  if ((*wis) == NULL) return FailedMemoryAllocation;
+  if ((*wis) == NULL) return kFailedMemoryAllocation;
 
   (*wis)->n = n;
   (*wis)->weight = weight;
   (*wis)->vertices = vertices;
 
-  return Success;
+  return kSuccess;
 }
 
 static Result _weightedIndependentSetFromVertex(
     WeightedVertex* vertex, WeightedIndependentSet** result) {
   WeightedVertex** new_vertices = malloc(sizeof(void*));
-  if (new_vertices == NULL) return FailedMemoryAllocation;
+  if (new_vertices == NULL) return kFailedMemoryAllocation;
 
   *new_vertices = vertex;
   Result r =
       _weightedIndependentSet_Init(1, vertex->weight, new_vertices, result);
-  if (r != Success) free(new_vertices);
+  if (r != kSuccess) free(new_vertices);
 
   return r;
 }
@@ -40,7 +40,7 @@ static Result WeightedIndependentSet_Union(
     WeightedIndependentSet* wis, WeightedVertex* wv,
     WeightedIndependentSet** conclusion) {
   WeightedVertex** vertices = calloc(sizeof(WeightedVertex*), wis->n + 1);
-  if (vertices == NULL) return FailedMemoryAllocation;
+  if (vertices == NULL) return kFailedMemoryAllocation;
 
   if (wis != &EMPTY_SET) {
     memcpy(vertices, wis->vertices, sizeof(void*) * wis->n);
@@ -53,7 +53,7 @@ static Result WeightedIndependentSet_Union(
   Result result = _weightedIndependentSet_Init(wis->n + 1, new_weight, vertices,
                                                conclusion);
 
-  if (result != Success) free(vertices);
+  if (result != kSuccess) free(vertices);
 
   return result;
 }
@@ -70,21 +70,21 @@ static Result _wisResursive(WeightedIndependentSet** wis,
                             WeightedVertex* vertices[], const size_t n) {
   if (n == 0) {
     (*wis) = (WeightedIndependentSet*)&EMPTY_SET;
-    return Success;
+    return kSuccess;
   }
 
   if (n == 1) return _weightedIndependentSetFromVertex(vertices[0], wis);
 
   WeightedIndependentSet* wis1 = NULL;
   Result result1 = _wisResursive(&wis1, vertices, n - 1);
-  if (result1 != Success) {
+  if (result1 != kSuccess) {
     WeightedIndependentSet_Destroy(wis1);
     return result1;
   }
 
   WeightedIndependentSet* wis2 = NULL;
   Result result2 = _wisResursive(&wis2, vertices, n - 2);
-  if (result2 != Success) {
+  if (result2 != kSuccess) {
     WeightedIndependentSet_Destroy(wis1);
     WeightedIndependentSet_Destroy(wis2);
     return result2;
@@ -93,14 +93,14 @@ static Result _wisResursive(WeightedIndependentSet** wis,
   if (is_add_overflow_uint(wis2->weight, vertices[n - 1]->weight)) {
     WeightedIndependentSet_Destroy(wis1);
     WeightedIndependentSet_Destroy(wis2);
-    return ArithmeticOverflow;
+    return kArithmeticOverflow;
   }
 
   // overflow is checked in the block above
   if (wis1->weight >= wis2->weight + vertices[n - 1]->weight) {
     WeightedIndependentSet_Destroy(wis2);
     (*wis) = wis1;
-    return Success;
+    return kSuccess;
   } else {
     WeightedIndependentSet* final = NULL;
     Result result = WeightedIndependentSet_Union(wis2, vertices[n - 1], &final);
@@ -116,14 +116,14 @@ static Result _dupWeightedIndependentSet(WeightedIndependentSet* input,
                                          WeightedIndependentSet** new_set) {
   if (input == &EMPTY_SET) {
     *new_set = (WeightedIndependentSet*)&EMPTY_SET;
-    return Success;
+    return kSuccess;
   }
 
   *new_set = malloc(sizeof(WeightedIndependentSet));
-  if (*new_set == NULL) return FailedMemoryAllocation;
+  if (*new_set == NULL) return kFailedMemoryAllocation;
 
   WeightedVertex** vertices = calloc(sizeof(WeightedVertex*), input->n + 1);
-  if (vertices == NULL) return FailedMemoryAllocation;
+  if (vertices == NULL) return kFailedMemoryAllocation;
 
   memcpy(vertices, input->vertices, sizeof(void*) * input->n);
 
@@ -131,7 +131,7 @@ static Result _dupWeightedIndependentSet(WeightedIndependentSet* input,
   (*new_set)->vertices = vertices;
   (*new_set)->weight = input->weight;
 
-  return Success;
+  return kSuccess;
 }
 
 static void _solutionsDestroy(WeightedIndependentSet** solutions,
@@ -151,7 +151,7 @@ static Result _reconstruct(unsigned long solutions[], PathGraph* graph,
       WeightedIndependentSet* new;
       Result r = WeightedIndependentSet_Union(winner, w, &new);
       WeightedIndependentSet_Destroy(winner);
-      if (r != Success) return r;
+      if (r != kSuccess) return r;
 
       winner = new;
       i = i - 2;
@@ -161,7 +161,7 @@ static Result _reconstruct(unsigned long solutions[], PathGraph* graph,
       WeightedIndependentSet* new;
       Result r = WeightedIndependentSet_Union(winner, graph->vertices[0], &new);
       WeightedIndependentSet_Destroy(winner);
-      if (r != Success) return r;
+      if (r != kSuccess) return r;
 
       winner = new;
     }
@@ -169,20 +169,20 @@ static Result _reconstruct(unsigned long solutions[], PathGraph* graph,
 
   (*result) = winner;
 
-  return Success;
+  return kSuccess;
 }
 
 Result PathGraph_Create(unsigned int ids[], unsigned long weights[], size_t n,
                         PathGraph** graph) {
-  if (ids == NULL || weights == NULL || graph == NULL) return NullParameter;
+  if (ids == NULL || weights == NULL || graph == NULL) return kNullParameter;
 
   PathGraph* _graph = malloc(sizeof(PathGraph));
-  if (_graph == NULL) return FailedMemoryAllocation;
+  if (_graph == NULL) return kFailedMemoryAllocation;
 
   _graph->vertices = calloc(sizeof(void*), n);
   if (_graph->vertices == NULL) {
     PathGraph_Destroy(_graph);
-    return FailedMemoryAllocation;
+    return kFailedMemoryAllocation;
   }
 
   _graph->n = n;
@@ -191,7 +191,7 @@ Result PathGraph_Create(unsigned int ids[], unsigned long weights[], size_t n,
     WeightedVertex* wv = malloc(sizeof(WeightedVertex));
     if (wv == NULL) {
       PathGraph_Destroy(_graph);
-      return FailedMemoryAllocation;
+      return kFailedMemoryAllocation;
     }
 
     wv->id = ids[i];
@@ -200,7 +200,7 @@ Result PathGraph_Create(unsigned int ids[], unsigned long weights[], size_t n,
   }
 
   *graph = _graph;
-  return Success;
+  return kSuccess;
 }
 
 void PathGraph_Destroy(PathGraph* graph) {
@@ -218,30 +218,30 @@ void PathGraph_Destroy(PathGraph* graph) {
 Result WeightedVertex_Init(unsigned int id, const unsigned long weight,
                            WeightedVertex** vw) {
   (*vw) = malloc(sizeof(WeightedVertex));
-  if (vw == NULL) return FailedMemoryAllocation;
+  if (vw == NULL) return kFailedMemoryAllocation;
 
   (*vw)->weight = weight;
   (*vw)->id = id;
-  return Success;
+  return kSuccess;
 }
 
 void WeightedVertex_Destroy(WeightedVertex* vw) { free(vw); }
 
 Result WeightedIndependentSet_Recursive(PathGraph* graph,
                                         WeightedIndependentSet** conclusion) {
-  if (graph == NULL || conclusion == NULL) return NullParameter;
+  if (graph == NULL || conclusion == NULL) return kNullParameter;
 
   return _wisResursive(conclusion, graph->vertices, graph->n);
 }
 
 Result WeightedIndependentSet_Dynamic_Reconstruction(
     PathGraph* graph, WeightedIndependentSet** conclusion) {
-  if (graph == NULL || conclusion == NULL) return NullParameter;
+  if (graph == NULL || conclusion == NULL) return kNullParameter;
 
   // Pass in an empty set and you deserve to get one back
   if (graph->n == 0) {
     (*conclusion) = (WeightedIndependentSet*)&EMPTY_SET;
-    return Success;
+    return kSuccess;
   }
 
   // If there is only 1 vertex, return it
@@ -265,7 +265,7 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
     unsigned long iminus2 = solutions[i - 2];
     unsigned long w = graph->vertices[i - 1]->weight;
 
-    if (is_add_overflow_ulong(iminus1, w)) return ArithmeticOverflow;
+    if (is_add_overflow_ulong(iminus1, w)) return kArithmeticOverflow;
 
     // overflow checked above
     if (iminus1 >= iminus2 + w) {
@@ -281,24 +281,24 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
 Result WeightedIndependentSet_Dynamic(PathGraph* graph,
                                       WeightedIndependentSet** conclusion) {
   return WeightedIndependentSet_Dynamic_Reconstruction(graph, conclusion);
-  if (graph == NULL || conclusion == NULL) return NullParameter;
+  if (graph == NULL || conclusion == NULL) return kNullParameter;
 
   // Pass in an empty set and you deserve to get one back
   if (graph->n == 0) {
     (*conclusion) = (WeightedIndependentSet*)&EMPTY_SET;
-    return Success;
+    return kSuccess;
   }
 
   // Set 1 will always be the first vertex by itself
   WeightedIndependentSet* set1 = NULL;
   Result result = _weightedIndependentSetFromVertex(graph->vertices[0], &set1);
 
-  if (result != Success) return result;
+  if (result != kSuccess) return result;
 
   // If there is only 1 vertex, return it
   if (graph->n == 1) {
     *conclusion = set1;
-    return Success;
+    return kSuccess;
   }
 
   // Create array to hold solutions
@@ -319,7 +319,7 @@ Result WeightedIndependentSet_Dynamic(PathGraph* graph,
 
     if (is_add_overflow_uint(iminus1->weight, w->weight)) {
       _solutionsDestroy(solutions, solutions_n);
-      return ArithmeticOverflow;
+      return kArithmeticOverflow;
     }
 
     Result r;
@@ -330,7 +330,7 @@ Result WeightedIndependentSet_Dynamic(PathGraph* graph,
       r = WeightedIndependentSet_Union(iminus2, w, &solutions[i]);
     }
 
-    if (r != Success) {
+    if (r != kSuccess) {
       _solutionsDestroy(solutions, solutions_n);
       return r;
     }
@@ -339,5 +339,5 @@ Result WeightedIndependentSet_Dynamic(PathGraph* graph,
   _solutionsDestroy(solutions, solutions_n - 1);
   (*conclusion) = solutions[graph->n];
 
-  return Success;
+  return kSuccess;
 }

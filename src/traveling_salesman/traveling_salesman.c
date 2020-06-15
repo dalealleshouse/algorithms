@@ -15,19 +15,19 @@ static double _dist(const point* p1, const point* p2) {
 }
 
 ResultCode dist(const point* p1, const point* p2, double* result) {
-  if (p1 == NULL || p2 == NULL || result == NULL) return NullParameter;
+  if (p1 == NULL || p2 == NULL || result == NULL) return kNullParameter;
 
   *result = _dist(p1, p2);
-  return Success;
+  return kSuccess;
 }
 
 ResultCode adjacencyMatrix(const city* cities, const size_t n,
                            double** matrix) {
-  if (cities == NULL || matrix == NULL) return NullParameter;
-  if (*matrix != NULL) return OutputPointerIsNotNull;
+  if (cities == NULL || matrix == NULL) return kNullParameter;
+  if (*matrix != NULL) return kOutputPointerIsNotNull;
 
   double* result = malloc(sizeof(double) * n * n);
-  if (result == NULL) return FailedMemoryAllocation;
+  if (result == NULL) return kFailedMemoryAllocation;
 
   for (size_t i = 0; i < n; ++i) {
     for (size_t j = 0; j < n; ++j) {
@@ -36,13 +36,13 @@ ResultCode adjacencyMatrix(const city* cities, const size_t n,
   }
 
   *matrix = result;
-  return Success;
+  return kSuccess;
 }
 
 ResultCode TravelingSalesman(size_t n, double graph[n][n],
                              double* shortest_path) {
-  if (graph == NULL || shortest_path == NULL) return NullParameter;
-  if (n < 2) return ArgumentOutOfRange;
+  if (graph == NULL || shortest_path == NULL) return kNullParameter;
+  if (n < 2) return kArgumentOutOfRange;
 
   unsigned int size = 1 << (n - 1);
   double* pBest = malloc(sizeof(double) * size * n);
@@ -85,7 +85,7 @@ ResultCode TravelingSalesman(size_t n, double graph[n][n],
   free(best);
   *shortest_path = answer;
 
-  return Success;
+  return kSuccess;
 }
 
 static city* find_closest(city* cities, size_t n, city* the_city) {
@@ -108,8 +108,8 @@ static city* find_closest(city* cities, size_t n, city* the_city) {
 
 ResultCode TravelingSalesmanApprox(size_t n, city* cities,
                                    double* shortest_path) {
-  if (cities == NULL || shortest_path == NULL) return NullParameter;
-  if (n < 2) return ArgumentOutOfRange;
+  if (cities == NULL || shortest_path == NULL) return kNullParameter;
+  if (n < 2) return kArgumentOutOfRange;
 
   city* here_now = &cities[0];
   here_now->visted = true;
@@ -127,5 +127,5 @@ ResultCode TravelingSalesmanApprox(size_t n, city* cities,
   dist_so_far += _dist(&cities[0].coordinates, &here_now->coordinates);
   *shortest_path = dist_so_far;
 
-  return Success;
+  return kSuccess;
 }

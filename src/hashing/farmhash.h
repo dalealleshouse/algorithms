@@ -26,7 +26,7 @@
 // This file provides a few functions for hashing strings and other
 // data.  All of them are high-quality functions in the sense that
 // they do well on standard tests such as Austin Appleby's SMHasher.
-// They're also fast.  FarmHash is the successor to CityHash.
+// They're also fast.  FarmHash is the Successor to CityHash.
 //
 // Functions in the FarmHash family are not suitable for cryptography.
 //

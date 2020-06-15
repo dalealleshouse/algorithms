@@ -45,10 +45,10 @@ static void Stack_Push_null_parameter() {
 
   const int dummy = 5;
   StackResult result = Stack_Push(NULL, (void*)&dummy);
-  CU_ASSERT_EQUAL(Stack_NullParameter, result);
+  CU_ASSERT_EQUAL(Stack_kNullParameter, result);
 
   result = Stack_Push(sut, NULL);
-  CU_ASSERT_EQUAL(Stack_NullParameter, result);
+  CU_ASSERT_EQUAL(Stack_kNullParameter, result);
 
   Stack_Destroy(sut);
 }
@@ -59,7 +59,7 @@ static void Stack_Push_first_item() {
 
   StackResult result = Stack_Push(sut, (void*)&dummy);
 
-  CU_ASSERT_EQUAL(Stack_Success, result);
+  CU_ASSERT_EQUAL(Stack_kSuccess, result);
   CU_ASSERT_PTR_EQUAL(&dummy, sut->head->payload);
   CU_ASSERT_EQUAL(1, sut->n);
 
@@ -73,10 +73,10 @@ static void Stack_Push_two_items() {
   const int second_in = 10;
 
   StackResult result = Stack_Push(sut, (void*)&first_in);
-  CU_ASSERT_EQUAL(Stack_Success, result);
+  CU_ASSERT_EQUAL(Stack_kSuccess, result);
 
   result = Stack_Push(sut, (void*)&second_in);
-  CU_ASSERT_EQUAL(Stack_Success, result);
+  CU_ASSERT_EQUAL(Stack_kSuccess, result);
 
   CU_ASSERT_PTR_EQUAL(&second_in, sut->head->payload);
   CU_ASSERT_PTR_EQUAL(&first_in, sut->head->next->payload);
@@ -163,13 +163,13 @@ static void Stack_Pop_heap_pointers() {
 
 /*************************** Stack_IsEmpty ************************************/
 static void Stack_IsEmtpy_null_parameter() {
-  bool result = Stack_IsEmpty(NULL);
+  bool result = Stack_IskEmpty(NULL);
   CU_ASSERT_EQUAL(true, result);
 }
 
 static void Stack_IsEmtpy_empty() {
   Stack* sut = Stack_Create(NULL);
-  CU_ASSERT_EQUAL(true, Stack_IsEmpty(sut));
+  CU_ASSERT_EQUAL(true, Stack_IskEmpty(sut));
   Stack_Destroy(sut);
 }
 
@@ -177,7 +177,7 @@ static void Stack_IsEmtpy_not_empty() {
   int first_in = 5;
   Stack* sut = Stack_Create(NULL);
   Stack_Push(sut, &first_in);
-  CU_ASSERT_EQUAL(false, Stack_IsEmpty(sut));
+  CU_ASSERT_EQUAL(false, Stack_IskEmpty(sut));
   Stack_Destroy(sut);
 }
 

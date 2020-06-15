@@ -1,5 +1,5 @@
 // Copyright 2020 Dale Alleshouse
-#include "./algo_timer.h"
+#include "algo_timer.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -9,17 +9,17 @@
 #include "../utils/math.h"
 #include "./sorted_array.h"
 
-void* BuildEmptyDataStructure(Structure str) {
+void* BuildkEmptyDataStructure(Structure str) {
   switch (str) {
-    case ARRAY:
-    case SORTED_ARRAY:
+    case kArray:
+    case kSortedArray:
       return Array_Create(PIntComparator, sizeof(uintptr_t));
-    case LINKED_LIST:
-    case LINKED_LIST_POOR_LOCALITY:
+    case kLinkedList:
+    case kLinkedListPoorLocality:
       return LinkedList_Create(NULL, ptr_comparator);
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_Create(ptr_comparator);
   }
 
@@ -27,36 +27,37 @@ void* BuildEmptyDataStructure(Structure str) {
 }
 
 void* BuildDataStructure(Structure str, size_t n) {
-  void* ds = BuildEmptyDataStructure(str);
+  unsigned int seed = time(NULL);
+  void* ds = BuildkEmptyDataStructure(str);
   ListOp op = GetInsertOperation(str);
   if (ds == NULL) return NULL;
 
   switch (str) {
-    case ARRAY:
-    case LINKED_LIST:
-    case BINARY_TREE:
-    case RED_BLACK_TREE:
-      for (size_t i = 0; i < n; i++) op(ds, rand());
+    case kArray:
+    case kLinkedList:
+    case kBinaryTree:
+    case kRedBlackTree:
+      for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
       break;
-    case SORTED_ARRAY:
-      for (size_t i = 0; i < n; i++) op(ds, rand());
+    case kSortedArray:
+      for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
 
       Array* arr = (Array*)ds;
       qsort(arr->array, arr->n, arr->item_size, arr->comparator);
       break;
-    case LINKED_LIST_POOR_LOCALITY:
+    case kLinkedListPoorLocality:
       for (size_t i = 0; i < n * 4; i++) {
         void* temp = malloc(10000);
-        op(ds, rand());
+        op(ds, rand_r(&seed));
         free(temp);
       }
 
       LinkedList* list = (LinkedList*)ds;
       for (size_t i = 0; i < n * 3; i++) {
-        LinkedList_DeleteAt(list, rand() % list->size);
+        LinkedList_DeleteAt(list, rand_r(&seed) % list->size);
       }
       break;
-    case BINARY_TREE_UNBALANCED:
+    case kBinaryTreeUnbalanced:
       for (size_t i = 1; i <= n; i++) op(ds, i);
       break;
     default:
@@ -68,17 +69,17 @@ void* BuildDataStructure(Structure str, size_t n) {
 
 void DestroyStructure(Structure str, void* structure) {
   switch (str) {
-    case ARRAY:
-    case SORTED_ARRAY:
+    case kArray:
+    case kSortedArray:
       Array_Destroy(structure);
       break;
-    case LINKED_LIST:
-    case LINKED_LIST_POOR_LOCALITY:
+    case kLinkedList:
+    case kLinkedListPoorLocality:
       LinkedList_Destroy(structure);
       break;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       BinaryTree_Destroy(structure, NULL);
       break;
   }
@@ -116,16 +117,16 @@ ListOpResult RedBlackTree_InsertOp(void* tree, uintptr_t item) {
 
 ListOp GetInsertOperation(Structure str) {
   switch (str) {
-    case ARRAY:
-    case SORTED_ARRAY:
+    case kArray:
+    case kSortedArray:
       return Array_InsertOp;
-    case LINKED_LIST:
-    case LINKED_LIST_POOR_LOCALITY:
+    case kLinkedList:
+    case kLinkedListPoorLocality:
       return LinkedList_InsertOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
       return BinaryTree_InsertOp;
-    case RED_BLACK_TREE:
+    case kRedBlackTree:
       return RedBlackTree_InsertOp;
   }
 
@@ -158,16 +159,16 @@ uintptr_t BinaryTree_SearchOp(const void* tree, const uintptr_t item) {
 
 SearchOp GetSearchOperation(Structure str) {
   switch (str) {
-    case ARRAY:
+    case kArray:
       return Array_SearchOp;
-    case SORTED_ARRAY:
+    case kSortedArray:
       return SortedArray_SearchOp;
-    case LINKED_LIST:
-    case LINKED_LIST_POOR_LOCALITY:
+    case kLinkedList:
+    case kLinkedListPoorLocality:
       return LinkedList_SearchOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_SearchOp;
   }
 
@@ -194,15 +195,15 @@ void BinaryTree_EnumerateOp(const void* tree) {
 
 EnumerateOp GetEnumerateOperation(Structure str) {
   switch (str) {
-    case ARRAY:
-    case SORTED_ARRAY:
+    case kArray:
+    case kSortedArray:
       return Array_EnumerateOp;
-    case LINKED_LIST:
-    case LINKED_LIST_POOR_LOCALITY:
+    case kLinkedList:
+    case kLinkedListPoorLocality:
       return LinkedList_EnumerateOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_EnumerateOp;
   }
 
@@ -219,11 +220,11 @@ uintptr_t BinaryTree_MaxOp(const void* tree) {
 
 MaxOp GetMaxOperation(Structure str) {
   switch (str) {
-    case SORTED_ARRAY:
+    case kSortedArray:
       return SortedArray_MaxOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_MaxOp;
     default:
       return NULL;
@@ -240,11 +241,11 @@ uintptr_t BinaryTree_PredecessorOp(const void* tree, const uintptr_t item) {
 
 PredOp GetPredOperation(Structure str) {
   switch (str) {
-    case SORTED_ARRAY:
+    case kSortedArray:
       return SortedArray_PredecessorOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_PredecessorOp;
     default:
       return NULL;
@@ -261,11 +262,11 @@ uintptr_t BinaryTree_SelectOp(const void* tree, const size_t item) {
 
 SelectOp GetSelectOperation(Structure str) {
   switch (str) {
-    case SORTED_ARRAY:
+    case kSortedArray:
       return SortedArray_SelectOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_SelectOp;
     default:
       return NULL;
@@ -282,11 +283,11 @@ size_t BinaryTree_RankOp(const void* tree, const size_t item) {
 
 RankOp GetRankOp(Structure str) {
   switch (str) {
-    case SORTED_ARRAY:
+    case kSortedArray:
       return SortedArray_RankOp;
-    case BINARY_TREE:
-    case BINARY_TREE_UNBALANCED:
-    case RED_BLACK_TREE:
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+    case kRedBlackTree:
       return BinaryTree_RankOp;
     default:
       return NULL;
@@ -294,31 +295,32 @@ RankOp GetRankOp(Structure str) {
 }
 
 double OperationTime(Operation op, Structure st, size_t n) {
+  unsigned int seed = time(NULL);
   clock_t t;
   void* ds;
 
   switch (op) {
-    case INSERT:
+    case kInsert:
       // In the case of insert, n is ignored
-      ds = BuildEmptyDataStructure(st);
+      ds = BuildkEmptyDataStructure(st);
       ListOp op = GetInsertOperation(st);
       if (ds == NULL || op == NULL) return -1;
 
       // Timed operation
       t = clock();
-      for (size_t i = 0; i < n; i++) op(ds, rand());
+      for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
       t = clock() - t;
       break;
-    case SEARCH:
+    case kSearch:
       ds = BuildDataStructure(st, n);
       SearchOp s_op = GetSearchOperation(st);
       if (ds == NULL || s_op == NULL) return -1;
 
       t = clock();
-      for (size_t i = 0; i < n; i++) s_op(ds, rand());
+      for (size_t i = 0; i < n; i++) s_op(ds, rand_r(&seed));
       t = clock() - t;
       break;
-    case ENUMERATE:
+    case kEnumerate:
       ds = BuildDataStructure(st, n);
       EnumerateOp e_op = GetEnumerateOperation(st);
       _enumerate_sum = 0;
@@ -327,7 +329,7 @@ double OperationTime(Operation op, Structure st, size_t n) {
       e_op(ds);
       t = clock() - t;
       break;
-    case MAX:
+    case kMax:
       ds = BuildDataStructure(st, n);
       MaxOp m_op = GetMaxOperation(st);
 
@@ -335,28 +337,28 @@ double OperationTime(Operation op, Structure st, size_t n) {
       for (size_t i = 0; i < n; i++) m_op(ds);
       t = clock() - t;
       break;
-    case PREDECESSOR:
+    case kPredecessor:
       ds = BuildDataStructure(st, n);
       PredOp p_op = GetPredOperation(st);
 
       t = clock();
-      for (size_t i = 0; i < n; i++) p_op(ds, rand());
+      for (size_t i = 0; i < n; i++) p_op(ds, rand_r(&seed));
       t = clock() - t;
       break;
-    case SELECT:
+    case kSelect:
       ds = BuildDataStructure(st, n);
       SelectOp se_op = GetSelectOperation(st);
 
       t = clock();
-      for (size_t i = 0; i < n; i++) se_op(ds, rand() % n);
+      for (size_t i = 0; i < n; i++) se_op(ds, rand_r(&seed) % n);
       t = clock() - t;
       break;
-    case RANK:
+    case kRank:
       ds = BuildDataStructure(st, n);
       RankOp r_op = GetRankOp(st);
 
       t = clock();
-      for (size_t i = 0; i < n; i++) r_op(ds, rand());
+      for (size_t i = 0; i < n; i++) r_op(ds, rand_r(&seed));
       t = clock() - t;
       break;
   }

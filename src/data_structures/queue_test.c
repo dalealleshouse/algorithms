@@ -44,10 +44,10 @@ static void Queue_Enqueue_null_parameter() {
 
   const int dummy = 5;
   QueueResult result = Queue_Enqueue(NULL, (void*)&dummy);
-  CU_ASSERT_EQUAL(Queue_NullParameter, result);
+  CU_ASSERT_EQUAL(Queue_kNullParameter, result);
 
   result = Queue_Enqueue(sut, NULL);
-  CU_ASSERT_EQUAL(Queue_NullParameter, result);
+  CU_ASSERT_EQUAL(Queue_kNullParameter, result);
 
   Queue_Destroy(sut);
 }
@@ -57,7 +57,7 @@ static void Queue_Enqueue_first_item() {
 
   const int dummy = 5;
   QueueResult result = Queue_Enqueue(sut, (void*)&dummy);
-  CU_ASSERT_EQUAL(Queue_Success, result);
+  CU_ASSERT_EQUAL(Queue_kSuccess, result);
 
   CU_ASSERT_PTR_EQUAL(&dummy, sut->head->payload);
   CU_ASSERT_PTR_EQUAL(&dummy, sut->tail->payload);
@@ -72,10 +72,10 @@ static void Queue_Enqueue_two_items() {
   const int first_in = 5;
   const int second_in = 10;
   QueueResult result = Queue_Enqueue(sut, (void*)&first_in);
-  CU_ASSERT_EQUAL(Queue_Success, result);
+  CU_ASSERT_EQUAL(Queue_kSuccess, result);
 
   result = Queue_Enqueue(sut, (void*)&second_in);
-  CU_ASSERT_EQUAL(Queue_Success, result);
+  CU_ASSERT_EQUAL(Queue_kSuccess, result);
 
   CU_ASSERT_PTR_EQUAL(&first_in, sut->head->payload);
   CU_ASSERT_PTR_EQUAL(&second_in, sut->tail->payload);
@@ -162,15 +162,15 @@ static void Queue_Dequeue_heap_pointers() {
   free(third);
 }
 
-/*************************** Queue_IsEmpty ************************************/
+/************************** Queue_IskEmpty ************************************/
 static void Queue_IsEmtpy_null_parameter() {
-  bool result = Queue_IsEmpty(NULL);
+  bool result = Queue_IskEmpty(NULL);
   CU_ASSERT_EQUAL(true, result);
 }
 
 static void Queue_IsEmtpy_empty() {
   Queue* sut = Queue_Create(NULL);
-  CU_ASSERT_EQUAL(true, Queue_IsEmpty(sut));
+  CU_ASSERT_EQUAL(true, Queue_IskEmpty(sut));
   Queue_Destroy(sut);
 }
 
@@ -178,7 +178,7 @@ static void Queue_IsEmtpy_not_empty() {
   int first_in = 5;
   Queue* sut = Queue_Create(NULL);
   Queue_Enqueue(sut, &first_in);
-  CU_ASSERT_EQUAL(false, Queue_IsEmpty(sut));
+  CU_ASSERT_EQUAL(false, Queue_IskEmpty(sut));
   Queue_Destroy(sut);
 }
 

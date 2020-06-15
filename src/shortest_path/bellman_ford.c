@@ -8,7 +8,7 @@
 static GraphResult _initPath(vertex_id vertex, Path* next, Path** path) {
   Path* p = malloc(sizeof(Path));
 
-  if (p == NULL) return Graph_FailedMemoryAllocation;
+  if (p == NULL) return Graph_kFailedMemoryAllocation;
 
   p->vertex = vertex;
   p->next = NULL;
@@ -16,7 +16,7 @@ static GraphResult _initPath(vertex_id vertex, Path* next, Path** path) {
   p->n = (next == NULL) ? 1 : next->n + 1;
   *path = p;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 static vertex_id _getPrevious(Vertex* v) {
@@ -38,7 +38,7 @@ static GraphResult _shortest(Graph* graph, Vertex* v, BFData cache[graph->n],
 
     if (cache[e->tail].distance != UNINITIALIZED) {
       if (is_add_overflow_int(cache[e->tail].distance, e->weight)) {
-        return Graph_ArithmeticOverflow;
+        return Graph_kArithmeticOverflow;
       }
 
       contender.distance = cache[e->tail].distance + e->weight;
@@ -50,24 +50,24 @@ static GraphResult _shortest(Graph* graph, Vertex* v, BFData cache[graph->n],
   }
 
   *result = winner;
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 GraphResult _loadBFDatas(Graph* graph, BFData answers[graph->n]) {
   for (size_t i = 0; i < graph->n; i++) {
     BFData* d = malloc(sizeof(BFData));
-    if (d == NULL) return Graph_FailedMemoryAllocation;
+    if (d == NULL) return Graph_kFailedMemoryAllocation;
 
     *d = answers[i];
     graph->V[i]->data = d;
   }
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 GraphResult BellmanFordShortestPath(Graph* graph,
                                     const vertex_id start_vertex) {
-  if (graph == NULL) return Graph_NullParameter;
+  if (graph == NULL) return Graph_kNullParameter;
   if (start_vertex >= graph->n) return Graph_InvalidVertexId;
 
   BFData cache1[graph->n];
@@ -90,7 +90,7 @@ GraphResult BellmanFordShortestPath(Graph* graph,
       BFData case1 = previous[j];
       BFData case2 = {UNINITIALIZED, NULL};
       GraphResult result = _shortest(graph, graph->V[j], previous, &case2);
-      if (result != Graph_Success) return result;
+      if (result != Graph_kSuccess) return result;
 
       // TODO(dalealleshouse): cache both the predecessor node and the value so
       // consumers can decipher the shortest path instead of just it's value
@@ -110,14 +110,14 @@ GraphResult BellmanFordShortestPath(Graph* graph,
 
 GraphResult BellmandFordTracePath(const Graph* graph, const vertex_id start,
                                   Path** path) {
-  if (graph == NULL || path == NULL) return Graph_NullParameter;
+  if (graph == NULL || path == NULL) return Graph_kNullParameter;
   if (start >= graph->n) return Graph_VertexIdExceedsMaxSize;
 
   Path* p = NULL;
   vertex_id vid = start;
   while (vid != UINT_MAX) {
     GraphResult result = _initPath(vid, p, &p);
-    if (result != Graph_Success) {
+    if (result != Graph_kSuccess) {
       Path_Destroy(p);
       return result;
     }
@@ -126,7 +126,7 @@ GraphResult BellmandFordTracePath(const Graph* graph, const vertex_id start,
   }
 
   *path = p;
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 void Path_Destroy(Path* path) {

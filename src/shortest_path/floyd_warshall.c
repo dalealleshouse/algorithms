@@ -36,7 +36,7 @@ path_length _findEdge(Graph* graph, vertex_id v, vertex_id w) {
 }
 
 GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
-  if (graph == NULL) return Graph_NullParameter;
+  if (graph == NULL) return Graph_kNullParameter;
 
   size_t n = graph->n;
 
@@ -69,7 +69,7 @@ GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
           if (is_add_overflow_int(previous[v + n * k], previous[k + n * w])) {
             free(previous);
             free(current);
-            return Graph_ArithmeticOverflow;
+            return Graph_kArithmeticOverflow;
           }
           case2 = previous[v + n * k] + previous[k + n * w];
         }
@@ -87,5 +87,5 @@ GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
   *solutions = current;
   (void)_printSolutions;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }

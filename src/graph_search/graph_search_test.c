@@ -87,18 +87,18 @@ static void Graph_BFS_null_parameter() {
   Graph* graph = Graph_Create(10);
 
   GraphResult result = Graph_BFS(NULL, 1, &strategy);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   result = Graph_BFS(graph, 1, NULL);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   SearchStrategy bad = {NULL, is_con};
   result = Graph_BFS(graph, 1, &bad);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   SearchStrategy bad2 = {conquer, NULL};
   result = Graph_BFS(graph, 1, &bad2);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   Graph_Destroy(graph, NULL);
 }
@@ -193,18 +193,18 @@ static void Graph_DFS_null_parameter() {
   Graph* graph = Graph_Create(10);
 
   GraphResult result = Graph_DFS(NULL, 1, &strategy);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   result = Graph_DFS(graph, 1, NULL);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   SearchStrategy bad = {NULL, is_con};
   result = Graph_DFS(graph, 1, &bad);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   SearchStrategy bad2 = {conquer, NULL};
   result = Graph_DFS(graph, 1, &bad2);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 
   Graph_Destroy(graph, NULL);
 }
@@ -241,7 +241,7 @@ static void Graph_DFS_stops_on_false_con() {
 static void Graph_TopSort_null_paramter() {
   GraphResult result = Graph_TopSort(NULL);
 
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 }
 
 static void Graph_TopSort_standard() {
@@ -249,7 +249,7 @@ static void Graph_TopSort_standard() {
 
   GraphResult result = Graph_TopSort(graph);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   CU_ASSERT_EQUAL(1, Value(graph->V[0]));
   CU_ASSERT_EQUAL(2, Value(graph->V[1]));
   CU_ASSERT_EQUAL(3, Value(graph->V[2]));
@@ -263,7 +263,7 @@ static void Graph_SCC_MagicOrdering_null_paramter() {
   Stack* result = Graph_SCC_MagicOrdering(NULL);
 
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(Graph_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(Graph_kNullParameter, ErrorReporter_LastErrorCode());
 }
 
 static void Graph_SCC_MagicOrdering_standard() {
@@ -301,7 +301,7 @@ static void Graph_SCC_MagicOrdering_standard_two() {
 static void Graph_SCC_null_parameter() {
   GraphResult result = Graph_SCC(NULL);
 
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 }
 
 static void Graph_SCC_standard() {
@@ -309,7 +309,7 @@ static void Graph_SCC_standard() {
 
   GraphResult result = Graph_SCC(graph);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   CU_ASSERT_EQUAL(0, Value(graph->V[0]));
 
   CU_ASSERT_EQUAL(1, Value(graph->V[1]));

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "../utils/common.h"
+#include "../utils/comparators.h"
 #include "../utils/error_reporter.h"
 
 #define PQ_ERROR(result)                                                \
@@ -17,11 +17,11 @@
   }
 
 typedef enum {
-  PQ_ItemNotFound = -4,
-  PQ_EmptyQueue = -3,
-  PQ_NullParameter = -2,
+  PQ_ItemkNotFound = -4,
+  PQ_kEmptyQueue = -3,
+  PQ_kNullParameter = -2,
   PQ_FailedMalloc = -1,
-  PQ_Success = 0
+  PQ_kSuccess = 0
 } PQResult;
 
 typedef struct PQ_Item {
@@ -42,6 +42,6 @@ PQResult PQ_Insert(PriorityQueue*, void*);
 PQResult PQ_Reprioritize(PriorityQueue*, void*);
 void* PQ_Peek(PriorityQueue*);
 void* PQ_Remove(PriorityQueue*);
-bool PQ_IsEmpty(PriorityQueue*);
+bool PQ_IskEmpty(PriorityQueue*);
 void PQ_Destroy(PriorityQueue*, freer);
 char* PQ_ErrorMessage(PQResult);

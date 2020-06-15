@@ -114,7 +114,10 @@ static void tree_property_holds(BinaryTreeNode* node) {
 }
 
 static void tree_is_valid(BinaryTree* tree, size_t n) {
-  CU_ASSERT_PTR_NOT_NULL(tree);
+  if (tree == NULL) {
+    CU_FAIL("tree is null");
+    return;
+  }
 
   if (n == 0) {
     CU_ASSERT_PTR_EQUAL(&NULL_NODE, tree->root);
@@ -196,7 +199,7 @@ static BinaryTree* generate_valid_tree() {
 
 /*************************** BinaryTree_Create ********************************/
 static void BinaryTree_Create_null_parmeter() {
-  UNARY_NULL_TEST(ListOp_NullParameter, BinaryTree_Create);
+  UNARY_NULL_TEST(kkNullParameter, BinaryTree_Create);
 }
 
 static void BinaryTree_Create_failed_mem_allocation() {
@@ -207,14 +210,18 @@ static void BinaryTree_Create_failed_mem_allocation() {
   FAILED_MALLOC_TEST({ sut = BinaryTree_Create(PIntComparator); })
 
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ListOp_FailedMalloc, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kFailedMalloc, ErrorReporter_LastErrorCode());
 #endif
 }
 
 static void BinaryTree_Create_init_values() {
   BinaryTree* sut = BinaryTree_Create(PIntComparator);
 
-  CU_ASSERT_PTR_NOT_NULL(sut);
+  if (sut == NULL) {
+    CU_FAIL("sut is null");
+    return;
+  }
+
   CU_ASSERT_PTR_EQUAL(PIntComparator, sut->comparator);
   CU_ASSERT_PTR_EQUAL(&NULL_NODE, sut->root);
   CU_ASSERT_EQUAL(0, sut->n);
@@ -230,7 +237,7 @@ static void BinaryTree_Insert_failed_mem_allocation() {
 
   FAILED_MALLOC_TEST({ result = BinaryTree_Insert(sut, &value); })
 
-  CU_ASSERT_EQUAL(ListOp_FailedMalloc, result);
+  CU_ASSERT_EQUAL(kFailedMalloc, result);
   BinaryTree_Destroy(sut, NULL);
 }
 
@@ -239,7 +246,7 @@ static void BinaryTree_Insert_creates_root() {
   int value = 5;
 
   ListOpResult result = BinaryTree_Insert(sut, &value);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
   CU_ASSERT_PTR_NOT_EQUAL(&NULL_NODE, sut->root);
   CU_ASSERT_EQUAL(1, sut->n);
   tree_is_valid(sut, 1);
@@ -279,7 +286,7 @@ static void BinaryTree_Insert_creates_valid_tree() {
 static void BinaryTree_Delete_null_paramter() {
   SUT(mock_vals, {
     int search_for = 5;
-    BINARY_NULL_TEST(ListOp_NullParameter, sut, &search_for, BinaryTree_Delete);
+    BINARY_NULL_TEST(kkNullParameter, sut, &search_for, BinaryTree_Delete);
   });
 }
 
@@ -288,7 +295,7 @@ static void BinaryTree_Delete_empty() {
     int search_for = 5;
     ErrorReporter_Clear();
     BinaryTree_Delete(sut, &search_for);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -298,7 +305,7 @@ static void BinaryTree_Delete_not_found() {
     ErrorReporter_Clear();
     void* result = BinaryTree_Delete(sut, &not_found);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
     tree_is_valid(sut, mock_n);
   });
 }
@@ -312,7 +319,7 @@ static void BinaryTree_DeleteTest(int doomed) {
     ErrorReporter_Clear();
     void* found = BinaryTree_Search(sut, &doomed);
     CU_ASSERT_PTR_NULL(found);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -349,7 +356,7 @@ static void BinaryTree_Delete_standard() {
       ErrorReporter_Clear();
       void* found = BinaryTree_Search(sut, &doomed);
       CU_ASSERT_PTR_NULL(found);
-      CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+      CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
     });
   }
 }
@@ -363,7 +370,7 @@ static void MockItemHandler(void* item) {
 
 static void BinaryTree_Enumerate_null_paramter() {
   SUT(mock_vals, {
-    BINARY_INT_NULL_TEST(ListOp_NullParameter, sut, MockItemHandler,
+    BINARY_INT_NULL_TEST(kkNullParameter, sut, MockItemHandler,
                          BinaryTree_Enumerate);
   });
 }
@@ -371,7 +378,7 @@ static void BinaryTree_Enumerate_null_paramter() {
 static void BinaryTree_Enumerate_empty() {
   SUT(empty_vals, {
     ListOpResult result = BinaryTree_Enumerate(sut, MockItemHandler);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
+    CU_ASSERT_EQUAL(kkSuccess, result);
   });
 }
 
@@ -379,7 +386,7 @@ static void BinaryTree_Enumerate_standard() {
   SUT(mock_vals, {
     mock_pos = 0;
     ListOpResult result = BinaryTree_Enumerate(sut, MockItemHandler);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
+    CU_ASSERT_EQUAL(kkSuccess, result);
     CU_ASSERT_EQUAL(mock_n, mock_pos);
   });
 }
@@ -391,7 +398,7 @@ static void BinaryTree_Search_not_found() {
     ErrorReporter_Clear();
     void* result = BinaryTree_Search(sut, &not_found);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -403,7 +410,7 @@ static void BinaryTree_Search_empty() {
     void* result = BinaryTree_Search(sut, &search_for);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -427,7 +434,7 @@ static void BinaryTree_Min_empty() {
     void* result = BinaryTree_Min(sut);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -445,7 +452,7 @@ static void BinaryTree_Max_empty() {
     void* result = BinaryTree_Max(sut);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -465,7 +472,7 @@ static void BinaryTree_Predecessor_empty() {
     void* result = BinaryTree_Predecessor(sut, &search_for);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -477,7 +484,7 @@ static void BinaryTree_Predecessor_not_found() {
     void* result = BinaryTree_Predecessor(sut, &not_found);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -511,7 +518,7 @@ static void BinaryTree_Successor_empty() {
     void* result = BinaryTree_Successor(sut, &search_for);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -523,7 +530,7 @@ static void BinaryTree_Successor_not_found() {
     void* result = BinaryTree_Successor(sut, &not_found);
 
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -553,7 +560,7 @@ static void BinaryTree_Select_null_paramter() {
   ErrorReporter_Clear();
   void* result = BinaryTree_Select(NULL, 1);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 }
 
 static void BinaryTree_Select_empty() {
@@ -561,7 +568,7 @@ static void BinaryTree_Select_empty() {
     ErrorReporter_Clear();
     void* result = BinaryTree_Select(sut, 0);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -570,7 +577,7 @@ static void BinaryTree_Select_out_of_bounds() {
     ErrorReporter_Clear();
     void* result = BinaryTree_Select(sut, mock_n + 1);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_InvalidIndex, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkInvalidIndex, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -591,17 +598,17 @@ static void BinaryTree_Rank_null_paramter() {
     ErrorReporter_Clear();
     size_t result = BinaryTree_Rank(NULL, NULL);
     CU_ASSERT_EQUAL(RANK_ERROR, result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 
     ErrorReporter_Clear();
     result = BinaryTree_Rank(sut, NULL);
     CU_ASSERT_EQUAL(RANK_ERROR, result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 
     ErrorReporter_Clear();
     result = BinaryTree_Rank(NULL, &search_for);
     CU_ASSERT_EQUAL(RANK_ERROR, result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -612,7 +619,7 @@ static void BinaryTree_Rank_empty() {
     ErrorReporter_Clear();
     size_t result = BinaryTree_Rank(sut, &search_for);
     CU_ASSERT_EQUAL(RANK_ERROR, result);
-    CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -622,7 +629,7 @@ static void BinaryTree_Rank_not_found() {
     ErrorReporter_Clear();
     size_t result = BinaryTree_Rank(sut, &not_found);
     CU_ASSERT_EQUAL(RANK_ERROR, result);
-    CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
   });
 }
 
@@ -661,17 +668,16 @@ static void BinaryTree_null_parameters() {
 
   ListOpResult (*binary_int_tests[])(BinaryTree*, void*) = {BinaryTree_Insert,
                                                             NULL};
-  BINARY_INT_NULL_TEST_ENUMERATOR(ListOp_NullParameter, tree, &search_for,
+  BINARY_INT_NULL_TEST_ENUMERATOR(kkNullParameter, tree, &search_for,
                                   binary_int_tests);
 
   void* (*binary_tests[])(const BinaryTree*, const void*) = {
       BinaryTree_Search, BinaryTree_Predecessor, BinaryTree_Successor, NULL};
-  BINARY_NULL_TEST_ENUMERATOR(ListOp_NullParameter, tree, &search_for,
-                              binary_tests);
+  BINARY_NULL_TEST_ENUMERATOR(kkNullParameter, tree, &search_for, binary_tests);
 
   void* (*tests[])(const BinaryTree*) = {BinaryTree_Min, BinaryTree_Max, NULL};
 
-  UNARY_NULL_TEST_ENUMERATOR(ListOp_NullParameter, tests);
+  UNARY_NULL_TEST_ENUMERATOR(kkNullParameter, tests);
 
   BinaryTree_Destroy(tree, NULL);
 }
@@ -683,8 +689,8 @@ static void BinaryTree_validate_validator() {
 }
 
 /*************************** BinaryTree_RotateLeft ****************************/
-static void tree_has_values(BinaryTreeNode* sut, BinaryTreeNode* expected) {
-  if (expected == NULL && sut == NULL) return;
+static void TreeHasValues(BinaryTreeNode* sut, BinaryTreeNode* expected) {
+  if (expected == NULL || sut == NULL) return;
 
   int actual = node_value(sut);
   int exp = node_value(expected);
@@ -696,26 +702,26 @@ static void tree_has_values(BinaryTreeNode* sut, BinaryTreeNode* expected) {
 
   if (expected == &NULL_NODE || sut == &NULL_NODE) return;
 
-  tree_has_values(sut->left, expected->left);
-  tree_has_values(sut->right, expected->right);
+  TreeHasValues(sut->left, expected->left);
+  TreeHasValues(sut->right, expected->right);
 }
 
 static void test_rotate(int* vals, int* expected_vals, int pivot, int n,
                         ListOpResult (*rotate)(BinaryTree*, const void*)) {
   SUT(vals, {
     ListOpResult result = rotate(sut, &pivot);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
+    CU_ASSERT_EQUAL(kkSuccess, result);
     tree_is_valid(sut, n);
 
     BinaryTree* expected = create_sut(expected_vals);
-    tree_has_values(sut->root, expected->root);
+    TreeHasValues(sut->root, expected->root);
     BinaryTree_Destroy(expected, NULL);
   });
 }
 
 static void BinaryTree_RotateLeft_null_parameter() {
   int search_for = 5;
-  SUT(mock_vals, {BINARY_INT_NULL_TEST(ListOp_NullParameter, sut, &search_for,
+  SUT(mock_vals, {BINARY_INT_NULL_TEST(kkNullParameter, sut, &search_for,
                                        BinaryTree_RotateLeft)});
 }
 
@@ -724,7 +730,7 @@ static void BinaryTree_RotateLeft_not_found() {
 
   SUT(mock_vals, {
     ListOpResult result = BinaryTree_RotateLeft(sut, &not_found);
-    CU_ASSERT_EQUAL(ListOp_NotFound, result);
+    CU_ASSERT_EQUAL(kkNotFound, result);
   });
 }
 
@@ -747,7 +753,7 @@ static void BinaryTree_RotateLeft_happy_path() {
 
 static void BinaryTree_RotateRight_null_parameter() {
   int search_for = 5;
-  SUT(mock_vals, {BINARY_INT_NULL_TEST(ListOp_NullParameter, sut, &search_for,
+  SUT(mock_vals, {BINARY_INT_NULL_TEST(kkNullParameter, sut, &search_for,
                                        BinaryTree_RotateRight)});
 }
 
@@ -756,7 +762,7 @@ static void BinaryTree_RotateRight_not_found() {
 
   SUT(mock_vals, {
     ListOpResult result = BinaryTree_RotateRight(sut, &not_found);
-    CU_ASSERT_EQUAL(ListOp_NotFound, result);
+    CU_ASSERT_EQUAL(kkNotFound, result);
   });
 }
 
@@ -819,7 +825,7 @@ static void RedBlackTree_Insert_failed_mem_allocation() {
 
   FAILED_MALLOC_TEST({ result = RedBlackTree_Insert(sut, &value); })
 
-  CU_ASSERT_EQUAL(ListOp_FailedMalloc, result);
+  CU_ASSERT_EQUAL(kFailedMalloc, result);
   BinaryTree_Destroy(sut, NULL);
 }
 
@@ -903,7 +909,7 @@ int RegisterBinaryTreeTests() {
       CU_TEST_INFO(BinaryTree_Predecessor_first_item),
       CU_TEST_INFO(BinaryTree_Predecessor_standard), CU_TEST_INFO_NULL};
 
-  CU_TestInfo successor_tests[] = {CU_TEST_INFO(BinaryTree_Successor_empty),
+  CU_TestInfo Successor_tests[] = {CU_TEST_INFO(BinaryTree_Successor_empty),
                                    CU_TEST_INFO(BinaryTree_Successor_not_found),
                                    CU_TEST_INFO(BinaryTree_Successor_last_item),
                                    CU_TEST_INFO(BinaryTree_Successor_standard),
@@ -979,7 +985,7 @@ int RegisterBinaryTreeTests() {
                            {.pName = "BinaryTree_Successor",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
-                            .pTests = successor_tests},
+                            .pTests = Successor_tests},
                            {.pName = "BinaryTree_Select",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,

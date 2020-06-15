@@ -66,13 +66,13 @@ static Result _hasCycle(DisjointSet* ds, const Graph* graph, const Edge* edge,
   SetItem* head;
 
   Result r = DisjointSet_FindSet(ds, graph->V[edge->tail], &tail);
-  if (r != Success) return r;
+  if (r != kSuccess) return r;
 
   r = DisjointSet_FindSet(ds, graph->V[edge->head], &head);
-  if (r != Success) return r;
+  if (r != kSuccess) return r;
 
   *result = tail == head;
-  return Success;
+  return kSuccess;
 }
 
 MinSpanTree* MinSpanTree_Create() {
@@ -110,7 +110,7 @@ static Edge* _findCheapestEdgeInGraph(const Graph* graph, char* conqueredList) {
 
 static Result _addEdgeToMst(MinSpanTree* mst, Edge* edge) {
   Edge* current = malloc(sizeof(Edge));
-  if (current == NULL) return FailedMemoryAllocation;
+  if (current == NULL) return kFailedMemoryAllocation;
 
   *current = *edge;
   current->next = NULL;
@@ -124,12 +124,12 @@ static Result _addEdgeToMst(MinSpanTree* mst, Edge* edge) {
   }
 
   if (is_add_overflow_int(mst->cost, current->weight)) {
-    return ArithmeticOverflow;
+    return kArithmeticOverflow;
   }
 
   ++mst->edge_count;
   mst->cost += current->weight;
-  return Success;
+  return kSuccess;
 }
 
 void MinSpanTree_Edges_Destroy(Edge* edges) {
@@ -152,7 +152,7 @@ void MinSpanTree_Destroy(MinSpanTree* mst) {
 }
 
 Result PrimMinSpanTreeNaive(const Graph* graph, MinSpanTree* mst) {
-  if (graph == NULL || mst == NULL) return NullParameter;
+  if (graph == NULL || mst == NULL) return kNullParameter;
 
   _initMst(mst);
 
@@ -167,13 +167,13 @@ Result PrimMinSpanTreeNaive(const Graph* graph, MinSpanTree* mst) {
 
   while (shortest != NULL) {
     Result result = _addEdgeToMst(mst, shortest);
-    if (result != Success) return result;
+    if (result != kSuccess) return result;
 
     _conquer(graph->V[shortest->head], conquered);
     shortest = _findCheapestEdgeInGraph(graph, conquered);
   }
 
-  return Success;
+  return kSuccess;
 }
 
 void _setWinner(SpanTreeResult* conquered, int vertex_id, Edge* winner) {
@@ -202,7 +202,7 @@ Edge* _findWinningEdge(SpanTreeResult* conquered, Edge* edges) {
 }
 
 Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
-  if (graph == NULL || mst == NULL) return NullParameter;
+  if (graph == NULL || mst == NULL) return kNullParameter;
 
   _initMst(mst);
 
@@ -213,7 +213,7 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
   conquered[1].vertex_id = 1;
 
   Heap* heap = Heap_Create(graph->n, _spanTreeResultComparator);
-  if (heap == NULL) return FailedMemoryAllocation;
+  if (heap == NULL) return kFailedMemoryAllocation;
 
   for (size_t i = 2; i < graph->n; i++) {
     conquered[i].vertex_id = i;
@@ -222,22 +222,22 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
     _setWinner(conquered, i, winner);
 
     HeapResult result = Heap_Insert(heap, &conquered[i]);
-    if (result != HeapSuccess) {
+    if (result != HeapkSuccess) {
       Heap_Destroy(heap, NULL);
-      return DependancyError;
+      return kDependancyError;
     }
   }
 
-  while (!Heap_IsEmpty(heap)) {
+  while (!Heap_IskEmpty(heap)) {
     SpanTreeResult* next = Heap_Extract(heap);
 
     if (next == NULL) {
       Heap_Destroy(heap, NULL);
-      return DependancyError;
+      return kDependancyError;
     }
 
     Result result = _addEdgeToMst(mst, next->winner);
-    if (result != Success) {
+    if (result != kSuccess) {
       Heap_Destroy(heap, NULL);
       return result;
     }
@@ -258,11 +258,11 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
   }
 
   Heap_Destroy(heap, NULL);
-  return Success;
+  return kSuccess;
 }
 
 Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst) {
-  if (graph == NULL || mst == NULL) return NullParameter;
+  if (graph == NULL || mst == NULL) return kNullParameter;
 
   _initMst(mst);
 
@@ -270,7 +270,7 @@ Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst) {
 
   DisjointSet ds;
   Result result = DisjointSet_Init(&ds, graph->n);
-  if (result != Success) return result;
+  if (result != kSuccess) return result;
 
   // Initialize the disjoint set and edge array
   size_t current_edge = 0;
@@ -295,7 +295,7 @@ Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst) {
 
     bool hasCycle;
     result = _hasCycle(&ds, graph, &edges[i], &hasCycle);
-    if (result != Success) {
+    if (result != kSuccess) {
       DisjointSet_Destory(&ds);
       return result;
     }
@@ -305,13 +305,13 @@ Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst) {
     } else {
       result = DisjointSet_Union(&ds, graph->V[edges[i].head],
                                  graph->V[edges[i].tail]);
-      if (result != Success) {
+      if (result != kSuccess) {
         DisjointSet_Destory(&ds);
         return result;
       }
 
       Result result = _addEdgeToMst(mst, &edges[i]);
-      if (result != Success) {
+      if (result != kSuccess) {
         DisjointSet_Destory(&ds);
         return result;
       }
@@ -319,5 +319,5 @@ Result KruskalMinSpanTree(const Graph* graph, MinSpanTree* mst) {
   }
 
   DisjointSet_Destory(&ds);
-  return Success;
+  return kSuccess;
 }

@@ -11,23 +11,23 @@
 uintptr_t _enumerate_sum;
 
 typedef enum {
-  INSERT = 1,
-  SEARCH = 2,
-  ENUMERATE = 3,
-  MAX = 4,
-  PREDECESSOR = 5,
-  SELECT = 6,
-  RANK = 7
+  kInsert = 1,
+  kSearch = 2,
+  kEnumerate = 3,
+  kMax = 4,
+  kPredecessor = 5,
+  kSelect = 6,
+  kRank = 7
 } Operation;
 
 typedef enum {
-  ARRAY = 1,
-  SORTED_ARRAY = 2,
-  LINKED_LIST = 3,
-  LINKED_LIST_POOR_LOCALITY = 4,
-  BINARY_TREE = 5,
-  BINARY_TREE_UNBALANCED = 6,
-  RED_BLACK_TREE = 7
+  kArray = 1,
+  kSortedArray = 2,
+  kLinkedList = 3,
+  kLinkedListPoorLocality = 4,
+  kBinaryTree = 5,
+  kBinaryTreeUnbalanced = 6,
+  kRedBlackTree = 7
 } Structure;
 
 typedef ListOpResult (*ListOp)(void*, uintptr_t);
@@ -42,7 +42,7 @@ ListOp GetInsertOperation(Structure);
 SearchOp GetSearchOperation(Structure);
 EnumerateOp GetEnumerateOperation(Structure);
 
-void* BuildEmptyDataStructure(Structure);
+void* BuildkEmptyDataStructure(Structure);
 void* BuildDataStructure(Structure, size_t);
 void DestroyStructure(Structure, void*);
 

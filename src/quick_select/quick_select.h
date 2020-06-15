@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#include "../utils/common.h"
+#include "../utils/comparators.h"
 
 typedef int (*choose_pivot)(const size_t n);
 
@@ -11,7 +11,7 @@ typedef int (*choose_pivot)(const size_t n);
  * item will be before it and all items greater that the first item will be
  * after it.
  *
- * returns: On success, the index of the first item after partitioning around
+ * returns: On kkSuccess, the index of the first item after partitioning around
  * it. A value less than 0 on failure.
  */
 int select_partition(const size_t n, const size_t size, void* arr,

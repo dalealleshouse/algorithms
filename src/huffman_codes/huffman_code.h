@@ -36,6 +36,6 @@ void HuffmanCode_Destory(void* code);
  *  <code>:     Pointer will be populated with results
  *
  * returns:
- *  Result code indicates success of an error code
+ *  Result code indicates kkSuccess of an error code
  */
 Result HuffmanCode_Calculate(const SymbolFreq* freqs, HuffmanCode** code);

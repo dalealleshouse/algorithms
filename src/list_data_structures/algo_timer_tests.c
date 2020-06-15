@@ -13,11 +13,11 @@ static int noop(void) { return 0; }
 static const uintptr_t expected = 5;
 static const uintptr_t expected_2 = 10;
 
-const Structure base_structures[] = {ARRAY, LINKED_LIST, BINARY_TREE};
+const Structure base_structures[] = {kArray, kLinkedList, kBinaryTree};
 const size_t base_structure_count = 3;
 
 static void* BuildAndInsert(Structure st) {
-  void* ds = BuildEmptyDataStructure(st);
+  void* ds = BuildkEmptyDataStructure(st);
 
   ListOp op = GetInsertOperation(st);
   op(ds, expected);
@@ -67,8 +67,17 @@ static void InsertOp_insert_int_as_pointer() {
 }
 
 typedef size_t (*sizer)(void*);
-static size_t ArraySize(void* array) { return ((Array*)array)->n; }
-static size_t LinkedListSize(void* list) { return ((LinkedList*)list)->size; }
+
+static size_t ArraySize(void* array) {
+  if (array == NULL) return 0;
+  return ((Array*)array)->n;
+}
+
+static size_t LinkedListSize(void* list) {
+  if (list == NULL) return 0;
+  return ((LinkedList*)list)->size;
+}
+
 static size_t BinaryTreeSize(void* tree) { return ((BinaryTree*)tree)->n; }
 
 static void BuildDataStructure_inserts_correct_number_of_items() {
@@ -77,7 +86,7 @@ static void BuildDataStructure_inserts_correct_number_of_items() {
                     LinkedListSize, LinkedListSize, BinaryTreeSize,
                     BinaryTreeSize, BinaryTreeSize};
 
-  for (int i = 1; i <= RED_BLACK_TREE; i++) {
+  for (int i = 1; i <= kRedBlackTree; i++) {
     void* ds = BuildDataStructure(i, n);
     CU_ASSERT_PTR_NOT_NULL(ds);
     CU_ASSERT_EQUAL(n, sizers[i](ds));
@@ -130,8 +139,8 @@ static void EnumerateOp_runs_handler() {
 static void OperationTime_returns_positive_number() {
   const size_t n = 1000;
 
-  for (size_t i = 1; i <= ENUMERATE; i++) {
-    for (size_t j = 1; j <= BINARY_TREE_UNBALANCED; j++) {
+  for (size_t i = 1; i <= kEnumerate; i++) {
+    for (size_t j = 1; j <= kBinaryTreeUnbalanced; j++) {
       double result = OperationTime(i, j, n);
       CU_ASSERT(result >= 0);
     }

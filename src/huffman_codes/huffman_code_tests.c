@@ -139,15 +139,15 @@ static SymbolFreq* _createSymbolFreq(char* input) {
 
 static void HuffmanCode_Calculate_NullParamerter() {
   Result result = HuffmanCode_Calculate(NULL, NULL);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 
   HuffmanCode* code;
   result = HuffmanCode_Calculate(NULL, &code);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 
   SymbolFreq* freqs = _createSymbolFreq("ABCADBB CCaa");
   result = HuffmanCode_Calculate(freqs, NULL);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 
   SymbolFreq_Destroy(freqs);
 }
@@ -159,7 +159,7 @@ static void HuffmanCode_Calculate_FailedMalloc() {
 
   FAILED_MALLOC_TEST({ result = HuffmanCode_Calculate(freqs, &code); });
 
-  CU_ASSERT_EQUAL(result, FailedMemoryAllocation);
+  CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
 
   SymbolFreq_Destroy(freqs);
 }
@@ -191,7 +191,7 @@ static void HuffmanCode_Calculate_SmallCode() {
   HuffmanCode* code = NULL;
 
   Result result = HuffmanCode_Calculate(freqs, &code);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
 
   CU_ASSERT_STRING_EQUAL(code->zero->zero->symbol->symbol, "D")
   CU_ASSERT_STRING_EQUAL(code->one->one->symbol->symbol, "C")
@@ -215,7 +215,7 @@ static void _validateFile(const char* path, size_t max, size_t min) {
   HuffmanCode* code = NULL;
 
   Result result = HuffmanCode_Calculate(freqs, &code);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
 
   CU_ASSERT_EQUAL(_maxLengthCode(code, 0), max);
   CU_ASSERT_EQUAL(_minLengthCode(code, 0), min);

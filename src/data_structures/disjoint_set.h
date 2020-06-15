@@ -24,7 +24,7 @@ typedef struct DisjointSet {
  *          number of items may vary.
  *
  * returns:
- *  Result code indicating success/failure status
+ *  Result code indicating kkSuccess/failure status
  */
 Result DisjointSet_Init(DisjointSet* self, const size_t n);
 
@@ -38,7 +38,7 @@ Result DisjointSet_Init(DisjointSet* self, const size_t n);
  *  <y>:    The second item to locate
  *
  * returns:
- *  Result code indicating success/failure status
+ *  Result code indicating kkSuccess/failure status
  */
 Result DisjointSet_Union(DisjointSet* self, const void* x, const void* y);
 
@@ -51,7 +51,7 @@ Result DisjointSet_Union(DisjointSet* self, const void* x, const void* y);
  *  <set>:  Pointer to populate with the address of the found set
  *
  * returns:
- *  Result code indicating success/failure status
+ *  Result code indicating kkSuccess/failure status
  */
 Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
                            SetItem** set);
@@ -65,7 +65,7 @@ Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
  *  <set>:  Pointer to populate with the address of the newly created set
  *
  * returns:
- *  Result code indicating success/failure status
+ *  Result code indicating kkSuccess/failure status
  */
 Result DisjointSet_MakeSet(DisjointSet* self, const void* rep, SetItem** set);
 

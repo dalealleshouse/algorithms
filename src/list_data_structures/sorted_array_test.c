@@ -39,20 +39,20 @@ static void* SortedArray_Rank_ArrayOp(const Array* self, const void* item) {
   return NULL;
 }
 
-static void TestUnaryFuncNullParameter(SortedArrayOpUnary unary_funcs[]) {
+static void TestUnaryFunckNullParameter(SortedArrayOpUnary unary_funcs[]) {
   int tracker = 0;
   SortedArrayOpUnary uop = unary_funcs[0];
   while (uop != NULL) {
     ErrorReporter_Clear();
     void* result = uop(NULL);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 
     uop = unary_funcs[++tracker];
   }
 }
 
-static void TestFuncNullParameter(SortedArrayOp funcs[]) {
+static void TestFunckNullParameter(SortedArrayOp funcs[]) {
   void* item = malloc(100);
   Array* sut = CreateSut(10);
 
@@ -62,24 +62,24 @@ static void TestFuncNullParameter(SortedArrayOp funcs[]) {
     ErrorReporter_Clear();
     void* result = op(NULL, NULL);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 
     ErrorReporter_Clear();
     result = op(NULL, item);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 
     ErrorReporter_Clear();
     result = op(sut, NULL);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(kkNullParameter, ErrorReporter_LastErrorCode());
 
     op = funcs[++tracker];
   }
 
   SortedArrayOpUnary unary_funcs[] = {SortedArray_Min, SortedArray_Max,
                                       SortedArray_Select_Unary, NULL};
-  TestUnaryFuncNullParameter(unary_funcs);
+  TestUnaryFunckNullParameter(unary_funcs);
 
   free(item);
   Array_Destroy(sut);
@@ -89,11 +89,11 @@ static void SortedArray_null_parameter() {
   SortedArrayOp funcs[] = {SortedArray_Search, SortedArray_Successor,
                            SortedArray_Predecessor, SortedArray_Rank_ArrayOp,
                            NULL};
-  TestFuncNullParameter(funcs);
+  TestFunckNullParameter(funcs);
 
   SortedArrayOpUnary unary_funcs[] = {SortedArray_Min, SortedArray_Max,
                                       SortedArray_Select_Unary, NULL};
-  TestUnaryFuncNullParameter(unary_funcs);
+  TestUnaryFunckNullParameter(unary_funcs);
 }
 
 static void SortedArray_Search_not_found() {
@@ -127,7 +127,7 @@ static void SortedArray_Min_empty() {
 
   void* result = SortedArray_Min(sut);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -147,7 +147,7 @@ static void SortedArray_Max_empty() {
 
   void* result = SortedArray_Max(sut);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -170,7 +170,7 @@ static void SortedArray_Predecessor_not_found() {
   ErrorReporter_Clear();
   void* result = SortedArray_Predecessor(sut, &not_found);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -182,7 +182,7 @@ static void SortedArray_Predecessor_empty() {
   ErrorReporter_Clear();
   void* result = SortedArray_Predecessor(sut, &item);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -220,7 +220,7 @@ static void SortedArray_Successor_not_found() {
   ErrorReporter_Clear();
   void* result = SortedArray_Successor(sut, &not_found);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -232,7 +232,7 @@ static void SortedArray_Successor_empty() {
   ErrorReporter_Clear();
   void* result = SortedArray_Successor(sut, &item);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -271,7 +271,7 @@ static void SortedArray_Select_out_of_bounds() {
   ErrorReporter_Clear();
   void* result = SortedArray_Select(sut, n);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ListOp_InvalidIndex, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkInvalidIndex, ErrorReporter_LastErrorCode());
   Array_Destroy(sut);
 }
 
@@ -295,7 +295,7 @@ static void SortedArray_Rank_not_found() {
   ErrorReporter_Clear();
   size_t result = SortedArray_Rank(sut, &not_found);
   CU_ASSERT_EQUAL(RANK_ERROR, result);
-  CU_ASSERT_EQUAL(ListOp_NotFound, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkNotFound, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }
@@ -307,7 +307,7 @@ static void SortedArray_Rank_empty() {
   ErrorReporter_Clear();
   size_t result = SortedArray_Rank(sut, &item);
   CU_ASSERT_EQUAL(RANK_ERROR, result);
-  CU_ASSERT_EQUAL(ListOp_EmptyList, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(kkEmptyList, ErrorReporter_LastErrorCode());
 
   Array_Destroy(sut);
 }

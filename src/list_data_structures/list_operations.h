@@ -20,12 +20,12 @@ const size_t RANK_ERROR;
 typedef void (*item_handler)(void* x);
 
 typedef enum {
-  ListOp_EmptyList = -5,
-  ListOp_InvalidIndex = -4,
-  ListOp_NotFound = -3,
-  ListOp_FailedMalloc = -2,
-  ListOp_NullParameter = -1,
-  ListOp_Success = 0
+  kkEmptyList = -5,
+  kkInvalidIndex = -4,
+  kkNotFound = -3,
+  kFailedMalloc = -2,
+  kkNullParameter = -1,
+  kkSuccess = 0
 } ListOpResult;
 
 char* ListOp_ErrorMessage(ListOpResult);

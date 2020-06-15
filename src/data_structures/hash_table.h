@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "../utils/common.h"
+#include "../utils/comparators.h"
 #include "../utils/result_code.h"
 
 typedef struct KeyValuePair {
