@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "./common.h"
+#include "./comparators.h"
 #include "./error_reporter.h"
 
 typedef unsigned int vertex_id;
@@ -20,17 +20,17 @@ typedef unsigned int vertex_id;
   }
 
 typedef enum GraphResult {
-  Graph_ArithmeticOverflow = -10,
+  Graph_kArithmeticOverflow = -10,
   Graph_NegativeCycle = -9,
   Graph_DependencyError = -8,
   Graph_FileOpenError = -7,
   Graph_InvalidFilePath = -6,
   Graph_VertexIdExceedsMaxSize = -5,
-  Graph_DuplicateVertexId = -4,
+  Graph_kDuplicateVertexId = -4,
   Graph_InvalidVertexId = -3,
-  Graph_FailedMemoryAllocation = -2,
-  Graph_NullParameter = -1,
-  Graph_Success = 0
+  Graph_kFailedMemoryAllocation = -2,
+  Graph_kNullParameter = -1,
+  Graph_kSuccess = 0
 } GraphResult;
 
 typedef struct Edge {

@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -25,9 +26,9 @@ static void ListIsValid(const LinkedList* list, const size_t n,
 
   LinkedListItem* item = list->head;
   for (size_t i = 0; i < n; i++) {
-    if (item == NULL || item->payload == NULL)
+    if (item == NULL || item->payload == NULL) {
       CU_FAIL("null item")
-    else {
+    } else {
       CU_ASSERT_PTR_EQUAL(item->payload, expected[i]);
       item = item->next;
     }
@@ -36,9 +37,9 @@ static void ListIsValid(const LinkedList* list, const size_t n,
 
   item = list->tail;
   for (size_t i = 1; i <= n; i++) {
-    if (item == NULL || item->payload == NULL)
+    if (item == NULL || item->payload == NULL) {
       CU_FAIL("null item")
-    else {
+    } else {
       CU_ASSERT_PTR_EQUAL(item->payload, expected[n - i]);
       item = item->prev;
     }
@@ -59,7 +60,11 @@ static void LinkedList_Create_bad_malloc() {
 static void LinkedList_Create_initalizes_values() {
   LinkedList* list = LinkedList_Create(free, PIntComparator);
 
-  CU_ASSERT_PTR_NOT_NULL(list);
+  if (list == NULL) {
+    CU_FAIL("list is null");
+    return;
+  }
+
   CU_ASSERT_EQUAL(0, list->size);
   CU_ASSERT_PTR_NULL(list->head);
   CU_ASSERT_PTR_NULL(list->tail);
@@ -72,15 +77,15 @@ static void LinkedList_Create_initalizes_values() {
 /*************************** LinkedList_InsertAt ******************************/
 static void LinkedList_InsertAt_null_parameters() {
   ListOpResult result = LinkedList_InsertAt(NULL, NULL, 0);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   int dummy = 5;
   result = LinkedList_InsertAt(NULL, &dummy, 0);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   LinkedList* list = LinkedList_Create(NULL, PIntComparator);
   result = LinkedList_InsertAt(list, NULL, 0);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   LinkedList_Destroy(list);
 }
@@ -90,7 +95,7 @@ static void LinkedList_InsertAt_bad_index() {
 
   int dummy = 5;
   ListOpResult result = LinkedList_InsertAt(list, &dummy, 5);
-  CU_ASSERT_EQUAL(ListOp_InvalidIndex, result);
+  CU_ASSERT_EQUAL(kkInvalidIndex, result);
 
   LinkedList_Destroy(list);
 }
@@ -101,7 +106,7 @@ static void LinkedList_InsertAt_bad_malloc() {
 
   FAILED_MALLOC_TEST({
     ListOpResult result = LinkedList_InsertAt(list, &dummy, 0);
-    CU_ASSERT_EQUAL(ListOp_FailedMalloc, result);
+    CU_ASSERT_EQUAL(kFailedMalloc, result);
   })
 
   LinkedList_Destroy(list);
@@ -114,7 +119,7 @@ static void LinkedList_InsertAt_empty() {
 
   ListOpResult result = LinkedList_InsertAt(list, &payload, 0);
 
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
   ListIsValid(list, 1, expected);
 
   LinkedList_Destroy(list);
@@ -129,7 +134,7 @@ static void LinkedList_InsertAt_tail() {
   LinkedList_InsertAt(list, &head_payload, 0);
   ListOpResult result = LinkedList_InsertAt(list, &tail_payload, 1);
 
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
   ListIsValid(list, 2, expected);
 
   LinkedList_Destroy(list);
@@ -146,7 +151,7 @@ static void LinkedList_InsertAt_middle() {
   LinkedList_InsertAt(list, &head_payload, 0);
   LinkedList_InsertAt(list, &tail_payload, 1);
   ListOpResult result = LinkedList_InsertAt(list, &mid_payload, 1);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
 
   ListIsValid(list, 3, expected);
 
@@ -163,7 +168,7 @@ static void LinkedList_InsertAt_head_creates_links() {
 
   for (size_t i = 0; i < n; i++) {
     ListOpResult result = LinkedList_InsertAt(list, &payload[i], 0);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
+    CU_ASSERT_EQUAL(kkSuccess, result);
   }
 
   ListIsValid(list, n, expected);
@@ -181,7 +186,7 @@ static void LinkedList_InsertAt_tail_creates_links() {
 
   for (size_t i = 0; i < n; i++) {
     ListOpResult result = LinkedList_InsertAt(list, &payload[i], i);
-    CU_ASSERT_EQUAL(ListOp_Success, result);
+    CU_ASSERT_EQUAL(kkSuccess, result);
   }
 
   ListIsValid(list, n, expected);
@@ -196,13 +201,13 @@ static void LinkedList_InsertAt_mid_creates_links() {
   LinkedList* list = LinkedList_Create(NULL, PIntComparator);
 
   ListOpResult result = LinkedList_InsertAt(list, &payload[0], 0);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
 
   result = LinkedList_InsertAt(list, &payload[1], 1);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
 
   result = LinkedList_InsertAt(list, &payload[2], 1);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
 
   ListIsValid(list, 3, expected);
 
@@ -219,7 +224,7 @@ static void MockFreer(void* ptr) {
 
 static void LinkedList_DeleteAt_null_parameters() {
   ListOpResult result = LinkedList_DeleteAt(NULL, 0);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 }
 
 static void LinkedList_DeleteAt_invalid_index() {
@@ -227,7 +232,7 @@ static void LinkedList_DeleteAt_invalid_index() {
 
   ListOpResult result = LinkedList_DeleteAt(list, 1);
 
-  CU_ASSERT_EQUAL(ListOp_InvalidIndex, result);
+  CU_ASSERT_EQUAL(kkInvalidIndex, result);
 
   LinkedList_Destroy(list);
 }
@@ -240,7 +245,7 @@ static void LinkedList_DeleteAt_calls_freer() {
   LinkedList_InsertAt(list, &dummy, 0);
   ListOpResult result = LinkedList_DeleteAt(list, 0);
 
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
   CU_ASSERT_EQUAL(true, is_free);
 
   LinkedList_Destroy(list);
@@ -311,14 +316,14 @@ static void LinkedList_Delete_null_parameters() {
   int val = 5;
 
   ListOpResult result = LinkedList_Delete(NULL, NULL);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   result = LinkedList_Delete(NULL, &val);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   SUT({
     result = LinkedList_Delete(sut, NULL);
-    CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+    CU_ASSERT_EQUAL(kkNullParameter, result);
   });
 }
 
@@ -328,7 +333,7 @@ static void LinkedList_Delete_not_found() {
   SUT({
     LinkedList_InsertAt(sut, &val, 0);
     ListOpResult result = LinkedList_Delete(sut, &not_found);
-    CU_ASSERT_EQUAL(result, ListOp_NotFound);
+    CU_ASSERT_EQUAL(result, kkNotFound);
   });
 }
 
@@ -430,10 +435,10 @@ static void LinkedList_Enumerate_null_paramter() {
   LinkedList* list = LinkedList_Create(NULL, PIntComparator);
 
   ListOpResult result = LinkedList_Enumerate(list, NULL);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   result = LinkedList_Enumerate(NULL, MockItemHandler);
-  CU_ASSERT_EQUAL(ListOp_NullParameter, result);
+  CU_ASSERT_EQUAL(kkNullParameter, result);
 
   LinkedList_Destroy(list);
 }
@@ -442,7 +447,7 @@ static void LinkedList_Enumerate_empty() {
   LinkedList* list = LinkedList_Create(NULL, PIntComparator);
 
   ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
 
   LinkedList_Destroy(list);
 }
@@ -456,7 +461,7 @@ static void LinkedList_Enumerate_standard() {
 
   mock_pos = 0;
   ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);
-  CU_ASSERT_EQUAL(ListOp_Success, result);
+  CU_ASSERT_EQUAL(kkSuccess, result);
   CU_ASSERT_EQUAL(mock_n, mock_pos);
 
   LinkedList_Destroy(list);

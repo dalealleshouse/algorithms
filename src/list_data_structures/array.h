@@ -1,8 +1,9 @@
+// Copyright 2020 Dale Alleshouse
 #pragma once
 
 #include <stddef.h>
 
-#include "../utils/common.h"
+#include "../utils/comparators.h"
 #include "./list_operations.h"
 
 typedef struct {

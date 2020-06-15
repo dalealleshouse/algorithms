@@ -19,19 +19,19 @@ static void _containsId(WeightedVertex* vertices[], const size_t n,
   CU_FAIL("ID not found");
 }
 
-static void _testNullParameter(wis func) {
+static void _testkNullParameter(wis func) {
   Result result = func(NULL, NULL);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 }
 
-static void _testEmptySet(wis func) {
+static void _testkEmptySet(wis func) {
   WeightedIndependentSet* wis = NULL;
   PathGraph graph;
   graph.n = 0;
   graph.vertices = NULL;
 
   Result result = func(&graph, &wis);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_PTR_EQUAL(wis, &EMPTY_SET);
 }
 
@@ -43,7 +43,7 @@ static void _testSingleVertex(wis func) {
   WeightedIndependentSet* wis = NULL;
 
   Result result = func(graph, &wis);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(1, wis->n);
   CU_ASSERT_EQUAL(100, wis->weight);
   CU_ASSERT_EQUAL(1, wis->vertices[0]->id);
@@ -61,7 +61,7 @@ static void _testTwoVertices(wis func) {
   WeightedIndependentSet* wis = NULL;
 
   Result result = func(graph, &wis);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(1, wis->n);
   CU_ASSERT_EQUAL(101, wis->weight);
   CU_ASSERT_EQUAL(2, wis->vertices[0]->id);
@@ -79,7 +79,7 @@ static void _testFourVertices(wis func) {
   WeightedIndependentSet* wis = NULL;
 
   Result result = func(graph, &wis);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(2, wis->n);
   CU_ASSERT_EQUAL(8, wis->weight);
   _containsId(wis->vertices, wis->n, 1);
@@ -97,7 +97,7 @@ static void _testSixVertices(wis func) {
   WeightedIndependentSet* wis = NULL;
 
   Result result = func(graph, &wis);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(3, wis->n);
   CU_ASSERT_EQUAL(14, wis->weight);
   _containsId(wis->vertices, wis->n, 0);
@@ -116,18 +116,18 @@ static void _testArimiticOverflow(wis func) {
   WeightedIndependentSet* wis = NULL;
 
   Result result = func(graph, &wis);
-  CU_ASSERT_EQUAL(result, ArithmeticOverflow);
+  CU_ASSERT_EQUAL(result, kArithmeticOverflow);
 
   WeightedIndependentSet_Destroy(wis);
   PathGraph_Destroy(graph);
 }
 
-static void WeightedIndependentSet_Recursive_NullParameter() {
-  _testNullParameter(WeightedIndependentSet_Recursive);
+static void WeightedIndependentSet_Recursive_kNullParameter() {
+  _testkNullParameter(WeightedIndependentSet_Recursive);
 }
 
-static void WeightedIndependentSet_Recursive_EmptySet() {
-  _testEmptySet(WeightedIndependentSet_Recursive);
+static void WeightedIndependentSet_Recursive_kEmptySet() {
+  _testkEmptySet(WeightedIndependentSet_Recursive);
 }
 
 static void WeightedIndependentSet_Recursive_SingleVertex() {
@@ -150,12 +150,12 @@ static void WeightedIndependentSet_Recursive_ArimiticOverflow() {
   _testArimiticOverflow(WeightedIndependentSet_Recursive);
 }
 
-static void WeightedIndependentSet_Dynamic_NullParameter() {
-  _testNullParameter(WeightedIndependentSet_Dynamic);
+static void WeightedIndependentSet_Dynamic_kNullParameter() {
+  _testkNullParameter(WeightedIndependentSet_Dynamic);
 }
 
-static void WeightedIndependentSet_Dynamic_EmptySet() {
-  _testEmptySet(WeightedIndependentSet_Dynamic);
+static void WeightedIndependentSet_Dynamic_kEmptySet() {
+  _testkEmptySet(WeightedIndependentSet_Dynamic);
 }
 
 static void WeightedIndependentSet_Dynamic_SingleVertex() {
@@ -178,12 +178,12 @@ static void WeightedIndependentSet_Dynamic_ArimiticOverflow() {
   _testArimiticOverflow(WeightedIndependentSet_Dynamic);
 }
 
-static void WeightedIndependentSet_Dynamic_Reconstruction_NullParameter() {
-  _testNullParameter(WeightedIndependentSet_Dynamic_Reconstruction);
+static void WeightedIndependentSet_Dynamic_Reconstruction_kNullParameter() {
+  _testkNullParameter(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
-static void WeightedIndependentSet_Dynamic_Reconstruction_EmptySet() {
-  _testEmptySet(WeightedIndependentSet_Dynamic_Reconstruction);
+static void WeightedIndependentSet_Dynamic_Reconstruction_kEmptySet() {
+  _testkEmptySet(WeightedIndependentSet_Dynamic_Reconstruction);
 }
 
 static void WeightedIndependentSet_Dynamic_Reconstruction_SingleVertex() {
@@ -247,7 +247,7 @@ static void _testFile(const char* path, const char* solution) {
   PathGraph* graph = _readFile(path);
 
   Result result = WeightedIndependentSet_Dynamic_Reconstruction(graph, &wis);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
 
   char _solution[] = "00000000\0";
 
@@ -300,8 +300,8 @@ static void WeightedIndependentSet_File() {
 
 int RegisterWeightedIndependentSetTests() {
   CU_TestInfo WeightedIndependentSet_Recursive_Tests[] = {
-      CU_TEST_INFO(WeightedIndependentSet_Recursive_NullParameter),
-      CU_TEST_INFO(WeightedIndependentSet_Recursive_EmptySet),
+      CU_TEST_INFO(WeightedIndependentSet_Recursive_kNullParameter),
+      CU_TEST_INFO(WeightedIndependentSet_Recursive_kEmptySet),
       CU_TEST_INFO(WeightedIndependentSet_Recursive_SingleVertex),
       CU_TEST_INFO(WeightedIndependentSet_Recursive_TwoVertices),
       CU_TEST_INFO(WeightedIndependentSet_Recursive_FourVertices),
@@ -310,8 +310,8 @@ int RegisterWeightedIndependentSetTests() {
       CU_TEST_INFO_NULL};
 
   CU_TestInfo WeightedIndependentSet_Dynamic_Tests[] = {
-      CU_TEST_INFO(WeightedIndependentSet_Dynamic_NullParameter),
-      CU_TEST_INFO(WeightedIndependentSet_Dynamic_EmptySet),
+      CU_TEST_INFO(WeightedIndependentSet_Dynamic_kNullParameter),
+      CU_TEST_INFO(WeightedIndependentSet_Dynamic_kEmptySet),
       CU_TEST_INFO(WeightedIndependentSet_Dynamic_SingleVertex),
       CU_TEST_INFO(WeightedIndependentSet_Dynamic_TwoVertices),
       CU_TEST_INFO(WeightedIndependentSet_Dynamic_FourVertices),
@@ -320,8 +320,9 @@ int RegisterWeightedIndependentSetTests() {
       CU_TEST_INFO_NULL};
 
   CU_TestInfo WeightedIndependentSet_Dynamic_Reconstruction_Tests[] = {
-      CU_TEST_INFO(WeightedIndependentSet_Dynamic_Reconstruction_NullParameter),
-      CU_TEST_INFO(WeightedIndependentSet_Dynamic_Reconstruction_EmptySet),
+      CU_TEST_INFO(
+          WeightedIndependentSet_Dynamic_Reconstruction_kNullParameter),
+      CU_TEST_INFO(WeightedIndependentSet_Dynamic_Reconstruction_kEmptySet),
       CU_TEST_INFO(WeightedIndependentSet_Dynamic_Reconstruction_SingleVertex),
       CU_TEST_INFO(WeightedIndependentSet_Dynamic_Reconstruction_TwoVertices),
       CU_TEST_INFO(WeightedIndependentSet_Dynamic_Reconstruction_FourVertices),

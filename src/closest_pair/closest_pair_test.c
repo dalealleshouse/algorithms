@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #include "./closest_pair.h"
 
 #include <float.h>

@@ -1,4 +1,5 @@
-#include "./linked_list.h"
+// Copyright 2020 Dale Alleshouse
+#include "linked_list.h"
 
 #include <stdlib.h>
 
@@ -143,12 +144,12 @@ LinkedList* LinkedList_Create(freer freer, comparator comparator) {
 
 ListOpResult LinkedList_InsertAt(LinkedList* self, void* payload,
                                  const size_t index) {
-  if (self == NULL || payload == NULL) return ListOp_NullParameter;
+  if (self == NULL || payload == NULL) return kkNullParameter;
 
-  if (index > self->size) return ListOp_InvalidIndex;
+  if (index > self->size) return kkInvalidIndex;
 
   LinkedListItem* item = LinkedList_ItemCreate(payload);
-  if (item == NULL) return ListOp_FailedMalloc;
+  if (item == NULL) return kFailedMalloc;
 
   if (index == 0) {
     insert_at_head(self, item);
@@ -160,13 +161,13 @@ ListOpResult LinkedList_InsertAt(LinkedList* self, void* payload,
 
   self->size++;
 
-  return ListOp_Success;
+  return kkSuccess;
 }
 
 ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index) {
-  if (self == NULL) return ListOp_NullParameter;
+  if (self == NULL) return kkNullParameter;
 
-  if (index >= self->size) return ListOp_InvalidIndex;
+  if (index >= self->size) return kkInvalidIndex;
 
   if (index == 0) {
     delete_at_head(self);
@@ -177,14 +178,14 @@ ListOpResult LinkedList_DeleteAt(LinkedList* self, const size_t index) {
   }
 
   self->size--;
-  return ListOp_Success;
+  return kkSuccess;
 }
 
 ListOpResult LinkedList_Delete(LinkedList* self, void* doomed) {
-  if (self == NULL || doomed == NULL) return ListOp_NullParameter;
+  if (self == NULL || doomed == NULL) return kkNullParameter;
 
   LinkedListItem* item = search(self, doomed);
-  if (item == NULL) return ListOp_NotFound;
+  if (item == NULL) return kkNotFound;
 
   if (item == self->head) {
     delete_at_head(self);
@@ -195,7 +196,7 @@ ListOpResult LinkedList_Delete(LinkedList* self, void* doomed) {
   }
 
   self->size--;
-  return ListOp_Success;
+  return kkSuccess;
 }
 
 void* LinkedList_Search(const LinkedList* self, const void* item) {
@@ -209,7 +210,7 @@ void* LinkedList_Search(const LinkedList* self, const void* item) {
 
 ListOpResult LinkedList_Enumerate(const LinkedList* self,
                                   item_handler handler) {
-  if (self == NULL || handler == NULL) return ListOp_NullParameter;
+  if (self == NULL || handler == NULL) return kkNullParameter;
 
   LinkedListItem* current = self->head;
 
@@ -218,7 +219,7 @@ ListOpResult LinkedList_Enumerate(const LinkedList* self,
     current = current->next;
   }
 
-  return ListOp_Success;
+  return kkSuccess;
 }
 
 void LinkedList_Destroy(LinkedList* list) {
@@ -231,7 +232,7 @@ void LinkedList_Destroy(LinkedList* list) {
     curr = curr->next;
 
     LinkedList_ItemDestroy(list, doomed);
-  };
+  }
 
   free(list);
 }

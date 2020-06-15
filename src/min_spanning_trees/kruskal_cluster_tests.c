@@ -30,9 +30,9 @@ static Graph* GiantCluster() {
 }
 
 // Common Test Functions
-static void KruskalCluster_NullParameterTest() {
+static void KruskalCluster_kNullParameterTest() {
   Result result = KruskalCluster(NULL, 1, NULL);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 }
 
 static void KruskalCluster_CalcsMaxSpacingForMedCluster() {
@@ -40,7 +40,7 @@ static void KruskalCluster_CalcsMaxSpacingForMedCluster() {
 
   int max_space;
   Result result = KruskalCluster(graph, 4, &max_space);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(max_space, 90);
 
   Graph_Destroy(graph, NULL);
@@ -51,7 +51,7 @@ static void KruskalCluster_CalcsMaxSpacingForBigCluster() {
 
   int max_space;
   Result result = KruskalCluster(graph, 4, &max_space);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(max_space, 578);
 
   Graph_Destroy(graph, NULL);
@@ -62,7 +62,7 @@ static void KruskalCluster_CalcsMaxSpacingForGiantCluster() {
 
   int max_space;
   Result result = KruskalCluster(graph, 4, &max_space);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(max_space, 106);
 
   Graph_Destroy(graph, NULL);
@@ -74,7 +74,7 @@ static void KruskalCluster_FailedMallocTest() {
   int max_space;
 
   FAILED_MALLOC_TEST({ result = KruskalCluster(input, 2, &max_space); });
-  CU_ASSERT_EQUAL(result, FailedMemoryAllocation);
+  CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
 
   Graph_Destroy(input, free);
 }
@@ -84,14 +84,14 @@ static void KruskalCluster_InvalidInput() {
   int max_space;
 
   Result result = KruskalCluster(input, 1, &max_space);
-  CU_ASSERT_EQUAL(result, ArgumentOutOfRange);
+  CU_ASSERT_EQUAL(result, kArgumentOutOfRange);
 
   Graph_Destroy(input, free);
 }
 
 int RegisterKruskalClusterTests() {
   CU_TestInfo KruskalClusterTests[] = {
-      CU_TEST_INFO(KruskalCluster_NullParameterTest),
+      CU_TEST_INFO(KruskalCluster_kNullParameterTest),
       CU_TEST_INFO(KruskalCluster_CalcsMaxSpacingForMedCluster),
       CU_TEST_INFO(KruskalCluster_CalcsMaxSpacingForBigCluster),
       CU_TEST_INFO(KruskalCluster_CalcsMaxSpacingForGiantCluster),

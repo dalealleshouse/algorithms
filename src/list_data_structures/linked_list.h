@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 /*******************************************************************************
  * This is a rather anomalous implementation because it's rarely the case that
  * anyone would want to insert/delete an item into a linked list at a particular
@@ -10,7 +11,7 @@
 
 #include <stddef.h>
 
-#include "../utils/common.h"
+#include "../utils/comparators.h"
 #include "./list_operations.h"
 
 typedef void (*freer)(void* x);

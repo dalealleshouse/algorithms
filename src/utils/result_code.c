@@ -2,33 +2,33 @@
 
 char* Result_ErrorMessage(Result result) {
   switch (result) {
-    case SystemError:
+    case kSystemError:
       return "Underlying OS error";
-    case SecurityError:
+    case kSecurityError:
       return "There was a security related error";
-    case OutputPointerIsNotNull:
+    case kOutputPointerIsNotNull:
       return "An output parameter pointer is not null. These are intented to "
              "be populated by the function.";
-    case Duplicate:
+    case kDuplicate:
       return "The paramerter is a duplicate of an existing item";
-    case NotFound:
+    case kNotFound:
       return "The requested object was not found.";
-    case Empty:
+    case kEmpty:
       return "List is empty";
-    case DependancyError:
+    case kDependancyError:
       return "Error code from a dependancy";
-    case ArgumentOutOfRange:
+    case kArgumentOutOfRange:
       return "The specified value is outside the range of valid values";
-    case InvalidIndex:
+    case kInvalidIndex:
       return "Invalid index";
-    case ArithmeticOverflow:
+    case kArithmeticOverflow:
       return "Arithmetic Overflow";
-    case FailedMemoryAllocation:
+    case kFailedMemoryAllocation:
       return "Failed to allocate memory";
-    case NullParameter:
+    case kNullParameter:
       return "A required parameter is NULL";
-    case Success:
-      return "Success";
+    case kSuccess:
+      return "kSuccess";
     default:
       return "Unknown result code";
   }

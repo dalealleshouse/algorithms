@@ -28,9 +28,9 @@ int ratio_compare(const void* job1, const void* job2) {
 
 Result ScheduleOptimizer_Calc(job* jobs, const size_t n,
                               double* optimization_score) {
-  if (jobs == NULL || optimization_score == NULL) return NullParameter;
+  if (jobs == NULL || optimization_score == NULL) return kNullParameter;
 
-  if (n <= 0) return Empty;
+  if (n <= 0) return kEmpty;
 
   double running_length = 0;
   *optimization_score = 0;
@@ -44,5 +44,5 @@ Result ScheduleOptimizer_Calc(job* jobs, const size_t n,
     jobs++;
   }
 
-  return Success;
+  return kSuccess;
 }

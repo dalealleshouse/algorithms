@@ -34,7 +34,7 @@ double AlgoTime(const size_t n, const size_t m, const algo algo) {
   for (size_t i = 0; i < n; i++) {
     GraphResult result = Graph_AddVertex(graph, i + 1);
 
-    if (result != Graph_Success) printf("vertex fail %d\n", result);
+    if (result != Graph_kSuccess) printf("vertex fail %d\n", result);
   }
 
   for (size_t i = 0; i < m; i++) {
@@ -45,7 +45,7 @@ double AlgoTime(const size_t n, const size_t m, const algo algo) {
 
     GraphResult result = Deprecated_Graph_AddEdge(graph, x, y);
 
-    if (result != Graph_Success) {
+    if (result != Graph_kSuccess) {
       printf("edge fail %d, %d, %d \n", result, x, y);
     }
   }

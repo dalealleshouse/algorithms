@@ -97,6 +97,7 @@ static inline uint32_t bswap32(const uint32_t x) {
 
   // clang-format off
   for (size_t i = 0; i<sizeof(uint32_t)>> 1; i++) {
+    // clang-format on
     uint32_t d = sizeof(uint32_t) - i - 1;
 
     uint32_t mh = ((uint32_t)0xff) << (d << 3);
@@ -109,7 +110,6 @@ static inline uint32_t bswap32(const uint32_t x) {
 
     y = t | (y & ~(mh | ml));
   }
-  // clang-format on
 
   return y;
 }
@@ -117,7 +117,9 @@ static inline uint32_t bswap32(const uint32_t x) {
 static inline uint64_t bswap64(const uint64_t x) {
   uint64_t y = x;
 
+  // clang-format off
   for (size_t i = 0; i<sizeof(uint64_t)>> 1; i++) {
+    // clang-format on
     uint64_t d = sizeof(uint64_t) - i - 1;
 
     uint64_t mh = ((uint64_t)0xff) << (d << 3);

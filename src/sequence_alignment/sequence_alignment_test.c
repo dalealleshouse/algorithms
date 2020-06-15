@@ -13,11 +13,11 @@ static void _testSequenceAlignment_Score(char* x, char* y, penalty gap,
   SeqAlignSolution* solution = NULL;
   SeqAlign* problem = NULL;
   ResultCode code = SeqAlign_Init(x, y, gap, mismatch, &problem);
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
 
   code = SequenceAlignment_Score(problem, &solution);
 
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
   CU_ASSERT_EQUAL(solution->nw_score, nw);
   CU_ASSERT_EQUAL(solution->n, s);
   CU_ASSERT_STRING_EQUAL(solution->x, expected_x);
@@ -27,33 +27,33 @@ static void _testSequenceAlignment_Score(char* x, char* y, penalty gap,
   SeqAlign_Destory(problem);
 }
 
-static void SequenceAlignment_Score_NullParameter() {
+static void SequenceAlignment_Score_kNullParameter() {
   ResultCode code = SequenceAlignment_Score(NULL, NULL);
-  CU_ASSERT_EQUAL(code, NullParameter);
+  CU_ASSERT_EQUAL(code, kNullParameter);
 }
 
 static void SequenceAlignment_Score_InvalidInput() {
   SeqAlignSolution* solution = malloc(sizeof(SeqAlignSolution));
   SeqAlign* problem = NULL;
   ResultCode code = SeqAlign_Init("x", "y", 5, 5, &problem);
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
 
   code = SequenceAlignment_Score(problem, &solution);
 
-  CU_ASSERT_EQUAL(code, OutputPointerIsNotNull);
+  CU_ASSERT_EQUAL(code, kOutputPointerIsNotNull);
   free(solution);
   SeqAlign_Destory(problem);
 }
 
-static void SequenceAlignment_Score_ArithmeticOverflow() {
+static void SequenceAlignment_Score_kArithmeticOverflow() {
   SeqAlign* problem = NULL;
   ResultCode code = SeqAlign_Init("and", "not", ULONG_MAX, ULONG_MAX, &problem);
-  CU_ASSERT_EQUAL(code, Success);
+  CU_ASSERT_EQUAL(code, kSuccess);
 
   SeqAlignSolution* result = NULL;
   code = SequenceAlignment_Score(problem, &result);
 
-  CU_ASSERT_EQUAL(code, ArithmeticOverflow);
+  CU_ASSERT_EQUAL(code, kArithmeticOverflow);
   SeqAlign_Destory(problem);
 }
 
@@ -67,23 +67,23 @@ static void SequenceAlignment_Score_DifferentSizes() {
                                "A_GGCA");
 }
 
-static void SequenceAlignment_Score_EmptyString() {
+static void SequenceAlignment_Score_kEmptyString() {
   _testSequenceAlignment_Score("AGGGCT", "", 2, 3, 12, 6, "AGGGCT", "______");
 }
 
-static void SequenceAlignment_Score_OtherEmptyString() {
+static void SequenceAlignment_Score_OtherkEmptyString() {
   _testSequenceAlignment_Score("", "AGGGCT", 2, 3, 12, 6, "______", "AGGGCT");
 }
 
 int RegisterSequenceAlignmentTests() {
   CU_TestInfo SequenceAlignment_Tests[] = {
-      CU_TEST_INFO(SequenceAlignment_Score_NullParameter),
+      CU_TEST_INFO(SequenceAlignment_Score_kNullParameter),
       CU_TEST_INFO(SequenceAlignment_Score_InvalidInput),
-      CU_TEST_INFO(SequenceAlignment_Score_ArithmeticOverflow),
+      CU_TEST_INFO(SequenceAlignment_Score_kArithmeticOverflow),
       CU_TEST_INFO(SequenceAlignment_Score_HappyPath),
       CU_TEST_INFO(SequenceAlignment_Score_DifferentSizes),
-      CU_TEST_INFO(SequenceAlignment_Score_EmptyString),
-      CU_TEST_INFO(SequenceAlignment_Score_OtherEmptyString),
+      CU_TEST_INFO(SequenceAlignment_Score_kEmptyString),
+      CU_TEST_INFO(SequenceAlignment_Score_OtherkEmptyString),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Sequence Alignment",

@@ -10,7 +10,7 @@ Stack* Stack_Create() {
 }
 
 StackResult Stack_Push(Stack* self, void* item) {
-  if (self == NULL || item == NULL) return Stack_NullParameter;
+  if (self == NULL || item == NULL) return Stack_kNullParameter;
 
   Stack_Item* s_item = calloc(sizeof(Stack_Item), 1);
 
@@ -26,7 +26,7 @@ StackResult Stack_Push(Stack* self, void* item) {
 
   self->n++;
 
-  return Stack_Success;
+  return Stack_kSuccess;
 }
 
 void* Stack_Pop(Stack* self) {
@@ -46,7 +46,7 @@ void* Stack_Pop(Stack* self) {
   return item;
 }
 
-bool Stack_IsEmpty(Stack* self) {
+bool Stack_IskEmpty(Stack* self) {
   if (self == NULL) return true;
 
   return self->n == 0;

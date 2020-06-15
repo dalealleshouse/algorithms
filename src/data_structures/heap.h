@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "../utils/common.h"
+#include "../utils/comparators.h"
 #include "../utils/error_reporter.h"
 #include "./hash_table.h"
 
@@ -18,15 +18,15 @@
   }
 
 typedef enum {
-  HeapItemNotFound = -8,
+  HeapItemkNotFound = -8,
   HeapHashTableError = -7,
-  HeapArithmeticOverflow = -6,
+  HeapkArithmeticOverflow = -6,
   HeapOverflow = -5,
-  HeapEmpty = -4,
-  HeapFailedMemoryAllocation = -3,
+  HeapkEmpty = -4,
+  HeapkFailedMemoryAllocation = -3,
   HeapInvalidSize = -2,
-  HeapNullParameter = -1,
-  HeapSuccess = 0
+  HeapkNullParameter = -1,
+  HeapkSuccess = 0
 } HeapResult;
 
 typedef struct Heap {
@@ -42,7 +42,7 @@ HeapResult Heap_Insert(Heap*, void*);
 HeapResult Heap_Resize(Heap*, size_t);
 HeapResult Heap_Reproiritize(Heap*, void*);
 void* Heap_Extract(Heap*);
-bool Heap_IsEmpty(Heap*);
+bool Heap_IskEmpty(Heap*);
 bool Heap_Exists(Heap*, void*);
 void* Heap_Peek(Heap*);
 void Heap_Destroy(Heap*, freer);

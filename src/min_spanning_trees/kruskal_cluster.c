@@ -24,26 +24,26 @@ static Result _hasCycle(DisjointSet* ds, const Graph* graph, const Edge* edge,
   SetItem* head;
 
   Result r = DisjointSet_FindSet(ds, graph->V[edge->tail], &tail);
-  if (r != Success) return r;
+  if (r != kSuccess) return r;
 
   r = DisjointSet_FindSet(ds, graph->V[edge->head], &head);
-  if (r != Success) return r;
+  if (r != kSuccess) return r;
 
   *result = tail == head;
-  return Success;
+  return kSuccess;
 }
 
 Result KruskalCluster(const Graph* graph, const size_t num_clusters,
                       int* max_space) {
-  if (graph == NULL) return NullParameter;
+  if (graph == NULL) return kNullParameter;
 
-  if (num_clusters <= 1) return ArgumentOutOfRange;
+  if (num_clusters <= 1) return kArgumentOutOfRange;
 
   Edge edges[graph->m];
 
   DisjointSet ds;
   Result result = DisjointSet_Init(&ds, graph->n);
-  if (result != Success) return result;
+  if (result != kSuccess) return result;
 
   // Initialize the disjoint set and edge array
   size_t current_edge = 0;
@@ -70,7 +70,7 @@ Result KruskalCluster(const Graph* graph, const size_t num_clusters,
 
     bool hasCycle;
     result = _hasCycle(&ds, graph, &edges[i], &hasCycle);
-    if (result != Success) {
+    if (result != kSuccess) {
       DisjointSet_Destory(&ds);
       return result;
     }
@@ -80,12 +80,12 @@ Result KruskalCluster(const Graph* graph, const size_t num_clusters,
     } else {
       result = DisjointSet_Union(&ds, graph->V[edges[i].head],
                                  graph->V[edges[i].tail]);
-      if (result != Success) {
+      if (result != kSuccess) {
         DisjointSet_Destory(&ds);
         return result;
       }
 
-      if (result != Success) {
+      if (result != kSuccess) {
         DisjointSet_Destory(&ds);
         return result;
       }
@@ -93,5 +93,5 @@ Result KruskalCluster(const Graph* graph, const size_t num_clusters,
   }
 
   DisjointSet_Destory(&ds);
-  return Success;
+  return kSuccess;
 }

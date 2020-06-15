@@ -40,7 +40,7 @@ static int min_comparator(const void* x, const void* y) {
 static double get_heap_value(Heap* heap) {
   void* val = Heap_Peek(heap);
   if (val == NULL) {
-    ERROR("RunningMedian", DependancyError);
+    ERROR("RunningMedian", kDependancyError);
     return NAN;
   }
 
@@ -60,7 +60,7 @@ static HeapResult heap_insert(Heap* heap, double* value) {
 
   if (heap->n == heap->size) {
     result = Heap_Resize(heap, heap->size * 2);
-    if (result != HeapSuccess) return result;
+    if (result != HeapkSuccess) return result;
   }
 
   return Heap_Insert(heap, value);
@@ -77,7 +77,7 @@ static HeapResult heap_insert(Heap* heap, double* value) {
  * than in upper
  */
 static Result balance_heaps(RunningMedian* self) {
-  if (heap_is_balanced(self)) return Success;
+  if (heap_is_balanced(self)) return kSuccess;
 
   Heap* too_many;
   Heap* too_low;
@@ -91,12 +91,12 @@ static Result balance_heaps(RunningMedian* self) {
   }
 
   double* temp = Heap_Extract(too_many);
-  if (temp == NULL) return DependancyError;
+  if (temp == NULL) return kDependancyError;
 
   HeapResult result = heap_insert(too_low, temp);
-  if (result != HeapSuccess) return DependancyError;
+  if (result != HeapkSuccess) return kDependancyError;
 
-  return Success;
+  return kSuccess;
 }
 
 static Heap* find_insert_heap(RunningMedian* self, double value) {
@@ -115,20 +115,20 @@ static Heap* find_insert_heap(RunningMedian* self, double value) {
 RunningMedian* RunningMedian_Create() {
   RunningMedian* rm = malloc(sizeof(RunningMedian));
   if (rm == NULL) {
-    ERROR("RunningMedian", FailedMemoryAllocation);
+    ERROR("RunningMedian", kFailedMemoryAllocation);
     return NULL;
   }
 
   rm->upper = Heap_Create(INITAL_HEAP_SIZE, min_comparator);
   if (rm->upper == NULL) {
-    ERROR("RunningMedian", DependancyError);
+    ERROR("RunningMedian", kDependancyError);
     RunningMedian_Destroy(rm);
     return NULL;
   }
 
   rm->lower = Heap_Create(INITAL_HEAP_SIZE, max_comparator);
   if (rm->lower == NULL) {
-    ERROR("RunningMedian", DependancyError);
+    ERROR("RunningMedian", kDependancyError);
     RunningMedian_Destroy(rm);
     return NULL;
   }
@@ -138,22 +138,22 @@ RunningMedian* RunningMedian_Create() {
 }
 
 Result RunningMedian_Insert(RunningMedian* self, double value) {
-  if (self == NULL) return NullParameter;
+  if (self == NULL) return kNullParameter;
 
-  if (isnan(value) || isinf(value)) return ArgumentOutOfRange;
+  if (isnan(value) || isinf(value)) return kArgumentOutOfRange;
 
   double* val = malloc(sizeof(double));
-  if (val == NULL) return FailedMemoryAllocation;
+  if (val == NULL) return kFailedMemoryAllocation;
 
   *val = value;
 
   // Find which heap to insert the value into
   Heap* h = find_insert_heap(self, value);
-  if (h == NULL) return DependancyError;
+  if (h == NULL) return kDependancyError;
 
   // Insert the value
   HeapResult hresult = heap_insert(h, val);
-  if (hresult != HeapSuccess) return DependancyError;
+  if (hresult != HeapkSuccess) return kDependancyError;
 
   self->n++;
 
@@ -169,12 +169,12 @@ size_t RunningMedian_GetN(RunningMedian* self) {
 
 double RunningMedian_Median(RunningMedian* self) {
   if (self == NULL) {
-    ERROR("RunningMedian", NullParameter);
+    ERROR("RunningMedian", kNullParameter);
     return NAN;
   }
 
   if (self->n == 0) {
-    ERROR("RunningMedian", Empty);
+    ERROR("RunningMedian", kEmpty);
     return NAN;
   }
 
@@ -186,7 +186,7 @@ double RunningMedian_Median(RunningMedian* self) {
     if (isnan(high)) return NAN;
 
     double result = (low + high) / 2;
-    if (isinf(result)) ERROR("RunningMedian", ArithmeticOverflow);
+    if (isinf(result)) ERROR("RunningMedian", kArithmeticOverflow);
 
     return result;
   } else {

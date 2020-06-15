@@ -40,11 +40,11 @@ static void _printSolutions(size_t x_n, size_t y_n,
  */
 static ResultCode _seqAlignSolution_Init(char* x, char* y, penalty nw_score,
                                          SeqAlignSolution** solution) {
-  if (x == NULL || y == NULL || solution == NULL) return NullParameter;
-  if (*solution != NULL) return OutputPointerIsNotNull;
+  if (x == NULL || y == NULL || solution == NULL) return kNullParameter;
+  if (*solution != NULL) return kOutputPointerIsNotNull;
 
   SeqAlignSolution* _result = malloc(sizeof(SeqAlignSolution));
-  if (_result == NULL) return FailedMemoryAllocation;
+  if (_result == NULL) return kFailedMemoryAllocation;
 
   _result->n = strlen(x);
   _result->x = x;
@@ -52,7 +52,7 @@ static ResultCode _seqAlignSolution_Init(char* x, char* y, penalty nw_score,
   _result->nw_score = nw_score;
 
   *solution = _result;
-  return Success;
+  return kSuccess;
 }
 
 static penalty _min(penalty x, penalty y, penalty z) {
@@ -68,7 +68,7 @@ static ResultCode _reconstruct(
     SeqAlign* problem, penalty solutions[problem->x_n + 1][problem->y_n + 1],
     SeqAlignSolution** solution) {
   if (is_add_overflow_size_t(problem->x_n, problem->y_n)) {
-    return ArithmeticOverflow;
+    return kArithmeticOverflow;
   }
 
   // Max possible size of aligned string
@@ -130,12 +130,12 @@ static ResultCode _reconstruct(
   size_t new_size = size - maxpos;
 
   char* new_x = malloc(new_size);
-  if (new_x == NULL) return FailedMemoryAllocation;
+  if (new_x == NULL) return kFailedMemoryAllocation;
 
   char* new_y = malloc(new_size);
   if (new_y == NULL) {
     free(new_x);
-    return FailedMemoryAllocation;
+    return kFailedMemoryAllocation;
   }
 
   strncpy(new_x, &x[maxpos + 1], new_size);
@@ -143,7 +143,7 @@ static ResultCode _reconstruct(
 
   ResultCode code = _seqAlignSolution_Init(
       new_x, new_y, solutions[problem->x_n][problem->y_n], solution);
-  if (code != Success) {
+  if (code != kSuccess) {
     free(new_x);
     free(new_y);
   }
@@ -160,11 +160,11 @@ void SeqAlignSolution_Destory(SeqAlignSolution* self) {
 
 ResultCode SeqAlign_Init(char* x, char* y, penalty gap_penalty,
                          penalty mismatch_penalty, SeqAlign** result) {
-  if (x == NULL || y == NULL || result == NULL) return NullParameter;
-  if (*result != NULL) return OutputPointerIsNotNull;
+  if (x == NULL || y == NULL || result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
 
   SeqAlign* _result = malloc(sizeof(SeqAlign));
-  if (_result == NULL) return FailedMemoryAllocation;
+  if (_result == NULL) return kFailedMemoryAllocation;
 
   _result->x = x;
   _result->x_n = strlen(x);
@@ -174,28 +174,28 @@ ResultCode SeqAlign_Init(char* x, char* y, penalty gap_penalty,
   _result->mismatch_penalty = mismatch_penalty;
 
   *result = _result;
-  return Success;
+  return kSuccess;
 }
 
 void SeqAlign_Destory(SeqAlign* self) { free(self); }
 
 ResultCode SequenceAlignment_Score(SeqAlign* problem,
                                    SeqAlignSolution** solution) {
-  if (problem == NULL || solution == NULL) return NullParameter;
-  if (*solution != NULL) return OutputPointerIsNotNull;
+  if (problem == NULL || solution == NULL) return kNullParameter;
+  if (*solution != NULL) return kOutputPointerIsNotNull;
 
   penalty solutions[problem->x_n + 1][problem->y_n + 1];
 
   for (size_t i = 0; i <= problem->x_n; i++) {
     if (is_mul_overflow_ulong(i, problem->gap_penalty)) {
-      return ArithmeticOverflow;
+      return kArithmeticOverflow;
     }
     solutions[i][0] = i * problem->gap_penalty;
   }
 
   for (size_t j = 0; j <= problem->y_n; j++) {
     if (is_mul_overflow_ulong(j, problem->gap_penalty)) {
-      return ArithmeticOverflow;
+      return kArithmeticOverflow;
     }
     solutions[0][j] = j * problem->gap_penalty;
   }
@@ -210,17 +210,17 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
       } else {
         if (is_add_overflow_ulong(solutions[i - 1][j - 1],
                                   problem->mismatch_penalty)) {
-          return ArithmeticOverflow;
+          return kArithmeticOverflow;
         }
         penalty case1 = solutions[i - 1][j - 1] + problem->mismatch_penalty;
 
         if (is_add_overflow_ulong(solutions[i - 1][j], problem->gap_penalty)) {
-          return ArithmeticOverflow;
+          return kArithmeticOverflow;
         }
         penalty case2 = solutions[i - 1][j] + problem->gap_penalty;
 
         if (is_add_overflow_ulong(solutions[i][j - 1], problem->gap_penalty)) {
-          return ArithmeticOverflow;
+          return kArithmeticOverflow;
         }
         penalty case3 = solutions[i][j - 1] + problem->gap_penalty;
 

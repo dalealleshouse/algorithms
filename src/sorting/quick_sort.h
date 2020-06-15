@@ -12,7 +12,7 @@
  * Sets the value of <pivot_index> to the index of the first item after
  * partitioning around it
  *
- * returns: 0 on success, less than 0 on failure
+ * returns: 0 on kkSuccess, less than 0 on failure
  */
 int partition(const size_t n, const size_t size, void* arr,
               const comparator comparator, size_t* pivot_index);

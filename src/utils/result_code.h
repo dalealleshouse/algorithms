@@ -15,19 +15,19 @@
   }
 
 typedef enum Result {
-  SystemError = -12,
-  SecurityError = -11,
-  OutputPointerIsNotNull = -10,
-  Duplicate = -9,
-  NotFound = -8,
-  Empty = -7,
-  DependancyError = -6,
-  ArgumentOutOfRange = -5,
-  InvalidIndex = -4,
-  ArithmeticOverflow = -3,
-  FailedMemoryAllocation = -2,
-  NullParameter = -1,
-  Success = 0
+  kSystemError = -12,
+  kSecurityError = -11,
+  kOutputPointerIsNotNull = -10,
+  kDuplicate = -9,
+  kNotFound = -8,
+  kEmpty = -7,
+  kDependancyError = -6,
+  kArgumentOutOfRange = -5,
+  kInvalidIndex = -4,
+  kArithmeticOverflow = -3,
+  kFailedMemoryAllocation = -2,
+  kNullParameter = -1,
+  kSuccess = 0
 } Result;
 
 typedef Result ResultCode;

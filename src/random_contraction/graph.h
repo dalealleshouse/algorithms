@@ -13,10 +13,10 @@ typedef enum {
   Graph_InvalidEdgeIndex = -6,
   Graph_InvalidVertex = -5,
   Graph_EdgeIsSelfLoop = -4,
-  Graph_DuplicateVertex = -3,
-  Graph_FailedMemoryAllocation = -2,
-  Graph_NullParameter = -1,
-  Graph_Success = 0
+  Graph_kDuplicateVertex = -3,
+  Graph_kFailedMemoryAllocation = -2,
+  Graph_kNullParameter = -1,
+  Graph_kSuccess = 0
 } GraphResult;
 
 typedef struct {

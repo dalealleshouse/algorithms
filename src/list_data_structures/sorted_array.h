@@ -1,3 +1,4 @@
+// Copyright 2020 Dale Alleshouse
 #pragma once
 
 #include "./array.h"

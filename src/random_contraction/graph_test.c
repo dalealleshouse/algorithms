@@ -36,7 +36,7 @@ static void Graph_Create_intializes_graph() {
 /*************************** Graph_AddVertex **********************************/
 static void Graph_AddVertex_null() {
   int result = Graph_AddVertex(NULL, 0);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 }
 
 static void Graph_AddVertex_bad_malloc() {
@@ -44,7 +44,7 @@ static void Graph_AddVertex_bad_malloc() {
   FAILED_MALLOC_TEST({
     int result = Graph_AddVertex(graph, 1);
 
-    CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
+    CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);
     CU_ASSERT_EQUAL(0, graph->n);
   });
 
@@ -55,7 +55,7 @@ static void Graph_AddVertex_first() {
   Deprecated_Graph* graph = Deprecated_Graph_Create();
   int result = Graph_AddVertex(graph, 1);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   CU_ASSERT_EQUAL(1, graph->n);
   CU_ASSERT_PTR_NOT_NULL_FATAL(graph->V);
 
@@ -70,7 +70,7 @@ static void Graph_AddVertex_adds_five() {
 
   for (size_t i = 0; i < 5; i++) {
     int result = Graph_AddVertex(graph, i);
-    CU_ASSERT_EQUAL(Graph_Success, result);
+    CU_ASSERT_EQUAL(Graph_kSuccess, result);
   }
 
   CU_ASSERT_EQUAL(5, graph->n);
@@ -88,11 +88,11 @@ static void Graph_AddVertex_bad_realloc() {
   Deprecated_Graph* graph = Deprecated_Graph_Create();
 
   int result = Graph_AddVertex(graph, 1);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   FAILED_MALLOC_TEST({
     result = Graph_AddVertex(graph, INITIAL_ALLOC + 1);
-    CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
+    CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);
     CU_ASSERT_EQUAL(1, graph->n);
   });
 
@@ -133,7 +133,7 @@ static void Graph_AddVertex_duplicate() {
   Deprecated_Graph* graph = Deprecated_Graph_Create();
   Graph_AddVertex(graph, 10);
   int result = Graph_AddVertex(graph, 10);
-  CU_ASSERT_EQUAL(Graph_DuplicateVertex, result);
+  CU_ASSERT_EQUAL(Graph_kDuplicateVertex, result);
   CU_ASSERT_EQUAL(1, graph->n);
 
   Deprecated_Graph_Destroy(graph);
@@ -142,7 +142,7 @@ static void Graph_AddVertex_duplicate() {
 /*************************** Graph_AddEdge ************************************/
 static void Graph_AddEdge_null() {
   int result = Deprecated_Graph_AddEdge(NULL, 0, 0);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 }
 
 static void Graph_AddEdge_bad_malloc() {
@@ -152,7 +152,7 @@ static void Graph_AddEdge_bad_malloc() {
 
   FAILED_MALLOC_TEST({
     int result = Deprecated_Graph_AddEdge(graph, 1, 2);
-    CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
+    CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);
   });
 
   Deprecated_Graph_Destroy(graph);
@@ -164,7 +164,7 @@ static void Graph_AddEdge_first() {
   Graph_AddVertex(graph, 2);
 
   int result = Deprecated_Graph_AddEdge(graph, 1, 2);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
   CU_ASSERT_EQUAL(1, graph->m);
   CU_ASSERT_PTR_NOT_NULL_FATAL(graph->E);
   CU_ASSERT_EQUAL(1, graph->E->tail);
@@ -182,7 +182,7 @@ static void Graph_AddEdge_adds_five() {
 
   for (size_t i = 0; i < 5; i++) {
     int result = Deprecated_Graph_AddEdge(graph, i, i + 1);
-    CU_ASSERT_EQUAL(Graph_Success, result);
+    CU_ASSERT_EQUAL(Graph_kSuccess, result);
   }
 
   CU_ASSERT_EQUAL(5, graph->m);
@@ -214,7 +214,7 @@ static void Graph_AddEdge_bad_realloc() {
 
   FAILED_MALLOC_TEST({
     int result = Deprecated_Graph_AddEdge(graph, 2, 1);
-    CU_ASSERT_EQUAL(Graph_FailedMemoryAllocation, result);
+    CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);
   });
 
   Deprecated_Graph_Destroy(graph);
@@ -332,7 +332,7 @@ static void Graph_FromFile_invalid() {
 /*************************** Graph_CollapseEdge *******************************/
 static void Graph_CollapseEdge_null() {
   int result = Graph_CollapseEdge(NULL, 0);
-  CU_ASSERT_EQUAL(Graph_NullParameter, result);
+  CU_ASSERT_EQUAL(Graph_kNullParameter, result);
 }
 
 static void Graph_CollapseEdge_invalid_index() {
@@ -353,7 +353,7 @@ static void Graph_CollapseEdge_tail() {
 
   int result = Graph_CollapseEdge(graph, 1);
 
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   CU_ASSERT_EQUAL(n - 1, graph->n);
   CU_ASSERT_EQUAL(false, graph->V[1].initalized);
@@ -376,7 +376,7 @@ static void Graph_CollapseEdge_head() {
   size_t n = graph->n;
 
   int result = Graph_CollapseEdge(graph, 7);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   CU_ASSERT_EQUAL(n - 1, graph->n);
   CU_ASSERT_EQUAL(false, graph->V[4].initalized);
@@ -400,11 +400,11 @@ static void Graph_CollapseEdge_self_loop() {
 
   // tail = 4, head = 5
   int result = Graph_CollapseEdge(graph, 7);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   // tail = 2, head = 5
   result = Graph_CollapseEdge(graph, 4);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   CU_ASSERT_EQUAL(n - 2, graph->n);
 
@@ -438,7 +438,7 @@ static void Graph_CollapseEdge_large() {
   size_t n = graph->n;
 
   int result = Graph_CollapseEdge(graph, m - 1);
-  CU_ASSERT_EQUAL(Graph_Success, result);
+  CU_ASSERT_EQUAL(Graph_kSuccess, result);
 
   CU_ASSERT_EQUAL(n - 1, graph->n);
   CU_ASSERT_EQUAL(m - 1, graph->m);

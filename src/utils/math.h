@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stddef.h>
 
-#include "./common.h"
+#include "./comparators.h"
 
 int Min(const size_t count, ...);
 double MinDouble(const size_t count, ...);

@@ -41,11 +41,11 @@ static job* _buildScheduleFromFile(char* path) {
 static void ScheduleOptimizer_Calc_null_parameter() {
   double score = 0;
   Result result = ScheduleOptimizer_Calc(NULL, 5, &score);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   job jobs = {1.0, 1.0};
   result = ScheduleOptimizer_Calc(&jobs, 1, NULL);
-  CU_ASSERT_EQUAL(NullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 }
 
 static void ScheduleOptimizer_Calc_same_lengths() {
@@ -61,7 +61,7 @@ static void ScheduleOptimizer_Calc_same_lengths() {
 
   CU_ASSERT_DOUBLE_EQUAL(score, expected_score, EPSILON);
   CU_ASSERT_EQUAL(0, cmp_result);
-  CU_ASSERT_EQUAL(Success, result);
+  CU_ASSERT_EQUAL(kSuccess, result);
 }
 
 static void ScheduleOptimizer_Calc_same_weights() {
@@ -77,7 +77,7 @@ static void ScheduleOptimizer_Calc_same_weights() {
 
   CU_ASSERT_DOUBLE_EQUAL(score, expected_score, EPSILON);
   CU_ASSERT_EQUAL(0, cmp_result);
-  CU_ASSERT_EQUAL(Success, result);
+  CU_ASSERT_EQUAL(kSuccess, result);
 }
 
 static void ScheduleOptimizer_Calc_empty_array() {
@@ -86,7 +86,7 @@ static void ScheduleOptimizer_Calc_empty_array() {
   size_t n = 0;
 
   Result result = ScheduleOptimizer_Calc(jobs, n, &score);
-  CU_ASSERT_EQUAL(Empty, result);
+  CU_ASSERT_EQUAL(kEmpty, result);
 }
 
 static void ScheduleOptimizer_Calc_large_schedule() {
@@ -97,7 +97,7 @@ static void ScheduleOptimizer_Calc_large_schedule() {
   Result result = ScheduleOptimizer_Calc(jobs, n, &score);
   free(jobs);
 
-  CU_ASSERT_EQUAL(Success, result);
+  CU_ASSERT_EQUAL(kSuccess, result);
   CU_ASSERT_DOUBLE_EQUAL(score, 67311454237, EPSILON);
 }
 

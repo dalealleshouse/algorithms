@@ -16,7 +16,7 @@ typedef struct point_dist {
 /*
  * Calculates the Euclidean distance between two points
  *
- * returns: 0 on success and a negative number on failure
+ * returns: 0 on kkSuccess and a negative number on failure
  */
 int euclid_dist(const point_t* p1, const point_t* p2, double* result);
 
@@ -28,7 +28,7 @@ int euclid_dist(const point_t* p1, const point_t* p2, double* result);
  *  - points = array of point objects
  *  - result = object to populate with calculation results
  *
- * returns: 0 on success, negative value on failure
+ * returns: 0 on kkSuccess, negative value on failure
  */
 int closest_distance(const size_t n, const point_t points[n],
                      point_dist_t* result);

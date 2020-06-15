@@ -19,13 +19,13 @@ static size_t _NextAllocSize(unsigned id) {
 }
 
 GraphResult Graph_AddVertex(Deprecated_Graph* self, const unsigned id) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   if (self->n_allocated <= id) {
     size_t next_size = _NextAllocSize(id);
     vertex* temp = realloc(self->V, sizeof(vertex) * next_size);
 
-    if (temp == NULL) return Graph_FailedMemoryAllocation;
+    if (temp == NULL) return Graph_kFailedMemoryAllocation;
 
     self->V = temp;
     memset(&self->V[self->n_allocated], 0,
@@ -33,19 +33,19 @@ GraphResult Graph_AddVertex(Deprecated_Graph* self, const unsigned id) {
     self->n_allocated = next_size;
   }
 
-  if (self->V[id].initalized == true) return Graph_DuplicateVertex;
+  if (self->V[id].initalized == true) return Graph_kDuplicateVertex;
 
   self->n++;
   self->V[id].vertex_id = id;
   self->V[id].degree = 0;
   self->V[id].initalized = true;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 GraphResult Deprecated_Graph_AddEdge(Deprecated_Graph* self,
                                      const unsigned tail, const unsigned head) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   if (tail == head) return Graph_EdgeIsSelfLoop;
 
@@ -60,7 +60,7 @@ GraphResult Deprecated_Graph_AddEdge(Deprecated_Graph* self,
     size_t next_size = _NextAllocSize(self->m);
     edge* temp = realloc(self->E, sizeof(edge) * next_size);
 
-    if (temp == NULL) return Graph_FailedMemoryAllocation;
+    if (temp == NULL) return Graph_kFailedMemoryAllocation;
 
     self->E = temp;
     self->m_allocated = next_size;
@@ -73,7 +73,7 @@ GraphResult Deprecated_Graph_AddEdge(Deprecated_Graph* self,
   self->V[tail].degree++;
   self->V[head].degree++;
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 static void _ShiftEdges(edge* edges, size_t size, size_t edge_index) {
@@ -100,7 +100,7 @@ static void _DeleteVertex(Deprecated_Graph* self, const unsigned id) {
 }
 
 GraphResult Graph_CollapseEdge(Deprecated_Graph* self, size_t edge_index) {
-  if (self == NULL) return Graph_NullParameter;
+  if (self == NULL) return Graph_kNullParameter;
 
   if (edge_index >= self->m) return Graph_InvalidEdgeIndex;
 
@@ -128,7 +128,7 @@ GraphResult Graph_CollapseEdge(Deprecated_Graph* self, size_t edge_index) {
     }
   }
 
-  return Graph_Success;
+  return Graph_kSuccess;
 }
 
 static void _AddVertexIfMissing(Deprecated_Graph* self, unsigned vertex) {

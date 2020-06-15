@@ -38,11 +38,11 @@ static void _testPathFromFile(const char* path, const size_t n,
                               const vertex_id expected[n]) {
   Graph* sut = Graph_WeightedFromFileDirected(path);
   GraphResult result = BellmanFordShortestPath(sut, 4);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   Path* solution = NULL;
   result = BellmandFordTracePath(sut, expected[n - 1], &solution);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   _testPath(n, expected, solution);
 
@@ -52,7 +52,7 @@ static void _testPathFromFile(const char* path, const size_t n,
 
 static void BellmanFordShortestPath_NullParamter() {
   GraphResult result = BellmanFordShortestPath(NULL, 0);
-  CU_ASSERT_EQUAL(result, Graph_NullParameter);
+  CU_ASSERT_EQUAL(result, Graph_kNullParameter);
 }
 
 static void BellmanFordShortestPath_InvalidStartVertex() {
@@ -68,7 +68,7 @@ static void BellmanFordShortestPath_HappyPath() {
   Graph* sut = Graph_WeightedFromFile(small_n, small_path);
 
   GraphResult result = BellmanFordShortestPath(sut, 1);
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
 
   CU_ASSERT_EQUAL(UNINITIALIZED, _value(sut->V[0]));
   CU_ASSERT_EQUAL(0, _value(sut->V[1]));
@@ -89,20 +89,20 @@ static void BellmanFordShortestPath_NegativeCycle() {
   Graph_Destroy(sut, NULL);
 }
 
-static void BellmanFordShortestPath_ArithmeticOverflow() {
+static void BellmanFordShortestPath_kArithmeticOverflow() {
   Graph* sut = Graph_WeightedFromFile(small_n, small_path);
 
   sut->V[3]->in_edges->weight = INT_MAX;
 
   GraphResult result = BellmanFordShortestPath(sut, 1);
-  CU_ASSERT_EQUAL(result, Graph_ArithmeticOverflow);
+  CU_ASSERT_EQUAL(result, Graph_kArithmeticOverflow);
 
   Graph_Destroy(sut, free);
 }
 
-static void BellmandFordTracePath_NullParameter() {
+static void BellmandFordTracePath_kNullParameter() {
   GraphResult result = BellmandFordTracePath(NULL, 1, NULL);
-  CU_ASSERT_EQUAL(result, Graph_NullParameter);
+  CU_ASSERT_EQUAL(result, Graph_kNullParameter);
 }
 
 static void BellmandFordTracePath_InvalidVertex() {
@@ -122,7 +122,7 @@ static void BellmandFordTracePath_NullData() {
   Path* solution = NULL;
   GraphResult result = BellmandFordTracePath(sut, 5, &solution);
 
-  CU_ASSERT_EQUAL(result, Graph_Success);
+  CU_ASSERT_EQUAL(result, Graph_kSuccess);
   CU_ASSERT_EQUAL(solution->vertex, 5);
   CU_ASSERT_PTR_NULL(solution->next);
 
@@ -148,14 +148,14 @@ int RegisterBellmanFordTests() {
       CU_TEST_INFO(BellmanFordShortestPath_InvalidStartVertex),
       CU_TEST_INFO(BellmanFordShortestPath_HappyPath),
       CU_TEST_INFO(BellmanFordShortestPath_NegativeCycle),
-      CU_TEST_INFO(BellmanFordShortestPath_ArithmeticOverflow),
+      CU_TEST_INFO(BellmanFordShortestPath_kArithmeticOverflow),
       CU_TEST_INFO_NULL};
 
-  CU_TestInfo trace_path[] = {CU_TEST_INFO(BellmandFordTracePath_NullParameter),
-                              CU_TEST_INFO(BellmandFordTracePath_InvalidVertex),
-                              CU_TEST_INFO(BellmandFordTracePath_NullData),
-                              CU_TEST_INFO(BellmandFordTracePath_FromFiles),
-                              CU_TEST_INFO_NULL};
+  CU_TestInfo trace_path[] = {
+      CU_TEST_INFO(BellmandFordTracePath_kNullParameter),
+      CU_TEST_INFO(BellmandFordTracePath_InvalidVertex),
+      CU_TEST_INFO(BellmandFordTracePath_NullData),
+      CU_TEST_INFO(BellmandFordTracePath_FromFiles), CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Bellman Ford",
                             .pInitFunc = noop,

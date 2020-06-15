@@ -11,22 +11,22 @@
 static const size_t BUFFER_SIZE = 1024;
 
 static ResultCode _importFile(const char* path, clause** clauses, size_t* n) {
-  if (path == NULL) return NullParameter;
-  if (*clauses != NULL) return OutputPointerIsNotNull;
-  if (access(path, R_OK) != 0) return SecurityError;
+  if (path == NULL) return kNullParameter;
+  if (*clauses != NULL) return kOutputPointerIsNotNull;
+  if (access(path, R_OK) != 0) return kSecurityError;
 
   FILE* file = fopen(path, "r");
-  if (file == NULL) return SystemError;
+  if (file == NULL) return kSystemError;
 
   // Size is the first line of the file
   char line[BUFFER_SIZE];
   fgets(line, BUFFER_SIZE, file);
 
   size_t _n = strtoul(line, NULL, 10);
-  if (_n == 0) return SystemError;
+  if (_n == 0) return kSystemError;
 
   clause* result = calloc(sizeof(clause), _n);
-  if (result == NULL) return FailedMemoryAllocation;
+  if (result == NULL) return kFailedMemoryAllocation;
 
   size_t tracker = 0;
   while (fgets(line, BUFFER_SIZE, file)) {
@@ -41,7 +41,7 @@ static ResultCode _importFile(const char* path, clause** clauses, size_t* n) {
 
   *n = _n;
   *clauses = result;
-  return Success;
+  return kSuccess;
 }
 
 static void _testFile(const char* path, bool expected) {
@@ -49,11 +49,11 @@ static void _testFile(const char* path, bool expected) {
   size_t n = 0;
 
   ResultCode result = _importFile(path, &clauses, &n);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
 
   bool satisfiable = false;
   result = Sat_Solve(n, clauses, &satisfiable);
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
 
   CU_ASSERT_EQUAL(satisfiable, expected);
   free(clauses);
@@ -61,14 +61,14 @@ static void _testFile(const char* path, bool expected) {
 
 static void Sat_EvalClause_NullParamter() {
   ResultCode result = Sat_EvalClause(NULL, true, true, NULL);
-  CU_ASSERT_EQUAL(result, NullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 }
 
 static void _testSatClause(clause* clause, bool a, bool b, bool expected) {
   bool satisfied = false;
   ResultCode result = Sat_EvalClause(clause, a, b, &satisfied);
 
-  CU_ASSERT_EQUAL(result, Success);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(satisfied, expected);
 }
 
