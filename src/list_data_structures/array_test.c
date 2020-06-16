@@ -137,7 +137,7 @@ static void Array_Search_null_parameter() {
   CU_ASSERT_EQUAL(result_code, kNullParameter);
 
   void* result = NULL;
-  Array* array;
+  Array* array = NULL;
   result_code = Array_Create(PIntComparator, sizeof(int), &array);
   CU_ASSERT_EQUAL(result_code, kSuccess);
 

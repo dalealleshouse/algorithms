@@ -4,31 +4,35 @@
 set -e
 
 function print_success() {
-    echo -en "\033[32m"
-    echo $1
-    echo -en "\033[0m"
+  echo -en "\033[32m"
+  echo $1
+  echo -en "\033[0m"
 }
 
 function print_error() {
-    echo -en "\033[31m"
-    echo $1
-    echo -en "\033[0m"
+  echo -en "\033[31m"
+  echo $1
+  echo -en "\033[0m"
 }
 
 
 function test_build() {
-    make -B $1 --jobs=8
-    print_success "$1 Success"
+  make -B $1 --jobs=8
+  print_success "$1 Success"
 }
 
 # Clear the screen so results don't get confused between runs
 clear
 
+print_success "Generating Compilation Database"
+make comp-db > /dev/null
+print_success "Compilation Database Created"
+
 # Validate that all formatting conforms to the style specified in .clang-format
 ./validate_format.py -r \
-    --exclude src/hashing/farmhash.c \
-    src
-print_success "Format Check Passed"
+  --exclude src/hashing/farmhash.c \
+  src
+  print_success "Format Check Passed"
 
 # TODO: cpplint
 # make lint
