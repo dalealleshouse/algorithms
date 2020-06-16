@@ -18,33 +18,40 @@
 static void Array_Create_bad_malloc() {
 #if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
-    Array* result = Array_Create(PIntComparator, sizeof(int));
-    CU_ASSERT_PTR_NULL(result);
+    Array* array = NULL;
+    ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
+    CU_ASSERT_PTR_NULL(array);
   });
 #endif
 }
 
 static void Array_Create_inits_values() {
-  Array* result = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  CU_ASSERT_PTR_EQUAL(PIntComparator, result->comparator);
-  CU_ASSERT_EQUAL(sizeof(int), result->item_size);
-  CU_ASSERT_EQUAL(0, result->n);
-  CU_ASSERT_PTR_NULL(result->array);
+  CU_ASSERT_PTR_EQUAL(PIntComparator, array->comparator);
+  CU_ASSERT_EQUAL(sizeof(int), array->item_size);
+  CU_ASSERT_EQUAL(0, array->n);
+  CU_ASSERT_PTR_NULL(array->array);
 
-  Array_Destroy(result);
+  Array_Destroy(array);
 }
 
 /*************************** Array_Insert *************************************/
 static void Array_Insert_null_paramter() {
   int dummy = 5;
-  ListOpResult result = Array_Insert(NULL, &dummy);
+  ResultCode result_code = Array_Insert(NULL, &dummy);
 
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
-  result = Array_Insert(array, NULL);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  Array* array = NULL;
+  result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  result_code = Array_Insert(array, NULL);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
   CU_ASSERT_EQUAL(0, array->n);
 
   Array_Destroy(array);
@@ -53,11 +60,14 @@ static void Array_Insert_null_paramter() {
 static void Array_Insert_bad_malloc() {
   int first = 1;
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
-  FAILED_MALLOC_TEST({
-    ListOpResult result = Array_Insert(array, &first);
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-    CU_ASSERT_EQUAL(kFailedMalloc, result);
+  FAILED_MALLOC_TEST({
+    result_code = Array_Insert(array, &first);
+
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
     CU_ASSERT_EQUAL(0, array->n);
   });
 
@@ -67,10 +77,13 @@ static void Array_Insert_bad_malloc() {
 static void Array_Insert_first_item() {
   int first = 1;
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
-  ListOpResult result = Array_Insert(array, &first);
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  CU_ASSERT_EQUAL(kkSuccess, result);
+  result_code = Array_Insert(array, &first);
+
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(1, array->n);
   int* a = (int*)array->array;
   CU_ASSERT_EQUAL(first, a[0]);
@@ -83,11 +96,13 @@ static void Array_Insert_standard() {
   const int items[] = {1, 2, 3, 4, 5};
   const int expected[] = {5, 4, 3, 2, 1};
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   for (size_t i = 0; i < n; i++) {
-    ListOpResult result = Array_Insert(array, &items[i]);
-    CU_ASSERT_EQUAL(kkSuccess, result);
+    result_code = Array_Insert(array, &items[i]);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
   }
 
   CU_ASSERT_EQUAL(n, array->n);
@@ -100,12 +115,16 @@ static void Array_Insert_bad_malloc_on_realloc() {
   int first = 1;
   int second = 2;
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
-  Array_Insert(array, &first);
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  result_code = Array_Insert(array, &first);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   FAILED_MALLOC_TEST({
-    ListOpResult result = Array_Insert(array, &second);
-    CU_ASSERT_EQUAL(kFailedMalloc, result);
+    result_code = Array_Insert(array, &second);
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
     CU_ASSERT_EQUAL(1, array->n);
   });
 
@@ -114,16 +133,20 @@ static void Array_Insert_bad_malloc_on_realloc() {
 
 /*************************** Array_Search *************************************/
 static void Array_Search_null_parameter() {
-  void* result = Array_Search(NULL, NULL);
-  CU_ASSERT_PTR_NULL(result);
+  ResultCode result_code = Array_Search(NULL, NULL, NULL);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
-  result = Array_Search(array, NULL);
-  CU_ASSERT_PTR_NULL(result);
+  void* result = NULL;
+  Array* array;
+  result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  result_code = Array_Search(array, NULL, result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 
   int dummy = 5;
-  result = Array_Search(NULL, &dummy);
-  CU_ASSERT_PTR_NULL(result);
+  result_code = Array_Search(NULL, &dummy, result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 
   Array_Destroy(array);
 }
@@ -133,15 +156,19 @@ static void Array_Search_not_found() {
   const int dummy = 10;
   const int items[] = {1, 2, 3, 4, 5};
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   for (size_t i = 0; i < n; i++) {
-    ListOpResult result = Array_Insert(array, &items[i]);
-    CU_ASSERT_EQUAL(kkSuccess, result);
+    result_code = Array_Insert(array, &items[i]);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
   }
 
-  void* result = Array_Search(array, &dummy);
+  void* result = NULL;
+  result_code = Array_Search(array, &dummy, &result);
   CU_ASSERT_PTR_NULL(result);
+  CU_ASSERT_EQUAL(result_code, kNotFound);
 
   Array_Destroy(array);
 }
@@ -152,17 +179,23 @@ static void Array_Search_standard() {
   const int find2 = 4;
   const int items[] = {1, 2, 3, 4, 5};
 
-  Array* array = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   for (size_t i = 0; i < n; i++) {
-    ListOpResult result = Array_Insert(array, &items[i]);
-    CU_ASSERT_EQUAL(kkSuccess, result);
+    result_code = Array_Insert(array, &items[i]);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
   }
 
-  void* result = Array_Search(array, &find);
+  void* result = NULL;
+  result_code = Array_Search(array, &find, &result);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_PTR_EQUAL(result, (char*)array->array + (array->item_size * 3));
 
-  result = Array_Search(array, &find2);
+  result = NULL;
+  result_code = Array_Search(array, &find2, &result);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_PTR_EQUAL(result, (char*)array->array + array->item_size);
 
   Array_Destroy(array);
@@ -180,34 +213,40 @@ static void MockItemHandler(void* item) {
 }
 
 static void Array_Enumerate_null_parameter() {
-  Array* array = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  ListOpResult result = Array_Enumerate(array, NULL);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  result_code = Array_Enumerate(array, NULL);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
 
-  result = Array_Enumerate(NULL, MockItemHandler);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  result_code = Array_Enumerate(NULL, MockItemHandler);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
 
   Array_Destroy(array);
 }
 
 static void Array_Enumerate_empty() {
-  Array* array = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  ListOpResult result = Array_Enumerate(array, MockItemHandler);
-  CU_ASSERT_EQUAL(kkSuccess, result);
+  result_code = Array_Enumerate(array, MockItemHandler);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   Array_Destroy(array);
 }
 
 static void Array_Enumerate_standard() {
-  Array* array = Array_Create(PIntComparator, sizeof(int));
+  Array* array = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &array);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   for (size_t i = 0; i < mock_n; i++) Array_Insert(array, &mock_vals[i]);
 
   mock_pos = 0;
-  ListOpResult result = Array_Enumerate(array, MockItemHandler);
-  CU_ASSERT_EQUAL(kkSuccess, result);
+  result_code = Array_Enumerate(array, MockItemHandler);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(mock_n, mock_pos);
 
   Array_Destroy(array);

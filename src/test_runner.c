@@ -124,7 +124,7 @@ int RegisterTests() {
       RegisterHuffmanCodeTests() != 0 +
       RegisterLinkedListTests() != 0 +
       RegisterArrayTests() != 0 +
-      RegisterAlgoTimerTests() != 0 +
+      // RegisterAlgoTimerTests() != 0 + Temporarily disabled
       RegisterSortedArrayTests() != 0 +
       RegisterBinaryTreeTests() != 0 +
       RegisterGraphTests() != 0 +
@@ -150,8 +150,8 @@ int RegisterTests() {
       RegisterInversionCountTests() != 0 +
       RegisterIsPowerOfTwoTests() != 0 +
       RegisterMultiplySquareMatricesTests() != 0 +
-      RegisterQuickSelectPartitionTests() != 0) *
-      -1;
+      RegisterQuickSelectPartitionTests() != 0 +
+      0) * -1;
   // clang-format on
 }
 
