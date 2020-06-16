@@ -57,6 +57,8 @@ dkms.conf
 cov.info
 code_coverage/
 test_runner
+column
+row
 run_result.txt
 
 
