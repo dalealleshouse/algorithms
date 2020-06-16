@@ -34,14 +34,14 @@ print_success "Format Check Passed"
 # make lint
 cpplint src/*.c
 cpplint src/list_data_structures/*.[ch]
-cpplint src/locality/*.[ch]
+cpplint locality/*.c
 print_success "Lint Passed"
 
 # TODO: clang-tidy
 # make tidy
 clang-tidy src/test_runner.c
 clang-tidy src/list_data_structures/*.[ch]
-clang-tidy src/locality/*.[ch]
+clang-tidy locality/*.c
 print_success "Tidy Static Analysis Passed"
 
 # Build with undefined and address clang sanitizers and run all tests

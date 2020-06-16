@@ -3,4 +3,6 @@
 set -e
 
 make -B
-python compare_times.py
+
+time ./row
+time ./column
