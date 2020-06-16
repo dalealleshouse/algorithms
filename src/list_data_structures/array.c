@@ -4,29 +4,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-Array* Array_Create(comparator comparator, size_t item_size) {
+ResultCode Array_Create(comparator comparator, size_t item_size,
+                        Array** result) {
   Array* array = calloc(sizeof(Array), 1);
 
-  if (array == NULL) return NULL;
+  if (array == NULL) return kFailedMemoryAllocation;
 
   array->item_size = item_size;
   array->comparator = comparator;
 
-  return array;
+  *result = array;
+  return kSuccess;
 }
 
-ListOpResult Array_Insert(Array* self, const void* item) {
-  if (self == NULL || item == NULL) return kkNullParameter;
+ResultCode Array_Insert(Array* self, const void* item) {
+  if (self == NULL || item == NULL) return kNullParameter;
 
   if (self->n == 0) {
     self->array = malloc(self->item_size);
-    if (self->array == NULL) return kFailedMalloc;
+    if (self->array == NULL) return kFailedMemoryAllocation;
 
     memcpy(self->array, item, self->item_size);
     self->n++;
   } else {
     void* arr = realloc(self->array, (self->n + 1) * self->item_size);
-    if (arr == NULL) return kFailedMalloc;
+    if (arr == NULL) return kFailedMemoryAllocation;
 
     self->array = arr;
     memmove((char*)self->array + self->item_size, self->array,
@@ -35,29 +37,32 @@ ListOpResult Array_Insert(Array* self, const void* item) {
     memcpy(self->array, item, self->item_size);
   }
 
-  return kkSuccess;
+  return kSuccess;
 }
 
-void* Array_Search(const Array* self, const void* item) {
-  if (self == NULL || item == NULL) return NULL;
+ResultCode Array_Search(const Array* self, const void* item, void** result) {
+  if (self == NULL || item == NULL) return kNullParameter;
 
   for (size_t i = 0; i < self->n; i++) {
     size_t offset = i * self->item_size;
-    int result = self->comparator(item, (char*)self->array + offset);
-    if (result == 0) return (char*)self->array + offset;
+    int cmp_result = self->comparator(item, (char*)self->array + offset);
+    if (cmp_result == 0) {
+      *result = (char*)self->array + offset;
+      return kSuccess;
+    }
   }
 
-  return NULL;
+  return kNotFound;
 }
 
-ListOpResult Array_Enumerate(const Array* self, item_handler item_handler) {
-  if (self == NULL || item_handler == NULL) return kkNullParameter;
+ResultCode Array_Enumerate(const Array* self, item_handler item_handler) {
+  if (self == NULL || item_handler == NULL) return kNullParameter;
 
   for (size_t pos = 0; pos < self->n; pos++) {
     item_handler((char*)self->array + (self->item_size * pos));
   }
 
-  return kkSuccess;
+  return kSuccess;
 }
 
 void Array_Destroy(Array* self) {

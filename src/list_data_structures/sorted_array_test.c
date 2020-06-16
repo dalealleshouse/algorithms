@@ -17,7 +17,10 @@ typedef void* (*SortedArrayOpUnary)(const Array*);
 static unsigned int seed;
 
 static Array* CreateSut(size_t n) {
-  Array* sut = Array_Create(PIntComparator, sizeof(int));
+  Array* sut = NULL;
+  ResultCode result_code = Array_Create(PIntComparator, sizeof(int), &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
   sut->array = calloc(sizeof(int), n);
 
   for (size_t i = 0; i < n; i++) ((int*)sut->array)[i] = rand_r(&seed);

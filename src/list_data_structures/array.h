@@ -4,8 +4,9 @@
 #include <stddef.h>
 
 #include "../utils/comparators.h"
-#include "./list_operations.h"
+#include "../utils/result_code.h"
 
+typedef void (*item_handler)(void* x);
 typedef struct {
   comparator comparator;
   size_t n;
@@ -13,8 +14,8 @@ typedef struct {
   void* array;
 } Array;
 
-Array* Array_Create(comparator, size_t item_size);
-ListOpResult Array_Insert(Array*, const void*);
-void* Array_Search(const Array*, const void*);
-ListOpResult Array_Enumerate(const Array*, item_handler);
+ResultCode Array_Create(comparator, size_t item_size, Array**);
+ResultCode Array_Insert(Array*, const void*);
+ResultCode Array_Search(const Array*, const void*, void**);
+ResultCode Array_Enumerate(const Array*, item_handler);
 void Array_Destroy(Array*);
