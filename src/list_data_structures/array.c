@@ -1,4 +1,4 @@
-// Copyright 2020 Dale Alleshouse
+// Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
 #include "array.h"
 
 #include <stdlib.h>
@@ -6,6 +6,9 @@
 
 ResultCode Array_Create(comparator comparator, size_t item_size,
                         Array** result) {
+  if (comparator == NULL || result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+
   Array* array = calloc(sizeof(Array), 1);
 
   if (array == NULL) return kFailedMemoryAllocation;
@@ -41,7 +44,8 @@ ResultCode Array_Insert(Array* self, const void* item) {
 }
 
 ResultCode Array_Search(const Array* self, const void* item, void** result) {
-  if (self == NULL || item == NULL) return kNullParameter;
+  if (self == NULL || item == NULL || result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
 
   for (size_t i = 0; i < self->n; i++) {
     size_t offset = i * self->item_size;
