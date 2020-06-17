@@ -1,4 +1,4 @@
-// Copyright 2020 Dale Alleshouse
+// Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
 #include "sorted_array.h"
 
 #include <stdio.h>
@@ -28,7 +28,7 @@ static ResultCode BinarySearch(const void* arr, comparator comparator,
   return BinarySearch(arr, comparator, search_for, half, item_size, result);
 }
 
-static size_t FindIndex(const Array* sut, void* ptr) {
+static size_t CalculateIndex(const Array* sut, void* ptr) {
   size_t diff = (char*)ptr - (char*)sut->array;
   return diff / sut->item_size;
 }
@@ -109,6 +109,6 @@ ResultCode SortedArray_Rank(const Array* self, const void* item,
   ResultCode result_code = SortedArray_Search(self, item, &found);
   if (result_code != kSuccess) return result_code;
 
-  *result = FindIndex(self, found);
+  *result = CalculateIndex(self, found);
   return kSuccess;
 }

@@ -1,4 +1,4 @@
-// Copyright 2020 Dale Alleshouse
+// Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
 #include "list_operations.h"
 
 #include <stdint.h>
