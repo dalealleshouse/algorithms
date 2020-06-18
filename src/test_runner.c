@@ -167,11 +167,10 @@ int TestRunner(int (*register_tests)()) {
   CU_basic_set_mode(CU_BRM_VERBOSE);
   CU_basic_run_tests();
 
-  // You must get this value before CU_cleanup_registry() or it will revert to
-  // zero
+  // Get this value before CU_cleanup_registry() or it will revert to zero
   int ret = CU_get_number_of_failures() != 0;
 
-  /* Clean up registry and return */
+  // Clean up registry and return
   CU_cleanup_registry();
   return ret;
 }
