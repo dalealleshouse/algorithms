@@ -1,19 +1,22 @@
 // Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
+#include "./linked_list.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 
 #include "../utils/malloc_test_wrapper.h"
 #include "../utils/math.h"
 #include "../utils/test_helpers.h"
-#include "./linked_list.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-#define SUT(code_block)                                        \
-  {                                                            \
-    LinkedList* sut = LinkedList_Create(NULL, PIntComparator); \
-    code_block;                                                \
-    LinkedList_Destroy(sut);                                   \
+#define SUT(code_block)                                                     \
+  {                                                                         \
+    LinkedList* sut = NULL;                                                 \
+    ResultCode result_code = LinkedList_Create(NULL, PIntComparator, &sut); \
+    CU_ASSERT_EQUAL(result_code, kSuccess);                                 \
+    code_block;                                                             \
+    LinkedList_Destroy(sut);                                                \
   }
 
 static void ListIsValid(const LinkedList* list, const size_t n,
@@ -51,14 +54,19 @@ static void ListIsValid(const LinkedList* list, const size_t n,
 static void LinkedList_Create_bad_malloc() {
 #if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
-    LinkedList* result = LinkedList_Create(free, PIntComparator);
-    CU_ASSERT_PTR_NULL(result);
+    LinkedList* list = NULL;
+    ResultCode result_code = LinkedList_Create(free, PIntComparator, &list);
+
+    CU_ASSERT_PTR_NULL(list);
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
   })
 #endif
 }
 
 static void LinkedList_Create_initalizes_values() {
-  LinkedList* list = LinkedList_Create(free, PIntComparator);
+  LinkedList* list = NULL;
+  ResultCode result_code = LinkedList_Create(free, PIntComparator, &list);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   if (list == NULL) {
     CU_FAIL("list is null");
@@ -76,53 +84,55 @@ static void LinkedList_Create_initalizes_values() {
 
 /*************************** LinkedList_InsertAt ******************************/
 static void LinkedList_InsertAt_null_parameters() {
-  ListOpResult result = LinkedList_InsertAt(NULL, NULL, 0);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  ResultCode result = LinkedList_InsertAt(NULL, NULL, 0);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   int dummy = 5;
   result = LinkedList_InsertAt(NULL, &dummy, 0);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  LinkedList* list = NULL;
+  ResultCode result_code = LinkedList_Create(NULL, PIntComparator, &list);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
   result = LinkedList_InsertAt(list, NULL, 0);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   LinkedList_Destroy(list);
 }
 
 static void LinkedList_InsertAt_bad_index() {
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
-
-  int dummy = 5;
-  ListOpResult result = LinkedList_InsertAt(list, &dummy, 5);
-  CU_ASSERT_EQUAL(kkInvalidIndex, result);
-
-  LinkedList_Destroy(list);
+  SUT({
+    int dummy = 5;
+    ResultCode result = LinkedList_InsertAt(sut, &dummy, 5);
+    CU_ASSERT_EQUAL(kInvalidIndex, result);
+  });
 }
 
 static void LinkedList_InsertAt_bad_malloc() {
   int dummy = 5;
-  LinkedList* list = LinkedList_Create(free, PIntComparator);
+  LinkedList* sut = NULL;
+  ResultCode result_code = LinkedList_Create(free, PIntComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   FAILED_MALLOC_TEST({
-    ListOpResult result = LinkedList_InsertAt(list, &dummy, 0);
-    CU_ASSERT_EQUAL(kFailedMalloc, result);
+    ResultCode result = LinkedList_InsertAt(sut, &dummy, 0);
+    CU_ASSERT_EQUAL(kFailedMemoryAllocation, result);
   })
 
-  LinkedList_Destroy(list);
+  LinkedList_Destroy(sut);
 }
 
 static void LinkedList_InsertAt_empty() {
   int payload = 138;
   void* expected[] = {&payload};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
 
-  ListOpResult result = LinkedList_InsertAt(list, &payload, 0);
+  SUT({
+    ResultCode result = LinkedList_InsertAt(sut, &payload, 0);
 
-  CU_ASSERT_EQUAL(kkSuccess, result);
-  ListIsValid(list, 1, expected);
-
-  LinkedList_Destroy(list);
+    CU_ASSERT_EQUAL(kSuccess, result);
+    ListIsValid(sut, 1, expected);
+  })
 }
 
 static void LinkedList_InsertAt_tail() {
@@ -130,14 +140,13 @@ static void LinkedList_InsertAt_tail() {
   int tail_payload = 1138;
   void* expected[] = {&head_payload, &tail_payload};
 
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
-  LinkedList_InsertAt(list, &head_payload, 0);
-  ListOpResult result = LinkedList_InsertAt(list, &tail_payload, 1);
+  SUT({
+    LinkedList_InsertAt(sut, &head_payload, 0);
+    ResultCode result = LinkedList_InsertAt(sut, &tail_payload, 1);
 
-  CU_ASSERT_EQUAL(kkSuccess, result);
-  ListIsValid(list, 2, expected);
-
-  LinkedList_Destroy(list);
+    CU_ASSERT_EQUAL(kSuccess, result);
+    ListIsValid(sut, 2, expected);
+  })
 }
 
 static void LinkedList_InsertAt_middle() {
@@ -146,16 +155,13 @@ static void LinkedList_InsertAt_middle() {
   int tail_payload = 11138;
   void* expected[] = {&head_payload, &mid_payload, &tail_payload};
 
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
-
-  LinkedList_InsertAt(list, &head_payload, 0);
-  LinkedList_InsertAt(list, &tail_payload, 1);
-  ListOpResult result = LinkedList_InsertAt(list, &mid_payload, 1);
-  CU_ASSERT_EQUAL(kkSuccess, result);
-
-  ListIsValid(list, 3, expected);
-
-  LinkedList_Destroy(list);
+  SUT({
+    LinkedList_InsertAt(sut, &head_payload, 0);
+    LinkedList_InsertAt(sut, &tail_payload, 1);
+    ResultCode result = LinkedList_InsertAt(sut, &mid_payload, 1);
+    CU_ASSERT_EQUAL(result, kSuccess);
+    ListIsValid(sut, 3, expected);
+  });
 }
 
 static void LinkedList_InsertAt_head_creates_links() {
@@ -164,16 +170,14 @@ static void LinkedList_InsertAt_head_creates_links() {
   void* expected[] = {&payload[6], &payload[5], &payload[4], &payload[3],
                       &payload[2], &payload[1], &payload[0]};
 
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) {
+      ResultCode result = LinkedList_InsertAt(sut, &payload[i], 0);
+      CU_ASSERT_EQUAL(kSuccess, result);
+    }
 
-  for (size_t i = 0; i < n; i++) {
-    ListOpResult result = LinkedList_InsertAt(list, &payload[i], 0);
-    CU_ASSERT_EQUAL(kkSuccess, result);
-  }
-
-  ListIsValid(list, n, expected);
-
-  LinkedList_Destroy(list);
+    ListIsValid(sut, n, expected);
+  });
 }
 
 static void LinkedList_InsertAt_tail_creates_links() {
@@ -182,36 +186,32 @@ static void LinkedList_InsertAt_tail_creates_links() {
   void* expected[] = {&payload[0], &payload[1], &payload[2], &payload[3],
                       &payload[4], &payload[5], &payload[6]};
 
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) {
+      ResultCode result = LinkedList_InsertAt(sut, &payload[i], i);
+      CU_ASSERT_EQUAL(kSuccess, result);
+    }
 
-  for (size_t i = 0; i < n; i++) {
-    ListOpResult result = LinkedList_InsertAt(list, &payload[i], i);
-    CU_ASSERT_EQUAL(kkSuccess, result);
-  }
-
-  ListIsValid(list, n, expected);
-
-  LinkedList_Destroy(list);
+    ListIsValid(sut, n, expected);
+  });
 }
 
 static void LinkedList_InsertAt_mid_creates_links() {
   int payload[] = {0, 1, 2};
   void* expected[] = {&payload[0], &payload[2], &payload[1]};
 
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    ResultCode result = LinkedList_InsertAt(sut, &payload[0], 0);
+    CU_ASSERT_EQUAL(kSuccess, result);
 
-  ListOpResult result = LinkedList_InsertAt(list, &payload[0], 0);
-  CU_ASSERT_EQUAL(kkSuccess, result);
+    result = LinkedList_InsertAt(sut, &payload[1], 1);
+    CU_ASSERT_EQUAL(kSuccess, result);
 
-  result = LinkedList_InsertAt(list, &payload[1], 1);
-  CU_ASSERT_EQUAL(kkSuccess, result);
+    result = LinkedList_InsertAt(sut, &payload[2], 1);
+    CU_ASSERT_EQUAL(kSuccess, result);
 
-  result = LinkedList_InsertAt(list, &payload[2], 1);
-  CU_ASSERT_EQUAL(kkSuccess, result);
-
-  ListIsValid(list, 3, expected);
-
-  LinkedList_Destroy(list);
+    ListIsValid(sut, 3, expected);
+  });
 }
 
 /*************************** LinkedList_DeleteAt ******************************/
@@ -223,47 +223,44 @@ static void MockFreer(void* ptr) {
 }
 
 static void LinkedList_DeleteAt_null_parameters() {
-  ListOpResult result = LinkedList_DeleteAt(NULL, 0);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  ResultCode result = LinkedList_DeleteAt(NULL, 0);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 }
 
 static void LinkedList_DeleteAt_invalid_index() {
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
-
-  ListOpResult result = LinkedList_DeleteAt(list, 1);
-
-  CU_ASSERT_EQUAL(kkInvalidIndex, result);
-
-  LinkedList_Destroy(list);
+  SUT({
+    ResultCode result = LinkedList_DeleteAt(sut, 1);
+    CU_ASSERT_EQUAL(kInvalidIndex, result);
+  });
 }
 
 static void LinkedList_DeleteAt_calls_freer() {
   int dummy = 5;
   is_free = false;
-  LinkedList* list = LinkedList_Create(MockFreer, PIntComparator);
+  LinkedList* sut = NULL;
+  ResultCode result_code = LinkedList_Create(MockFreer, PIntComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  LinkedList_InsertAt(list, &dummy, 0);
-  ListOpResult result = LinkedList_DeleteAt(list, 0);
+  LinkedList_InsertAt(sut, &dummy, 0);
+  ResultCode result = LinkedList_DeleteAt(sut, 0);
 
-  CU_ASSERT_EQUAL(kkSuccess, result);
+  CU_ASSERT_EQUAL(kSuccess, result);
   CU_ASSERT_EQUAL(true, is_free);
 
-  LinkedList_Destroy(list);
+  LinkedList_Destroy(sut);
 }
 
 static void LinkedList_DeleteAt_all_items() {
   size_t n = 7;
   int payload[] = {0, 1, 2, 3, 4, 5, 6};
   void* expected[] = {NULL};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) LinkedList_InsertAt(sut, &payload[i], 0);
 
-  for (size_t i = 0; i < n; i++) LinkedList_InsertAt(list, &payload[i], 0);
+    for (size_t i = 0; i < n; i++) LinkedList_DeleteAt(sut, 0);
 
-  for (size_t i = 0; i < n; i++) LinkedList_DeleteAt(list, 0);
-
-  ListIsValid(list, 0, expected);
-
-  LinkedList_Destroy(list);
+    ListIsValid(sut, 0, expected);
+  });
 }
 
 static void LinkedList_DeleteAt_head_modifies_links() {
@@ -271,14 +268,12 @@ static void LinkedList_DeleteAt_head_modifies_links() {
   int payload[] = {0, 1, 2, 3, 4, 5, 6};
   void* expected[] = {&payload[5], &payload[4], &payload[3],
                       &payload[2], &payload[1], &payload[0]};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) LinkedList_InsertAt(sut, &payload[i], 0);
 
-  for (size_t i = 0; i < n; i++) LinkedList_InsertAt(list, &payload[i], 0);
-
-  LinkedList_DeleteAt(list, 0);
-  ListIsValid(list, n - 1, expected);
-
-  LinkedList_Destroy(list);
+    LinkedList_DeleteAt(sut, 0);
+    ListIsValid(sut, n - 1, expected);
+  });
 }
 
 static void LinkedList_DeleteAt_tail_modifies_links() {
@@ -286,14 +281,13 @@ static void LinkedList_DeleteAt_tail_modifies_links() {
   int payload[] = {0, 1, 2, 3, 4, 5, 6};
   void* expected[] = {&payload[6], &payload[5], &payload[4],
                       &payload[3], &payload[2], &payload[1]};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
 
-  for (size_t i = 0; i < n; i++) LinkedList_InsertAt(list, &payload[i], 0);
+  SUT({
+    for (size_t i = 0; i < n; i++) LinkedList_InsertAt(sut, &payload[i], 0);
 
-  LinkedList_DeleteAt(list, n - 1);
-  ListIsValid(list, n - 1, expected);
-
-  LinkedList_Destroy(list);
+    LinkedList_DeleteAt(sut, n - 1);
+    ListIsValid(sut, n - 1, expected);
+  });
 }
 
 static void LinkedList_DeleteAt_mid_modifies_links() {
@@ -301,29 +295,27 @@ static void LinkedList_DeleteAt_mid_modifies_links() {
   int payload[] = {0, 1, 2, 3, 4, 5, 6};
   void* expected[] = {&payload[6], &payload[5], &payload[3],
                       &payload[2], &payload[1], &payload[0]};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) LinkedList_InsertAt(sut, &payload[i], 0);
 
-  for (size_t i = 0; i < n; i++) LinkedList_InsertAt(list, &payload[i], 0);
-
-  LinkedList_DeleteAt(list, 2);
-  ListIsValid(list, n - 1, expected);
-
-  LinkedList_Destroy(list);
+    LinkedList_DeleteAt(sut, 2);
+    ListIsValid(sut, n - 1, expected);
+  });
 }
 
 /*************************** LinkedList_Delete ********************************/
 static void LinkedList_Delete_null_parameters() {
   int val = 5;
 
-  ListOpResult result = LinkedList_Delete(NULL, NULL);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  ResultCode result = LinkedList_Delete(NULL, NULL);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   result = LinkedList_Delete(NULL, &val);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   SUT({
     result = LinkedList_Delete(sut, NULL);
-    CU_ASSERT_EQUAL(kkNullParameter, result);
+    CU_ASSERT_EQUAL(kNullParameter, result);
   });
 }
 
@@ -332,8 +324,8 @@ static void LinkedList_Delete_not_found() {
   int not_found = 401;
   SUT({
     LinkedList_InsertAt(sut, &val, 0);
-    ListOpResult result = LinkedList_Delete(sut, &not_found);
-    CU_ASSERT_EQUAL(result, kkNotFound);
+    ResultCode result = LinkedList_Delete(sut, &not_found);
+    CU_ASSERT_EQUAL(result, kNotFound);
   });
 }
 
@@ -381,45 +373,48 @@ static void LinkedList_Delete_mid() {
 
 /*************************** LinkedList_Search ********************************/
 static void LinkedList_Search_null_parameters() {
-  void* result = LinkedList_Search(NULL, NULL);
+  void* result = NULL;
+  ResultCode result_code = LinkedList_Search(NULL, NULL, &result);
   CU_ASSERT_PTR_NULL(result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 
   int dummy = 5;
-  result = LinkedList_Search(NULL, &dummy);
+  result_code = LinkedList_Search(NULL, &dummy, &result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
   CU_ASSERT_PTR_NULL(result);
 
-  LinkedList* list = LinkedList_Create(free, PIntComparator);
-  result = LinkedList_Search(list, NULL);
-  CU_ASSERT_PTR_NULL(result);
-
-  LinkedList_Destroy(list);
+  SUT({
+    result_code = LinkedList_Search(sut, NULL, &result);
+    CU_ASSERT_EQUAL(result_code, kNullParameter);
+    CU_ASSERT_PTR_NULL(result);
+  });
 }
 
 static void LinkedList_Search_not_found() {
   size_t n = 7;
   int dummy = 8;
   int payload[] = {0, 1, 2, 3, 4, 5, 6};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) LinkedList_InsertAt(sut, &payload[i], 0);
 
-  for (size_t i = 0; i < n; i++) LinkedList_InsertAt(list, &payload[i], 0);
-
-  void* result = LinkedList_Search(list, &dummy);
-  CU_ASSERT_PTR_NULL(result);
-
-  LinkedList_Destroy(list);
+    void* result = NULL;
+    ResultCode result_code = LinkedList_Search(sut, &dummy, &result);
+    CU_ASSERT_EQUAL(result_code, kNotFound);
+    CU_ASSERT_PTR_NULL(result);
+  });
 }
 
 static void LinkedList_Search_finds_item() {
   size_t n = 7;
   int payload[] = {0, 1, 2, 3, 4, 5, 6};
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < n; i++) LinkedList_InsertAt(sut, &payload[i], 0);
 
-  for (size_t i = 0; i < n; i++) LinkedList_InsertAt(list, &payload[i], 0);
-
-  void* result = LinkedList_Search(list, &payload[1]);
-  CU_ASSERT_EQUAL(payload[1], *(int*)result);
-
-  LinkedList_Destroy(list);
+    void* result = NULL;
+    ResultCode result_code = LinkedList_Search(sut, &payload[1], &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    CU_ASSERT_EQUAL(payload[1], *(int*)result);
+  });
 }
 
 /*************************** LinkedList_Enumerate *****************************/
@@ -432,39 +427,33 @@ static void MockItemHandler(void* item) {
 }
 
 static void LinkedList_Enumerate_null_paramter() {
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    ResultCode result = LinkedList_Enumerate(sut, NULL);
+    CU_ASSERT_EQUAL(kNullParameter, result);
 
-  ListOpResult result = LinkedList_Enumerate(list, NULL);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
-
-  result = LinkedList_Enumerate(NULL, MockItemHandler);
-  CU_ASSERT_EQUAL(kkNullParameter, result);
-
-  LinkedList_Destroy(list);
+    result = LinkedList_Enumerate(NULL, MockItemHandler);
+    CU_ASSERT_EQUAL(kNullParameter, result);
+  });
 }
 
 static void LinkedList_Enumerate_empty() {
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
-
-  ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);
-  CU_ASSERT_EQUAL(kkSuccess, result);
-
-  LinkedList_Destroy(list);
+  SUT({
+    ResultCode result = LinkedList_Enumerate(sut, MockItemHandler);
+    CU_ASSERT_EQUAL(kSuccess, result);
+  });
 }
 
 static void LinkedList_Enumerate_standard() {
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      LinkedList_InsertAt(sut, &mock_vals[i], sut->size);
+    }
 
-  for (size_t i = 0; i < mock_n; i++) {
-    LinkedList_InsertAt(list, &mock_vals[i], list->size);
-  }
-
-  mock_pos = 0;
-  ListOpResult result = LinkedList_Enumerate(list, MockItemHandler);
-  CU_ASSERT_EQUAL(kkSuccess, result);
-  CU_ASSERT_EQUAL(mock_n, mock_pos);
-
-  LinkedList_Destroy(list);
+    mock_pos = 0;
+    ResultCode result = LinkedList_Enumerate(sut, MockItemHandler);
+    CU_ASSERT_EQUAL(kSuccess, result);
+    CU_ASSERT_EQUAL(mock_n, mock_pos);
+  });
 }
 
 /*************************** LinkedList_Destory *******************************/
@@ -472,25 +461,25 @@ static void LinkedList_Enumerate_standard() {
 static void LinkedList_Destroy_null_parameter() { LinkedList_Destroy(NULL); }
 
 static void LinkedList_Destroy_calls_freeme() {
-  LinkedList* list = LinkedList_Create(MockFreer, PIntComparator);
+  LinkedList* sut = NULL;
+  ResultCode result_code = LinkedList_Create(MockFreer, PIntComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   is_free = false;
   int dummy = 5;
-  LinkedList_InsertAt(list, &dummy, 0);
+  LinkedList_InsertAt(sut, &dummy, 0);
 
-  LinkedList_Destroy(list);
+  LinkedList_Destroy(sut);
   CU_ASSERT_EQUAL(true, is_free);
 }
 
 static void LinkedList_Destroy_null_freer() {
   // If this does not create an error, it works
-  LinkedList* list = LinkedList_Create(NULL, PIntComparator);
-
-  is_free = false;
-  int dummy = 5;
-  LinkedList_InsertAt(list, &dummy, 0);
-
-  LinkedList_Destroy(list);
+  SUT({
+    is_free = false;
+    int dummy = 5;
+    LinkedList_InsertAt(sut, &dummy, 0);
+  });
 }
 
 int RegisterLinkedListTests() {
