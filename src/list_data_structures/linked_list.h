@@ -1,20 +1,12 @@
 // Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
-/*******************************************************************************
- * This is a rather anomalous implementation because it's rarely the case that
- * anyone would want to insert/delete an item into a linked list at a particular
- * index.  However, it meets the needs of this project because it easily enables
- * the creation of a list with poor spatial locality. This enables a
- * demonstration of the performance implications of sequentially accessing items
- * that are not contiguous in memory.
- ******************************************************************************/
 #pragma once
 
 #include <stddef.h>
 
 #include "../utils/comparators.h"
-#include "./list_operations.h"
+#include "../utils/result_code.h"
 
-typedef void (*freer)(void* x);
+typedef void (*item_handler)(void* x);
 
 typedef struct LinkedListItem {
   void* payload;
@@ -30,10 +22,10 @@ typedef struct {
   LinkedListItem* tail;
 } LinkedList;
 
-LinkedList* LinkedList_Create(freer, comparator);
-ListOpResult LinkedList_InsertAt(LinkedList*, void*, const size_t);
-ListOpResult LinkedList_DeleteAt(LinkedList*, const size_t);
-ListOpResult LinkedList_Delete(LinkedList*, void*);
-void* LinkedList_Search(const LinkedList*, const void*);
-ListOpResult LinkedList_Enumerate(const LinkedList*, item_handler);
+ResultCode LinkedList_Create(freer, comparator, LinkedList**);
+ResultCode LinkedList_InsertAt(LinkedList*, void*, const size_t);
+ResultCode LinkedList_DeleteAt(LinkedList*, const size_t);
+ResultCode LinkedList_Delete(LinkedList*, void*);
+ResultCode LinkedList_Search(const LinkedList*, const void*, void**);
+ResultCode LinkedList_Enumerate(const LinkedList*, item_handler);
 void LinkedList_Destroy(LinkedList*);

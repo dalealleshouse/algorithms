@@ -80,7 +80,10 @@ static KeyValuePair* KeyValuePair_create(void* key, size_t key_length,
 static KeyValuePair* search_list(LinkedList* list, void* key,
                                  size_t key_length) {
   KeyValuePair temp = {key, key_length, NULL};
-  return LinkedList_Search(list, &temp);
+  void* result = NULL;
+
+  LinkedList_Search(list, &temp, &result);
+  return result;
 }
 
 HashTable* HashTable_Create(size_t size) {
@@ -118,8 +121,8 @@ Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
   KeyValuePair* el = NULL;
 
   if (ls == NULL) {
-    self->table[index] =
-        LinkedList_Create(KeyValuePair_destroy, ele_comparator);
+    LinkedList_Create(KeyValuePair_destroy, ele_comparator,
+                      &self->table[index]);
     if (self->table[index] == NULL) return kFailedMemoryAllocation;
 
     ls = self->table[index];
@@ -141,8 +144,8 @@ Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
     el = KeyValuePair_create(key, len, value);
     if (el == NULL) return kFailedMemoryAllocation;
 
-    ListOpResult result = LinkedList_InsertAt(ls, el, 0);
-    if (result != kkSuccess) return kDependancyError;
+    ResultCode result = LinkedList_InsertAt(ls, el, 0);
+    if (result != kSuccess) return kDependancyError;
   }
 
   self->n++;
@@ -180,8 +183,8 @@ Result HashTable_Delete(HashTable* self, void* key, size_t len) {
   if (el == NULL) return kNotFound;
 
   KeyValuePair temp = {key, len, NULL};
-  ListOpResult result = LinkedList_Delete(ls, &temp);
-  if (result != kkSuccess) return kDependancyError;
+  ResultCode result = LinkedList_Delete(ls, &temp);
+  if (result != kSuccess) return kDependancyError;
 
   self->n--;
   return kSuccess;

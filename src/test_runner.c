@@ -101,6 +101,7 @@ extern int RegisterQuickSelectPartitionTests();
 int RegisterTests() {
   return (
              // clang-format off
+      // RegisterAlgoTimerTests() != 0 + Temporarily disabled
       RegisterGraphTests() != 0 +
       RegisterOverflowTests() != 0 +
       RegisterMathTests() != 0 +
@@ -124,7 +125,6 @@ int RegisterTests() {
       RegisterHuffmanCodeTests() != 0 +
       RegisterLinkedListTests() != 0 +
       RegisterArrayTests() != 0 +
-      // RegisterAlgoTimerTests() != 0 + Temporarily disabled
       RegisterSortedArrayTests() != 0 +
       RegisterBinaryTreeTests() != 0 +
       RegisterGraphTests() != 0 +
