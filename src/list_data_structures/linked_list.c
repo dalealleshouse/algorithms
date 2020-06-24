@@ -3,16 +3,17 @@
 
 #include <stdlib.h>
 
-static LinkedListItem* LinkedList_ItemCreate(void* payload) {
+static ResultCode LinkedList_ItemCreate(void* payload,
+                                        LinkedListItem** result) {
   LinkedListItem* item = calloc(sizeof(LinkedListItem), 1);
-
-  if (item == NULL) return NULL;
+  if (item == NULL) return kFailedMemoryAllocation;
 
   item->next = NULL;
   item->prev = NULL;
   item->payload = payload;
 
-  return item;
+  *result = item;
+  return kSuccess;
 }
 
 static void LinkedList_ItemDestroy(LinkedList* self, LinkedListItem* doomed) {
@@ -149,11 +150,11 @@ ResultCode LinkedList_Create(freer freer, comparator comparator,
 ResultCode LinkedList_InsertAt(LinkedList* self, void* payload,
                                const size_t index) {
   if (self == NULL || payload == NULL) return kNullParameter;
-
   if (index > self->size) return kInvalidIndex;
 
-  LinkedListItem* item = LinkedList_ItemCreate(payload);
-  if (item == NULL) return kFailedMemoryAllocation;
+  LinkedListItem* item = NULL;
+  ResultCode result = LinkedList_ItemCreate(payload, &item);
+  if (result != kSuccess) return result;
 
   if (index == 0) {
     insert_at_head(self, item);
@@ -170,7 +171,6 @@ ResultCode LinkedList_InsertAt(LinkedList* self, void* payload,
 
 ResultCode LinkedList_DeleteAt(LinkedList* self, const size_t index) {
   if (self == NULL) return kNullParameter;
-
   if (index >= self->size) return kInvalidIndex;
 
   if (index == 0) {
