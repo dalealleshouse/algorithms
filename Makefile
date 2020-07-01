@@ -51,7 +51,7 @@ ctags:
 	ctags -R .
 
 comp-db:
-	bear make -B release
+	bear make -B
 
 lint:
 	cpplint src/*.[ch] src/*/*.[ch]
