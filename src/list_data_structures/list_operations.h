@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "../utils/error_reporter.h"
+#include "error_reporter.h"
 
 const size_t RANK_ERROR;
 

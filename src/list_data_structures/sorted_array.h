@@ -1,7 +1,7 @@
 // Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
 #pragma once
 
-#include "./array.h"
+#include "array.h"
 
 ResultCode SortedArray_Search(const Array*, const void*, void**);
 ResultCode SortedArray_Min(const Array*, void**);

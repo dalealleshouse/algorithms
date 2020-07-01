@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#include "../utils/comparators.h"
-#include "./list_operations.h"
+#include "comparators.h"
+#include "list_operations.h"
 
 typedef enum { INVALID = 0, BLACK = 1, RED = 2 } COLOR;
 

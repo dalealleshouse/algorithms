@@ -1,15 +1,15 @@
 // Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
-#include "./binary_tree.h"
+#include "binary_tree.h"
 
 #include <limits.h>
 #include <stdlib.h>
 
-#include "../utils/error_reporter.h"
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/math.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "common_math.h"
+#include "error_reporter.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
 
 #define SUT(vals, code_block)           \
   {                                     \

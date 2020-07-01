@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#include "../utils/comparators.h"
-#include "../utils/result_code.h"
+#include "comparators.h"
+#include "result_code.h"
 
 typedef void (*item_handler)(void* x);
 

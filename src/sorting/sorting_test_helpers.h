@@ -2,8 +2,8 @@
 
 #include <stddef.h>
 
-#include "../utils/math.h"
 #include "./sorting.h"
+#include "common_math.h"
 
 typedef struct test_struct {
   int foo;

@@ -50,6 +50,7 @@ static Result WeightedIndependentSet_Union(
 
   // This should never overflow because it's checked by the caller
   int new_weight = wis->weight + wv->weight;
+
   Result result = _weightedIndependentSet_Init(wis->n + 1, new_weight, vertices,
                                                conclusion);
 

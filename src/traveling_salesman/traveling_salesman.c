@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "../utils/math.h"
+#include "common_math.h"
 
 static double squared_dist(const point* p1, const point* p2) {
   return ((p2->x - p1->x) * (p2->x - p1->x)) +

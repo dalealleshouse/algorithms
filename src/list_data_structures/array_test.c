@@ -1,15 +1,15 @@
 // Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
-#include "./array.h"
+#include "array.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/math.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "common_math.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
 
 #define INT2VOIDP(i) (void*)(uintptr_t)(i)
 #define VOIDP2INT(i) *(int*)(i)
