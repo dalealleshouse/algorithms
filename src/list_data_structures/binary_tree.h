@@ -4,9 +4,10 @@
 #include <stddef.h>
 
 #include "comparators.h"
-#include "list_operations.h"
+#include "result_code.h"
 
-typedef enum { INVALID = 0, BLACK = 1, RED = 2 } COLOR;
+typedef enum { kInvalid = 0, kBlack = 1, kRed = 2 } Color;
+typedef void (*item_handler)(void* x);
 
 typedef struct BinaryTreeNode {
   struct BinaryTreeNode* left;
@@ -14,7 +15,7 @@ typedef struct BinaryTreeNode {
   struct BinaryTreeNode* parent;
   void* payload;
   size_t size;
-  COLOR color;
+  Color color;
 } BinaryTreeNode;
 
 typedef struct {
@@ -23,24 +24,23 @@ typedef struct {
   size_t n;
 } BinaryTree;
 
-BinaryTreeNode NULL_NODE;
+BinaryTreeNode kNullNode;
 
-BinaryTree* BinaryTree_Create(comparator);
-ListOpResult BinaryTree_Insert(BinaryTree*, void*);
-ListOpResult BinaryTree_Enumerate(const BinaryTree*, item_handler);
-void* BinaryTree_Delete(BinaryTree*, void*);
-void* BinaryTree_Search(const BinaryTree*, const void*);
-void* BinaryTree_Min(const BinaryTree*);
-void* BinaryTree_Max(const BinaryTree*);
-void* BinaryTree_Predecessor(const BinaryTree*, const void*);
-void* BinaryTree_Successor(const BinaryTree*, const void*);
-void* BinaryTree_Select(const BinaryTree*, const size_t);
-size_t BinaryTree_Rank(const BinaryTree*, const void*);
+ResultCode BinaryTree_Create(comparator, BinaryTree**);
+ResultCode BinaryTree_Insert(BinaryTree*, void*);
+ResultCode BinaryTree_Enumerate(const BinaryTree*, item_handler);
+ResultCode BinaryTree_Delete(BinaryTree*, void*, void**);
+ResultCode BinaryTree_Search(const BinaryTree*, const void*, void**);
+ResultCode BinaryTree_Min(const BinaryTree*, void**);
+ResultCode BinaryTree_Max(const BinaryTree*, void**);
+ResultCode BinaryTree_Predecessor(const BinaryTree*, const void*, void**);
+ResultCode BinaryTree_Successor(const BinaryTree*, const void*, void**);
+ResultCode BinaryTree_Select(const BinaryTree*, const size_t, void**);
+ResultCode BinaryTree_Rank(const BinaryTree*, const void*, size_t*);
 void BinaryTree_Destroy(BinaryTree*, freer);
-
-ListOpResult BinaryTree_RotateLeft(BinaryTree*, const void*);
-ListOpResult BinaryTree_RotateRight(BinaryTree*, const void*);
 
 // Replace the insert methods above with these to have a self balancing red
 // black tree
-ListOpResult RedBlackTree_Insert(BinaryTree*, void*);
+ResultCode RedBlackTree_Insert(BinaryTree*, void*);
+ResultCode BinaryTree_RotateLeft(BinaryTree*, const void*);
+ResultCode BinaryTree_RotateRight(BinaryTree*, const void*);

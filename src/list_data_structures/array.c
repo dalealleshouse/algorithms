@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-ResultCode Array_Create(comparator comp_func, size_t item_size,
+ResultCode Array_Create(comparator comparator, size_t item_size,
                         Array** result) {
-  if (comp_func == NULL || result == NULL) return kNullParameter;
+  if (comparator == NULL || result == NULL) return kNullParameter;
   if (*result != NULL) return kOutputPointerIsNotNull;
 
   Array* array = calloc(sizeof(Array), 1);
@@ -14,7 +14,7 @@ ResultCode Array_Create(comparator comp_func, size_t item_size,
   if (array == NULL) return kFailedMemoryAllocation;
 
   array->item_size = item_size;
-  array->comparator = comp_func;
+  array->comparator = comparator;
 
   *result = array;
   return kSuccess;
