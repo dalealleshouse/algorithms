@@ -1,4 +1,4 @@
-#include "./math.h"
+#include "common_math.h"
 
 #include "./test_helpers.h"
 #include "CUnit/Basic.h"

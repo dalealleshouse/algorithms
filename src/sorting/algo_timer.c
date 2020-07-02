@@ -5,13 +5,13 @@
 #include <string.h>
 #include <time.h>
 
-#include "../utils/math.h"
 #include "./bubble_sort.h"
 #include "./insertion_sort.h"
 #include "./merge_sort.h"
 #include "./quick_sort.h"
 #include "./selection_sort.h"
 #include "./sorting_test_helpers.h"
+#include "common_math.h"
 
 typedef int (*sorter)(const size_t n, const size_t size, void* arr,
                       const comparator comparator);

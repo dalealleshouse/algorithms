@@ -6,10 +6,10 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "../utils/math.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "common_math.h"
+#include "test_helpers.h"
 
 typedef ResultCode (*SortedArrayOp)(const Array*, const void*, void**);
 typedef ResultCode (*SortedArrayOpUnary)(const Array*, void**);

@@ -1,11 +1,11 @@
-#include "./malloc_test_wrapper.h"
+#include "malloc_test_wrapper.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "./test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
 
 static void _MallocWorksWithoutIntercept() {
   void* test = malloc(100);

@@ -1,6 +1,6 @@
 ---
 Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
-WarningsAsErrors: 'google-*,bugprone-*'
+WarningsAsErrors: 'google-*,bugprone-*,clang-analyzer-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 FormatStyle:     file

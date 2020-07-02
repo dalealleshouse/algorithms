@@ -5,8 +5,8 @@
 #include <string.h>
 #include <time.h>
 
-#include "../utils/math.h"
 #include "./quick_select.h"
+#include "common_math.h"
 
 typedef void* (*selector)(const size_t nth, const size_t n, const size_t size,
                           void* arr, const comparator comparator);
