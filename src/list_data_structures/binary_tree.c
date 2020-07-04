@@ -184,7 +184,7 @@ static ResultCode ParentLessThan(BinaryTreeNode* root, const void* search_for,
   return ParentLessThan(root->parent, search_for, comparator, result);
 }
 
-static ResultCode predecessor(BinaryTreeNode* root, const void* search_for,
+static ResultCode Predecessor(BinaryTreeNode* root, const void* search_for,
                               comparator comparator, BinaryTreeNode** result) {
   const BinaryTreeNode* node = Traverse(root, search_for, comparator);
   if (node == NULL) return kNotFound;
@@ -219,13 +219,13 @@ static ResultCode Successor(BinaryTreeNode* root, const void* search_for,
   return ParentGreaterThan(node->parent, search_for, comparator, result);
 }
 
-static size_t node_size(const BinaryTreeNode* node) {
+static size_t NodeSize(const BinaryTreeNode* node) {
   return (node == 0) ? 0 : node->size;
 }
 
 static const BinaryTreeNode* Select(const BinaryTreeNode* root,
                                     const size_t index) {
-  size_t left = node_size(root->left);
+  size_t left = NodeSize(root->left);
 
   if (left == index) return root;
 
@@ -240,7 +240,7 @@ static ResultCode rank(const BinaryTreeNode* root, const void* payload,
 
   int comp_result = comparator(payload, root->payload);
 
-  size_t left = node_size(root->left);
+  size_t left = NodeSize(root->left);
   if (comp_result == 0) {
     *result = left + offset;
     return kSuccess;
@@ -253,7 +253,7 @@ static ResultCode rank(const BinaryTreeNode* root, const void* payload,
   return rank(root->right, payload, comparator, offset + left + 1, result);
 }
 
-static void left_rotate(BinaryTree* self, BinaryTreeNode* pivot) {
+static void LeftRotate(BinaryTree* self, BinaryTreeNode* pivot) {
   BinaryTreeNode* temp = pivot->right;
   pivot->right = temp->left;
 
@@ -276,7 +276,7 @@ static void left_rotate(BinaryTree* self, BinaryTreeNode* pivot) {
   pivot->parent->size = pivot->size + pivot->parent->right->size + 1;
 }
 
-static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot) {
+static void RightRotate(BinaryTree* self, BinaryTreeNode* pivot) {
   BinaryTreeNode* temp = pivot->left;
   pivot->left = temp->right;
 
@@ -299,7 +299,7 @@ static void right_rotate(BinaryTree* self, BinaryTreeNode* pivot) {
   pivot->parent->size = pivot->size + pivot->parent->left->size + 1;
 }
 
-static int node_value(BinaryTreeNode* node) {
+static int NodeValue(BinaryTreeNode* node) {
   if (node == &kNullNode) return -1;
 
   if (node == NULL) return -2;
@@ -307,7 +307,7 @@ static int node_value(BinaryTreeNode* node) {
   return *(int*)node->payload;
 }
 
-static char* color(Color color) {
+static char* _Color(Color color) {
   switch (color) {
     case kRed:
       return "red";
@@ -323,15 +323,15 @@ void BinaryTree_Print(BinaryTreeNode* node) {
 
   if (node->left == &kNullNode && node->right == &kNullNode) return;
 
-  printf("root=%d_%s, left=%d_%s, right=%d_%s\n", node_value(node),
-         color(node->color), node_value(node->left), color(node->left->color),
-         node_value(node->right), color(node->right->color));
+  printf("root=%d_%s, left=%d_%s, right=%d_%s\n", NodeValue(node),
+         _Color(node->color), NodeValue(node->left), _Color(node->left->color),
+         NodeValue(node->right), _Color(node->right->color));
 
   BinaryTree_Print(node->left);
   BinaryTree_Print(node->right);
 }
 
-static void balance(BinaryTree* tree, BinaryTreeNode* root) {
+static void Balance(BinaryTree* tree, BinaryTreeNode* root) {
   while (root->parent->color == kRed) {
     // parent->parent will never be null because this method should never be
     // called on the root node and the root node's parent is kNullNode.
@@ -344,11 +344,11 @@ static void balance(BinaryTree* tree, BinaryTreeNode* root) {
         root = root->parent->parent;
       } else if (root == root->parent->right) {
         root = root->parent;
-        left_rotate(tree, root);
+        LeftRotate(tree, root);
       } else {
         root->parent->color = kBlack;
         root->parent->parent->color = kRed;
-        right_rotate(tree, root->parent->parent);
+        RightRotate(tree, root->parent->parent);
       }
     } else {
       BinaryTreeNode* uncle = root->parent->parent->left;
@@ -359,11 +359,11 @@ static void balance(BinaryTree* tree, BinaryTreeNode* root) {
         root = root->parent->parent;
       } else if (root == root->parent->left) {
         root = root->parent;
-        right_rotate(tree, root);
+        RightRotate(tree, root);
       } else {
         root->parent->color = kBlack;
         root->parent->parent->color = kRed;
-        left_rotate(tree, root->parent->parent);
+        LeftRotate(tree, root->parent->parent);
       }
     }
   }
@@ -371,11 +371,11 @@ static void balance(BinaryTree* tree, BinaryTreeNode* root) {
   tree->root->color = kBlack;
 }
 
-static void free_nodes(BinaryTreeNode* node, freer freer) {
+static void FreeNodes(BinaryTreeNode* node, freer freer) {
   if (node == &kNullNode || node == NULL) return;
 
-  free_nodes(node->left, freer);
-  free_nodes(node->right, freer);
+  FreeNodes(node->left, freer);
+  FreeNodes(node->right, freer);
 
   TreeNodeDestroy(node, freer);
 }
@@ -484,7 +484,7 @@ ResultCode BinaryTree_Predecessor(const BinaryTree* self, const void* payload,
 
   BinaryTreeNode* pred = NULL;
   ResultCode result_code =
-      predecessor(self->root, payload, self->comparator, &pred);
+      Predecessor(self->root, payload, self->comparator, &pred);
   if (result_code != kSuccess) return result_code;
 
   *result = pred->payload;
@@ -529,7 +529,7 @@ ResultCode BinaryTree_Rank(const BinaryTree* self, const void* payload,
 void BinaryTree_Destroy(BinaryTree* self, freer freer) {
   if (self == NULL) return;
 
-  free_nodes(self->root, freer);
+  FreeNodes(self->root, freer);
   free(self);
 }
 
@@ -539,7 +539,7 @@ ResultCode BinaryTree_RotateLeft(BinaryTree* self, const void* item) {
   BinaryTreeNode* rotate_node = Traverse(self->root, item, self->comparator);
   if (rotate_node == NULL) return kNotFound;
 
-  left_rotate(self, rotate_node);
+  LeftRotate(self, rotate_node);
   return kSuccess;
 }
 
@@ -549,7 +549,7 @@ ResultCode BinaryTree_RotateRight(BinaryTree* self, const void* item) {
   BinaryTreeNode* rotate_node = Traverse(self->root, item, self->comparator);
   if (rotate_node == NULL) return kNotFound;
 
-  right_rotate(self, rotate_node);
+  RightRotate(self, rotate_node);
   return kSuccess;
 }
 
@@ -567,6 +567,6 @@ ResultCode RedBlackTree_Insert(BinaryTree* self, void* payload) {
   }
 
   self->n++;
-  balance(self, node);
+  Balance(self, node);
   return kSuccess;
 }
