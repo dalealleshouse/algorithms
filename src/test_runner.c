@@ -1,4 +1,10 @@
-// Copyright 2020 Hideous Humpback Freak https://hideoushumpbackfreak.com/
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
@@ -102,55 +108,55 @@ int RegisterTests() {
   return (
              // clang-format off
       // RegisterAlgoTimerTests() != 0 + Temporarily disabled
-      /* RegisterGraphTests() != 0 + */
-      /* RegisterOverflowTests() != 0 + */
-      /* RegisterMathTests() != 0 + */
-      /* RegisterCommonTests() != 0 + */
-      /* RegisterGraphSearchTests() != 0 + */
-      /* RegisterQueueTests() != 0 + */
-      /* RegisterPriorityQueueTests() != 0 + */
-      /* RegisterStackTests() != 0 + */
-      /* RegisterHeapTests() != 0 + */
-      /* RegisterHashTableTests() != 0 + */
-      /* RegisterBloomFilterTests() != 0 + */
-      /* RegisterHashFunctionTests() != 0 + */
-      /* RegisterDisjointSetTests() != 0 + */
-      /* RegisterKnapsackProblemTests() != 0 + */
-      /* RegisterRunningMedianTests() != 0 + */
-      /* RegisterSequenceAlignmentTests() != 0 + */
-      /* RegisterDijkstraTests() != 0 + */
-      /* RegisterShortestPathTests() != 0 + */
-      /* RegisterBellmanFordTests() != 0 + */
-      /* RegisterFloydWarshallTests() != 0 + */
-      /* RegisterHuffmanCodeTests() != 0 + */
-      /* RegisterLinkedListTests() != 0 + */
-      /* RegisterArrayTests() != 0 + */
-      /* RegisterSortedArrayTests() != 0 + */
+      RegisterGraphTests() != 0 +
+      RegisterOverflowTests() != 0 +
+      RegisterMathTests() != 0 +
+      RegisterCommonTests() != 0 +
+      RegisterGraphSearchTests() != 0 +
+      RegisterQueueTests() != 0 +
+      RegisterPriorityQueueTests() != 0 +
+      RegisterStackTests() != 0 +
+      RegisterHeapTests() != 0 +
+      RegisterHashTableTests() != 0 +
+      RegisterBloomFilterTests() != 0 +
+      RegisterHashFunctionTests() != 0 +
+      RegisterDisjointSetTests() != 0 +
+      RegisterKnapsackProblemTests() != 0 +
+      RegisterRunningMedianTests() != 0 +
+      RegisterSequenceAlignmentTests() != 0 +
+      RegisterDijkstraTests() != 0 +
+      RegisterShortestPathTests() != 0 +
+      RegisterBellmanFordTests() != 0 +
+      RegisterFloydWarshallTests() != 0 +
+      RegisterHuffmanCodeTests() != 0 +
+      RegisterLinkedListTests() != 0 +
+      RegisterArrayTests() != 0 +
+      RegisterSortedArrayTests() != 0 +
       RegisterBinaryTreeTests() != 0 +
-      /* RegisterGraphTests() != 0 + */
-      /* RegisterMinCutTests() != 0 + */
-      /* RegisterSatisfiabilityTests() != 0 + */
-      /* RegisterQuickSortTests() != 0 + */
-      /* RegisterPartitionTests() != 0 + */
-      /* RegisterBubbleSortTests() != 0 + */
-      /* RegisterInsertionSortTests() != 0 + */
-      /* RegisterSelectionSortTests() != 0 + */
-      /* RegisterMergeSortTestTests() != 0 + */
-      /* RegisterTravelingSalesmanTests() != 0 + */
-      /* RegisterWeightedIndependentSetTests() != 0 + */
-      /* RegisterMallocTestWrapperTests() != 0 + */
-      /* RegisterMinSpanningTreeTests() != 0 + */
-      /* RegisterKruskalClusterTests() != 0 + */
-      /* RegisterEuclidDistTests() != 0 + */
-      /* RegisterClosestDistanceTests() != 0 + */
-      /* RegisterClosestDistanceSlowTests() != 0 + */
-      /* RegisterSelectTests() != 0 + */
-      /* RegisterQuickSelectTests() != 0 + */
-      /* RegisterPartitionTests() != 0 + */
-      /* RegisterInversionCountTests() != 0 + */
-      /* RegisterIsPowerOfTwoTests() != 0 + */
-      /* RegisterMultiplySquareMatricesTests() != 0 + */
-      /* RegisterQuickSelectPartitionTests() != 0 + */
+      RegisterGraphTests() != 0 +
+      RegisterMinCutTests() != 0 +
+      RegisterSatisfiabilityTests() != 0 +
+      RegisterQuickSortTests() != 0 +
+      RegisterPartitionTests() != 0 +
+      RegisterBubbleSortTests() != 0 +
+      RegisterInsertionSortTests() != 0 +
+      RegisterSelectionSortTests() != 0 +
+      RegisterMergeSortTestTests() != 0 +
+      RegisterTravelingSalesmanTests() != 0 +
+      RegisterWeightedIndependentSetTests() != 0 +
+      RegisterMallocTestWrapperTests() != 0 +
+      RegisterMinSpanningTreeTests() != 0 +
+      RegisterKruskalClusterTests() != 0 +
+      RegisterEuclidDistTests() != 0 +
+      RegisterClosestDistanceTests() != 0 +
+      RegisterClosestDistanceSlowTests() != 0 +
+      RegisterSelectTests() != 0 +
+      RegisterQuickSelectTests() != 0 +
+      RegisterPartitionTests() != 0 +
+      RegisterInversionCountTests() != 0 +
+      RegisterIsPowerOfTwoTests() != 0 +
+      RegisterMultiplySquareMatricesTests() != 0 +
+      RegisterQuickSelectPartitionTests() != 0 +
       0) * -1;
   // clang-format on
 }
