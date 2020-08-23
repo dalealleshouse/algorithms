@@ -17,6 +17,8 @@
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
+#define INDENT_STEP 4
+
 #define SUT(vals, code_block)           \
   {                                     \
     BinaryTree* sut = create_sut(vals); \
@@ -55,19 +57,6 @@ static BinaryTree* create_sut(int* vals) {
 
   while (*vals != TERMINATOR) {
     BinaryTree_Insert(tree, vals);
-    vals++;
-  }
-
-  return tree;
-}
-
-static BinaryTree* create_red_black_sut(int* vals) {
-  BinaryTree* tree = NULL;
-  ResultCode result_code = BinaryTree_Create(PIntComparator, &tree);
-  CU_ASSERT_EQUAL(result_code, kSuccess);
-
-  while (*vals != TERMINATOR) {
-    RedBlackTree_Insert(tree, vals);
     vals++;
   }
 
@@ -208,6 +197,34 @@ static BinaryTree* generate_valid_tree() {
   sut->root = nodes[2];
   sut->n = n;
   return sut;
+}
+
+static void print_tree_recursive(BinaryTreeNode* node, int indent) {
+  int i;
+  if (node->right != &kNullNode && node->right != NULL) {
+    print_tree_recursive(node->right, indent + INDENT_STEP);
+  }
+  for (i = 0; i < indent; i++) printf(" ");
+
+  if (node->color == kBlack) {
+    printf("%d\n", node_value(node));
+  } else {
+    printf("<%d>\n", node_value(node));
+  }
+  if (node->left != &kNullNode && node->left != NULL) {
+    print_tree_recursive(node->left, indent + INDENT_STEP);
+  }
+}
+
+static void print_tree(BinaryTree* tree) {
+  if (tree->root == NULL) {
+    printf("<empty tree>");
+    return;
+  }
+
+  printf("\n\n");
+  print_tree_recursive(tree->root, 0);
+  printf("\n\n");
 }
 
 /*************************** BinaryTree_Create ********************************/
@@ -840,41 +857,81 @@ static void BinaryTree_RotateRight_happy_path() {
   test_rotate(vals2, expected_vals2, 75, 7, BinaryTree_RotateRight);
 }
 
-/*************************** RedBlackTree_Insert ******************************/
+/*************************** RedBlackTree_Invariants **************************/
 // Every node is designated as either red or black
-static void red_black_invaiant_1(BinaryTreeNode* node) {
+static void red_black_invariant_1(BinaryTreeNode* node) {
   if (node == NULL) return;
 
-  red_black_invaiant_1(node->left);
+  red_black_invariant_1(node->left);
   CU_ASSERT_TRUE(node->color == kRed || node->color == kBlack);
-  red_black_invaiant_1(node->right);
+  red_black_invariant_1(node->right);
 }
 
 // Root node is black
-static void red_black_invaiant_2(BinaryTree* tree) {
+static void red_black_invariant_2(BinaryTree* tree) {
   CU_ASSERT_TRUE(tree->root->color == kBlack);
 }
 
 // No consecutive red nodes
-static void red_black_invaiant_3(BinaryTreeNode* node) {
+static void red_black_invariant_3(BinaryTreeNode* node) {
   if (node == &kNullNode) return;
 
-  red_black_invaiant_3(node->left);
+  red_black_invariant_3(node->left);
   if (node->color == kRed) {
     CU_ASSERT_TRUE(node->parent->color == kBlack);
     CU_ASSERT_TRUE(node->left->color == kBlack);
     CU_ASSERT_TRUE(node->right->color == kBlack);
   }
-  red_black_invaiant_3(node->right);
+  red_black_invariant_3(node->right);
+}
+
+// Same number of black nodes per path
+static void red_black_invariant_4(BinaryTreeNode* node, int black_count,
+                                  int* path_black_count) {
+  if (node->color == kBlack) black_count++;
+
+  if (node == &kNullNode) {
+    // first null node sets the global variable that the others must be equal
+    if (*path_black_count == -1) {
+      *path_black_count = black_count;
+    } else {
+      CU_ASSERT_EQUAL(*path_black_count, black_count);
+    }
+
+    return;
+  }
+
+  red_black_invariant_4(node->left, black_count, path_black_count);
+  red_black_invariant_4(node->right, black_count, path_black_count);
 }
 
 static void red_black_tree_is_valid(BinaryTree* tree, size_t n) {
   tree_is_valid(tree, n);
-  red_black_invaiant_1(tree->root);
-  red_black_invaiant_2(tree);
-  red_black_invaiant_3(tree->root);
+  red_black_invariant_1(tree->root);
+  red_black_invariant_2(tree);
+  red_black_invariant_3(tree->root);
+
+  int black_count_path = -1;
+  red_black_invariant_4(tree->root, 0, &black_count_path);
 }
 
+static BinaryTree* create_red_black_sut(int* vals) {
+  BinaryTree* tree = NULL;
+  ResultCode result_code = BinaryTree_Create(PIntComparator, &tree);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+  size_t size = 0;
+
+  while (*vals != TERMINATOR) {
+    ResultCode result_code = RedBlackTree_Insert(tree, vals);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    red_black_tree_is_valid(tree, ++size);
+    vals++;
+  }
+
+  return tree;
+}
+
+/*************************** RedBlackTree_Insert ******************************/
 static void RedBlackTree_Insert_failed_mem_allocation() {
   BinaryTree* sut = NULL;
   ResultCode result_code = BinaryTree_Create(PIntComparator, &sut);
@@ -918,6 +975,192 @@ static void RedBlackTree_Insert_rotations() {
 
   int vals2[] = {50, 25, 100, 10, 30, 75, 150, 60, 80, 200, 55, TERMINATOR};
   RED_BLACK_SUT(vals2, { red_black_tree_is_valid(sut, 11); });
+}
+
+/*************************** RedBlackTree_Delete ******************************/
+static void* find_int(int* array, int value) {
+  while (array != &TERMINATOR) {
+    if (*array == value) return array;
+    array++;
+  }
+
+  return NULL;
+}
+
+static void RedBlackTree_Delete_null_paramter() {
+  SUT(mock_vals, {
+    int search_for = 5;
+    void* result = NULL;
+
+    ResultCode result_code = RedBlackTree_Delete(NULL, &search_for, &result);
+    CU_ASSERT_EQUAL(result_code, kNullParameter);
+
+    result_code = RedBlackTree_Delete(sut, NULL, &result);
+    CU_ASSERT_EQUAL(result_code, kNullParameter);
+
+    result = malloc(sizeof(int));
+    result_code = RedBlackTree_Delete(sut, &search_for, &result);
+    CU_ASSERT_EQUAL(result_code, kOutputPointerIsNotNull);
+    free(result);
+  });
+}
+
+static void RedBlackTree_Delete_empty() {
+  SUT(empty_vals, {
+    int search_for = 5;
+    void* result = NULL;
+
+    ResultCode result_code = RedBlackTree_Delete(sut, &search_for, &result);
+    CU_ASSERT_EQUAL(result_code, kEmpty);
+  });
+}
+
+static void RedBlackTree_Delete_not_found() {
+  SUT(mock_vals, {
+    int not_found = 401;
+    void* result = NULL;
+    ResultCode result_code = RedBlackTree_Delete(sut, &not_found, &result);
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(result_code, kNotFound);
+    tree_is_valid(sut, mock_n);
+  });
+}
+
+static void RedBlackTree_Delete_all_nodes() {
+  int vals[] = {5, TERMINATOR};
+  RED_BLACK_SUT(vals, {
+    void* result = NULL;
+    ResultCode result_code = RedBlackTree_Delete(sut, vals, &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    CU_ASSERT_EQUAL(sut->n, 0);
+    red_black_tree_is_valid(sut, 0);
+  });
+}
+
+static void RedBlackTree_Delete_recolors_root() {
+  /*
+   *     <10>
+   * 5
+   */
+  int vals[] = {5, 10, TERMINATOR};
+
+  RED_BLACK_SUT(vals, {
+    void* result = NULL;
+    ResultCode result_code =
+        RedBlackTree_Delete(sut, find_int(vals, 5), &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    red_black_tree_is_valid(sut, 1);
+  });
+}
+
+static void RedBlackTree_Delete_red_leaf() {
+  /*
+   *             <40>
+   *         35
+   *     <30>
+   *         25
+   * 20
+   *         15
+   *     <10>
+   *         5
+   */
+  int vals[] = {5, 10, 15, 20, 25, 30, 35, 40, TERMINATOR};
+  size_t n = (sizeof(vals) / sizeof(int)) - 1;
+  RED_BLACK_SUT(vals, {
+    void* result = NULL;
+    // Delete 40
+    ResultCode result_code =
+        RedBlackTree_Delete(sut, find_int(vals, 40), &result);
+    red_black_tree_is_valid(sut, n - 1);
+  });
+}
+
+static void RedBlackTree_Delete_black_leaf() {
+  /*
+   *             <40>
+   *         35
+   *     <30>
+   *         25
+   * 20
+   *         15
+   *     <10>
+   *         5
+   */
+  int vals[] = {5, 10, 15, 20, 25, 30, 35, 40, TERMINATOR};
+  size_t n = (sizeof(vals) / sizeof(int)) - 1;
+  RED_BLACK_SUT(vals, {
+    void* result = NULL;
+    ResultCode result_code =
+        RedBlackTree_Delete(sut, find_int(vals, 5), &result);
+    red_black_tree_is_valid(sut, n - 1);
+  });
+}
+
+static void RedBlackTree_Delete_root() {
+  /*
+   *             <40>
+   *         35
+   *     <30>
+   *         25
+   * 20
+   *         15
+   *     <10>
+   *         5
+   */
+  int vals[] = {5, 10, 15, 20, 25, 30, 35, 40, TERMINATOR};
+  size_t n = (sizeof(vals) / sizeof(int)) - 1;
+  RED_BLACK_SUT(vals, {
+    void* result = NULL;
+    ResultCode result_code =
+        RedBlackTree_Delete(sut, find_int(vals, 20), &result);
+    red_black_tree_is_valid(sut, n - 1);
+  });
+}
+
+static void RedBlackTree_Delete_one_red_child() {
+  /*
+   *             <40>
+   *         35
+   *     <30>
+   *         25
+   * 20
+   *         15
+   *     <10>
+   *         5
+   */
+  int vals[] = {5, 10, 15, 20, 25, 30, 35, 40, TERMINATOR};
+  size_t n = (sizeof(vals) / sizeof(int)) - 1;
+  RED_BLACK_SUT(vals, {
+    void* result = NULL;
+    // Delete 35
+    ResultCode result_code =
+        RedBlackTree_Delete(sut, find_int(vals, 35), &result);
+    red_black_tree_is_valid(sut, n - 1);
+  });
+}
+
+static void RedBlackTree_fuzz_test() {
+  const size_t kN = 5;
+  static unsigned int seed;
+  size_t size = kN;
+  void* result = NULL;
+  int vals[kN + 1];
+
+  for (size_t i = 0; i < kN; i++) {
+    vals[i] = rand_r(&seed);
+  }
+
+  vals[kN] = TERMINATOR;
+
+  RED_BLACK_SUT(vals, {
+    for (size_t i = 0; i < kN; i++) {
+      result = NULL;
+      ResultCode result_code = RedBlackTree_Delete(sut, &vals[i], &result);
+      CU_ASSERT_EQUAL(*(int*)result, vals[i]);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
+      red_black_tree_is_valid(sut, --size);
+    }
+  });
 }
 
 int RegisterBinaryTreeTests() {
@@ -1011,6 +1254,21 @@ int RegisterBinaryTreeTests() {
       CU_TEST_INFO(RedBlackTree_Insert_rotations),
       CU_TEST_INFO_NULL};
 
+  CU_TestInfo red_black_delete_tests[] = {
+      CU_TEST_INFO(RedBlackTree_Delete_empty),
+      CU_TEST_INFO(RedBlackTree_Delete_not_found),
+      CU_TEST_INFO(RedBlackTree_Delete_null_paramter),
+      CU_TEST_INFO(RedBlackTree_Delete_all_nodes),
+      CU_TEST_INFO(RedBlackTree_Delete_recolors_root),
+      CU_TEST_INFO(RedBlackTree_Delete_red_leaf),
+      CU_TEST_INFO(RedBlackTree_Delete_black_leaf),
+      CU_TEST_INFO(RedBlackTree_Delete_one_red_child),
+      CU_TEST_INFO(RedBlackTree_Delete_root),
+      CU_TEST_INFO_NULL};
+
+  CU_TestInfo red_black_tests[] = {CU_TEST_INFO(RedBlackTree_fuzz_test),
+                                   CU_TEST_INFO_NULL};
+
   CU_SuiteInfo suites[] = {{.pName = "BinaryTree_Create",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
@@ -1067,6 +1325,14 @@ int RegisterBinaryTreeTests() {
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
                             .pTests = red_black_insert_tests},
+                           {.pName = "RedBlackTree_Delete",
+                            .pInitFunc = noop,
+                            .pCleanupFunc = noop,
+                            .pTests = red_black_delete_tests},
+                           {.pName = "RedBlackTree",
+                            .pInitFunc = noop,
+                            .pCleanupFunc = noop,
+                            .pTests = red_black_tests},
                            CU_SUITE_INFO_NULL};
 
   return CU_register_suites(suites);

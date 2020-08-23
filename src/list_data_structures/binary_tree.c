@@ -12,8 +12,14 @@
 
 BinaryTreeNode kNullNode = {NULL, NULL, NULL, NULL, 0, kBlack};
 
+typedef struct DeletedContext {
+  struct BinaryTreeNode* replacement;
+  Color original_color;
+} DeletedContext;
+
 static void Delete(BinaryTreeNode**);
 static ResultCode Max(BinaryTreeNode*, BinaryTreeNode**);
+static ResultCode Min(BinaryTreeNode*, BinaryTreeNode**);
 
 static void TreeNodeDestroy(BinaryTreeNode* node, freer freer) {
   if (node == &kNullNode) return;
@@ -85,15 +91,17 @@ static void DeleteLeaf(BinaryTreeNode** doomed) {
 
   DecrementSize(node);
 
+  kNullNode.parent = (*doomed)->parent;
   TreeNodeDestroy(node, NULL);
   *doomed = &kNullNode;
 }
 
-static void DeleteDegreeOne(BinaryTreeNode** doomed) {
+static void DeleteDegreeOne(BinaryTreeNode** doomed, DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
 
   DecrementSize(node);
   BinaryTreeNode* child = (node->left != &kNullNode) ? node->left : node->right;
+  context->replacement = child;
   child->parent = node->parent;
   TreeNodeDestroy(node, NULL);
   *doomed = child;
@@ -107,16 +115,20 @@ static BinaryTreeNode** FindParentPointer(BinaryTreeNode* node) {
   return &parent->right;
 }
 
-static ResultCode DeleteDegreeTwo(BinaryTreeNode** doomed) {
+static ResultCode DeleteDegreeTwo(BinaryTreeNode** doomed,
+                                  DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
 
-  BinaryTreeNode* largest_left = NULL;
-  ResultCode result_code = Max(node->left, &largest_left);
+  BinaryTreeNode* smallest_right = NULL;
+  ResultCode result_code = Min(node->right, &smallest_right);
   if (result_code != kSuccess) return result_code;
 
-  void* new_value = largest_left->payload;
-  node->payload = new_value;
-  BinaryTreeNode** doomed_p = FindParentPointer(largest_left);
+  context->original_color = smallest_right->color;
+  context->replacement = smallest_right->right;
+
+  node->payload = smallest_right->payload;
+  node->color = smallest_right->color;
+  BinaryTreeNode** doomed_p = FindParentPointer(smallest_right);
   Delete(doomed_p);
   return kSuccess;
 }
@@ -125,22 +137,29 @@ static size_t Degree(BinaryTreeNode* node) {
   return (node->left != &kNullNode) + (node->right != &kNullNode);
 }
 
-static void Delete(BinaryTreeNode** doomed) {
+static void RedBlackDelete(BinaryTreeNode** doomed, DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
+  context->original_color = (*doomed)->color;
 
   size_t deg = Degree(node);
 
   switch (deg) {
     case 0:
       DeleteLeaf(doomed);
+      context->replacement = &kNullNode;
       break;
     case 1:
-      DeleteDegreeOne(doomed);
+      DeleteDegreeOne(doomed, context);
       break;
     case 2:
-      DeleteDegreeTwo(doomed);
+      DeleteDegreeTwo(doomed, context);
       break;
   }
+}
+
+static void Delete(BinaryTreeNode** doomed) {
+  DeletedContext context;
+  RedBlackDelete(doomed, &context);
 }
 
 static void Enumerate(BinaryTreeNode* node, item_handler payload_handler) {
@@ -371,6 +390,79 @@ static void Balance(BinaryTree* tree, BinaryTreeNode* root) {
   tree->root->color = kBlack;
 }
 
+static ResultCode BalanceAfterDelete(BinaryTree* tree, BinaryTreeNode* node) {
+  BinaryTreeNode* s = NULL;
+  if (node == NULL) return kNullParameter;
+
+  while (node != tree->root && node->color == kBlack) {
+    if (node == node->parent->left) {
+      s = node->parent->right;
+      if (s->color == kRed) {
+        // case 3.kRed
+        s->color = kBlack;
+        node->parent->color = kRed;
+        LeftRotate(tree, node->parent);
+        s = node->parent->right;
+      }
+
+      if (s->left->color == kBlack && s->right->color == kBlack) {
+        // case 3.2
+        s->color = kRed;
+        node = node->parent;
+      } else {
+        if (s->right->color == kBlack) {
+          // case 3.3
+          s->left->color = kBlack;
+          s->color = kRed;
+          RightRotate(tree, s);
+          s = node->parent->right;
+        }
+
+        // case 3.4
+        s->color = node->parent->color;
+        node->parent->color = kBlack;
+        s->right->color = kBlack;
+        LeftRotate(tree, node->parent);
+        node = tree->root;
+      }
+    } else {
+      s = node->parent->left;
+      if (s->color == kRed) {
+        // case 3.kRed
+        s->color = kBlack;
+        node->parent->color = kRed;
+        RightRotate(tree, node->parent);
+        s = node->parent->left;
+      }
+
+      printf("%d\n", s == &kNullNode);
+      if (s->left->color == kBlack && s->right->color == kBlack) {
+        // case 3.2
+        s->color = kRed;
+        node = node->parent;
+      } else {
+        if (s->left->color == kBlack) {
+          // case 3.3
+          s->right->color = kBlack;
+          s->color = kRed;
+          LeftRotate(tree, s);
+          s = node->parent->left;
+        }
+
+        // case 3.4
+        s->color = node->parent->color;
+        node->parent->color = kBlack;
+        s->left->color = kBlack;
+        RightRotate(tree, node->parent);
+        node = tree->root;
+      }
+    }
+  }
+
+  node->color = kBlack;
+  return kSuccess;
+}
+
 static void FreeNodes(BinaryTreeNode* node, freer freer) {
   if (node == &kNullNode || node == NULL) return;
 
@@ -568,5 +660,32 @@ ResultCode RedBlackTree_Insert(BinaryTree* self, void* payload) {
 
   self->n++;
   Balance(self, node);
+  return kSuccess;
+}
+
+ResultCode RedBlackTree_Delete(BinaryTree* self, void* payload, void** result) {
+  if (self == NULL || payload == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+  if (self->n == 0) return kEmpty;
+
+  BinaryTreeNode* doomed = Traverse(self->root, payload, self->comparator);
+  if (doomed == NULL) return kNotFound;
+
+  void* temp = doomed->payload;
+  DeletedContext context = {NULL, kInvalid};
+
+  if (doomed == self->root) {
+    RedBlackDelete(&self->root, &context);
+  } else {
+    RedBlackDelete(FindParentPointer(doomed), &context);
+  }
+
+  self->n--;
+  if (context.original_color == kBlack) {
+    ResultCode balance_result = BalanceAfterDelete(self, context.replacement);
+    if (balance_result != kSuccess) return balance_result;
+  }
+
+  *result = temp;
   return kSuccess;
 }
