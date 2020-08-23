@@ -48,5 +48,6 @@ void BinaryTree_Destroy(BinaryTree*, freer);
 // Replace the insert methods above with these to have a self balancing red
 // black tree
 ResultCode RedBlackTree_Insert(BinaryTree*, void*);
+ResultCode RedBlackTree_Delete(BinaryTree*, void*, void**);
 ResultCode BinaryTree_RotateLeft(BinaryTree*, const void*);
 ResultCode BinaryTree_RotateRight(BinaryTree*, const void*);
