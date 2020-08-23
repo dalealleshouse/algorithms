@@ -18,6 +18,7 @@ typedef struct DeletedContext {
 } DeletedContext;
 
 static void Delete(BinaryTreeNode**);
+static void RedBlackDelete(BinaryTreeNode**, DeletedContext* context);
 static ResultCode Max(BinaryTreeNode*, BinaryTreeNode**);
 static ResultCode Min(BinaryTreeNode*, BinaryTreeNode**);
 
@@ -86,12 +87,13 @@ static void DecrementSize(BinaryTreeNode* node) {
   node->size--;
 }
 
-static void DeleteLeaf(BinaryTreeNode** doomed) {
+static void DeleteLeaf(BinaryTreeNode** doomed, DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
 
   DecrementSize(node);
 
   kNullNode.parent = (*doomed)->parent;
+  context->replacement = &kNullNode;
   TreeNodeDestroy(node, NULL);
   *doomed = &kNullNode;
 }
@@ -119,17 +121,15 @@ static ResultCode DeleteDegreeTwo(BinaryTreeNode** doomed,
                                   DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
 
-  BinaryTreeNode* smallest_right = NULL;
-  ResultCode result_code = Min(node->right, &smallest_right);
+  BinaryTreeNode* biggest_left = NULL;
+  ResultCode result_code = Max(node->left, &biggest_left);
   if (result_code != kSuccess) return result_code;
 
-  context->original_color = smallest_right->color;
-  context->replacement = smallest_right->right;
+  context->original_color = biggest_left->color;
 
-  node->payload = smallest_right->payload;
-  node->color = smallest_right->color;
-  BinaryTreeNode** doomed_p = FindParentPointer(smallest_right);
-  Delete(doomed_p);
+  node->payload = biggest_left->payload;
+  BinaryTreeNode** doomed_p = FindParentPointer(biggest_left);
+  RedBlackDelete(doomed_p, context);
   return kSuccess;
 }
 
@@ -145,8 +145,7 @@ static void RedBlackDelete(BinaryTreeNode** doomed, DeletedContext* context) {
 
   switch (deg) {
     case 0:
-      DeleteLeaf(doomed);
-      context->replacement = &kNullNode;
+      DeleteLeaf(doomed, context);
       break;
     case 1:
       DeleteDegreeOne(doomed, context);
@@ -326,7 +325,7 @@ static int NodeValue(BinaryTreeNode* node) {
   return *(int*)node->payload;
 }
 
-static char* _Color(Color color) {
+static char* color_as_string(Color color) {
   switch (color) {
     case kRed:
       return "red";
@@ -343,8 +342,9 @@ void BinaryTree_Print(BinaryTreeNode* node) {
   if (node->left == &kNullNode && node->right == &kNullNode) return;
 
   printf("root=%d_%s, left=%d_%s, right=%d_%s\n", NodeValue(node),
-         _Color(node->color), NodeValue(node->left), _Color(node->left->color),
-         NodeValue(node->right), _Color(node->right->color));
+         color_as_string(node->color), NodeValue(node->left),
+         color_as_string(node->left->color), NodeValue(node->right),
+         color_as_string(node->right->color));
 
   BinaryTree_Print(node->left);
   BinaryTree_Print(node->right);
@@ -435,7 +435,6 @@ static ResultCode BalanceAfterDelete(BinaryTree* tree, BinaryTreeNode* node) {
         s = node->parent->left;
       }
 
-      printf("%d\n", s == &kNullNode);
       if (s->left->color == kBlack && s->right->color == kBlack) {
         // case 3.2
         s->color = kRed;
@@ -460,6 +459,7 @@ static ResultCode BalanceAfterDelete(BinaryTree* tree, BinaryTreeNode* node) {
   }
 
   node->color = kBlack;
+  kNullNode.parent = NULL;
   return kSuccess;
 }
 

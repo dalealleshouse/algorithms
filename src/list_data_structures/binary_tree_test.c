@@ -1068,9 +1068,9 @@ static void RedBlackTree_Delete_red_leaf() {
   size_t n = (sizeof(vals) / sizeof(int)) - 1;
   RED_BLACK_SUT(vals, {
     void* result = NULL;
-    // Delete 40
     ResultCode result_code =
         RedBlackTree_Delete(sut, find_int(vals, 40), &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
     red_black_tree_is_valid(sut, n - 1);
   });
 }
@@ -1092,6 +1092,7 @@ static void RedBlackTree_Delete_black_leaf() {
     void* result = NULL;
     ResultCode result_code =
         RedBlackTree_Delete(sut, find_int(vals, 5), &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
     red_black_tree_is_valid(sut, n - 1);
   });
 }
@@ -1113,6 +1114,7 @@ static void RedBlackTree_Delete_root() {
     void* result = NULL;
     ResultCode result_code =
         RedBlackTree_Delete(sut, find_int(vals, 20), &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
     red_black_tree_is_valid(sut, n - 1);
   });
 }
@@ -1132,15 +1134,16 @@ static void RedBlackTree_Delete_one_red_child() {
   size_t n = (sizeof(vals) / sizeof(int)) - 1;
   RED_BLACK_SUT(vals, {
     void* result = NULL;
-    // Delete 35
     ResultCode result_code =
         RedBlackTree_Delete(sut, find_int(vals, 35), &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
     red_black_tree_is_valid(sut, n - 1);
   });
 }
 
 static void RedBlackTree_fuzz_test() {
-  const size_t kN = 5;
+  (void)print_tree;
+  const size_t kN = 500;
   static unsigned int seed;
   size_t size = kN;
   void* result = NULL;
