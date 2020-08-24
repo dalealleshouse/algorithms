@@ -87,17 +87,6 @@ static void DecrementSize(BinaryTreeNode* node) {
   node->size--;
 }
 
-static void DeleteLeaf(BinaryTreeNode** doomed, DeletedContext* context) {
-  BinaryTreeNode* node = *doomed;
-
-  DecrementSize(node);
-
-  kNullNode.parent = (*doomed)->parent;
-  context->replacement = &kNullNode;
-  TreeNodeDestroy(node, NULL);
-  *doomed = &kNullNode;
-}
-
 static void DeleteDegreeOne(BinaryTreeNode** doomed, DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
 
@@ -111,10 +100,7 @@ static void DeleteDegreeOne(BinaryTreeNode** doomed, DeletedContext* context) {
 
 static BinaryTreeNode** FindParentPointer(BinaryTreeNode* node) {
   BinaryTreeNode* parent = node->parent;
-
-  if (parent->left == node) return &parent->left;
-
-  return &parent->right;
+  return (parent->left == node) ? &parent->left : &parent->right;
 }
 
 static ResultCode DeleteDegreeTwo(BinaryTreeNode** doomed,
@@ -145,8 +131,6 @@ static void RedBlackDelete(BinaryTreeNode** doomed, DeletedContext* context) {
 
   switch (deg) {
     case 0:
-      DeleteLeaf(doomed, context);
-      break;
     case 1:
       DeleteDegreeOne(doomed, context);
       break;
