@@ -7,6 +7,7 @@
  ******************************************************************************/
 #include "linked_list.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 static ResultCode LinkedList_ItemCreate(void* payload,
@@ -221,6 +222,23 @@ ResultCode LinkedList_Search(const LinkedList* self, const void* item,
   return kSuccess;
 }
 
+ResultCode LinkedList_Max(const LinkedList* self, void** result) {
+  if (self == NULL || result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+  if (self->size == 0) return kEmpty;
+
+  void* max = self->head->payload;
+  LinkedListItem* current = self->head->next;
+
+  while (current != NULL) {
+    if (self->comparator(max, current->payload) == -1) max = current->payload;
+    current = current->next;
+  }
+
+  *result = max;
+  return kSuccess;
+}
+
 ResultCode LinkedList_Enumerate(const LinkedList* self, item_handler handler) {
   if (self == NULL || handler == NULL) return kNullParameter;
 
@@ -231,6 +249,80 @@ ResultCode LinkedList_Enumerate(const LinkedList* self, item_handler handler) {
     current = current->next;
   }
 
+  return kSuccess;
+}
+
+ResultCode LinkedList_Predecessor(const LinkedList* self,
+                                  const void* search_for, void** result) {
+  if (self == NULL || search_for == NULL || result == NULL) {
+    return kNullParameter;
+  }
+  if (*result != NULL) return kOutputPointerIsNotNull;
+  if (self->size == 0) return kEmpty;
+
+  void* pred_canidate = NULL;
+  bool found = false;
+  LinkedListItem* current_item = self->head;
+
+  while (current_item != NULL) {
+    // Determine if search_for exists in the list
+    if (!found) {
+      int cmp_result = self->comparator(search_for, current_item->payload);
+      if (cmp_result == 0) found = true;
+    }
+
+    // Compare current item to search_for
+    int current_item_cmp_result =
+        self->comparator(current_item->payload, search_for);
+
+    // Compare current item to current predecessor candidate
+    int pred_cmp_result = 1;
+    if (pred_canidate != NULL) {
+      pred_cmp_result = self->comparator(current_item->payload, pred_canidate);
+    }
+
+    // To become the current predecessor candidate:
+    //  1) current item must be less than search_for
+    //  2) current item must be greater than current candidate (or current
+    //  candidate is null)
+    if (current_item_cmp_result < 0 && pred_cmp_result > 0) {
+      pred_canidate = current_item->payload;
+    }
+
+    current_item = current_item->next;
+  }
+
+  if (!found) return kNotFound;
+  if (pred_canidate == NULL) return kArgumentOutOfRange;
+
+  *result = pred_canidate;
+  return kSuccess;
+}
+
+ResultCode LinkedList_Rank(const LinkedList* self, const void* item,
+                           size_t* result) {
+  if (self == NULL || item == NULL || result == NULL) return kNullParameter;
+  if (self->size == 0) return kEmpty;
+
+  size_t rank = 0;
+  bool found = false;
+  LinkedListItem* current_item = self->head;
+
+  while (current_item != NULL) {
+    int cmp_result = self->comparator(current_item->payload, item);
+
+    // increment rank by 1 for every item less than item
+    if (cmp_result == 0) {
+      found = true;
+    } else if (cmp_result < 0) {
+      rank++;
+    }
+    current_item = current_item->next;
+  }
+
+  if (!found) return kNotFound;
+
+  *result = rank;
   return kSuccess;
 }
 

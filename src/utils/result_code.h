@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stdio.h>
@@ -12,6 +19,12 @@
              Result_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
                                                                              \
     ErrorReporter_Report(result, str);                                       \
+  }
+
+#define PRINT_ERROR(source, result)                                         \
+  {                                                                         \
+    fprintf(stderr, "%s: %s, %s, %s, %d\n", source,                         \
+            Result_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
   }
 
 typedef enum Result {

@@ -426,6 +426,8 @@ static void LinkedList_Search_finds_item() {
 /*************************** LinkedList_Enumerate *****************************/
 static const size_t mock_n = 13;
 static int mock_vals[] = {50, 25, 33, 11, 30, 40, 75, 61, 89, 52, 82, 95, 55};
+static int mock_ordered[] = {11, 25, 30, 33, 40, 50, 52,
+                             55, 61, 75, 82, 89, 95};
 static int mock_pos = 0;
 static void MockItemHandler(void* item) {
   CU_ASSERT_EQUAL(mock_vals[mock_pos], *(int*)item);
@@ -462,7 +464,158 @@ static void LinkedList_Enumerate_standard() {
   });
 }
 
-/*************************** LinkedList_Destory *******************************/
+/*************************** LinkedList_Max ***********************************/
+static void LinkedList_Max_empty() {
+  SUT({
+    void* max = NULL;
+    ResultCode result = LinkedList_Max(sut, &max);
+    CU_ASSERT_EQUAL(kEmpty, result);
+    CU_ASSERT_PTR_NULL(max);
+  });
+}
+
+static void LinkedList_Max_standard() {
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      LinkedList_InsertAt(sut, &mock_vals[i], sut->size);
+    }
+
+    void* max = NULL;
+    ResultCode result = LinkedList_Max(sut, &max);
+    CU_ASSERT_EQUAL(kSuccess, result);
+    CU_ASSERT_EQUAL(&mock_vals[11], max);
+  });
+}
+
+/*************************** LinkedList_Predecessor ***************************/
+static void LinkedList_Predecessor_empty() {
+  LinkedList* sut = NULL;
+  ResultCode result_code = LinkedList_Create(free, PIntComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+  int search_for = 5;
+
+  void* result = NULL;
+  result_code = LinkedList_Predecessor(sut, &search_for, &result);
+
+  CU_ASSERT_PTR_NULL(result);
+  CU_ASSERT_EQUAL(result_code, kEmpty);
+  LinkedList_Destroy(sut);
+}
+
+static void LinkedList_Predecessor_not_found() {
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      ResultCode result_code = LinkedList_InsertAt(sut, &mock_vals[i], 0);
+      CU_ASSERT_EQUAL(kSuccess, result_code);
+    }
+
+    int not_found = 401;
+
+    void* result = NULL;
+    ResultCode result_code = LinkedList_Predecessor(sut, &not_found, &result);
+
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(result_code, kNotFound);
+  });
+}
+
+static void LinkedList_Predecessor_first_item() {
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      ResultCode result_code = LinkedList_InsertAt(sut, &mock_vals[i], 0);
+      CU_ASSERT_EQUAL(kSuccess, result_code);
+    }
+    int first = 11;
+
+    void* result = NULL;
+    ResultCode result_code = LinkedList_Predecessor(sut, &first, &result);
+
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
+  });
+}
+
+static void LinkedList_Predecessor_standard() {
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      ResultCode result_code = LinkedList_InsertAt(sut, &mock_vals[i], 0);
+      CU_ASSERT_EQUAL(kSuccess, result_code);
+    }
+
+    for (size_t i = 1; i < mock_n; i++) {
+      void* result = NULL;
+      result_code = LinkedList_Predecessor(sut, &mock_ordered[i], &result);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
+      CU_ASSERT_EQUAL(mock_ordered[i - 1], *(int*)result);
+    }
+  });
+}
+
+/*************************** LinkedList_Rank **********************************/
+static void LinkedList_Rank_null_paramter() {
+  LinkedList* sut = NULL;
+  ResultCode result_code = LinkedList_Create(free, PIntComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+  int search_for = 5;
+
+  size_t result = 0;
+
+  result_code = LinkedList_Rank(NULL, NULL, &result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
+
+  result_code = LinkedList_Rank(sut, NULL, &result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
+
+  result_code = LinkedList_Rank(sut, &search_for, NULL);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
+  LinkedList_Destroy(sut);
+}
+
+static void LinkedList_Rank_empty() {
+  LinkedList* sut = NULL;
+  ResultCode result_code = LinkedList_Create(free, PIntComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  int search_for = 5;
+
+  size_t result = 0;
+  result_code = LinkedList_Rank(sut, &search_for, &result);
+  CU_ASSERT_EQUAL(result_code, kEmpty);
+
+  LinkedList_Destroy(sut);
+}
+
+static void LinkedList_Rank_not_found() {
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      ResultCode result_code = LinkedList_InsertAt(sut, &mock_vals[i], 0);
+      CU_ASSERT_EQUAL(kSuccess, result_code);
+    }
+
+    int not_found = 401;
+    size_t result = 0;
+    ResultCode result_code = LinkedList_Rank(sut, &not_found, &result);
+    CU_ASSERT_EQUAL(result_code, kNotFound);
+  });
+}
+
+static void LinkedList_Rank_standard() {
+  SUT({
+    for (size_t i = 0; i < mock_n; i++) {
+      ResultCode result_code = LinkedList_InsertAt(sut, &mock_vals[i], 0);
+      CU_ASSERT_EQUAL(kSuccess, result_code);
+    }
+
+    for (size_t i = 0; i < mock_n; i++) {
+      size_t result = 0;
+      ResultCode result_code = LinkedList_Rank(sut, &mock_ordered[i], &result);
+      CU_ASSERT_EQUAL(result, i);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
+    }
+  });
+}
+
+/*************************** LinkedList_Destroy *******************************/
 // If there are no errors, this passes
 static void LinkedList_Destroy_null_parameter() { LinkedList_Destroy(NULL); }
 
@@ -532,6 +685,22 @@ int RegisterLinkedListTests() {
       CU_TEST_INFO(LinkedList_Enumerate_empty),
       CU_TEST_INFO(LinkedList_Enumerate_standard), CU_TEST_INFO_NULL};
 
+  CU_TestInfo max_tests[] = {CU_TEST_INFO(LinkedList_Max_empty),
+                             CU_TEST_INFO(LinkedList_Max_standard),
+                             CU_TEST_INFO_NULL};
+
+  CU_TestInfo predecessor_tests[] = {
+      CU_TEST_INFO(LinkedList_Predecessor_empty),
+      CU_TEST_INFO(LinkedList_Predecessor_not_found),
+      CU_TEST_INFO(LinkedList_Predecessor_first_item),
+      CU_TEST_INFO(LinkedList_Predecessor_standard), CU_TEST_INFO_NULL};
+
+  CU_TestInfo rank_tests[] = {CU_TEST_INFO(LinkedList_Rank_null_paramter),
+                              CU_TEST_INFO(LinkedList_Rank_empty),
+                              CU_TEST_INFO(LinkedList_Rank_not_found),
+                              CU_TEST_INFO(LinkedList_Rank_standard),
+                              CU_TEST_INFO_NULL};
+
   CU_TestInfo destroy_tests[] = {
       CU_TEST_INFO(LinkedList_Destroy_null_parameter),
       CU_TEST_INFO(LinkedList_Destroy_null_freer),
@@ -561,6 +730,18 @@ int RegisterLinkedListTests() {
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
                             .pTests = enumerate_tests},
+                           {.pName = "LinkedList_Max",
+                            .pInitFunc = noop,
+                            .pCleanupFunc = noop,
+                            .pTests = max_tests},
+                           {.pName = "LinkedList_Predecessor",
+                            .pInitFunc = noop,
+                            .pCleanupFunc = noop,
+                            .pTests = predecessor_tests},
+                           {.pName = "LinkedList_Rank",
+                            .pInitFunc = noop,
+                            .pCleanupFunc = noop,
+                            .pTests = rank_tests},
                            {.pName = "LinkedList_Destroy",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,

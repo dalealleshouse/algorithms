@@ -382,7 +382,7 @@ static ResultCode BalanceAfterDelete(BinaryTree* tree, BinaryTreeNode* node) {
     if (node == node->parent->left) {
       s = node->parent->right;
       if (s->color == kRed) {
-        // case 3.kRed
+        // case 3.1
         s->color = kBlack;
         node->parent->color = kRed;
         LeftRotate(tree, node->parent);
@@ -412,7 +412,7 @@ static ResultCode BalanceAfterDelete(BinaryTree* tree, BinaryTreeNode* node) {
     } else {
       s = node->parent->left;
       if (s->color == kRed) {
-        // case 3.kRed
+        // case 3.1
         s->color = kBlack;
         node->parent->color = kRed;
         RightRotate(tree, node->parent);

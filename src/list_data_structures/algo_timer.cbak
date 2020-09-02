@@ -12,29 +12,31 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../utils/math.h"
-#include "./sorted_array.h"
+void* BuildEmptyDataStructure(Structure str) {
+  void* str_pointer = NULL;
 
-void* BuildkEmptyDataStructure(Structure str) {
   switch (str) {
     case kArray:
     case kSortedArray:
-      return Array_Create(PIntComparator, sizeof(uintptr_t));
+      Array_Create(PIntComparator, sizeof(uintptr_t), (Array**)&str_pointer);
+      break;
     case kLinkedList:
     case kLinkedListPoorLocality:
-      return LinkedList_Create(NULL, ptr_comparator);
+      LinkedList_Create(NULL, ptr_comparator, (LinkedList**)&str_pointer);
+      break;
     case kBinaryTree:
     case kBinaryTreeUnbalanced:
     case kRedBlackTree:
-      return BinaryTree_Create(ptr_comparator);
+      BinaryTree_Create(ptr_comparator, (BinaryTree**)&str_pointer);
+      break;
   }
 
-  return NULL;
+  return str_pointer;
 }
 
 void* BuildDataStructure(Structure str, size_t n) {
   unsigned int seed = time(NULL);
-  void* ds = BuildkEmptyDataStructure(str);
+  void* ds = BuildEmptyDataStructure(str);
   ListOp op = GetInsertOperation(str);
   if (ds == NULL) return NULL;
 
@@ -76,18 +78,18 @@ void* BuildDataStructure(Structure str, size_t n) {
 void DestroyStructure(Structure str, void* structure) {
   switch (str) {
     case kArray:
-    case kSortedArray:
+      case kSortedArray:
       Array_Destroy(structure);
       break;
-    case kLinkedList:
-    case kLinkedListPoorLocality:
-      LinkedList_Destroy(structure);
-      break;
-    case kBinaryTree:
-    case kBinaryTreeUnbalanced:
-    case kRedBlackTree:
-      BinaryTree_Destroy(structure, NULL);
-      break;
+      case kLinkedList:
+      case kLinkedListPoorLocality:
+        LinkedList_Destroy(structure);
+        break;
+      case kBinaryTree:
+      case kBinaryTreeUnbalanced:
+      case kRedBlackTree:
+        BinaryTree_Destroy(structure, NULL);
+        break;
   }
 }
 
@@ -104,20 +106,20 @@ int ptr_comparator(const void* x, const void* y) {
   return 1;
 }
 
-ListOpResult Array_InsertOp(void* array, uintptr_t item) {
+ResultCode Array_InsertOp(void* array, uintptr_t item) {
   return Array_Insert(array, &item);
 }
 
-ListOpResult LinkedList_InsertOp(void* list, uintptr_t item) {
+ResultCode LinkedList_InsertOp(void* list, uintptr_t item) {
   LinkedList* list_t = (LinkedList*)list;
   return LinkedList_InsertAt(list, (void*)item, list_t->size);
 }
 
-ListOpResult BinaryTree_InsertOp(void* tree, uintptr_t item) {
+ResultCode BinaryTree_InsertOp(void* tree, uintptr_t item) {
   return BinaryTree_Insert(tree, (void*)item);
 }
 
-ListOpResult RedBlackTree_InsertOp(void* tree, uintptr_t item) {
+ResultCode RedBlackTree_InsertOp(void* tree, uintptr_t item) {
   return RedBlackTree_Insert(tree, (void*)item);
 }
 
@@ -140,7 +142,8 @@ ListOp GetInsertOperation(Structure str) {
 }
 
 uintptr_t Array_SearchOp(const void* array, const uintptr_t item) {
-  void* result = Array_Search(array, &item);
+  void* result = NULL;
+  Array_Search(array, &item, &result);
 
   if (result == NULL) return 0;
 
@@ -148,7 +151,8 @@ uintptr_t Array_SearchOp(const void* array, const uintptr_t item) {
 }
 
 uintptr_t SortedArray_SearchOp(const void* array, const uintptr_t item) {
-  void* result = SortedArray_Search(array, &item);
+  void* result = NULL;
+  SortedArray_Search(array, &item, NULL);
 
   if (result == NULL) return 0;
 
@@ -300,73 +304,74 @@ RankOp GetRankOp(Structure str) {
   }
 }
 
-double OperationTime(Operation op, Structure st, size_t n) {
-  unsigned int seed = time(NULL);
+double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
+  (void)n;
+  /* unsigned int seed = time(NULL); */
   clock_t t;
   void* ds;
 
   switch (op) {
     case kInsert:
       // In the case of insert, n is ignored
-      ds = BuildkEmptyDataStructure(st);
+      ds = BuildEmptyDataStructure(st);
       ListOp op = GetInsertOperation(st);
-      if (ds == NULL || op == NULL) return -1;
+      /* if (ds == NULL || op == NULL) return -1; */
 
       // Timed operation
       t = clock();
-      for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
+      /* for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed)); */
       t = clock() - t;
       break;
-    case kSearch:
-      ds = BuildDataStructure(st, n);
-      SearchOp s_op = GetSearchOperation(st);
-      if (ds == NULL || s_op == NULL) return -1;
+      /* case kSearch: */
+      /*   ds = BuildDataStructure(st, n); */
+      /*   SearchOp s_op = GetSearchOperation(st); */
+      /*   if (ds == NULL || s_op == NULL) return -1; */
 
-      t = clock();
-      for (size_t i = 0; i < n; i++) s_op(ds, rand_r(&seed));
-      t = clock() - t;
-      break;
-    case kEnumerate:
-      ds = BuildDataStructure(st, n);
-      EnumerateOp e_op = GetEnumerateOperation(st);
-      _enumerate_sum = 0;
+      /*   t = clock(); */
+      /*   for (size_t i = 0; i < n; i++) s_op(ds, rand_r(&seed)); */
+      /*   t = clock() - t; */
+      /*   break; */
+      /* case kEnumerate: */
+      /*   ds = BuildDataStructure(st, n); */
+      /*   EnumerateOp e_op = GetEnumerateOperation(st); */
+      /*   _enumerate_sum = 0; */
 
-      t = clock();
-      e_op(ds);
-      t = clock() - t;
-      break;
-    case kMax:
-      ds = BuildDataStructure(st, n);
-      MaxOp m_op = GetMaxOperation(st);
+      /*   t = clock(); */
+      /*   e_op(ds); */
+      /*   t = clock() - t; */
+      /*   break; */
+      /* case kMax: */
+      /*   ds = BuildDataStructure(st, n); */
+      /*   MaxOp m_op = GetMaxOperation(st); */
 
-      t = clock();
-      for (size_t i = 0; i < n; i++) m_op(ds);
-      t = clock() - t;
-      break;
-    case kPredecessor:
-      ds = BuildDataStructure(st, n);
-      PredOp p_op = GetPredOperation(st);
+      /*   t = clock(); */
+      /*   for (size_t i = 0; i < n; i++) m_op(ds); */
+      /*   t = clock() - t; */
+      /*   break; */
+      /* case kPredecessor: */
+      /*   ds = BuildDataStructure(st, n); */
+      /*   PredOp p_op = GetPredOperation(st); */
 
-      t = clock();
-      for (size_t i = 0; i < n; i++) p_op(ds, rand_r(&seed));
-      t = clock() - t;
-      break;
-    case kSelect:
-      ds = BuildDataStructure(st, n);
-      SelectOp se_op = GetSelectOperation(st);
+      /*   t = clock(); */
+      /*   for (size_t i = 0; i < n; i++) p_op(ds, rand_r(&seed)); */
+      /*   t = clock() - t; */
+      /*   break; */
+      /* case kSelect: */
+      /*   ds = BuildDataStructure(st, n); */
+      /*   SelectOp se_op = GetSelectOperation(st); */
 
-      t = clock();
-      for (size_t i = 0; i < n; i++) se_op(ds, rand_r(&seed) % n);
-      t = clock() - t;
-      break;
-    case kRank:
-      ds = BuildDataStructure(st, n);
-      RankOp r_op = GetRankOp(st);
+      /*   t = clock(); */
+      /*   for (size_t i = 0; i < n; i++) se_op(ds, rand_r(&seed) % n); */
+      /*   t = clock() - t; */
+      /*   break; */
+      /* case kRank: */
+      /*   ds = BuildDataStructure(st, n); */
+      /*   RankOp r_op = GetRankOp(st); */
 
-      t = clock();
-      for (size_t i = 0; i < n; i++) r_op(ds, rand_r(&seed));
-      t = clock() - t;
-      break;
+      /*   t = clock(); */
+      /*   for (size_t i = 0; i < n; i++) r_op(ds, rand_r(&seed)); */
+      /*   t = clock() - t; */
+      /*   break; */
   }
 
   if (ds == NULL) return -1;

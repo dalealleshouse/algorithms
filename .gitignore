@@ -56,6 +56,7 @@ dkms.conf
 *.gcno
 cov.info
 code_coverage/
+run_time_data/
 test_runner
 column
 row
