@@ -18,8 +18,7 @@ from matplotlib import pyplot as plt #noqa
 lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
-# TEST_FOR_Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5]
-TEST_FOR_Ns = [10 ** 2, 10 ** 3]
+TEST_FOR_Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5]
 
 
 class CtypesEnum(IntEnum):
