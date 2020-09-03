@@ -6,9 +6,10 @@ CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 LINKFLAGS 	 = -lcunit -flto -lm -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc
+SHAREDFLAGS	 = -std=c11 -D_POSIX_C_SOURCE=200809L -O3 -D NDEBUG -I src/utils -fPIC -shared
 
 TARGET			= src/test_runner
-LIB_NAME	 	?=utils
+SHARED_TARGET	= algo.so
 SOURCES			= $(wildcard src/*.c src/*/*.c)
 OBJECTS			= $(SOURCES:.c=.o)
 DEPS			= $(OBJECTS:.o=.d)
@@ -46,6 +47,9 @@ thread-san: $(TARGET)
 
 address-san: CFLAGS += -fsanitize=address,undefined
 address-san: $(TARGET)
+
+shared: $(SOURCES)
+	$(CC) $(CFLAGS) $(SHAREDFLAGS) -o $(SHARED_TARGET) $(SOURCES) $(LINKFLAGS)
 
 ctags:
 	ctags -R .

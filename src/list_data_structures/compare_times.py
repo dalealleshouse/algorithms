@@ -1,12 +1,12 @@
 """
 /*******************************************************************************
- * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
- *  dale@alleshouse.net https://hideoushumpbackfreak.com/
- *
- * This file is subject to the terms and conditions defined in the 'LICENSE'
- * file, which is part of this source code package.
- ******************************************************************************/
- """
+* Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+*  dale@alleshouse.net https://hideoushumpbackfreak.com/
+*
+* This file is subject to the terms and conditions defined in the 'LICENSE'
+* file, which is part of this source code package.
+******************************************************************************/
+"""
 import ctypes
 from enum import IntEnum
 import statistics
@@ -18,7 +18,8 @@ from matplotlib import pyplot as plt #noqa
 lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
-TEST_FOR_Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5]
+# TEST_FOR_Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5]
+TEST_FOR_Ns = [10 ** 2, 10 ** 3]
 
 
 class CtypesEnum(IntEnum):
@@ -34,8 +35,8 @@ class Operations(CtypesEnum):
     ENUMERATE = 3,
     MAX = 4,
     PREDECESSOR = 5,
-    SELECT = 6,
-    RANK = 7
+    RANK = 6,
+    INSERT_AT_TAIL = 7
 
 
 class Structures(CtypesEnum):
@@ -48,8 +49,9 @@ class Structures(CtypesEnum):
     RED_BLACK_TREE = 7
 
 
-lib.OperationTime.argtypes = [Operations, Structures, ctypes.c_size_t]
-lib.OperationTime.restype = ctypes.c_double
+lib.ListDataStructures_OperationTime.argtypes = [Operations, Structures,
+                                                 ctypes.c_size_t]
+lib.ListDataStructures_OperationTime.restype = ctypes.c_double
 
 
 def median_run_time(func):
@@ -62,7 +64,7 @@ def median_run_time(func):
 
 
 def generate_md_table(ns, op, data):
-    f = open("run_results.txt", "a+")
+    f = open(f'run_time_data/list_data_struct_{op.name}.txt', "a+")
     f.write(op.name)
     f.write(os.linesep)
     n_headers = ""
@@ -72,7 +74,7 @@ def generate_md_table(ns, op, data):
         n_headers += 'n={:d} |'.format(n)
         header_sep += "--|"
 
-    f.write("|STRUCTURE|")
+    f.write("|Structure|")
     f.write(n_headers)
     f.write(os.linesep)
 
@@ -84,7 +86,7 @@ def generate_md_table(ns, op, data):
         for v in d[1]:
             times += '{:.6f} sec|'.format(v)
 
-        f.write('|{} |{}'.format(d[0].name, times))
+        f.write('|{} |{}'.format(d[0].name.title().replace('_', ' '), times))
         f.write("\n")
 
     f.write(os.linesep)
@@ -96,7 +98,8 @@ def generate_chart(op, structs):
     full_data = []
     plt.figure(figsize=(8, 6))
 
-    plt.title(op.name)
+    op_name = op.name.title().replace('_', ' ')
+    plt.title(op_name)
     plt.ylabel('sec')
     plt.xlabel('n')
 
@@ -104,16 +107,19 @@ def generate_chart(op, structs):
     print(op.name)
 
     for st in structs:
+        st_name = st.name.title().replace('_', ' ')
         data = []
         for n in TEST_FOR_Ns:
-            time = median_run_time(lambda: lib.OperationTime(op, st, n))
+            time = median_run_time(lambda:
+                                   lib.ListDataStructures_OperationTime(op, st,
+                                                                        n))
             data.append(time)
 
-        plt.plot(TEST_FOR_Ns, data, label=st.name)
+        plt.plot(TEST_FOR_Ns, data, label=st_name)
         full_data.append((st, data))
 
     plt.legend()
-    plt.savefig(op.name + '.png')
+    plt.savefig('run_time_data/' + op.name + '.png')
     plt.clf()
 
     generate_md_table(TEST_FOR_Ns, op, full_data)
@@ -122,37 +128,54 @@ def generate_chart(op, structs):
 
 
 if __name__ == "__main__":
-    # generate_chart(Operations.INSERT, [Structures.ARRAY,
-    #                                    Structures.LINKED_LIST,
-    #                                    Structures.BINARY_TREE,
-    #                                    Structures.RED_BLACK_TREE])
-    # generate_chart(Operations.SEARCH, [Structures.ARRAY,
-    #                                    Structures.SORTED_ARRAY,
-    #                                    Structures.LINKED_LIST,
-    #                                    Structures.LINKED_LIST_POOR_LOCALITY,
-    #                                    Structures.BINARY_TREE,
-    #                                    Structures.BINARY_TREE_UNBALANCED,
-    #                                    Structures.RED_BLACK_TREE])
-    # generate_chart(Operations.ENUMERATE, [Structures.ARRAY,
-    #                                       Structures.SORTED_ARRAY,
-    #                                       Structures.LINKED_LIST,
-    #                                       Structures.LINKED_LIST_POOR_LOCALITY,
-    #                                       Structures.BINARY_TREE,
-    #                                       Structures.BINARY_TREE_UNBALANCED,
-    #                                       Structures.RED_BLACK_TREE])
-    generate_chart(Operations.MAX, [Structures.SORTED_ARRAY,
-                                    Structures.BINARY_TREE,
-                                    Structures.BINARY_TREE_UNBALANCED,
-                                    Structures.RED_BLACK_TREE])
-    generate_chart(Operations.PREDECESSOR, [Structures.SORTED_ARRAY,
-                                            Structures.BINARY_TREE,
-                                            Structures.BINARY_TREE_UNBALANCED,
-                                            Structures.RED_BLACK_TREE])
-    generate_chart(Operations.SELECT, [Structures.SORTED_ARRAY,
-                                       Structures.BINARY_TREE,
-                                       Structures.BINARY_TREE_UNBALANCED,
-                                       Structures.RED_BLACK_TREE])
-    generate_chart(Operations.RANK, [Structures.SORTED_ARRAY,
-                                     Structures.BINARY_TREE,
-                                     Structures.BINARY_TREE_UNBALANCED,
-                                     Structures.RED_BLACK_TREE])
+    generate_chart(Operations.INSERT, [
+        Structures.ARRAY,
+        Structures.LINKED_LIST,
+        Structures.BINARY_TREE,
+        Structures.BINARY_TREE_UNBALANCED,
+        Structures.RED_BLACK_TREE])
+    generate_chart(Operations.INSERT_AT_TAIL, [
+        Structures.ARRAY,
+        Structures.LINKED_LIST,
+        Structures.BINARY_TREE,
+        Structures.RED_BLACK_TREE])
+    generate_chart(Operations.SEARCH, [
+        Structures.ARRAY,
+        Structures.SORTED_ARRAY,
+        Structures.LINKED_LIST,
+        Structures.LINKED_LIST_POOR_LOCALITY,
+        Structures.BINARY_TREE,
+        Structures.BINARY_TREE_UNBALANCED,
+        Structures.RED_BLACK_TREE])
+    generate_chart(Operations.ENUMERATE, [
+        Structures.ARRAY,
+        Structures.SORTED_ARRAY,
+        Structures.LINKED_LIST,
+        Structures.LINKED_LIST_POOR_LOCALITY,
+        Structures.BINARY_TREE,
+        Structures.BINARY_TREE_UNBALANCED,
+        Structures.RED_BLACK_TREE])
+    generate_chart(Operations.MAX, [
+        Structures.ARRAY,
+        Structures.SORTED_ARRAY,
+        Structures.LINKED_LIST,
+        Structures.LINKED_LIST_POOR_LOCALITY,
+        Structures.BINARY_TREE,
+        Structures.BINARY_TREE_UNBALANCED,
+        Structures.RED_BLACK_TREE])
+    generate_chart(Operations.PREDECESSOR, [
+        Structures.ARRAY,
+        Structures.SORTED_ARRAY,
+        Structures.LINKED_LIST,
+        Structures.LINKED_LIST_POOR_LOCALITY,
+        Structures.BINARY_TREE,
+        Structures.BINARY_TREE_UNBALANCED,
+        Structures.RED_BLACK_TREE])
+    generate_chart(Operations.RANK, [
+        Structures.ARRAY,
+        Structures.SORTED_ARRAY,
+        Structures.LINKED_LIST,
+        Structures.LINKED_LIST_POOR_LOCALITY,
+        Structures.BINARY_TREE,
+        Structures.BINARY_TREE_UNBALANCED,
+        Structures.RED_BLACK_TREE])

@@ -34,4 +34,7 @@ ResultCode LinkedList_DeleteAt(LinkedList*, const size_t);
 ResultCode LinkedList_Delete(LinkedList*, void*);
 ResultCode LinkedList_Search(const LinkedList*, const void*, void**);
 ResultCode LinkedList_Enumerate(const LinkedList*, item_handler);
+ResultCode LinkedList_Max(const LinkedList*, void**);
+ResultCode LinkedList_Predecessor(const LinkedList*, const void*, void**);
+ResultCode LinkedList_Rank(const LinkedList*, const void*, size_t*);
 void LinkedList_Destroy(LinkedList*);
