@@ -20,7 +20,8 @@ typedef enum {
   kEnumerate = 3,
   kMax = 4,
   kPredecessor = 5,
-  kRank = 6
+  kRank = 6,
+  kInsertAtTail = 7
 } Operation;
 
 typedef enum {

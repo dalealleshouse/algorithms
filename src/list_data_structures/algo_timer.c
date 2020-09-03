@@ -123,7 +123,15 @@ static ResultCode Array_InsertOp(void* array, uintptr_t item) {
   return Array_InsertAtHead(array, &item);
 }
 
+static ResultCode Array_InsertAtTailOp(void* array, uintptr_t item) {
+  return Array_InsertAtTail(array, &item);
+}
+
 static ResultCode LinkedList_InsertOp(void* list, uintptr_t item) {
+  return LinkedList_InsertAt(list, (void*)item, 0);
+}
+
+static ResultCode LinkedList_InsertAtTailOp(void* list, uintptr_t item) {
   LinkedList* list_t = (LinkedList*)list;
   return LinkedList_InsertAt(list, (void*)item, list_t->size);
 }
@@ -144,6 +152,24 @@ static InsertOp GetInsertOperation(Structure str) {
     case kLinkedList:
     case kLinkedListPoorLocality:
       return LinkedList_InsertOp;
+    case kBinaryTree:
+    case kBinaryTreeUnbalanced:
+      return BinaryTree_InsertOp;
+    case kRedBlackTree:
+      return RedBlackTree_InsertOp;
+    default:
+      return NULL;
+  }
+}
+
+static InsertOp GetInsertAtTailOperation(Structure str) {
+  switch (str) {
+    case kArray:
+    case kSortedArray:
+      return Array_InsertAtTailOp;
+    case kLinkedList:
+    case kLinkedListPoorLocality:
+      return LinkedList_InsertAtTailOp;
     case kBinaryTree:
     case kBinaryTreeUnbalanced:
       return BinaryTree_InsertOp;
@@ -346,8 +372,13 @@ ResultCode BinaryTree_RankOp(const void* tree, const size_t item) {
 
 RankOp GetRankOp(Structure str) {
   switch (str) {
+    case kArray:
+      return Array_RankOp;
     case kSortedArray:
       return SortedArray_RankOp;
+    case kLinkedList:
+    case kLinkedListPoorLocality:
+      return LinkedList_RankOp;
     case kBinaryTree:
     case kBinaryTreeUnbalanced:
     case kRedBlackTree:
@@ -364,6 +395,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
   void* ds = NULL;
 
   switch (op) {
+    case kInsertAtTail:
     case kInsert:
       // In the case of insert, n is ignored
       result_code = BuildEmptyDataStructure(st, &ds);
@@ -372,8 +404,9 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
         return -1;
       }
 
-      InsertOp op = GetInsertOperation(st);
-      if (op == NULL) {
+      InsertOp i_op = (op == kInsertAtTail) ? GetInsertAtTailOperation(st)
+                                            : GetInsertOperation(st);
+      if (i_op == NULL) {
         PRINT_ERROR("GetInsertOperation", kNotFound);
         return -1;
       }
@@ -383,9 +416,9 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
       // No error checking to avoid time overhead
       if (st == kBinaryTreeUnbalanced) {
         // Insert in sequential order so tree is completely unbalanced
-        for (size_t i = 0; i < n; i++) op(ds, i);
+        for (size_t i = 0; i < n; i++) i_op(ds, i);
       } else {
-        for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
+        for (size_t i = 0; i < n; i++) i_op(ds, rand_r(&seed));
       }
       t = clock() - t;
       break;
@@ -460,6 +493,21 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
       t = clock() - t;
       break;
     case kRank:
+      result_code = BuildDataStructure(st, n, &ds);
+      if (result_code != kSuccess) {
+        PRINT_ERROR("BuildDataStructure", result_code);
+        return -1;
+      }
+
+      RankOp r_op = GetRankOp(st);
+      if (r_op == NULL) {
+        PRINT_ERROR("GetRankOperation", kNotFound);
+        return -1;
+      }
+
+      t = clock();
+      for (size_t i = 0; i < n; i++) r_op(ds, rand_r(&seed));
+      t = clock() - t;
       break;
   }
 

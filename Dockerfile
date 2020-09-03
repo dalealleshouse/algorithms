@@ -10,7 +10,7 @@ RUN apt-get -y update && apt-get install -y \
 RUN mkdir build/ && \
     mkdir build/src
 
-RUN pip3 install cpplint
+RUN python3 -m pip install cpplint matplotlib
 
 VOLUME ["/build"]
 
