@@ -137,30 +137,26 @@ ResultCode Array_Predecessor(const Array* self, const void* search_for,
   for (size_t i = 0; i < self->n; i++) {
     size_t offset = i * self->item_size;
 
+    int cmp_result = self->comparator(search_for, (char*)self->array + offset);
+
     // Determine if search_for exists in the array
-    if (!found) {
-      int cmp_result =
-          self->comparator(search_for, (char*)self->array + offset);
-      if (cmp_result == 0) found = true;
-    }
+    if (cmp_result == 0) {
+      found = true;
+    } else {
+      // Compare current item to current predecessor candidate
+      int pred_cmp_result = 1;
+      if (pred_canidate != NULL) {
+        pred_cmp_result =
+            self->comparator((char*)self->array + offset, pred_canidate);
+      }
 
-    // Compare current item to search_for
-    int current_item_cmp_result =
-        self->comparator((char*)self->array + offset, search_for);
-
-    // Compare current item to current predecessor candidate
-    int pred_cmp_result = 1;
-    if (pred_canidate != NULL) {
-      pred_cmp_result =
-          self->comparator((char*)self->array + offset, pred_canidate);
-    }
-
-    // To become the current predecessor candidate:
-    //  1) current item must be less than search_for
-    //  2) current item must be greater than current candidate (or current
-    //  candidate is null)
-    if (current_item_cmp_result < 0 && pred_cmp_result > 0) {
-      pred_canidate = (char*)self->array + offset;
+      // To become the current predecessor candidate:
+      //  1) current item must be less than search_for
+      //  2) current item must be greater than current candidate (or current
+      //  candidate is null)
+      if (cmp_result > 0 && pred_cmp_result > 0) {
+        pred_canidate = (char*)self->array + offset;
+      }
     }
   }
 

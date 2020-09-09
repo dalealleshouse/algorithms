@@ -307,25 +307,25 @@ MaxOp GetMaxOperation(Structure str) {
  * Predecessor Operations
  ******************************************************************************/
 static ResultCode Array_PredecessorOp(const void* array, const uintptr_t item) {
-  void* result;
+  void* result = NULL;
   return Array_Predecessor(array, &item, &result);
 }
 
 static ResultCode LinkedList_PredecessorOp(const void* linked_list,
                                            const uintptr_t item) {
-  void* result;
+  void* result = NULL;
   return LinkedList_Predecessor(linked_list, &item, &result);
 }
 
 static ResultCode SortedArray_PredecessorOp(const void* array,
                                             const uintptr_t item) {
-  void* result;
+  void* result = NULL;
   return SortedArray_Predecessor(array, &item, &result);
 }
 
 static ResultCode BinaryTree_PredecessorOp(const void* tree,
                                            const uintptr_t item) {
-  void* result;
+  void* result = NULL;
   return BinaryTree_Predecessor(tree, &item, &result);
 }
 
@@ -455,6 +455,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
       _enumerate_sum = 0;
 
       t = clock();
+      // No error checking to avoid time overhead
       e_op(ds);
       t = clock() - t;
       break;
@@ -489,6 +490,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
       }
 
       t = clock();
+      // No error checking to avoid time overhead
       for (size_t i = 0; i < n; i++) p_op(ds, rand_r(&seed));
       t = clock() - t;
       break;
@@ -506,6 +508,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
       }
 
       t = clock();
+      // No error checking to avoid time overhead
       for (size_t i = 0; i < n; i++) r_op(ds, rand_r(&seed));
       t = clock() - t;
       break;
