@@ -1,4 +1,11 @@
-#include "./hash_table.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "hash_table.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -6,8 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../hashing/hash_functions.h"
-#include "../list_data_structures/linked_list.h"
+#include "hash_functions.h"
+#include "linked_list.h"
 
 const size_t ERROR_VAL = SIZE_MAX;
 const hasher hash_func = farm_hash;

@@ -1,9 +1,16 @@
-#include "./heap.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "heap.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "../utils/overflow_checker.h"
+#include "overflow_checker.h"
 
 static size_t _parentIndex(size_t index) {
   ++index;

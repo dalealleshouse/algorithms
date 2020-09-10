@@ -1,20 +1,40 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "stack.h"
 
 #include <stdlib.h>
 
-Stack* Stack_Create() {
-  Stack* stack = calloc(sizeof(Stack), 1);
-  if (stack == NULL) return NULL;
+typedef struct Stack_Item {
+  void* payload;
+  struct Stack_Item* next;
+} Stack_Item;
 
-  return stack;
+struct Stack_t {
+  size_t n;
+  Stack_Item* head;
+};
+
+ResultCode Stack_Create(Stack** self) {
+  if (self == NULL) return kNullParameter;
+  if (*self != NULL) return kOutputPointerIsNotNull;
+
+  Stack* stack = calloc(sizeof(Stack), 1);
+  if (stack == NULL) return kFailedMemoryAllocation;
+
+  *self = stack;
+  return kSuccess;
 }
 
-StackResult Stack_Push(Stack* self, void* item) {
-  if (self == NULL || item == NULL) return Stack_kNullParameter;
+ResultCode Stack_Push(Stack* self, void* item) {
+  if (self == NULL || item == NULL) return kNullParameter;
 
   Stack_Item* s_item = calloc(sizeof(Stack_Item), 1);
-
-  if (s_item == NULL) return Stack_FailedMalloc;
+  if (s_item == NULL) return kFailedMemoryAllocation;
 
   s_item->payload = item;
   if (self->n == 0) {
@@ -26,11 +46,13 @@ StackResult Stack_Push(Stack* self, void* item) {
 
   self->n++;
 
-  return Stack_kSuccess;
+  return kSuccess;
 }
 
-void* Stack_Pop(Stack* self) {
-  if (self == NULL || self->n == 0) return NULL;
+ResultCode Stack_Pop(Stack* self, void** result) {
+  if (self == NULL || result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+  if (self->n == 0) return kEmpty;
 
   void* item = self->head->payload;
   if (self->n == 1) {
@@ -43,13 +65,15 @@ void* Stack_Pop(Stack* self) {
   }
 
   self->n--;
-  return item;
+  *result = item;
+  return kSuccess;
 }
 
-bool Stack_IskEmpty(Stack* self) {
-  if (self == NULL) return true;
+ResultCode Stack_IsEmpty(Stack* self, bool* result) {
+  if (self == NULL || result == NULL) return kNullParameter;
 
-  return self->n == 0;
+  *result = self->n == 0;
+  return kSuccess;
 }
 
 void Stack_Destroy(Stack* self) {

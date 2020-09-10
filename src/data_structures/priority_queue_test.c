@@ -1,13 +1,20 @@
-#include "./priority_queue.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "priority_queue.h"
 
 #include <stdlib.h>
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
 
-const static size_t _n = 5;
+static const size_t _n = 5;
 static TestThingy* _items[5];
 
 static void test_obj_destroy(void* t) { free(t); }
@@ -42,7 +49,7 @@ static PriorityQueue* CreateSut() {
   PriorityQueue* sut = PQ_Create(test_comparator);
 
   for (size_t i = 0; i < _n; i++) {
-    _items[i] = test_obj_init(i + 1);
+    _items[i] = test_obj_init((int)i + 1);
     PQ_Insert(sut, (void*)_items[i]);
   }
 
@@ -372,7 +379,7 @@ static void PQ_Reprioritize_standard() {
   CU_ASSERT_EQUAL(PQ_kSuccess, result);
   CU_ASSERT_PTR_EQUAL(_items[head], sut->head->payload);
 
-  _items[tail]->x = _n * 2;
+  _items[tail]->x = (int)_n * 2;
   result = PQ_Reprioritize(sut, _items[tail]);
 
   CU_ASSERT_EQUAL(PQ_kSuccess, result);

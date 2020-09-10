@@ -38,13 +38,18 @@ print_success "Compilation Database Created"
 # make lint
 cpplint src/*.c
 cpplint src/list_data_structures/*.[ch]
+cpplint src/data_structures/*.[ch]
 cpplint locality/*.c
 print_success "Lint Passed"
 
 # TODO: clang-tidy
 # make tidy
 clang-tidy src/test_runner.c
+
 clang-tidy src/list_data_structures/*.[ch]
+clang-tidy src/data_structures/stack.[ch]
+clang-tidy src/data_structures/stack_test.c
+
 clang-tidy locality/*.c
 print_success "Tidy Static Analysis Passed"
 

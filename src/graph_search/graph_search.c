@@ -73,12 +73,17 @@ GraphResult Graph_DFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
   GraphResult result = SearchIsValid(self, vertex_id, strategy);
   if (result != Graph_kSuccess) return result;
 
-  Stack* s = Stack_Create();
+  Stack* s = NULL;
+  ResultCode result_code = Stack_Create(&s);
+  if (result_code != kSuccess) return Graph_kFailedMemoryAllocation;
+
   Stack_Push(s, self->V[vertex_id]);
 
   Vertex* prev = NULL;
-  while (!Stack_IskEmpty(s)) {
-    Vertex* v = Stack_Pop(s);
+  bool is_empty = false;
+  while (Stack_IsEmpty(s, &is_empty) == kSuccess && is_empty == false) {
+    Vertex* v = NULL;
+    Stack_Pop(s, (void**)&v);
     if (!strategy->is_conquered(v)) {
       bool con_result = strategy->conqueror(v, prev);
       if (!con_result) {
@@ -225,7 +230,8 @@ Stack* Graph_SCC_MagicOrdering(Graph* self) {
     return NULL;
   }
 
-  Stack* ordering = Stack_Create();
+  Stack* ordering = NULL;
+  Stack_Create(&ordering);
 
   for (size_t i = 0; i < self->n; i++) {
     if (!is_conquered(self->V[i])) Graph_MagicOrdering(self, i, ordering);
@@ -240,7 +246,9 @@ GraphResult Graph_SCC(Graph* self) {
   Stack* mo = Graph_SCC_MagicOrdering(self);
 
   for (size_t i = 0; i < self->n; i++) {
-    Vertex* v = Stack_Pop(mo);
+    Vertex* v = NULL;
+    Stack_Pop(mo, (void**)&v);
+
     if (scc_is_conquered(v)) continue;
 
     scc_id = v->id;

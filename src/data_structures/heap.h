@@ -1,20 +1,27 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
-#include "../utils/comparators.h"
-#include "../utils/error_reporter.h"
-#include "./hash_table.h"
+#include "comparators.h"
+#include "error_reporter.h"
+#include "hash_table.h"
 
-#define HEAP_ERROR(result)                                                  \
-  {                                                                         \
-    char str[1000];                                                         \
-    sprintf(str, "Heap Error: %s, %s, %s, %d\n", Heap_ErrorMessage(result), \
-            __FILE__, __FUNCTION__, __LINE__);                              \
-                                                                            \
-    ErrorReporter_Report(result, str);                                      \
+#define HEAP_ERROR(result)                                                 \
+  {                                                                        \
+    char str[1000];                                                        \
+    snprintf(str, sizeof(str), "Heap Error: %s, %s, %s, %d\n",             \
+             Heap_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
+                                                                           \
+    ErrorReporter_Report(result, str);                                     \
   }
 
 typedef enum {
