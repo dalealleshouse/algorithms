@@ -1,5 +1,13 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "./hash_table.h"
 
+#include <inttypes.h>
 #include <stdlib.h>
 
 #include "../utils/error_reporter.h"
@@ -293,21 +301,19 @@ static void HashTable_int_keys() {
 }
 
 static void HashTable_long_keys() {
-  long long int key = 138;
+  int64_t key = 138;
   char* value = "we are";
-  long long int key2 = -3;
+  int64_t key2 = -3;
   char* value2 = "we are, we are";
 
   SUT({
-    Result result = HashTable_Insert(sut, &key, sizeof(long long int), value);
+    Result result = HashTable_Insert(sut, &key, sizeof(int64_t), value);
     CU_ASSERT_EQUAL(result, kSuccess);
-    result = HashTable_Insert(sut, &key2, sizeof(long long int), value2);
+    result = HashTable_Insert(sut, &key2, sizeof(int64_t), value2);
     CU_ASSERT_EQUAL(result, kSuccess);
 
-    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key, sizeof(long long int)),
-                        value);
-    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key2, sizeof(long long int)),
-                        value2);
+    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key, sizeof(int64_t)), value);
+    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key2, sizeof(int64_t)), value2);
   });
 }
 

@@ -1,15 +1,22 @@
-#include "./disjoint_set.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "disjoint_set.h"
 
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/result_code.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "malloc_test_wrapper.h"
+#include "result_code.h"
+#include "test_helpers.h"
 
 #define SUT(size, code_block)                   \
   {                                             \

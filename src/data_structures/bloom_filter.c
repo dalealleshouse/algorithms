@@ -1,10 +1,17 @@
-#include "./bloom_filter.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "bloom_filter.h"
 
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../hashing/hash_functions.h"
+#include "hash_functions.h"
 
 const size_t N_ERROR = SIZE_MAX;
 static const size_t byte_size = 8;

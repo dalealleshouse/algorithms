@@ -1,26 +1,22 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef enum {
-  Stack_kNullParameter = -2,
-  Stack_FailedMalloc = -1,
-  Stack_kSuccess = 0
-} StackResult;
+#include "result_code.h"
 
-typedef struct Stack_Item {
-  void* payload;
-  struct Stack_Item* next;
-} Stack_Item;
+struct Stack_t;
+typedef struct Stack_t Stack;
 
-typedef struct Stack {
-  size_t n;
-  Stack_Item* head;
-} Stack;
-
-Stack* Stack_Create();
-StackResult Stack_Push(Stack*, void*);
-void* Stack_Pop(Stack*);
-bool Stack_IskEmpty(Stack*);
+ResultCode Stack_Create(Stack**);
+ResultCode Stack_Push(Stack*, void*);
+ResultCode Stack_Pop(Stack*, void**);
+bool Stack_IsEmpty(Stack*);
 void Stack_Destroy(Stack*);

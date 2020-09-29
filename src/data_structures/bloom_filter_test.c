@@ -1,11 +1,18 @@
-#include "./bloom_filter.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "bloom_filter.h"
 
-#include "../hashing/hash_functions.h"
-#include "../utils/error_reporter.h"
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "error_reporter.h"
+#include "hash_functions.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
 
 #define SUT(code_block)                                 \
   {                                                     \

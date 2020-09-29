@@ -1,24 +1,56 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "./stack.h"
 
 #include <stdlib.h>
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
+
+typedef struct Stack_Item {
+  void* payload;
+  struct Stack_Item* next;
+} Stack_Item;
+
+struct Stack_t {
+  size_t n;
+  Stack_Item* head;
+};
+
+#define SUT(code_block)                          \
+  {                                              \
+    Stack* sut = NULL;                           \
+    ResultCode result_code = Stack_Create(&sut); \
+    CU_ASSERT_EQUAL(result_code, kSuccess);      \
+                                                 \
+    code_block;                                  \
+                                                 \
+    Stack_Destroy(sut);                          \
+  }
 
 /*************************** Stack_Create *************************************/
 static void Stack_Create_failed_malloc() {
 #if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
-    Stack* sut = Stack_Create(NULL);
+    Stack* sut = NULL;
+    ResultCode result_code = Stack_Create(&sut);
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
     CU_ASSERT_PTR_NULL(sut);
   });
 #endif
 }
 
 static void Stack_Create_initalizes_values() {
-  Stack* sut = Stack_Create();
+  Stack* sut = NULL;
+  ResultCode result_code = Stack_Create(&sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   CU_ASSERT_PTR_NULL(sut->head);
   CU_ASSERT_EQUAL(0, sut->n);
@@ -27,112 +59,110 @@ static void Stack_Create_initalizes_values() {
 }
 
 /*************************** Stack_Push ***************************************/
-Stack* _stack;
-static void Stack_Push_malloc_tester(void) {
-  int dummy = 5;
-  StackResult result = Stack_Push(_stack, (void*)&dummy);
-  CU_ASSERT_EQUAL(Stack_FailedMalloc, result);
-}
-
 static void Stack_Push_failed_malloc() {
-  _stack = Stack_Create(NULL);
-  FAILED_MALLOC_TEST({ Stack_Push_malloc_tester(); });
-  Stack_Destroy(_stack);
+  Stack* sut = NULL;
+  ResultCode result_code = Stack_Create(&sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  FAILED_MALLOC_TEST({
+    int dummy = 5;
+    ResultCode result = Stack_Push(sut, (void*)&dummy);
+    CU_ASSERT_EQUAL(kFailedMemoryAllocation, result);
+  });
+  Stack_Destroy(sut);
 }
 
 static void Stack_Push_null_parameter() {
-  Stack* sut = Stack_Create(NULL);
+  SUT({
+    const int dummy = 5;
+    ResultCode result = Stack_Push(NULL, (void*)&dummy);
+    CU_ASSERT_EQUAL(kNullParameter, result);
 
-  const int dummy = 5;
-  StackResult result = Stack_Push(NULL, (void*)&dummy);
-  CU_ASSERT_EQUAL(Stack_kNullParameter, result);
-
-  result = Stack_Push(sut, NULL);
-  CU_ASSERT_EQUAL(Stack_kNullParameter, result);
-
-  Stack_Destroy(sut);
+    result = Stack_Push(sut, NULL);
+    CU_ASSERT_EQUAL(kNullParameter, result);
+  });
 }
 
 static void Stack_Push_first_item() {
   const int dummy = 5;
-  Stack* sut = Stack_Create();
+  SUT({
+    ResultCode result = Stack_Push(sut, (void*)&dummy);
 
-  StackResult result = Stack_Push(sut, (void*)&dummy);
-
-  CU_ASSERT_EQUAL(Stack_kSuccess, result);
-  CU_ASSERT_PTR_EQUAL(&dummy, sut->head->payload);
-  CU_ASSERT_EQUAL(1, sut->n);
-
-  Stack_Destroy(sut);
+    CU_ASSERT_EQUAL(kSuccess, result);
+    CU_ASSERT_PTR_EQUAL(&dummy, sut->head->payload);
+    CU_ASSERT_EQUAL(1, sut->n);
+  });
 }
 
 static void Stack_Push_two_items() {
-  Stack* sut = Stack_Create(NULL);
+  SUT({
+    const int first_in = 5;
+    const int second_in = 10;
 
-  const int first_in = 5;
-  const int second_in = 10;
+    ResultCode result = Stack_Push(sut, (void*)&first_in);
+    CU_ASSERT_EQUAL(kSuccess, result);
 
-  StackResult result = Stack_Push(sut, (void*)&first_in);
-  CU_ASSERT_EQUAL(Stack_kSuccess, result);
+    result = Stack_Push(sut, (void*)&second_in);
+    CU_ASSERT_EQUAL(kSuccess, result);
 
-  result = Stack_Push(sut, (void*)&second_in);
-  CU_ASSERT_EQUAL(Stack_kSuccess, result);
-
-  CU_ASSERT_PTR_EQUAL(&second_in, sut->head->payload);
-  CU_ASSERT_PTR_EQUAL(&first_in, sut->head->next->payload);
-  CU_ASSERT_EQUAL(2, sut->n);
-
-  Stack_Destroy(sut);
+    CU_ASSERT_PTR_EQUAL(&second_in, sut->head->payload);
+    CU_ASSERT_PTR_EQUAL(&first_in, sut->head->next->payload);
+    CU_ASSERT_EQUAL(2, sut->n);
+  });
 }
 
 /*************************** Stack_Pop ************************************/
 static void Stack_Pop_null_parameter() {
-  Stack* sut = Stack_Create(NULL);
-
-  void* result = Stack_Pop(NULL);
-  CU_ASSERT_PTR_NULL(result);
-
-  Stack_Destroy(sut);
+  SUT({
+    void* result = NULL;
+    ResultCode result_code = Stack_Pop(NULL, &result);
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(result_code, kNullParameter);
+  });
 }
 
 static void Stack_Pop_empty() {
-  Stack* sut = Stack_Create();
-
-  void* result = Stack_Pop(sut);
-  CU_ASSERT_PTR_NULL(result);
-
-  Stack_Destroy(sut);
+  SUT({
+    void* result = NULL;
+    ResultCode result_code = Stack_Pop(sut, &result);
+    CU_ASSERT_PTR_NULL(result);
+    CU_ASSERT_EQUAL(result_code, kEmpty);
+  });
 }
 
 static void Stack_Pop_last_item() {
   const int first_in = 5;
-  Stack* sut = Stack_Create(NULL);
+  SUT({
+    Stack_Push(sut, (void*)&first_in);
 
-  Stack_Push(sut, (void*)&first_in);
-  void* result = Stack_Pop(sut);
+    void* result = NULL;
+    ResultCode result_code = Stack_Pop(sut, &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  CU_ASSERT_PTR_EQUAL(&first_in, result);
-  CU_ASSERT_PTR_NULL(sut->head);
-  CU_ASSERT_EQUAL(0, sut->n);
-
-  Stack_Destroy(sut);
+    CU_ASSERT_PTR_EQUAL(&first_in, result);
+    CU_ASSERT_PTR_NULL(sut->head);
+    CU_ASSERT_EQUAL(0, sut->n);
+  });
 }
 
 static void Stack_Pop_is_lifo() {
   const size_t n = 5;
   int expected[] = {1, 2, 3, 4, 5};
-  Stack* sut = Stack_Create();
+  SUT({
+    for (size_t i = 0; i < n; i++) Stack_Push(sut, &expected[i]);
 
-  for (size_t i = 0; i < n; i++) Stack_Push(sut, &expected[i]);
+    CU_ASSERT_EQUAL(n, sut->n);
+    for (size_t i = n; i > 0; i--) {
+      CU_ASSERT_EQUAL(i, sut->n);
 
-  CU_ASSERT_EQUAL(n, sut->n);
-  for (size_t i = n; i > 0; i--) {
-    CU_ASSERT_EQUAL(i, sut->n);
-    CU_ASSERT_EQUAL(expected[i - 1], *(int*)Stack_Pop(sut));
-    CU_ASSERT_EQUAL(i - 1, sut->n);
-  }
+      int* result = NULL;
+      ResultCode result_code = Stack_Pop(sut, (void**)&result);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  Stack_Destroy(sut);
+      CU_ASSERT_EQUAL(expected[i - 1], *result);
+      CU_ASSERT_EQUAL(i - 1, sut->n);
+    }
+  });
 }
 
 static void Stack_Pop_heap_pointers() {
@@ -143,19 +173,21 @@ static void Stack_Pop_heap_pointers() {
   TestThingy* third = malloc(sizeof(TestThingy));
   third->id = 2;
 
-  Stack* sut = Stack_Create(NULL);
+  SUT({
+    Stack_Push(sut, first);
+    Stack_Push(sut, second);
+    Stack_Push(sut, third);
 
-  Stack_Push(sut, first);
-  Stack_Push(sut, second);
-  Stack_Push(sut, third);
+    for (int i = 2; i >= 0; i--) {
+      TestThingy* curr = NULL;
+      ResultCode result_code = Stack_Pop(sut, (void**)&curr);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  for (int i = 2; i >= 0; i--) {
-    TestThingy* curr = Stack_Pop(sut);
-    CU_ASSERT_EQUAL(i, curr->id);
-    CU_ASSERT_EQUAL((size_t)i, sut->n);
-  }
+      CU_ASSERT_EQUAL(i, curr->id);
+      CU_ASSERT_EQUAL((size_t)i, sut->n);
+    }
+  });
 
-  Stack_Destroy(sut);
   free(first);
   free(second);
   free(third);
@@ -163,22 +195,27 @@ static void Stack_Pop_heap_pointers() {
 
 /*************************** Stack_IsEmpty ************************************/
 static void Stack_IsEmtpy_null_parameter() {
-  bool result = Stack_IskEmpty(NULL);
-  CU_ASSERT_EQUAL(true, result);
+  bool result = false;
+  result = Stack_IsEmpty(NULL);
+  CU_ASSERT_TRUE(result);
 }
 
 static void Stack_IsEmtpy_empty() {
-  Stack* sut = Stack_Create(NULL);
-  CU_ASSERT_EQUAL(true, Stack_IskEmpty(sut));
-  Stack_Destroy(sut);
+  SUT({
+    bool result = false;
+    result = Stack_IsEmpty(sut);
+    CU_ASSERT_TRUE(result);
+  });
 }
 
 static void Stack_IsEmtpy_not_empty() {
   int first_in = 5;
-  Stack* sut = Stack_Create(NULL);
-  Stack_Push(sut, &first_in);
-  CU_ASSERT_EQUAL(false, Stack_IskEmpty(sut));
-  Stack_Destroy(sut);
+  SUT({
+    Stack_Push(sut, &first_in);
+    bool result = true;
+    result = Stack_IsEmpty(sut);
+    CU_ASSERT_FALSE(result);
+  });
 }
 
 /*************************** Stack_Destroy ************************************/

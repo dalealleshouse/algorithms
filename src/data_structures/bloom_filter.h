@@ -1,8 +1,15 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stdbool.h>
 
-#include "../utils/result_code.h"
+#include "result_code.h"
 
 typedef struct BloomFilter BloomFilter;
 const size_t N_ERROR;

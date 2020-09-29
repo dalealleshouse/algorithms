@@ -274,7 +274,8 @@ static void Graph_SCC_MagicOrdering_standard() {
 
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   for (int i = 0; i < (int)simple_n; i++) {
-    Vertex* v = Stack_Pop(result);
+    Vertex* v = NULL;
+    Stack_Pop(result, (void**)&v);
     CU_ASSERT_EQUAL(expected[i], v->id);
   }
 
@@ -290,7 +291,8 @@ static void Graph_SCC_MagicOrdering_standard_two() {
 
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   for (int i = 0; i < (int)scc_n; i++) {
-    Vertex* v = Stack_Pop(result);
+    Vertex* v = NULL;
+    Stack_Pop(result, (void**)&v);
     CU_ASSERT_EQUAL(expected[i], v->id);
   }
 
