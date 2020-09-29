@@ -196,16 +196,15 @@ static void Stack_Pop_heap_pointers() {
 /*************************** Stack_IsEmpty ************************************/
 static void Stack_IsEmtpy_null_parameter() {
   bool result = false;
-  ResultCode result_code = Stack_IsEmpty(NULL, &result);
-  CU_ASSERT_EQUAL(result_code, kNullParameter);
+  result = Stack_IsEmpty(NULL);
+  CU_ASSERT_TRUE(result);
 }
 
 static void Stack_IsEmtpy_empty() {
   SUT({
     bool result = false;
-    ResultCode result_code = Stack_IsEmpty(sut, &result);
-    CU_ASSERT_EQUAL(result_code, kSuccess);
-    CU_ASSERT_EQUAL(result, true);
+    result = Stack_IsEmpty(sut);
+    CU_ASSERT_TRUE(result);
   });
 }
 
@@ -214,9 +213,8 @@ static void Stack_IsEmtpy_not_empty() {
   SUT({
     Stack_Push(sut, &first_in);
     bool result = true;
-    ResultCode result_code = Stack_IsEmpty(sut, &result);
-    CU_ASSERT_EQUAL(result_code, kSuccess);
-    CU_ASSERT_EQUAL(result, false);
+    result = Stack_IsEmpty(sut);
+    CU_ASSERT_FALSE(result);
   });
 }
 

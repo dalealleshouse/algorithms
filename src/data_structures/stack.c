@@ -69,11 +69,10 @@ ResultCode Stack_Pop(Stack* self, void** result) {
   return kSuccess;
 }
 
-ResultCode Stack_IsEmpty(Stack* self, bool* result) {
-  if (self == NULL || result == NULL) return kNullParameter;
+bool Stack_IsEmpty(Stack* self) {
+  if (self == NULL) return true;
 
-  *result = self->n == 0;
-  return kSuccess;
+  return self->n == 0;
 }
 
 void Stack_Destroy(Stack* self) {

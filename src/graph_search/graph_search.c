@@ -42,13 +42,19 @@ GraphResult Graph_BFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
   GraphResult result = SearchIsValid(self, vertex_id, strategy);
   if (result != Graph_kSuccess) return result;
 
-  Queue* q = Queue_Create();
+  Queue* q = NULL;
+  ResultCode result_code = Queue_Create(&q);
+  if (result_code != kSuccess) return Graph_kFailedMemoryAllocation;
+
   Queue_Enqueue(q, self->V[vertex_id]);
   bool con_result = strategy->conqueror(self->V[vertex_id], NULL);
   if (!con_result) return Graph_kSuccess;
 
-  while (!Queue_IskEmpty(q)) {
-    Vertex* v = Queue_Dequeue(q);
+  while (!Queue_IsEmpty(q)) {
+    Vertex* v = NULL;
+    ResultCode result_code = Queue_Dequeue(q, (void**)&v);
+    if (result_code != kSuccess) return Graph_DependencyError;
+
     Edge* e = v->edges;
     while (e != NULL) {
       Vertex* w = self->V[e->head];
@@ -80,8 +86,7 @@ GraphResult Graph_DFS(Graph* self, int vertex_id, SearchStrategy* strategy) {
   Stack_Push(s, self->V[vertex_id]);
 
   Vertex* prev = NULL;
-  bool is_empty = false;
-  while (Stack_IsEmpty(s, &is_empty) == kSuccess && is_empty == false) {
+  while (Stack_IsEmpty(s) == false) {
     Vertex* v = NULL;
     Stack_Pop(s, (void**)&v);
     if (!strategy->is_conquered(v)) {

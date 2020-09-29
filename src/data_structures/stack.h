@@ -18,5 +18,5 @@ typedef struct Stack_t Stack;
 ResultCode Stack_Create(Stack**);
 ResultCode Stack_Push(Stack*, void*);
 ResultCode Stack_Pop(Stack*, void**);
-ResultCode Stack_IsEmpty(Stack*, bool*);
+bool Stack_IsEmpty(Stack*);
 void Stack_Destroy(Stack*);
