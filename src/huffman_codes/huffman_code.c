@@ -44,8 +44,8 @@ static Result _combineNodes(HuffmanCode* x, HuffmanCode* y, HuffmanCode** new) {
 
 // Add a code node to the heap for each symbol
 static Result _initHeap(const SymbolFreq* freqs, Heap** heap) {
-  (*heap) = Heap_Create(freqs->n, _codeNodeComparer);
-  if ((*heap) == NULL) return kFailedMemoryAllocation;
+  ResultCode result_code = Heap_Create(freqs->n, _codeNodeComparer, heap);
+  if (result_code != kSuccess) return result_code;
 
   for (size_t i = 0; i < freqs->n; i++) {
     HuffmanCode* cn;
@@ -56,8 +56,8 @@ static Result _initHeap(const SymbolFreq* freqs, Heap** heap) {
       return result;
     }
 
-    HeapResult hr = Heap_Insert((*heap), cn);
-    if (hr != HeapkSuccess) {
+    ResultCode hr = Heap_Insert((*heap), cn);
+    if (hr != kSuccess) {
       Heap_Destroy((*heap), HuffmanCode_Destory);
       return kDependancyError;
     }
@@ -99,20 +99,33 @@ void HuffmanCode_Destory(void* codenode) {
 }
 
 Result HuffmanCode_Calculate(const SymbolFreq* freqs, HuffmanCode** code) {
-  Result result;
+  ResultCode result_code;
 
   if (freqs == NULL || code == NULL) return kNullParameter;
 
   Heap* h = NULL;
-  result = _initHeap(freqs, &h);
-  if (result != kSuccess) {
+  result_code = _initHeap(freqs, &h);
+  if (result_code != kSuccess) {
     Heap_Destroy(h, NULL);
-    return result;
+    return result_code;
   }
 
-  while (!Heap_IskEmpty(h)) {
-    HuffmanCode* x = Heap_Extract(h);
-    HuffmanCode* y = Heap_Extract(h);
+  while (!Heap_IsEmpty(h)) {
+    HuffmanCode* x = NULL;
+    ResultCode result_code = Heap_Extract(h, (void**)&x);
+    if (result_code != kSuccess) {
+      Heap_Destroy(h, NULL);
+      return result_code;
+    }
+
+    HuffmanCode* y = NULL;
+    result_code = Heap_Extract(h, (void**)&y);
+    // Underflow is OK here because it's possible that the previous extract
+    // exhausted the queue. In this case, y = NULL is correct
+    if (result_code != kSuccess && result_code != kUnderflow) {
+      Heap_Destroy(h, NULL);
+      return result_code;
+    }
 
     // If y is NULL, there was only one item left on the heap and it is the
     // final code
@@ -123,16 +136,16 @@ Result HuffmanCode_Calculate(const SymbolFreq* freqs, HuffmanCode** code) {
     }
 
     HuffmanCode* new = NULL;
-    result = _combineNodes(x, y, &new);
-    if (result != kSuccess) {
+    result_code = _combineNodes(x, y, &new);
+    if (result_code != kSuccess) {
       Heap_Destroy(h, HuffmanCode_Destory);
-      return result;
+      return result_code;
     }
 
-    HeapResult hr = Heap_Insert(h, new);
-    if (hr != HeapkSuccess) {
+    result_code = Heap_Insert(h, new);
+    if (result_code != kSuccess) {
       Heap_Destroy(h, HuffmanCode_Destory);
-      return kDependancyError;
+      return result_code;
     }
   }
 

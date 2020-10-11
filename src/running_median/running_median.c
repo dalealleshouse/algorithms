@@ -38,9 +38,10 @@ static int min_comparator(const void* x, const void* y) {
 }
 
 static double get_heap_value(Heap* heap) {
-  void* val = Heap_Peek(heap);
-  if (val == NULL) {
-    ERROR("RunningMedian", kDependancyError);
+  void* val = NULL;
+  ResultCode result_code = Heap_Peek(heap, &val);
+  if (result_code != kSuccess) {
+    ERROR("RunningMedian", result_code);
     return NAN;
   }
 
@@ -49,18 +50,18 @@ static double get_heap_value(Heap* heap) {
 
 static bool heap_is_balanced(RunningMedian* self) {
   if (is_even(self->n)) {
-    return self->upper->n == self->lower->n;
+    return Heap_Size(self->upper) == Heap_Size(self->lower);
   } else {
-    return self->upper->n + 1 == self->lower->n;
+    return Heap_Size(self->upper) + 1 == Heap_Size(self->lower);
   }
 }
 
-static HeapResult heap_insert(Heap* heap, double* value) {
-  HeapResult result;
+static ResultCode heap_insert(Heap* heap, double* value) {
+  ResultCode result_code;
 
-  if (heap->n == heap->size) {
-    result = Heap_Resize(heap, heap->size * 2);
-    if (result != HeapkSuccess) return result;
+  if (Heap_Size(heap) == Heap_MaxSize(heap)) {
+    result_code = Heap_Resize(heap, Heap_MaxSize(heap) * 2);
+    if (result_code != kSuccess) return result_code;
   }
 
   return Heap_Insert(heap, value);
@@ -82,7 +83,7 @@ static Result balance_heaps(RunningMedian* self) {
   Heap* too_many;
   Heap* too_low;
 
-  if (self->upper->n > self->lower->n) {
+  if (Heap_Size(self->upper) > Heap_Size(self->lower)) {
     too_many = self->upper;
     too_low = self->lower;
   } else {
@@ -90,11 +91,12 @@ static Result balance_heaps(RunningMedian* self) {
     too_low = self->upper;
   }
 
-  double* temp = Heap_Extract(too_many);
-  if (temp == NULL) return kDependancyError;
+  double* temp = NULL;
+  ResultCode result_code = Heap_Extract(too_many, (void**)&temp);
+  if (result_code != kSuccess) return result_code;
 
-  HeapResult result = heap_insert(too_low, temp);
-  if (result != HeapkSuccess) return kDependancyError;
+  result_code = heap_insert(too_low, temp);
+  if (result_code != kSuccess) return result_code;
 
   return kSuccess;
 }
@@ -119,15 +121,18 @@ RunningMedian* RunningMedian_Create() {
     return NULL;
   }
 
-  rm->upper = Heap_Create(INITAL_HEAP_SIZE, min_comparator);
-  if (rm->upper == NULL) {
+  rm->upper = NULL;
+  ResultCode result_code =
+      Heap_Create(INITAL_HEAP_SIZE, min_comparator, &rm->upper);
+  if (result_code != kSuccess) {
     ERROR("RunningMedian", kDependancyError);
     RunningMedian_Destroy(rm);
     return NULL;
   }
 
-  rm->lower = Heap_Create(INITAL_HEAP_SIZE, max_comparator);
-  if (rm->lower == NULL) {
+  rm->lower = NULL;
+  result_code = Heap_Create(INITAL_HEAP_SIZE, max_comparator, &rm->lower);
+  if (result_code != kSuccess) {
     ERROR("RunningMedian", kDependancyError);
     RunningMedian_Destroy(rm);
     return NULL;
@@ -149,11 +154,17 @@ Result RunningMedian_Insert(RunningMedian* self, double value) {
 
   // Find which heap to insert the value into
   Heap* h = find_insert_heap(self, value);
-  if (h == NULL) return kDependancyError;
+  if (h == NULL) {
+    free(val);
+    return kDependancyError;
+  }
 
   // Insert the value
-  HeapResult hresult = heap_insert(h, val);
-  if (hresult != HeapkSuccess) return kDependancyError;
+  ResultCode hresult = heap_insert(h, val);
+  if (hresult != kSuccess) {
+    free(val);
+    return hresult;
+  }
 
   self->n++;
 

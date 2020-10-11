@@ -31,11 +31,7 @@ static int test_comparator(const void* x, const void* y) {
   TestThingy* t1 = (TestThingy*)x;
   TestThingy* t2 = (TestThingy*)y;
 
-  if (t1->x == t2->x) return 0;
-
-  if (t1->x < t2->x) return 1;
-
-  return -1;
+  return t2->x - t1->x;
 }
 
 static int GetX(PQ_Item* i) {

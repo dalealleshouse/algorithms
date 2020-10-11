@@ -121,7 +121,10 @@ GraphResult Graph_DijkstraShortestPathNaive(Graph* self, int start) {
 
   Vertex* startv = self->V[start];
   GraphResult r = SetDistanceAndConquer(startv, 0, NULL);
-  if (r != Graph_kSuccess) return r;
+  if (r != Graph_kSuccess) {
+    free(conquered);
+    return r;
+  }
 
   conquered[tracker] = startv;
 
@@ -147,14 +150,16 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start) {
   GraphResult r = SetDistanceAndConquer(startv, 0, NULL);
   if (r != Graph_kSuccess) return r;
 
-  Heap* heap = Heap_Create(self->n, path_comparator);
-  if (heap == NULL) return Graph_DependencyError;
+  Heap* heap = NULL;
+  ResultCode result_code = Heap_Create(self->n, path_comparator, &heap);
+  if (result_code != kSuccess) return Graph_DependencyError;
 
-  HeapResult h_result = Heap_Insert(heap, startv);
-  if (h_result != HeapkSuccess) return Graph_DependencyError;
+  ResultCode h_result = Heap_Insert(heap, startv);
+  if (h_result != kSuccess) return Graph_DependencyError;
 
-  while (!Heap_IskEmpty(heap)) {
-    Vertex* v = Heap_Extract(heap);
+  while (!Heap_IsEmpty(heap)) {
+    Vertex* v = NULL;
+    Heap_Extract(heap, (void**)&v);
 
     // unreachable vertices, time to bail
     if (Distance(v) == UNINITIALIZED) break;
@@ -171,14 +176,14 @@ GraphResult Graph_DijkstraShortestPath(Graph* self, int start) {
         // We only need to re prioritize if the distance changed
         if (dist == Distance(head)) {
           h_result = Heap_Reproiritize(heap, head);
-          if (h_result != HeapkSuccess) return Graph_DependencyError;
+          if (h_result != kSuccess) return Graph_DependencyError;
         }
       } else {
         r = SetDistanceAndConquer(head, dist, v);
         if (r != Graph_kSuccess) return r;
 
         h_result = Heap_Insert(heap, head);
-        if (h_result != HeapkSuccess) return Graph_DependencyError;
+        if (h_result != kSuccess) return Graph_DependencyError;
       }
       e = e->next;
     }

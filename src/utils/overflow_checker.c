@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-bool is_mul_overflow_size_t(size_t x, size_t y) {
+bool IsMulOverflow_size_t(size_t x, size_t y) {
   if (x == 0 || y == 0) return false;
 
   size_t result = x * y;

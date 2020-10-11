@@ -389,7 +389,7 @@ static void HashTable_Enumerate_null_parameter() {
 
 static void _itemHandler(const KeyValuePair* item, const size_t index,
                          void* context) {
-  *(int*)context += (*(int*)item->value + index);
+  *(int*)context += (*(int*)item->value + (int)index);
 }
 
 static void HashTable_Enumerate_happy_path() {
