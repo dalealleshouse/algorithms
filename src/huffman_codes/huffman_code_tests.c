@@ -192,6 +192,7 @@ static void HuffmanCode_Calculate_SmallCode() {
 
   Result result = HuffmanCode_Calculate(freqs, &code);
   CU_ASSERT_EQUAL(result, kSuccess);
+  printf("%s\n", Result_ErrorMessage(result));
 
   CU_ASSERT_STRING_EQUAL(code->zero->zero->symbol->symbol, "D")
   CU_ASSERT_STRING_EQUAL(code->one->one->symbol->symbol, "C")

@@ -212,8 +212,10 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
   conquered[1].conquered = true;
   conquered[1].vertex_id = 1;
 
-  Heap* heap = Heap_Create(graph->n, _spanTreeResultComparator);
-  if (heap == NULL) return kFailedMemoryAllocation;
+  Heap* heap = NULL;
+  ResultCode result_code =
+      Heap_Create(graph->n, _spanTreeResultComparator, &heap);
+  if (result_code != kSuccess) return result_code;
 
   for (size_t i = 2; i < graph->n; i++) {
     conquered[i].vertex_id = i;
@@ -221,19 +223,19 @@ Result PrimMinSpanTree(const Graph* graph, MinSpanTree* mst) {
     Edge* winner = _findWinningEdge(conquered, graph->V[i]->edges);
     _setWinner(conquered, i, winner);
 
-    HeapResult result = Heap_Insert(heap, &conquered[i]);
-    if (result != HeapkSuccess) {
+    result_code = Heap_Insert(heap, &conquered[i]);
+    if (result_code != kSuccess) {
       Heap_Destroy(heap, NULL);
-      return kDependancyError;
+      return result_code;
     }
   }
 
-  while (!Heap_IskEmpty(heap)) {
-    SpanTreeResult* next = Heap_Extract(heap);
-
-    if (next == NULL) {
+  while (!Heap_IsEmpty(heap)) {
+    SpanTreeResult* next = NULL;
+    result_code = Heap_Extract(heap, (void**)&next);
+    if (result_code != kSuccess) {
       Heap_Destroy(heap, NULL);
-      return kDependancyError;
+      return result_code;
     }
 
     Result result = _addEdgeToMst(mst, next->winner);

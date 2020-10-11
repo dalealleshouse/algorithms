@@ -5,16 +5,23 @@
  * This file is subject to the terms and conditions defined in the 'LICENSE'
  * file, which is part of this source code package.
  ******************************************************************************/
-#include "./heap.h"
+#include "heap.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "../utils/error_reporter.h"
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
+
+struct Heap_t {
+  size_t n;
+  size_t size;
+  comparator comparator;
+  void** data;
+  HashTable* item_tracker;
+};
 
 #define SUT(size, code_block)               \
   {                                         \
@@ -65,44 +72,48 @@ static int TestComparator(const void* x, const void* y) {
 }
 
 static Heap* CreateSut(size_t size) {
-  Heap* sut = Heap_Create(size, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(size, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
   for (size_t i = 1; i <= size; i++) Heap_Insert(sut, TestHeapObj_Create(i));
 
   return sut;
 }
 
 static void Heap_Create_null_parameter() {
-  ErrorReporter_Clear();
-  Heap* sut = Heap_Create(5, NULL);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(5, NULL, &sut);
 
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), HeapkNullParameter);
 }
 
 static void Heap_Create_invalid_size() {
-  ErrorReporter_Clear();
-  Heap* sut = Heap_Create(0, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(0, TestComparator, &sut);
 
+  CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), HeapInvalidSize);
-}
-
-static void Heap_Create_malloc_tester(void) {
-  Heap* sut = Heap_Create(5, TestComparator);
-
-  CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), HeapkFailedMemoryAllocation);
 }
 
 static void Heap_Create_failed_malloc() {
-  FAILED_MALLOC_TEST({ Heap_Create_malloc_tester(); });
+  FAILED_MALLOC_TEST({
+    Heap* sut = NULL;
+    ResultCode result_code = Heap_Create(5, TestComparator, &sut);
+
+    CU_ASSERT_EQUAL(kFailedMemoryAllocation, result_code);
+    CU_ASSERT_PTR_NULL(sut);
+  });
 }
 
 static void Heap_Create_intializes_variables() {
   const size_t size = 10;
-  Heap* sut = Heap_Create(size, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(size, TestComparator, &sut);
 
-  CU_ASSERT_PTR_NOT_NULL(sut);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
   CU_ASSERT_EQUAL(0, sut->n);
   CU_ASSERT_EQUAL(size, sut->size);
   CU_ASSERT_PTR_EQUAL(TestComparator, sut->comparator);
@@ -112,37 +123,43 @@ static void Heap_Create_intializes_variables() {
 }
 
 static void Heap_Create_arith_overflow() {
-  ErrorReporter_Clear();
-  Heap* sut = Heap_Create(SIZE_MAX, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(SIZE_MAX, TestComparator, &sut);
+  CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(HeapkArithmeticOverflow, ErrorReporter_LastErrorCode());
 }
 
 static void Heap_Insert_null_parameter() {
-  const size_t size = 10;
   TestHeapObj obj = {1, 1};
-  Heap* sut = Heap_Create(size, TestComparator);
+  const size_t size = 10;
 
-  HeapResult result = Heap_Insert(sut, NULL);
-  CU_ASSERT_EQUAL(HeapkNullParameter, result);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(size, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  ResultCode result = Heap_Insert(sut, NULL);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   result = Heap_Insert(NULL, &obj);
-  CU_ASSERT_EQUAL(HeapkNullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
   result = Heap_Insert(NULL, NULL);
-  CU_ASSERT_EQUAL(HeapkNullParameter, result);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 
-  Heap_Destroy(sut, NULL);
+  Heap_Destroy(sut, free);
 }
 
 static void Heap_Insert_first_item() {
-  const size_t size = 10;
   TestHeapObj obj = {1, 1};
-  Heap* sut = Heap_Create(size, TestComparator);
 
-  HeapResult result = Heap_Insert(sut, &obj);
+  const size_t size = 10;
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(size, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  CU_ASSERT_EQUAL(HeapkSuccess, result);
+  ResultCode result = Heap_Insert(sut, &obj);
+
+  CU_ASSERT_EQUAL(kSuccess, result);
   CU_ASSERT_PTR_EQUAL(&obj, sut->data[0]);
   CU_ASSERT_EQUAL(1, sut->n);
 
@@ -152,7 +169,9 @@ static void Heap_Insert_first_item() {
 static void Heap_Insert_many_items() {
   const size_t size = 11;
 
-  Heap* sut = Heap_Create(size, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(size, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
   for (size_t i = size; i > 0; i--) Heap_Insert(sut, TestHeapObj_Create(i));
 
@@ -165,20 +184,19 @@ static void Heap_Insert_over_size() {
   Heap* sut = CreateSut(3);
 
   TestHeapObj* one_more = TestHeapObj_Create(1000);
-  HeapResult result = Heap_Insert(sut, one_more);
+  ResultCode result = Heap_Insert(sut, one_more);
 
-  CU_ASSERT_EQUAL(HeapOverflow, result);
+  CU_ASSERT_EQUAL(kOverflow, result);
 
   TestHeapObj_Destroy(one_more);
   Heap_Destroy(sut, TestHeapObj_Destroy);
 }
 
 static void Heap_Extract_null_parameter() {
-  ErrorReporter_Clear();
-
-  void* result = Heap_Extract(NULL);
+  void* result = NULL;
+  ResultCode result_code = Heap_Extract(NULL, &result);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), HeapkNullParameter);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 }
 
 static void Heap_Extract_returns_highest_priority() {
@@ -186,7 +204,10 @@ static void Heap_Extract_returns_highest_priority() {
   Heap* sut = CreateSut(size);
 
   for (int i = 1; i <= (int)size; i++) {
-    TestHeapObj* obj = Heap_Extract(sut);
+    TestHeapObj* obj = NULL;
+    ResultCode result_code = Heap_Extract(sut, (void**)&obj);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+
     CU_ASSERT_EQUAL(i * 100, obj->priority);
     CU_ASSERT_EQUAL(size - i, sut->n);
     HeapIsValid(sut);
@@ -197,21 +218,25 @@ static void Heap_Extract_returns_highest_priority() {
 }
 
 static void Heap_Extract_empty_heap() {
-  ErrorReporter_Clear();
-  Heap* sut = Heap_Create(10, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(10, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  void* result = Heap_Extract(sut);
+  void* result = NULL;
+  result_code = Heap_Extract(sut, &result);
 
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(HeapkEmpty, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(result_code, kUnderflow);
 
   Heap_Destroy(sut, NULL);
 }
 
 static void Heap_IskEmpty_return_true_when_empty() {
-  Heap* sut = Heap_Create(10, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(10, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  bool result = Heap_IskEmpty(sut);
+  bool result = Heap_IsEmpty(sut);
   CU_ASSERT_TRUE(result);
 
   Heap_Destroy(sut, NULL);
@@ -220,33 +245,32 @@ static void Heap_IskEmpty_return_true_when_empty() {
 static void Heap_IskEmpty_return_false_when_not_empty() {
   Heap* sut = CreateSut(2);
 
-  bool result = Heap_IskEmpty(sut);
+  bool result = Heap_IsEmpty(sut);
   CU_ASSERT_FALSE(result);
 
   Heap_Destroy(sut, TestHeapObj_Destroy);
 }
 
 static void Heap_IskEmpty_null_parameter() {
-  ErrorReporter_Clear();
-
-  bool result = Heap_IskEmpty(NULL);
+  bool result = Heap_IsEmpty(NULL);
   CU_ASSERT_TRUE(result);
-  CU_ASSERT_EQUAL(HeapkNullParameter, ErrorReporter_LastErrorCode());
 }
 
 static void Heap_Peek_null_parameter() {
-  ErrorReporter_Clear();
-
-  void* result = Heap_Peek(NULL);
+  void* result = NULL;
+  ResultCode result_code = Heap_Peek(NULL, &result);
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(HeapkNullParameter, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 }
 
 static void Heap_Peek_returns_highest_priority() {
   const size_t size = 11;
   Heap* sut = CreateSut(size);
 
-  TestHeapObj* obj = Heap_Peek(sut);
+  TestHeapObj* obj = NULL;
+  ResultCode result_code = Heap_Peek(sut, (void**)&obj);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
   CU_ASSERT_EQUAL(100, obj->priority);
   CU_ASSERT_EQUAL(size, sut->n);
   HeapIsValid(sut);
@@ -255,73 +279,77 @@ static void Heap_Peek_returns_highest_priority() {
 }
 
 static void Heap_Peek_empty() {
-  ErrorReporter_Clear();
-  Heap* sut = Heap_Create(10, TestComparator);
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(10, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  void* result = Heap_Peek(sut);
+  void* result = NULL;
+  result_code = Heap_Peek(sut, &result);
 
   CU_ASSERT_PTR_NULL(result);
-  CU_ASSERT_EQUAL(HeapkEmpty, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(result_code, kUnderflow);
 
   Heap_Destroy(sut, NULL);
 }
 
 static void Heap_Resize_null_parameter() {
-  HeapResult result = Heap_Resize(NULL, 5);
-  CU_ASSERT_EQUAL(HeapkNullParameter, result);
+  ResultCode result = Heap_Resize(NULL, 5);
+  CU_ASSERT_EQUAL(kNullParameter, result);
 }
 
 static void Heap_Resize_zero() {
   SUT(10, {
-    HeapResult result = Heap_Resize(sut, 0);
-    CU_ASSERT_EQUAL(HeapInvalidSize, result);
+    ResultCode result_code = Heap_Resize(sut, 0);
+    CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
   });
 }
 
 static void Heap_Resize_too_small() {
   SUT(10, {
-    HeapResult result = Heap_Resize(sut, 9);
-    CU_ASSERT_EQUAL(HeapInvalidSize, result);
+    ResultCode result_code = Heap_Resize(sut, 9);
+    CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
   });
 }
 
 static void Heap_Resize_arith_overflow() {
   SUT(10, {
-    ErrorReporter_Clear();
-    HeapResult result = Heap_Resize(sut, SIZE_MAX);
-    CU_ASSERT_EQUAL(HeapkArithmeticOverflow, result);
+    ResultCode result_code = Heap_Resize(sut, SIZE_MAX);
+    CU_ASSERT_EQUAL(result_code, kArithmeticOverflow);
   });
 }
 
 static void Heap_Resize_failed_malloc() {
   SUT(10, {
     FAILED_MALLOC_TEST({
-      HeapResult result = Heap_Resize(sut, 20);
-      CU_ASSERT_EQUAL(HeapkFailedMemoryAllocation, result);
+      ResultCode result_code = Heap_Resize(sut, 20);
+      CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
     });
   });
 }
 
 static void Heap_Resize_smaller_happy_path() {
   SUT(10, {
-    void* item = Heap_Extract(sut);
-    TestHeapObj_Destroy(item);
-    HeapResult result = Heap_Resize(sut, 9);
+    void* item = NULL;
+    ResultCode result_code = Heap_Extract(sut, &item);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
 
-    CU_ASSERT_EQUAL(HeapkSuccess, result);
+    TestHeapObj_Destroy(item);
+    ResultCode result = Heap_Resize(sut, 9);
+
+    CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(9, sut->size);
   });
 }
 
 static void Heap_Resize_larger_happy_path() {
   SUT(10, {
-    HeapResult result = Heap_Resize(sut, 20);
-    CU_ASSERT_EQUAL(HeapkSuccess, result);
+    ResultCode result = Heap_Resize(sut, 20);
+    CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(20, sut->size);
 
     TestHeapObj* obj = TestHeapObj_Create(5);
     result = Heap_Insert(sut, obj);
-    CU_ASSERT_EQUAL(HeapkSuccess, result);
+    CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(11, sut->n);
   });
 }
@@ -331,66 +359,59 @@ static void Heap_Destroy_null_parameter() { Heap_Destroy(NULL, free); }
 static void Heap_Exists_null_parameter() {
   bool result = Heap_Exists(NULL, NULL);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(HeapkNullParameter, ErrorReporter_LastErrorCode());
 
   int somePointer;
   result = Heap_Exists(NULL, &somePointer);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(HeapkNullParameter, ErrorReporter_LastErrorCode());
 
   SUT(10, {
     result = Heap_Exists(sut, NULL);
     CU_ASSERT_FALSE(result);
-    CU_ASSERT_EQUAL(HeapkNullParameter, ErrorReporter_LastErrorCode());
   });
 }
 
 static void Heap_Exists_returns_true_when_item_exists() {
-  ErrorReporter_Clear();
   SUT(10, {
     bool exists = Heap_Exists(sut, sut->data[5]);
     CU_ASSERT_TRUE(exists);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
   });
 }
 
 static void Heap_Exists_returns_false_when_item_does_not_exist() {
-  ErrorReporter_Clear();
   SUT(10, {
     int somePointer;
     bool exists = Heap_Exists(sut, &somePointer);
     CU_ASSERT_FALSE(exists);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
   });
 }
 
 static void Heap_Reproiritize_null_parameter() {
-  HeapResult result = Heap_Reproiritize(NULL, NULL);
-  CU_ASSERT_EQUAL(result, HeapkNullParameter);
+  ResultCode result = Heap_Reproiritize(NULL, NULL);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 
   int somePointer;
   result = Heap_Reproiritize(NULL, &somePointer);
-  CU_ASSERT_EQUAL(result, HeapkNullParameter);
+  CU_ASSERT_EQUAL(result, kNullParameter);
 
   SUT(10, {
     result = Heap_Reproiritize(sut, NULL);
-    CU_ASSERT_EQUAL(result, HeapkNullParameter);
+    CU_ASSERT_EQUAL(result, kNullParameter);
   });
 }
 
 static void Heap_Reproiritize_item_not_found() {
   SUT(10, {
     int somePointer;
-    HeapResult result = Heap_Reproiritize(sut, &somePointer);
-    CU_ASSERT_EQUAL(result, HeapItemkNotFound);
+    ResultCode result_code = Heap_Reproiritize(sut, &somePointer);
+    CU_ASSERT_EQUAL(result_code, kNotFound);
     HeapIsValid(sut);
   });
 }
 
 static void Heap_Reproiritize_no_change_to_priority() {
   SUT(10, {
-    HeapResult result = Heap_Reproiritize(sut, sut->data[5]);
-    CU_ASSERT_EQUAL(result, HeapkSuccess);
+    ResultCode result = Heap_Reproiritize(sut, sut->data[5]);
+    CU_ASSERT_EQUAL(result, kSuccess);
     HeapIsValid(sut);
   });
 }
@@ -399,8 +420,8 @@ static void Heap_Reproiritize_raise_priority() {
   SUT(10, {
     TestHeapObj* changeMe = sut->data[5];
     changeMe->priority = 1;
-    HeapResult result = Heap_Reproiritize(sut, changeMe);
-    CU_ASSERT_EQUAL(result, HeapkSuccess);
+    ResultCode result = Heap_Reproiritize(sut, changeMe);
+    CU_ASSERT_EQUAL(result, kSuccess);
     HeapIsValid(sut);
   });
 }
@@ -409,8 +430,8 @@ static void Heap_Reproiritize_lower_priority() {
   SUT(10, {
     TestHeapObj* changeMe = sut->data[2];
     changeMe->priority = 1200;
-    HeapResult result = Heap_Reproiritize(sut, changeMe);
-    CU_ASSERT_EQUAL(result, HeapkSuccess);
+    ResultCode result = Heap_Reproiritize(sut, changeMe);
+    CU_ASSERT_EQUAL(result, kSuccess);
     HeapIsValid(sut);
   });
 }
@@ -419,8 +440,8 @@ static void Heap_Reproiritize_lower_last_item() {
   SUT(10, {
     TestHeapObj* changeMe = sut->data[9];
     changeMe->priority = 1200;
-    HeapResult result = Heap_Reproiritize(sut, changeMe);
-    CU_ASSERT_EQUAL(result, HeapkSuccess);
+    ResultCode result = Heap_Reproiritize(sut, changeMe);
+    CU_ASSERT_EQUAL(result, kSuccess);
     HeapIsValid(sut);
   });
 }
@@ -429,9 +450,33 @@ static void Heap_Reproiritize_raise_first_item() {
   SUT(10, {
     TestHeapObj* changeMe = sut->data[0];
     changeMe->priority = 50;
-    HeapResult result = Heap_Reproiritize(sut, changeMe);
-    CU_ASSERT_EQUAL(result, HeapkSuccess);
+    ResultCode result = Heap_Reproiritize(sut, changeMe);
+    CU_ASSERT_EQUAL(result, kSuccess);
     HeapIsValid(sut);
+  });
+}
+
+static void Heap_Size_null_parameter() {
+  size_t result = Heap_Size(NULL);
+  CU_ASSERT_EQUAL(result, 0);
+}
+
+static void Heap_Size_returns_size() {
+  SUT(10, {
+    size_t result = Heap_Size(sut);
+    CU_ASSERT_EQUAL(result, 10);
+  });
+}
+
+static void Heap_MaxSize_null_parameter() {
+  size_t result = Heap_MaxSize(NULL);
+  CU_ASSERT_EQUAL(result, 0);
+}
+
+static void Heap_MaxSize_returns_max_size() {
+  SUT(10, {
+    size_t result = Heap_Size(sut);
+    CU_ASSERT_EQUAL(result, 10);
   });
 }
 
@@ -473,6 +518,10 @@ int RegisterHeapTests() {
       CU_TEST_INFO(Heap_Reproiritize_lower_priority),
       CU_TEST_INFO(Heap_Reproiritize_lower_last_item),
       CU_TEST_INFO(Heap_Reproiritize_raise_first_item),
+      CU_TEST_INFO(Heap_Size_null_parameter),
+      CU_TEST_INFO(Heap_Size_returns_size),
+      CU_TEST_INFO(Heap_MaxSize_null_parameter),
+      CU_TEST_INFO(Heap_MaxSize_returns_max_size),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Heap",

@@ -72,7 +72,9 @@ ResultCode BloomFilter_Insert(BloomFilter* self, const char* key) {
     size_t index = mul_compressor64(hash, self->bits);
     size_t byte_index = index / byte_size;
     size_t bit_index = index % byte_size;
-    self->filter[byte_index] |= 1 << bit_index;
+
+    self->filter[byte_index] =
+        (char)(self->filter[byte_index] | 1 << bit_index);
   }
 
   self->n++;

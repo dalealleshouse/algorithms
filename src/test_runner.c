@@ -20,7 +20,6 @@ extern int RegisterGraphSearchTests();
 
 // Data Structures
 extern int RegisterQueueTests();
-extern int RegisterPriorityQueueTests();
 extern int RegisterStackTests();
 extern int RegisterHeapTests();
 extern int RegisterHashTableTests();
@@ -113,7 +112,6 @@ int RegisterTests() {
       RegisterCommonTests() != 0 +
       RegisterGraphSearchTests() != 0 +
       RegisterQueueTests() != 0 +
-      RegisterPriorityQueueTests() != 0 +
       RegisterStackTests() != 0 +
       RegisterHeapTests() != 0 +
       RegisterHashTableTests() != 0 +

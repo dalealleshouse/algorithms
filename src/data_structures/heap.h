@@ -12,45 +12,21 @@
 #include <stdio.h>
 
 #include "comparators.h"
-#include "error_reporter.h"
 #include "hash_table.h"
+#include "result_code.h"
 
-#define HEAP_ERROR(result)                                                 \
-  {                                                                        \
-    char str[1000];                                                        \
-    snprintf(str, sizeof(str), "Heap Error: %s, %s, %s, %d\n",             \
-             Heap_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
-                                                                           \
-    ErrorReporter_Report(result, str);                                     \
-  }
+struct Heap_t;
+typedef struct Heap_t Heap;
 
-typedef enum {
-  HeapItemkNotFound = -8,
-  HeapHashTableError = -7,
-  HeapkArithmeticOverflow = -6,
-  HeapOverflow = -5,
-  HeapkEmpty = -4,
-  HeapkFailedMemoryAllocation = -3,
-  HeapInvalidSize = -2,
-  HeapkNullParameter = -1,
-  HeapkSuccess = 0
-} HeapResult;
+ResultCode Heap_Create(size_t, comparator, Heap**);
+ResultCode Heap_Insert(Heap*, void*);
+ResultCode Heap_Resize(Heap*, size_t);
+ResultCode Heap_Reproiritize(Heap*, void*);
+ResultCode Heap_Extract(Heap*, void**);
+ResultCode Heap_Peek(Heap*, void**);
 
-typedef struct Heap {
-  size_t n;
-  size_t size;
-  comparator comparator;
-  void** data;
-  HashTable* item_tracker;
-} Heap;
-
-Heap* Heap_Create(size_t, comparator);
-HeapResult Heap_Insert(Heap*, void*);
-HeapResult Heap_Resize(Heap*, size_t);
-HeapResult Heap_Reproiritize(Heap*, void*);
-void* Heap_Extract(Heap*);
-bool Heap_IskEmpty(Heap*);
+size_t Heap_Size(Heap*);
+size_t Heap_MaxSize(Heap*);
 bool Heap_Exists(Heap*, void*);
-void* Heap_Peek(Heap*);
+bool Heap_IsEmpty(Heap*);
 void Heap_Destroy(Heap*, freer);
-char* Heap_ErrorMessage(HeapResult);

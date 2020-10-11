@@ -7,18 +7,18 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
-static void is_mul_overflow_size_t_zero() {
-  CU_ASSERT_FALSE(is_mul_overflow_size_t(5, 0));
-  CU_ASSERT_FALSE(is_mul_overflow_size_t(0, 5));
+static void IsMulOverflow_size_t_zero() {
+  CU_ASSERT_FALSE(IsMulOverflow_size_t(5, 0));
+  CU_ASSERT_FALSE(IsMulOverflow_size_t(0, 5));
 }
 
-static void is_mul_overflow_size_t_no_overflow() {
-  CU_ASSERT_FALSE(is_mul_overflow_size_t(200, 200));
-  CU_ASSERT_FALSE(is_mul_overflow_size_t(SIZE_MAX, 1));
+static void IsMulOverflow_size_t_no_overflow() {
+  CU_ASSERT_FALSE(IsMulOverflow_size_t(200, 200));
+  CU_ASSERT_FALSE(IsMulOverflow_size_t(SIZE_MAX, 1));
 }
 
-static void is_mul_overflow_size_t_overflow() {
-  CU_ASSERT_TRUE(is_mul_overflow_size_t(SIZE_MAX, 2));
+static void IsMulOverflow_size_t_overflow() {
+  CU_ASSERT_TRUE(IsMulOverflow_size_t(SIZE_MAX, 2));
 }
 
 static void is_add_overflow_size_t_no_overflow() {
@@ -69,9 +69,9 @@ static void is_mul_overflow_ulong_overflow() {
 
 int RegisterOverflowTests() {
   CU_TestInfo size_t_tests[] = {
-      CU_TEST_INFO(is_mul_overflow_size_t_zero),
-      CU_TEST_INFO(is_mul_overflow_size_t_no_overflow),
-      CU_TEST_INFO(is_mul_overflow_size_t_overflow),
+      CU_TEST_INFO(IsMulOverflow_size_t_zero),
+      CU_TEST_INFO(IsMulOverflow_size_t_no_overflow),
+      CU_TEST_INFO(IsMulOverflow_size_t_overflow),
       CU_TEST_INFO(is_add_overflow_size_t_overflow),
       CU_TEST_INFO(is_add_overflow_size_t_no_overflow),
       CU_TEST_INFO_NULL};

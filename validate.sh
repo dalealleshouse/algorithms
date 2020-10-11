@@ -39,20 +39,15 @@ print_success "Compilation Database Created"
 cpplint src/*.c
 cpplint src/list_data_structures/*.[ch]
 cpplint src/data_structures/*.[ch]
-cpplint locality/*.c
+cpplint locality/*.[ch]
 print_success "Lint Passed"
 
 # TODO: clang-tidy
 # make tidy
 clang-tidy src/test_runner.c
-
 clang-tidy src/list_data_structures/*.[ch]
-clang-tidy src/data_structures/stack.[ch]
-clang-tidy src/data_structures/stack_test.c
-clang-tidy src/data_structures/queue.[ch]
-clang-tidy src/data_structures/queue_test.c
-
-clang-tidy locality/*.c
+clang-tidy src/data_structures/*.[ch]
+clang-tidy locality/*.[ch]
 print_success "Tidy Static Analysis Passed"
 
 # Build with undefined and address clang sanitizers and run all tests

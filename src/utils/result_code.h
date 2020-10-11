@@ -28,6 +28,8 @@
   }
 
 typedef enum Result {
+  kUnderflow = -14,
+  kOverflow = -13,
   kSystemError = -12,
   kSecurityError = -11,
   kOutputPointerIsNotNull = -10,
