@@ -119,7 +119,7 @@ static void Queue_Dequeue_empty() {
   SUT({
     void* result = NULL;
     ResultCode result_code = Queue_Dequeue(sut, &result);
-    CU_ASSERT_EQUAL(kEmpty, result_code);
+    CU_ASSERT_EQUAL(kUnderflow, result_code);
     CU_ASSERT_PTR_NULL(result);
   });
 }
@@ -186,7 +186,7 @@ static void Queue_Dequeue_heap_pointers() {
   free(third);
 }
 
-/************************** Queue_IskEmpty ************************************/
+/************************** Queue_IsEmpty *************************************/
 static void Queue_IsEmtpy_null_parameter() {
   bool result = Queue_IsEmpty(NULL);
   CU_ASSERT_EQUAL(true, result);

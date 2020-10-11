@@ -1,10 +1,10 @@
-/*******************************************************************************
- * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
- *  dale@alleshouse.net https://hideoushumpbackfreak.com/
- *
- * This file is subject to the terms and conditions defined in the 'LICENSE'
- * file, which is part of this source code package.
- ******************************************************************************/
+  /*******************************************************************************
+  * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+  *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+  *
+  * This file is subject to the terms and conditions defined in the 'LICENSE'
+  * file, which is part of this source code package.
+  ******************************************************************************/
 #include "./stack.h"
 
 #include <stdlib.h>
@@ -126,7 +126,7 @@ static void Stack_Pop_empty() {
     void* result = NULL;
     ResultCode result_code = Stack_Pop(sut, &result);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(result_code, kEmpty);
+    CU_ASSERT_EQUAL(result_code, kUnderflow);
   });
 }
 
