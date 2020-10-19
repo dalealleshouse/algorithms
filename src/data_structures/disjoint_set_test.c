@@ -213,7 +213,8 @@ static void DisjointSet_FindSet_compresses_paths() {
     // of 0 and all others will have a path length of 1
     for (size_t i = 0; i < 10; i++) {
       uintptr_t val = (uintptr_t)&vals[i];
-      set = HashTable_Find(sut.items, &val, sizeof(void*));
+      set = NULL;
+      HashTable_Get(sut.items, &val, sizeof(void*), (void**)&set);
       size_t path_len = _getPathLength(set);
 
       if (set == rep) {

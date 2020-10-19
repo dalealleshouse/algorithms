@@ -13,11 +13,11 @@ static void SetItem_Destory(void* item) { free(item); }
 
 Result DisjointSet_Init(DisjointSet* self, const size_t n) {
   if (self == NULL) return kNullParameter;
-
   if (n <= 1) return kArgumentOutOfRange;
 
-  self->items = HashTable_Create(n);
-  if (self->items == NULL) return kFailedMemoryAllocation;
+  self->items = NULL;
+  ResultCode result_code = HashTable_Create(n, &self->items);
+  if (result_code != kSuccess) return result_code;
 
   self->num_sets = 0;
 
@@ -37,7 +37,7 @@ Result DisjointSet_MakeSet(DisjointSet* self, const void* rep, SetItem** set) {
   item->payload = rep;
   ++self->num_sets;
 
-  Result result = HashTable_Insert(self->items, &rep, sizeof(void*), item);
+  Result result = HashTable_Put(self->items, &rep, sizeof(void*), item);
   if (result != kSuccess) {
     SetItem_Destory(item);
     return result;
@@ -51,8 +51,10 @@ Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
                            SetItem** set) {
   if (self == NULL || item == NULL || set == NULL) return kNullParameter;
 
-  SetItem* _set = HashTable_Find(self->items, &item, sizeof(void*));
-  if (_set == NULL) return kNotFound;
+  SetItem* _set = NULL;
+  ResultCode result_code =
+      HashTable_Get(self->items, &item, sizeof(void*), (void**)&_set);
+  if (result_code != kSuccess) return result_code;
 
   if (_set != _set->parent) {
     // Path compression - go ahead and set to the immediate parent to

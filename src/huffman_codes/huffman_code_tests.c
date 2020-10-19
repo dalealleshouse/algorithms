@@ -114,13 +114,17 @@ static SymbolFreq* _createSymbolFreq(char* input) {
   size_t n = strlen(input);  // Don't do this in production code, a non null
                              // terminated string can wreak havoc
 
-  HashTable* ht = HashTable_Create(n);
+  HashTable* ht = NULL;
+  ResultCode result_code = HashTable_Create(n, &ht);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
   for (size_t i = 0; i < n; i++) {
-    size_t* freq = HashTable_Find(ht, &input[i], 1);
+    size_t* freq = NULL;
+    HashTable_Get(ht, &input[i], 1, (void**)&freq);
     if (freq == NULL) {
       freq = malloc(sizeof(size_t));
       *freq = 1;
-      HashTable_Insert(ht, &input[i], 1, freq);
+      HashTable_Put(ht, &input[i], 1, freq);
     } else {
       ++*freq;
     }

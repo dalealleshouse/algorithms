@@ -10,138 +10,157 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "../utils/error_reporter.h"
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
 
 const size_t n = 16384;
 static const double kEpsilon = 0.0000000000001;
 
-#define SUT(code_block)                   \
-  {                                       \
-    HashTable* sut = HashTable_Create(n); \
-    code_block;                           \
-    HashTable_Destroy(sut, NULL);         \
+#define SUT(code_block)                                 \
+  {                                                     \
+    HashTable* sut = NULL;                              \
+    ResultCode result_code = HashTable_Create(n, &sut); \
+    CU_ASSERT_EQUAL(result_code, kSuccess);             \
+    code_block;                                         \
+    HashTable_Destroy(sut, NULL);                       \
   }
 
+static void VerifyGet(HashTable* sut, void* key, size_t size, void* expected) {
+  void* actual = NULL;
+  ResultCode result_code = HashTable_Get(sut, key, size, &actual);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+  CU_ASSERT_PTR_EQUAL(expected, actual);
+}
+
 static void HashTable_Create_failed_malloc() {
+#if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
-    HashTable* result = HashTable_Create(8);
+    HashTable* result = NULL;
+    ResultCode result_code = HashTable_Create(8, &result);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
   });
+#endif
 }
 
 static void HashTable_Create_invalid_size() {
-  ErrorReporter_Clear();
-  HashTable* sut = HashTable_Create(0);
+  HashTable* sut = NULL;
+  ResultCode result_code = HashTable_Create(0, &sut);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(kArgumentOutOfRange, ErrorReporter_LastErrorCode());
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
 }
 
 static void HashTable_Create_happy_path() {
-  HashTable* sut = HashTable_Create(16384);
+  HashTable* sut = NULL;
+  ResultCode result_code = HashTable_Create(16384, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_PTR_NOT_NULL(sut);
   HashTable_Destroy(sut, NULL);
 }
 
-static void HashTable_Insert_null_parameter() {
+static void HashTable_Put_null_parameter() {
   char* key = "we are";
   int value = 138;
 
-  Result result = HashTable_Insert(NULL, NULL, 10, NULL);
+  Result result = HashTable_Put(NULL, NULL, 10, NULL);
   CU_ASSERT_EQUAL(kNullParameter, result);
 
-  result = HashTable_Insert(NULL, key, strlen(key), &value);
+  result = HashTable_Put(NULL, key, strlen(key), &value);
   CU_ASSERT_EQUAL(kNullParameter, result);
 
   SUT({
-    result = HashTable_Insert(sut, NULL, 10, &value);
+    result = HashTable_Put(sut, NULL, 10, &value);
     CU_ASSERT_EQUAL(kNullParameter, result);
 
-    result = HashTable_Insert(sut, key, strlen(key), NULL);
+    result = HashTable_Put(sut, key, strlen(key), NULL);
     CU_ASSERT_EQUAL(kNullParameter, result);
   });
 }
 
-static void HashTable_Insert_failed_malloc() {
+static void HashTable_Put_failed_malloc() {
   char* key = "we are";
   int value = 138;
 
   SUT({
     FAILED_MALLOC_TEST({
-      Result result = HashTable_Insert(sut, key, strlen(key), &value);
+      Result result = HashTable_Put(sut, key, strlen(key), &value);
       CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
     });
   });
 }
 
-static void HashTable_Insert_happy_path() {
+static void HashTable_Put_happy_path() {
   char* key = "we are";
   int value = 138;
 
   SUT({
     CU_ASSERT_EQUAL(0, HashTable_GetN(sut));
-    Result result = HashTable_Insert(sut, key, strlen(key), &value);
+    Result result = HashTable_Put(sut, key, strlen(key), &value);
     CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(1, HashTable_GetN(sut));
 
-    void* found = HashTable_Find(sut, key, strlen(key));
+    void* found = NULL;
+    ResultCode result_code = HashTable_Get(sut, key, strlen(key), &found);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
     CU_ASSERT_PTR_EQUAL(found, &value);
   });
 }
 
-static void HashTable_Insert_chains() {
+static void HashTable_Put_chains() {
   int *one = malloc(sizeof(int)), *two = malloc(sizeof(int)),
       *three = malloc(sizeof(int));
   char *one_key = "one", *two_key = "two", *three_key = "three";
-  HashTable* sut = HashTable_Create(2);
+  HashTable* sut = NULL;
+  ResultCode result_code = HashTable_Create(2, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  HashTable_Insert(sut, one_key, strlen(one_key), one);
-  HashTable_Insert(sut, two_key, strlen(two_key), two);
-  HashTable_Insert(sut, three_key, strlen(three_key), three);
+  HashTable_Put(sut, one_key, strlen(one_key), one);
+  HashTable_Put(sut, two_key, strlen(two_key), two);
+  HashTable_Put(sut, three_key, strlen(three_key), three);
 
   CU_ASSERT_EQUAL(HashTable_GetLoadFactor(sut), 1.5);
-  CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, one_key, strlen(one_key)), one);
-  CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, two_key, strlen(two_key)), two);
-  CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, three_key, strlen(three_key)), three);
+  VerifyGet(sut, one_key, strlen(one_key), one);
+  VerifyGet(sut, two_key, strlen(two_key), two);
+  VerifyGet(sut, three_key, strlen(three_key), three);
 
   HashTable_Destroy(sut, free);
 }
 
-static void HashTable_Insert_updates_existing() {
+static void HashTable_Put_updates_existing() {
   char* key = "we are";
   int first = 138;
   int second = 1380138;
   SUT({
-    HashTable_Insert(sut, key, strlen(key), &first);
-    CU_ASSERT_EQUAL(HashTable_Find(sut, key, strlen(key)), &first);
+    HashTable_Put(sut, key, strlen(key), &first);
+    VerifyGet(sut, key, strlen(key), &first);
+    /* CU_ASSERT_EQUAL(HashTable_Get(sut, key, strlen(key)), &first); */
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 1);
 
-    HashTable_Insert(sut, key, strlen(key), &second);
-    CU_ASSERT_EQUAL(HashTable_Find(sut, key, strlen(key)), &second);
+    HashTable_Put(sut, key, strlen(key), &second);
+    VerifyGet(sut, key, strlen(key), &second);
+    /* CU_ASSERT_EQUAL(HashTable_Get(sut, key, strlen(key)), &second); */
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 1);
   });
 }
 
-static void HashTable_Delete_null_parameter() {
+static void HashTable_Remove_null_parameter() {
   char* key = "we are";
 
-  Result result = HashTable_Delete(NULL, NULL, 10);
+  Result result = HashTable_Remove(NULL, NULL, 10);
   CU_ASSERT_EQUAL(kNullParameter, result);
 
-  result = HashTable_Delete(NULL, key, 10);
+  result = HashTable_Remove(NULL, key, 10);
   CU_ASSERT_EQUAL(kNullParameter, result);
 
   SUT({
-    result = HashTable_Delete(sut, NULL, 10);
+    result = HashTable_Remove(sut, NULL, 10);
     CU_ASSERT_EQUAL(kNullParameter, result);
   });
 }
 
-static void HashTable_Delete_not_found() {
+static void HashTable_Remove_not_found() {
   int value = 5;
   char* key = "some key";
   char* key2 = "some other key";
@@ -149,18 +168,18 @@ static void HashTable_Delete_not_found() {
   char* key4 = "401 not found";
 
   SUT({
-    HashTable_Insert(sut, key, strlen(key), &value);
-    HashTable_Insert(sut, key2, strlen(key), &value);
-    HashTable_Insert(sut, key3, strlen(key), &value);
+    HashTable_Put(sut, key, strlen(key), &value);
+    HashTable_Put(sut, key2, strlen(key), &value);
+    HashTable_Put(sut, key3, strlen(key), &value);
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 3);
 
-    Result result = HashTable_Delete(sut, key4, strlen(key4));
+    Result result = HashTable_Remove(sut, key4, strlen(key4));
     CU_ASSERT_EQUAL(result, kNotFound);
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 3);
   });
 }
 
-static void HashTable_Delete_happy_path() {
+static void HashTable_Remove_happy_path() {
   char* key = "we are";
   char* key2 = "some key";
   char* key3 = "some other key";
@@ -168,25 +187,24 @@ static void HashTable_Delete_happy_path() {
   int value = 138;
 
   SUT({
-    HashTable_Insert(sut, key2, strlen(key2), &value);
-    HashTable_Insert(sut, key3, strlen(key3), &value);
-    HashTable_Insert(sut, key4, strlen(key4), &value);
-    HashTable_Insert(sut, key, strlen(key), &value);
+    HashTable_Put(sut, key2, strlen(key2), &value);
+    HashTable_Put(sut, key3, strlen(key3), &value);
+    HashTable_Put(sut, key4, strlen(key4), &value);
+    HashTable_Put(sut, key, strlen(key), &value);
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 4);
 
-    Result result = HashTable_Delete(sut, key, strlen(key));
+    Result result = HashTable_Remove(sut, key, strlen(key));
     CU_ASSERT_EQUAL(result, kSuccess);
     CU_ASSERT_EQUAL(HashTable_GetN(sut), 3);
-    void* found = HashTable_Find(sut, key, strlen(key));
+    void* found = NULL;
+    HashTable_Get(sut, key, strlen(key), &found);
     CU_ASSERT_PTR_NULL(found);
   });
 }
 
 static void HashTable_GetLoadFactor_null_parameter() {
-  ErrorReporter_Clear();
   double result = HashTable_GetLoadFactor(NULL);
   CU_ASSERT(isnan(result));
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 }
 
 static void HashTable_GetLoadFactor_happy_path() {
@@ -199,7 +217,7 @@ static void HashTable_GetLoadFactor_happy_path() {
 
     char key[2] = "!";
     for (size_t i = 0; i < num_keys; i++) {
-      HashTable_Insert(sut, key, strlen(key), &value);
+      HashTable_Put(sut, key, strlen(key), &value);
       key[0]++;
     }
 
@@ -212,44 +230,41 @@ static void HashTable_GetLoadFactor_happy_path() {
 }
 
 static void HashTable_GetN_null_paramter() {
-  ErrorReporter_Clear();
   size_t result = HashTable_GetN(NULL);
-  CU_ASSERT_EQUAL(result, ERROR_VAL);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
+  CU_ASSERT_EQUAL(result, 0);
 }
 
-static void HashTable_Find_null_parameter() {
+static void HashTable_Get_null_parameter() {
   char* key = "42";
 
-  ErrorReporter_Clear();
-  void* result = HashTable_Find(NULL, NULL, 10);
+  void* result = NULL;
+  ResultCode result_code = HashTable_Get(NULL, NULL, 10, &result);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
   CU_ASSERT_EQUAL(NULL, result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
-  ErrorReporter_Clear();
-  result = HashTable_Find(NULL, key, 10);
+  result_code = HashTable_Get(NULL, key, 10, &result);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
   CU_ASSERT_EQUAL(NULL, result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   SUT({
-    ErrorReporter_Clear();
-    void* result = HashTable_Find(sut, NULL, 10);
+    result_code = HashTable_Get(sut, NULL, 10, &result);
     CU_ASSERT_EQUAL(NULL, result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
+    CU_ASSERT_EQUAL(kNullParameter, result_code);
   });
 }
 
-static void HashTable_Find_not_found() {
+static void HashTable_Get_not_found() {
   char* not_found = "401";
   SUT({
-    ErrorReporter_Clear();
-    void* result = HashTable_Find(sut, not_found, strlen(not_found));
+    void* result = NULL;
+    ResultCode result_code =
+        HashTable_Get(sut, not_found, strlen(not_found), &result);
+    CU_ASSERT_EQUAL(kNotFound, result_code);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
   });
 }
 
-static void HashTable_Find_happy_path() {
+static void HashTable_Get_happy_path() {
   int one = 1;
   int two = 2;
 
@@ -257,14 +272,11 @@ static void HashTable_Find_happy_path() {
   char* key_two = "two";
 
   SUT({
-    HashTable_Insert(sut, key_one, strlen(key_one), &one);
-    HashTable_Insert(sut, key_two, strlen(key_two), &two);
+    HashTable_Put(sut, key_one, strlen(key_one), &one);
+    HashTable_Put(sut, key_two, strlen(key_two), &two);
 
-    void* result = HashTable_Find(sut, key_one, strlen(key_one));
-    CU_ASSERT_PTR_EQUAL(result, &one);
-
-    result = HashTable_Find(sut, key_two, strlen(key_two));
-    CU_ASSERT_PTR_EQUAL(result, &two);
+    VerifyGet(sut, key_one, strlen(key_one), &one);
+    VerifyGet(sut, key_two, strlen(key_two), &two);
   });
 }
 
@@ -277,9 +289,12 @@ static void HashTable_Destroy_frees_items() {
   char* key_two = "two";
 
   // failures will get caught by address sanitizer
-  HashTable* sut = HashTable_Create(n);
-  HashTable_Insert(sut, key_one, strlen(key_one), one);
-  HashTable_Insert(sut, key_two, strlen(key_two), two);
+  HashTable* sut = NULL;
+  ResultCode result_code = HashTable_Create(n, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  HashTable_Put(sut, key_one, strlen(key_one), one);
+  HashTable_Put(sut, key_two, strlen(key_two), two);
   HashTable_Destroy(sut, free);
 }
 
@@ -290,13 +305,13 @@ static void HashTable_int_keys() {
   char* value2 = "we are, we are";
 
   SUT({
-    Result result = HashTable_Insert(sut, &key, sizeof(int), value);
+    Result result = HashTable_Put(sut, &key, sizeof(int), value);
     CU_ASSERT_EQUAL(result, kSuccess);
-    result = HashTable_Insert(sut, &key2, sizeof(int), value2);
+    result = HashTable_Put(sut, &key2, sizeof(int), value2);
     CU_ASSERT_EQUAL(result, kSuccess);
 
-    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key, sizeof(int)), value);
-    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key2, sizeof(int)), value2);
+    VerifyGet(sut, &key, sizeof(int), value);
+    VerifyGet(sut, &key2, sizeof(int), value2);
   });
 }
 
@@ -307,32 +322,32 @@ static void HashTable_long_keys() {
   char* value2 = "we are, we are";
 
   SUT({
-    Result result = HashTable_Insert(sut, &key, sizeof(int64_t), value);
+    Result result = HashTable_Put(sut, &key, sizeof(int64_t), value);
     CU_ASSERT_EQUAL(result, kSuccess);
-    result = HashTable_Insert(sut, &key2, sizeof(int64_t), value2);
+    result = HashTable_Put(sut, &key2, sizeof(int64_t), value2);
     CU_ASSERT_EQUAL(result, kSuccess);
 
-    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key, sizeof(int64_t)), value);
-    CU_ASSERT_PTR_EQUAL(HashTable_Find(sut, &key2, sizeof(int64_t)), value2);
+    VerifyGet(sut, &key, sizeof(int64_t), value);
+    VerifyGet(sut, &key2, sizeof(int64_t), value2);
   });
 }
 
 static void HashTable_GetCollisions_null_parameter() {
-  ErrorReporter_Clear();
   size_t result = HashTable_GetCollisions(NULL);
-  CU_ASSERT_EQUAL(result, ERROR_VAL);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
+  CU_ASSERT_EQUAL(result, 0);
 }
 
 static void HashTable_GetCollisions_happy_path() {
   int *one = malloc(sizeof(int)), *two = malloc(sizeof(int)),
       *three = malloc(sizeof(int));
   char *one_key = "one", *two_key = "two", *three_key = "three";
-  HashTable* sut = HashTable_Create(2);
+  HashTable* sut = NULL;
+  ResultCode result_code = HashTable_Create(2, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  HashTable_Insert(sut, one_key, strlen(one_key), one);
-  HashTable_Insert(sut, two_key, strlen(two_key), two);
-  HashTable_Insert(sut, three_key, strlen(three_key), three);
+  HashTable_Put(sut, one_key, strlen(one_key), one);
+  HashTable_Put(sut, two_key, strlen(two_key), two);
+  HashTable_Put(sut, three_key, strlen(three_key), three);
 
   CU_ASSERT_EQUAL(HashTable_GetCollisions(sut), 1);
 
@@ -344,16 +359,13 @@ static void HashTable_KeyExists_null_parameter() {
 
   bool result = HashTable_KeyExists(NULL, NULL, 10);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   result = HashTable_KeyExists(NULL, key, 10);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   SUT({
     result = HashTable_KeyExists(sut, NULL, 10);
     CU_ASSERT_FALSE(result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
   });
 }
 
@@ -361,24 +373,20 @@ static void HashTable_KeyExists_returns_true_when_item_exists() {
   char* key = "we are";
   int value = 138;
 
-  ErrorReporter_Clear();
   SUT({
-    HashTable_Insert(sut, key, strlen(key), &value);
+    HashTable_Put(sut, key, strlen(key), &value);
 
     bool found = HashTable_KeyExists(sut, key, strlen(key));
     CU_ASSERT_TRUE(found);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
   });
 }
 
 static void HashTable_KeyExists_returns_false_when_item_does_not_exist() {
   char* key = "we are";
 
-  ErrorReporter_Clear();
   SUT({
     bool found = HashTable_KeyExists(sut, key, strlen(key));
     CU_ASSERT_FALSE(found);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), 0);
   });
 }
 
@@ -400,8 +408,8 @@ static void HashTable_Enumerate_happy_path() {
   int context = 0;
 
   SUT({
-    HashTable_Insert(sut, key, strlen(key), &value);
-    HashTable_Insert(sut, key2, strlen(key2), &value2);
+    HashTable_Put(sut, key, strlen(key), &value);
+    HashTable_Put(sut, key2, strlen(key2), &value2);
 
     HashTable_Enumerate(sut, _itemHandler, &context);
 
@@ -417,20 +425,20 @@ int RegisterHashTableTests() {
       CU_TEST_INFO(HashTable_Create_failed_malloc),
       CU_TEST_INFO(HashTable_Create_invalid_size),
       CU_TEST_INFO(HashTable_Create_happy_path),
-      CU_TEST_INFO(HashTable_Insert_null_parameter),
-      CU_TEST_INFO(HashTable_Insert_failed_malloc),
-      CU_TEST_INFO(HashTable_Insert_happy_path),
-      CU_TEST_INFO(HashTable_Insert_chains),
-      CU_TEST_INFO(HashTable_Insert_updates_existing),
-      CU_TEST_INFO(HashTable_Delete_not_found),
-      CU_TEST_INFO(HashTable_Delete_null_parameter),
-      CU_TEST_INFO(HashTable_Delete_happy_path),
+      CU_TEST_INFO(HashTable_Put_null_parameter),
+      CU_TEST_INFO(HashTable_Put_failed_malloc),
+      CU_TEST_INFO(HashTable_Put_happy_path),
+      CU_TEST_INFO(HashTable_Put_chains),
+      CU_TEST_INFO(HashTable_Put_updates_existing),
+      CU_TEST_INFO(HashTable_Remove_not_found),
+      CU_TEST_INFO(HashTable_Remove_null_parameter),
+      CU_TEST_INFO(HashTable_Remove_happy_path),
       CU_TEST_INFO(HashTable_GetLoadFactor_null_parameter),
       CU_TEST_INFO(HashTable_GetLoadFactor_happy_path),
       CU_TEST_INFO(HashTable_GetN_null_paramter),
-      CU_TEST_INFO(HashTable_Find_null_parameter),
-      CU_TEST_INFO(HashTable_Find_not_found),
-      CU_TEST_INFO(HashTable_Find_happy_path),
+      CU_TEST_INFO(HashTable_Get_null_parameter),
+      CU_TEST_INFO(HashTable_Get_not_found),
+      CU_TEST_INFO(HashTable_Get_happy_path),
       CU_TEST_INFO(HashTable_Destroy_null),
       CU_TEST_INFO(HashTable_Destroy_frees_items),
       CU_TEST_INFO(HashTable_int_keys),
