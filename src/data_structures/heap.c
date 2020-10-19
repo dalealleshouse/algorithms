@@ -34,7 +34,11 @@ static size_t ChildIndex(size_t index) {
 
 static ResultCode SetDataItem(Heap* self, void* item, size_t index) {
   // Clean up whatever is in the current slot
-  void* existing = HashTable_Find(self->item_tracker, &item, sizeof(void*));
+  void* existing = NULL;
+  ResultCode result_code =
+      HashTable_Get(self->item_tracker, &item, sizeof(void*), &existing);
+  if (result_code != kSuccess && result_code != kNotFound) return result_code;
+
   free(existing);
 
   // Geta a new index
@@ -43,7 +47,7 @@ static ResultCode SetDataItem(Heap* self, void* item, size_t index) {
 
   // Set the index in the hash table
   *i = index;
-  HashTable_Insert(self->item_tracker, &item, sizeof(void*), i);
+  HashTable_Put(self->item_tracker, &item, sizeof(void*), i);
 
   // Update the data
   self->data[index] = item;
@@ -125,10 +129,10 @@ ResultCode Heap_Create(size_t size, comparator comparator, Heap** self) {
     return kFailedMemoryAllocation;
   }
 
-  heap->item_tracker = HashTable_Create(size);
-  if (heap->item_tracker == NULL) {
+  ResultCode result_code = HashTable_Create(size, &heap->item_tracker);
+  if (result_code != kSuccess) {
     Heap_Destroy(heap, NULL);
-    return kFailedMemoryAllocation;
+    return result_code;
   }
 
   heap->size = size;
@@ -216,16 +220,20 @@ bool Heap_IsEmpty(Heap* self) {
 
 bool Heap_Exists(Heap* self, void* findMe) {
   if (self == NULL || findMe == NULL) return false;
-  void* found = HashTable_Find(self->item_tracker, &findMe, sizeof(void*));
+  void* found = NULL;
+  ResultCode result_code =
+      HashTable_Get(self->item_tracker, &findMe, sizeof(void*), &found);
 
-  return found != NULL;
+  return result_code == kSuccess;
 }
 
 ResultCode Heap_Reproiritize(Heap* self, void* item) {
   if (self == NULL || item == NULL) return kNullParameter;
 
-  size_t* index = HashTable_Find(self->item_tracker, &item, sizeof(void*));
-  if (index == NULL) return kNotFound;
+  size_t* index = NULL;
+  ResultCode result_code =
+      HashTable_Get(self->item_tracker, &item, sizeof(void*), (void**)&index);
+  if (result_code != kSuccess) return result_code;
 
   // Index is the first item in queue, so it can only go down
   if (*index == 0) return BubbleDown(self, *index);

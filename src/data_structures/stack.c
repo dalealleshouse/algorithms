@@ -52,7 +52,7 @@ ResultCode Stack_Push(Stack* self, void* item) {
 ResultCode Stack_Pop(Stack* self, void** result) {
   if (self == NULL || result == NULL) return kNullParameter;
   if (*result != NULL) return kOutputPointerIsNotNull;
-  if (self->n == 0) return kEmpty;
+  if (self->n == 0) return kUnderflow;
 
   void* item = self->head->payload;
   if (self->n == 1) {

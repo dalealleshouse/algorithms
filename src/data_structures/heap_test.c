@@ -157,9 +157,12 @@ static void Heap_Insert_first_item() {
   ResultCode result_code = Heap_Create(size, TestComparator, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  ResultCode result = Heap_Insert(sut, &obj);
+  result_code = Heap_Insert(sut, &obj);
 
-  CU_ASSERT_EQUAL(kSuccess, result);
+  printf("Result Code %d = %s\n\n", result_code,
+         Result_ErrorMessage(result_code));
+
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_EQUAL(&obj, sut->data[0]);
   CU_ASSERT_EQUAL(1, sut->n);
 

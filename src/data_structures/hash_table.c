@@ -16,7 +16,6 @@
 #include "hash_functions.h"
 #include "linked_list.h"
 
-const size_t ERROR_VAL = SIZE_MAX;
 const hasher hash_func = farm_hash;
 const hash_compressor compressor = mul_compressor64;
 
@@ -93,33 +92,27 @@ static KeyValuePair* search_list(LinkedList* list, void* key,
   return result;
 }
 
-HashTable* HashTable_Create(size_t size) {
-  if (size == 0) {
-    ERROR("HashTable", kArgumentOutOfRange);
-    return NULL;
-  }
+ResultCode HashTable_Create(size_t size, HashTable** self) {
+  if (size == 0) return kArgumentOutOfRange;
 
   size_t valid_size = _nextPowerOf2(size);
 
   HashTable* ht = calloc(sizeof(HashTable), 1);
-  if (ht == NULL) {
-    ERROR("HashTable", kFailedMemoryAllocation);
-    return NULL;
-  }
+  if (ht == NULL) return kFailedMemoryAllocation;
 
   ht->table = calloc(sizeof(void*), valid_size);
   if (ht->table == NULL) {
-    ERROR("HashTable", kFailedMemoryAllocation);
     HashTable_Destroy(ht, NULL);
-    return NULL;
+    return kFailedMemoryAllocation;
   }
 
   ht->collisons = 0;
   ht->m = size;
-  return ht;
+  *self = ht;
+  return kSuccess;
 }
 
-Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
+Result HashTable_Put(HashTable* self, void* key, size_t len, void* value) {
   if (self == NULL || key == NULL || value == NULL) return kNullParameter;
 
   size_t index = generate_index(key, len, self->m);
@@ -161,24 +154,18 @@ Result HashTable_Insert(HashTable* self, void* key, size_t len, void* value) {
 }
 
 size_t HashTable_GetN(HashTable* self) {
-  if (self == NULL) {
-    ERROR("HashTable", kNullParameter);
-    return ERROR_VAL;
-  }
+  if (self == NULL) return 0;
 
   return self->n;
 }
 
 size_t HashTable_GetCollisions(HashTable* self) {
-  if (self == NULL) {
-    ERROR("HashTable", kNullParameter);
-    return ERROR_VAL;
-  }
+  if (self == NULL) return 0;
 
   return self->collisons;
 }
 
-Result HashTable_Delete(HashTable* self, void* key, size_t len) {
+Result HashTable_Remove(HashTable* self, void* key, size_t len) {
   if (self == NULL || key == NULL) return kNullParameter;
 
   size_t index = generate_index(key, len, self->m);
@@ -198,19 +185,13 @@ Result HashTable_Delete(HashTable* self, void* key, size_t len) {
 }
 
 double HashTable_GetLoadFactor(HashTable* self) {
-  if (self == NULL) {
-    ERROR("HashTable", kNullParameter);
-    return NAN;
-  }
+  if (self == NULL) return NAN;
 
   return (double)self->n / (double)self->m;
 }
 
 bool HashTable_KeyExists(HashTable* self, void* key, size_t len) {
-  if (self == NULL || key == NULL) {
-    ERROR("HashTable", kNullParameter);
-    return false;
-  }
+  if (self == NULL || key == NULL) return false;
 
   size_t index = generate_index(key, len, self->m);
   LinkedList* ls = self->table[index];
@@ -226,26 +207,19 @@ bool HashTable_KeyExists(HashTable* self, void* key, size_t len) {
   return true;
 }
 
-void* HashTable_Find(HashTable* self, void* key, size_t len) {
-  if (self == NULL || key == NULL) {
-    ERROR("HashTable", kNullParameter);
-    return NULL;
-  }
+ResultCode HashTable_Get(HashTable* self, void* key, size_t len,
+                         void** result) {
+  if (self == NULL || key == NULL) return kNullParameter;
 
   size_t index = generate_index(key, len, self->m);
   LinkedList* ls = self->table[index];
-  if (ls == NULL) {
-    /*     ERROR("HashTable", kNotFound); */
-    return NULL;
-  }
+  if (ls == NULL) return kNotFound;
 
   KeyValuePair* el = search_list(ls, key, len);
-  if (el == NULL) {
-    /*     ERROR("HashTable", kNotFound); */
-    return NULL;
-  }
+  if (el == NULL) return kNotFound;
 
-  return el->value;
+  *result = el->value;
+  return kSuccess;
 }
 
 Result HashTable_Enumerate(HashTable* self, keyvaluehandler func,

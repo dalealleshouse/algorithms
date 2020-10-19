@@ -35,7 +35,6 @@ ResultCode Queue_Enqueue(Queue* self, void* item) {
   if (self == NULL || item == NULL) return kNullParameter;
 
   Queue_Item* q_item = calloc(sizeof(Queue_Item), 1);
-
   if (q_item == NULL) return kFailedMemoryAllocation;
 
   q_item->payload = item;
@@ -55,7 +54,7 @@ ResultCode Queue_Enqueue(Queue* self, void* item) {
 ResultCode Queue_Dequeue(Queue* self, void** result) {
   if (self == NULL || result == NULL) return kNullParameter;
   if (*result != NULL) return kOutputPointerIsNotNull;
-  if (self->n == 0) return kEmpty;
+  if (self->n == 0) return kUnderflow;
 
   void* item = self->head->payload;
   if (self->n == 1) {

@@ -5,7 +5,7 @@
  * This file is subject to the terms and conditions defined in the 'LICENSE'
  * file, which is part of this source code package.
  ******************************************************************************/
-#include "./stack.h"
+#include "stack.h"
 
 #include <stdlib.h>
 
@@ -126,7 +126,7 @@ static void Stack_Pop_empty() {
     void* result = NULL;
     ResultCode result_code = Stack_Pop(sut, &result);
     CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(result_code, kEmpty);
+    CU_ASSERT_EQUAL(result_code, kUnderflow);
   });
 }
 
