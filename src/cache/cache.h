@@ -27,7 +27,7 @@ ResultCode Cache_Create(size_t limit, freer freer, Cache**);
 
 /*
  * If key exists it cache, it will return it. If it does not, it will store the
- * item returned from producer in the cache. When the number of items in the
+ * item returned from <producer> in the cache. When the number of items in the
  * cache exceeds <limit>, it will purge the least recently used item
  *
  *  <key> = key to associate with the items
@@ -37,4 +37,8 @@ ResultCode Cache_Create(size_t limit, freer freer, Cache**);
  */
 ResultCode Cache_Get(Cache*, void* key, size_t key_size, producer,
                      void** result);
+
+/*
+ * Frees all memory, including items stored in the cache
+ */
 void Cache_Destroy(Cache*);
