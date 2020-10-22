@@ -5,18 +5,18 @@
  * This file is subject to the terms and conditions defined in the 'LICENSE'
  * file, which is part of this source code package.
  ******************************************************************************/
+
 #pragma once
 
 #include <stddef.h>
 
-#define FAILED_MALLOC_TEST(code_block)          \
-  {                                             \
-    InterceptMalloc();                          \
-    code_block;                                 \
-    CU_ASSERT_EQUAL(1, MallocInterceptCount()); \
-    ResetMalloc();                              \
-  }
+#include "comparators.h"
+#include "result_code.h"
 
-void InterceptMalloc();
-size_t MallocInterceptCount();
-void ResetMalloc();
+typedef void* (*producer)(const void* key, const size_t key_size);
+typedef struct Cache Cache;
+
+ResultCode Cache_Create(size_t limit, freer freer, Cache**);
+ResultCode Cache_Get(Cache*, void* key, size_t key_size, producer,
+                     void** result);
+void Cache_Destroy(Cache*);

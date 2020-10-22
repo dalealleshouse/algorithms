@@ -103,6 +103,9 @@ extern int RegisterMultiplySquareMatricesTests();
 // Quick Select
 extern int RegisterQuickSelectPartitionTests();
 
+// Cache
+extern int RegisterCacheTests();
+
 int RegisterTests() {
   return (
              // clang-format off
@@ -154,6 +157,7 @@ int RegisterTests() {
       RegisterIsPowerOfTwoTests() != 0 +
       RegisterMultiplySquareMatricesTests() != 0 +
       RegisterQuickSelectPartitionTests() != 0 +
+      RegisterCacheTests() != 0 +
       0) * -1;
   // clang-format on
 }
