@@ -29,24 +29,31 @@ typedef struct CacheItem {
 
 static int access_tracker = 0;
 
-static CacheItem* CacheItem_Create(void* payload, void* key, size_t key_size) {
-  CacheItem* ci = malloc(sizeof(CacheItem));
-  if (ci == NULL) return NULL;
-
-  ci->payload = payload;
-  ci->access_tracker = ++access_tracker;
-  ci->key = malloc(key_size);
-  memcpy(ci->key, key, key_size);
-  ci->key_size = key_size;
-  return ci;
-}
-
 static void CacheItem_Destory(CacheItem* ci, freer freer) {
   if (ci == NULL) return;
 
   free(ci->key);
   if (freer != NULL) freer(ci->payload);
   free(ci);
+}
+
+static ResultCode CacheItem_Create(void* payload, void* key, size_t key_size,
+                                   CacheItem** result) {
+  CacheItem* ci = malloc(sizeof(CacheItem));
+  if (ci == NULL) return kFailedMemoryAllocation;
+
+  ci->payload = payload;
+  ci->access_tracker = ++access_tracker;
+  ci->key = malloc(key_size);
+  if (ci->key == NULL) {
+    CacheItem_Destory(ci, NULL);
+    return kFailedMemoryAllocation;
+  }
+
+  memcpy(ci->key, key, key_size);
+  ci->key_size = key_size;
+  *result = ci;
+  return kSuccess;
 }
 
 static int CacheItemComparator(const void* x, const void* y) {
@@ -69,6 +76,7 @@ ResultCode Cache_Create(size_t limit, freer freer, Cache** self) {
   c->data = NULL;
   c->time_tracker = NULL;
   c->freer = freer;
+  c->limit = limit;
 
   ResultCode result_code = HashTable_Create(limit, &c->data);
   if (result_code != kSuccess) {
@@ -81,8 +89,6 @@ ResultCode Cache_Create(size_t limit, freer freer, Cache** self) {
     Cache_Destroy(c);
     return result_code;
   }
-
-  c->limit = limit;
 
   *self = c;
   return kSuccess;
@@ -98,20 +104,24 @@ ResultCode Cache_Get(Cache* self, void* key, size_t key_size, producer producer,
   if (*result != NULL) return kOutputPointerIsNotNull;
 
   ResultCode result_code;
-  // Retun the item from cache
+
+  // Return the item from cache if it exists
   if (HashTable_KeyExists(self->data, key, key_size)) {
     CacheItem* ci;
     result_code = HashTable_Get(self->data, key, key_size, (void**)&ci);
     if (result_code != kSuccess) return result_code;
 
+    // Update the last accessed variable
     ci->access_tracker = ++access_tracker;
     Heap_Reproiritize(self->time_tracker, ci);
     *result = ci->payload;
     return kSuccess;
   }
 
-  CacheItem* ci = CacheItem_Create(producer(key, key_size), key, key_size);
-  if (ci == NULL) return kFailedMemoryAllocation;
+  // Create a new cache item and add it to the cache
+  CacheItem* ci = NULL;
+  result_code = CacheItem_Create(producer(key, key_size), key, key_size, &ci);
+  if (result_code != kSuccess) return result_code;
 
   result_code = HashTable_Put(self->data, key, key_size, ci);
   if (result_code != kSuccess) return result_code;
@@ -121,7 +131,7 @@ ResultCode Cache_Get(Cache* self, void* key, size_t key_size, producer producer,
 
   *result = ci->payload;
 
-  // Remove items from the cache if there are too many
+  // Purge an item from the cache if there are too many
   if (HashTable_GetN(self->data) > self->limit) {
     ci = NULL;
     result_code = Heap_Extract(self->time_tracker, (void**)&ci);
@@ -147,6 +157,7 @@ static void HashFreer(const KeyValuePair* x, const size_t index,
 void Cache_Destroy(Cache* self) {
   if (self == NULL) return;
 
+  // Free all the existing cache items
   if (self->data != NULL && self->freer != NULL) {
     HashTable_Enumerate(self->data, HashFreer, (void*)self->freer);
   }
