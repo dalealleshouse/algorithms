@@ -7,8 +7,10 @@
  ******************************************************************************/
 #include "cache.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "hash_table.h"
 #include "heap.h"
@@ -24,10 +26,20 @@ typedef struct CacheItem {
   void* payload;
   void* key;
   size_t key_size;
-  int access_tracker;
+  int64_t last_accessed;
 } CacheItem;
 
-static int access_tracker = 0;
+static int64_t GetTimeStamp() {
+  struct timespec t;
+
+  int result = clock_gettime(CLOCK_REALTIME, &t);
+  if (result != 0) {
+    perror("Error generating time stamp");
+    return 0;
+  }
+
+  return (t.tv_sec) * (int64_t)1000000000 + (int64_t)(t.tv_nsec);
+}
 
 static void CacheItem_Destory(CacheItem* ci, freer freer) {
   if (ci == NULL) return;
@@ -37,13 +49,25 @@ static void CacheItem_Destory(CacheItem* ci, freer freer) {
   free(ci);
 }
 
+static ResultCode PurgeOldestItem(Cache* self) {
+  CacheItem* ci = NULL;
+  ResultCode result_code = Heap_Extract(self->time_tracker, (void**)&ci);
+  if (result_code != kSuccess) return result_code;
+
+  result_code = HashTable_Remove(self->data, ci->key, ci->key_size);
+  if (result_code != kSuccess) return result_code;
+
+  CacheItem_Destory(ci, self->freer);
+  return kSuccess;
+}
+
 static ResultCode CacheItem_Create(void* payload, void* key, size_t key_size,
                                    CacheItem** result) {
   CacheItem* ci = malloc(sizeof(CacheItem));
   if (ci == NULL) return kFailedMemoryAllocation;
 
   ci->payload = payload;
-  ci->access_tracker = ++access_tracker;
+  ci->last_accessed = GetTimeStamp();
   ci->key = malloc(key_size);
   if (ci->key == NULL) {
     CacheItem_Destory(ci, NULL);
@@ -60,9 +84,15 @@ static int CacheItemComparator(const void* x, const void* y) {
   CacheItem* _x = (CacheItem*)x;
   CacheItem* _y = (CacheItem*)y;
 
-  if (_x->access_tracker < _y->access_tracker) return 1;
-  if (_x->access_tracker > _y->access_tracker) return -1;
-  return 0;
+  return (int)(_y->last_accessed - _x->last_accessed);
+}
+
+static void HashFreer(const KeyValuePair* x, const size_t index,
+                      void* context) {
+  (void)index;
+
+  freer f = (freer)context;
+  CacheItem_Destory(x->value, f);
 }
 
 ResultCode Cache_Create(size_t limit, freer freer, Cache** self) {
@@ -112,7 +142,7 @@ ResultCode Cache_Get(Cache* self, void* key, size_t key_size, producer producer,
     if (result_code != kSuccess) return result_code;
 
     // Update the last accessed variable
-    ci->access_tracker = ++access_tracker;
+    ci->last_accessed = GetTimeStamp();
     Heap_Reproiritize(self->time_tracker, ci);
     *result = ci->payload;
     return kSuccess;
@@ -132,26 +162,9 @@ ResultCode Cache_Get(Cache* self, void* key, size_t key_size, producer producer,
   *result = ci->payload;
 
   // Purge an item from the cache if there are too many
-  if (HashTable_GetN(self->data) > self->limit) {
-    ci = NULL;
-    result_code = Heap_Extract(self->time_tracker, (void**)&ci);
-    if (result_code != kSuccess) return result_code;
-
-    result_code = HashTable_Remove(self->data, ci->key, ci->key_size);
-    if (result_code != kSuccess) return result_code;
-
-    CacheItem_Destory(ci, self->freer);
-  }
+  if (HashTable_GetN(self->data) > self->limit) return PurgeOldestItem(self);
 
   return kSuccess;
-}
-
-static void HashFreer(const KeyValuePair* x, const size_t index,
-                      void* context) {
-  (void)index;
-
-  freer f = (freer)context;
-  CacheItem_Destory(x->value, f);
 }
 
 void Cache_Destroy(Cache* self) {
