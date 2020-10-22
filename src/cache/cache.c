@@ -34,7 +34,7 @@ static int64_t GetTimeStamp() {
 
   int result = clock_gettime(CLOCK_REALTIME, &t);
   if (result != 0) {
-    perror("Error generating time stamp: ");
+    perror("Error generating time stamp");
     return 0;
   }
 
