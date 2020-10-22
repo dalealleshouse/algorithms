@@ -39,6 +39,7 @@ print_success "Compilation Database Created"
 cpplint src/*.c
 cpplint src/list_data_structures/*.[ch]
 cpplint src/data_structures/*.[ch]
+cpplint src/cache/*.[ch]
 cpplint locality/*.[ch]
 print_success "Lint Passed"
 
@@ -47,6 +48,7 @@ print_success "Lint Passed"
 clang-tidy src/test_runner.c
 clang-tidy src/list_data_structures/*.[ch]
 clang-tidy src/data_structures/*.[ch]
+clang-tidy src/cache/*.[ch]
 clang-tidy locality/*.[ch]
 print_success "Tidy Static Analysis Passed"
 
