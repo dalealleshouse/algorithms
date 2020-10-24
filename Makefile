@@ -10,7 +10,7 @@ SHAREDFLAGS	 = -std=c11 -D_POSIX_C_SOURCE=200809L -O3 -D NDEBUG -I src/utils -fP
 
 TARGET			= src/test_runner
 SHARED_TARGET	= algo.so
-SOURCES			= $(wildcard src/*.c src/*/*.c)
+SOURCES			= $(wildcard src/*.c src/*/*.c src/*/include/*.c)
 OBJECTS			= $(SOURCES:.c=.o)
 DEPS			= $(OBJECTS:.o=.d)
 

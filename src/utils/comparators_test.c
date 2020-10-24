@@ -1,7 +1,8 @@
-#include "./comparators.h"
-#include "./test_helpers.h"
+#include "comparators.h"
+
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
 
 static void PIntComparator_ReturnsZeroWhenEqual() {
   int x = 1;

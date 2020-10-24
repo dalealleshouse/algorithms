@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common_math.h"
 #include "hash_functions.h"
 #include "linked_list.h"
 
@@ -26,26 +27,12 @@ typedef struct HashTable {
   LinkedList** table;
 } HashTable;
 
-// Find a valid size for the hash table
-static size_t _nextPowerOf2(size_t val) {
-  size_t count = 0;
-
-  if (val && !(val & (val - 1))) return val;
-
-  while (val != 0) {
-    val >>= 1;
-    count += 1;
-  }
-
-  return 1 << count;
-}
-
-static size_t generate_index(void* key, size_t key_length, size_t max_index) {
+static size_t GenerateIndex(void* key, size_t key_length, size_t max_index) {
   hash h = hash_func(key, key_length);
   return compressor(h, max_index);
 }
 
-static int ele_comparator(const void* x, const void* y) {
+static int ElementComparator(const void* x, const void* y) {
   KeyValuePair* _x = (KeyValuePair*)x;
   KeyValuePair* _y = (KeyValuePair*)y;
 
@@ -54,7 +41,7 @@ static int ele_comparator(const void* x, const void* y) {
   return memcmp(_x->key, _y->key, _x->key_length);
 }
 
-static void KeyValuePair_destroy(void* el) {
+static void KeyValuePair_Destroy(void* el) {
   if (el == NULL) return;
 
   KeyValuePair* _el = (KeyValuePair*)el;
@@ -63,14 +50,14 @@ static void KeyValuePair_destroy(void* el) {
   free(_el);
 }
 
-static KeyValuePair* KeyValuePair_create(void* key, size_t key_length,
+static KeyValuePair* KeyValuePair_Create(void* key, size_t key_length,
                                          void* value) {
   KeyValuePair* el = malloc(sizeof(KeyValuePair));
   if (el == NULL) return NULL;
 
   el->key = malloc(key_length);
   if (el->key == NULL) {
-    KeyValuePair_destroy(el);
+    KeyValuePair_Destroy(el);
     return NULL;
   }
 
@@ -78,13 +65,11 @@ static KeyValuePair* KeyValuePair_create(void* key, size_t key_length,
   el->key_length = key_length;
   el->value = value;
 
-  /* printf("%s, %s, %zu\n", el->key, key, key_length); */
-
   return el;
 }
 
-static KeyValuePair* search_list(LinkedList* list, void* key,
-                                 size_t key_length) {
+static KeyValuePair* SearchList(LinkedList* list, void* key,
+                                size_t key_length) {
   KeyValuePair temp = {key, key_length, NULL};
   void* result = NULL;
 
@@ -95,7 +80,7 @@ static KeyValuePair* search_list(LinkedList* list, void* key,
 ResultCode HashTable_Create(size_t size, HashTable** self) {
   if (size == 0) return kArgumentOutOfRange;
 
-  size_t valid_size = _nextPowerOf2(size);
+  size_t valid_size = NextPowerOfTwo(size);
 
   HashTable* ht = calloc(sizeof(HashTable), 1);
   if (ht == NULL) return kFailedMemoryAllocation;
@@ -115,20 +100,20 @@ ResultCode HashTable_Create(size_t size, HashTable** self) {
 Result HashTable_Put(HashTable* self, void* key, size_t len, void* value) {
   if (self == NULL || key == NULL || value == NULL) return kNullParameter;
 
-  size_t index = generate_index(key, len, self->m);
+  size_t index = GenerateIndex(key, len, self->m);
 
   LinkedList* ls = self->table[index];
   KeyValuePair* el = NULL;
 
   if (ls == NULL) {
-    LinkedList_Create(KeyValuePair_destroy, ele_comparator,
+    LinkedList_Create(KeyValuePair_Destroy, ElementComparator,
                       &self->table[index]);
     if (self->table[index] == NULL) return kFailedMemoryAllocation;
 
     ls = self->table[index];
   } else {
     // search the list if already exists, otherwise, just leave el NULL
-    el = search_list(ls, key, len);
+    el = SearchList(ls, key, len);
 
     // if the list was found, but the item doesn't exit, it's a collision
     if (el == NULL) {
@@ -141,7 +126,7 @@ Result HashTable_Put(HashTable* self, void* key, size_t len, void* value) {
 
   // Insert the value if it exists, otherwise update it
   if (el == NULL) {
-    el = KeyValuePair_create(key, len, value);
+    el = KeyValuePair_Create(key, len, value);
     if (el == NULL) return kFailedMemoryAllocation;
 
     ResultCode result = LinkedList_InsertAt(ls, el, 0);
@@ -168,12 +153,12 @@ size_t HashTable_GetCollisions(HashTable* self) {
 Result HashTable_Remove(HashTable* self, void* key, size_t len) {
   if (self == NULL || key == NULL) return kNullParameter;
 
-  size_t index = generate_index(key, len, self->m);
+  size_t index = GenerateIndex(key, len, self->m);
   LinkedList* ls = self->table[index];
 
   if (ls == NULL) return kNotFound;
 
-  KeyValuePair* el = search_list(ls, key, len);
+  KeyValuePair* el = SearchList(ls, key, len);
   if (el == NULL) return kNotFound;
 
   KeyValuePair temp = {key, len, NULL};
@@ -193,13 +178,13 @@ double HashTable_GetLoadFactor(HashTable* self) {
 bool HashTable_KeyExists(HashTable* self, void* key, size_t len) {
   if (self == NULL || key == NULL) return false;
 
-  size_t index = generate_index(key, len, self->m);
+  size_t index = GenerateIndex(key, len, self->m);
   LinkedList* ls = self->table[index];
   if (ls == NULL) {
     return false;
   }
 
-  KeyValuePair* el = search_list(ls, key, len);
+  KeyValuePair* el = SearchList(ls, key, len);
   if (el == NULL) {
     return false;
   }
@@ -211,11 +196,11 @@ ResultCode HashTable_Get(HashTable* self, void* key, size_t len,
                          void** result) {
   if (self == NULL || key == NULL) return kNullParameter;
 
-  size_t index = generate_index(key, len, self->m);
+  size_t index = GenerateIndex(key, len, self->m);
   LinkedList* ls = self->table[index];
   if (ls == NULL) return kNotFound;
 
-  KeyValuePair* el = search_list(ls, key, len);
+  KeyValuePair* el = SearchList(ls, key, len);
   if (el == NULL) return kNotFound;
 
   *result = el->value;

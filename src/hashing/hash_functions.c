@@ -1,10 +1,17 @@
-#include "./hash_functions.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "hash_functions.h"
 
 #include <math.h>
 #include <stdio.h>
 
-#include "./farmhash.h"
-#include "./spooky.h"
+#include "include/farmhash.h"
+#include "include/spooky.h"
 
 static const hash seed_1 = 1480248131514916162;
 static const hash seed_2 = 4129361492271981247;

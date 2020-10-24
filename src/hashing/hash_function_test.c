@@ -1,8 +1,14 @@
-#include "../utils/error_reporter.h"
-#include "../utils/test_helpers.h"
-#include "./hash_functions.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "hash_functions.h"
+#include "test_helpers.h"
 
 static void test_hash_function(hasher func) {
   char* key = "meaning of life";
