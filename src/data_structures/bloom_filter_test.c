@@ -26,12 +26,14 @@ static const size_t bits = 512;
 static const size_t funcs = 7;
 
 static void BloomFilter_Create_failed_malloc() {
+#if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
     BloomFilter* sut = NULL;
     ResultCode result_code = BloomFilter_Create(bits, funcs, &sut);
     CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
     CU_ASSERT_PTR_NULL(sut);
   });
+#endif
 }
 
 static void BloomFilter_Create_invalid_bits() {
