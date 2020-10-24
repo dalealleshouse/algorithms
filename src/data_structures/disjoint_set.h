@@ -31,9 +31,9 @@ typedef struct DisjointSet {
  *          number of items may vary.
  *
  * returns:
- *  Result code indicating kkSuccess/failure status
+ *  Result code indicating kSuccess/failure status
  */
-Result DisjointSet_Init(DisjointSet* self, const size_t n);
+ResultCode DisjointSet_Init(DisjointSet* self, const size_t n);
 
 /*
  * Locates the sets where <x> and <y> reside and unions them if they are
@@ -45,9 +45,9 @@ Result DisjointSet_Init(DisjointSet* self, const size_t n);
  *  <y>:    The second item to locate
  *
  * returns:
- *  Result code indicating kkSuccess/failure status
+ *  Result code indicating kSuccess/failure status
  */
-Result DisjointSet_Union(DisjointSet* self, const void* x, const void* y);
+ResultCode DisjointSet_Union(DisjointSet* self, const void* x, const void* y);
 
 /*
  * Locates the sets where <item> resides
@@ -58,10 +58,10 @@ Result DisjointSet_Union(DisjointSet* self, const void* x, const void* y);
  *  <set>:  Pointer to populate with the address of the found set
  *
  * returns:
- *  Result code indicating kkSuccess/failure status
+ *  Result code indicating kSuccess/failure status
  */
-Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
-                           SetItem** set);
+ResultCode DisjointSet_FindSet(const DisjointSet* self, const void* item,
+                               SetItem** set);
 
 /*
  * Creates a new set in the disjoint set
@@ -72,9 +72,10 @@ Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
  *  <set>:  Pointer to populate with the address of the newly created set
  *
  * returns:
- *  Result code indicating kkSuccess/failure status
+ *  Result code indicating kSuccess/failure status
  */
-Result DisjointSet_MakeSet(DisjointSet* self, const void* rep, SetItem** set);
+ResultCode DisjointSet_MakeSet(DisjointSet* self, const void* rep,
+                               SetItem** set);
 
 /*
  * Cleans up memory allocations within the disjoint set. The consumer is

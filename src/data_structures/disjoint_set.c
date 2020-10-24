@@ -11,7 +11,7 @@
 
 static void SetItem_Destory(void* item) { free(item); }
 
-Result DisjointSet_Init(DisjointSet* self, const size_t n) {
+ResultCode DisjointSet_Init(DisjointSet* self, const size_t n) {
   if (self == NULL) return kNullParameter;
   if (n <= 1) return kArgumentOutOfRange;
 
@@ -24,7 +24,8 @@ Result DisjointSet_Init(DisjointSet* self, const size_t n) {
   return kSuccess;
 }
 
-Result DisjointSet_MakeSet(DisjointSet* self, const void* rep, SetItem** set) {
+ResultCode DisjointSet_MakeSet(DisjointSet* self, const void* rep,
+                               SetItem** set) {
   if (self == NULL || rep == NULL || set == NULL) return kNullParameter;
 
   bool exists = HashTable_KeyExists(self->items, &rep, sizeof(void*));
@@ -47,8 +48,8 @@ Result DisjointSet_MakeSet(DisjointSet* self, const void* rep, SetItem** set) {
   return kSuccess;
 }
 
-Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
-                           SetItem** set) {
+ResultCode DisjointSet_FindSet(const DisjointSet* self, const void* item,
+                               SetItem** set) {
   if (self == NULL || item == NULL || set == NULL) return kNullParameter;
 
   SetItem* _set = NULL;
@@ -68,7 +69,7 @@ Result DisjointSet_FindSet(const DisjointSet* self, const void* item,
   return kSuccess;
 }
 
-Result DisjointSet_Union(DisjointSet* self, const void* x, const void* y) {
+ResultCode DisjointSet_Union(DisjointSet* self, const void* x, const void* y) {
   if (self == NULL || x == NULL || y == NULL) return kNullParameter;
 
   SetItem* x_set = NULL;

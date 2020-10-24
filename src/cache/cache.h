@@ -19,9 +19,13 @@ typedef struct Cache Cache;
 /*
  * Allocates and initializes a Cache data structure
  *
+ * params:
  *  <limit> = max number of item to store in the cache before purging items
  *  <freer> = function used to free objects created by the producer (see
  *  Cache_Get)
+ *
+ * returns:
+ *  Result code indicating kSuccess/failure status
  */
 ResultCode Cache_Create(size_t limit, freer freer, Cache**);
 
@@ -30,10 +34,14 @@ ResultCode Cache_Create(size_t limit, freer freer, Cache**);
  * item returned from <producer> in the cache. When the number of items in the
  * cache exceeds <limit>, it will purge the least recently used item
  *
+ * params:
  *  <key> = key to associate with the items
  *  <key_size> = number of bytes in the key value
  *  <producer> = should return the item to store in the cache if it exists
  *  <result> = output parameter for result
+ *
+ * returns:
+ *  Result code indicating kSuccess/failure status
  */
 ResultCode Cache_Get(Cache*, void* key, size_t key_size, producer,
                      void** result);

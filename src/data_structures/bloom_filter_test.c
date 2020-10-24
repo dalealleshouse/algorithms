@@ -9,16 +9,17 @@
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-#include "error_reporter.h"
 #include "hash_functions.h"
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
-#define SUT(code_block)                                 \
-  {                                                     \
-    BloomFilter* sut = BloomFilter_Create(bits, funcs); \
-    code_block;                                         \
-    BloomFilter_Destroy(sut);                           \
+#define SUT(code_block)                                             \
+  {                                                                 \
+    BloomFilter* sut = NULL;                                        \
+    ResultCode result_code = BloomFilter_Create(bits, funcs, &sut); \
+    CU_ASSERT_EQUAL(result_code, kSuccess);                         \
+    code_block;                                                     \
+    BloomFilter_Destroy(sut);                                       \
   }
 
 static const size_t bits = 512;
@@ -26,39 +27,39 @@ static const size_t funcs = 7;
 
 static void BloomFilter_Create_failed_malloc() {
   FAILED_MALLOC_TEST({
-    ErrorReporter_Clear();
-    BloomFilter* result = BloomFilter_Create(bits, funcs);
-    CU_ASSERT_PTR_NULL(result);
-    CU_ASSERT_EQUAL(kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
+    BloomFilter* sut = NULL;
+    ResultCode result_code = BloomFilter_Create(bits, funcs, &sut);
+    CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
+    CU_ASSERT_PTR_NULL(sut);
   });
 }
 
 static void BloomFilter_Create_invalid_bits() {
   // Less than 8
-  ErrorReporter_Clear();
-  BloomFilter* sut = BloomFilter_Create(4, funcs);
+  BloomFilter* sut = NULL;
+  ResultCode result_code = BloomFilter_Create(4, funcs, &sut);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
 
   // Not a power of 2
-  ErrorReporter_Clear();
-  sut = BloomFilter_Create(1050, funcs);
+  sut = NULL;
+  result_code = BloomFilter_Create(1050, funcs, &sut);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
 }
 
 static void BloomFilter_Create_invalid_funcs() {
   // 0 hash functions
-  ErrorReporter_Clear();
-  BloomFilter* sut = BloomFilter_Create(bits, 0);
+  BloomFilter* sut = NULL;
+  ResultCode result_code = BloomFilter_Create(bits, 0, &sut);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
 
   // more than available
-  ErrorReporter_Clear();
-  sut = BloomFilter_Create(bits, hasher_count + 1);
+  sut = NULL;
+  result_code = BloomFilter_Create(bits, hasher_count + 1, &sut);
   CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kArgumentOutOfRange);
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
 }
 
 static void BloomFilter_Create_happy_path() {
@@ -89,22 +90,23 @@ static void BloomFilter_Insert_happy_path() {
 static void BloomFilter_Lookup_null_parameter() {
   char* key = "life is beauty";
 
-  ErrorReporter_Clear();
-  Result result = BloomFilter_Lookup(NULL, key);
+  bool result = false;
+  Result result_code = BloomFilter_Lookup(NULL, key, &result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
   CU_ASSERT_FALSE(result);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
 
   SUT({
-    ErrorReporter_Clear();
-    result = BloomFilter_Lookup(sut, NULL);
+    result_code = BloomFilter_Lookup(sut, NULL, &result);
+    CU_ASSERT_EQUAL(result_code, kNullParameter);
     CU_ASSERT_FALSE(result);
-    CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
   });
 }
 
 static void BloomFilter_Lookup_not_found() {
   SUT({
-    bool result = BloomFilter_Lookup(sut, "not found");
+    bool result;
+    ResultCode result_code = BloomFilter_Lookup(sut, "not found", &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
     CU_ASSERT_FALSE(result);
   });
 }
@@ -112,8 +114,12 @@ static void BloomFilter_Lookup_not_found() {
 static void BloomFilter_Lookup_found() {
   char* key = "life is an illusion";
   SUT({
-    BloomFilter_Insert(sut, (void*)key);
-    bool result = BloomFilter_Lookup(sut, (void*)key);
+    ResultCode result_code = BloomFilter_Insert(sut, (void*)key);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+
+    bool result;
+    result_code = BloomFilter_Lookup(sut, (void*)key, &result);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
     CU_ASSERT_TRUE(result);
   });
 }
@@ -129,17 +135,21 @@ static void BloomFilter_Lookup_happy_path() {
     for (size_t i = 0; i < n; i++) BloomFilter_Insert(sut, exists[i]);
 
     for (size_t i = 0; i < n; i++) {
-      CU_ASSERT_TRUE(BloomFilter_Lookup(sut, exists[i]));
-      CU_ASSERT_FALSE(BloomFilter_Lookup(sut, not_found[i]));
+      bool result;
+      ResultCode result_code = BloomFilter_Lookup(sut, exists[i], &result);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
+      CU_ASSERT_TRUE(result);
+
+      result_code = BloomFilter_Lookup(sut, not_found[i], &result);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
+      CU_ASSERT_FALSE(result);
     }
   });
 }
 
 static void BloomFilter_GetN_null_parameter() {
-  ErrorReporter_Clear();
   size_t result = BloomFilter_GetN(NULL);
-  CU_ASSERT_EQUAL(result, N_ERROR);
-  CU_ASSERT_EQUAL(ErrorReporter_LastErrorCode(), kNullParameter);
+  CU_ASSERT_EQUAL(result, 0);
 }
 
 static void BloomFilter_GetN_happy_path() {
