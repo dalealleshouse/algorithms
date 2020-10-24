@@ -25,12 +25,12 @@ function test_build() {
 clear
 
 print_success "Generating Compilation Database"
-# make comp-db > /dev/null
+make comp-db > /dev/null
 print_success "Compilation Database Created"
 
 # Validate that all formatting conforms to the style specified in .clang-format
 ./validate_format.py -r \
-  --exclude src/hashing/farmhash.c \
+  --exclude src/hashing/include/farmhash.c \
   src
   print_success "Format Check Passed"
 

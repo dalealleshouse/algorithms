@@ -14,7 +14,6 @@
 #include "hash_functions.h"
 
 static const size_t byte_size = 8;
-static const char* module_name = "BloomFilter";
 
 typedef struct BloomFilter {
   size_t n;
