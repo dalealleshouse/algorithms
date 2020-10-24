@@ -30,24 +30,24 @@ print_success "Compilation Database Created"
 
 # Validate that all formatting conforms to the style specified in .clang-format
 ./validate_format.py -r \
-  --exclude src/hashing/farmhash.c \
+  --exclude src/hashing/include/farmhash.c \
   src
   print_success "Format Check Passed"
 
-# TODO: cpplint
 # make lint
 cpplint src/*.c
 cpplint src/list_data_structures/*.[ch]
 cpplint src/data_structures/*.[ch]
+cpplint src/hashing/*.[ch]
 cpplint src/cache/*.[ch]
 cpplint locality/*.[ch]
 print_success "Lint Passed"
 
-# TODO: clang-tidy
 # make tidy
 clang-tidy src/test_runner.c
 clang-tidy src/list_data_structures/*.[ch]
 clang-tidy src/data_structures/*.[ch]
+clang-tidy src/hashing/*.[ch]
 clang-tidy src/cache/*.[ch]
 clang-tidy locality/*.[ch]
 print_success "Tidy Static Analysis Passed"

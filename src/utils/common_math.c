@@ -59,3 +59,16 @@ void* MinPArray(const size_t n, const size_t size, void* arr,
 
   return min;
 }
+
+size_t NextPowerOfTwo(size_t val) {
+  size_t count = 0;
+
+  if (val && !(val & (val - 1))) return val;
+
+  while (val != 0) {
+    val >>= 1;
+    count += 1;
+  }
+
+  return 1 << count;
+}

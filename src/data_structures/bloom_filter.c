@@ -13,9 +13,7 @@
 
 #include "hash_functions.h"
 
-const size_t N_ERROR = SIZE_MAX;
 static const size_t byte_size = 8;
-static const char* module_name = "BloomFilter";
 
 typedef struct BloomFilter {
   size_t n;
@@ -26,38 +24,31 @@ typedef struct BloomFilter {
 
 static bool is_power_2(size_t n) { return (ceil(log2(n)) == floor(log2(n))); }
 
-BloomFilter* BloomFilter_Create(size_t bits, size_t funcs) {
+ResultCode BloomFilter_Create(size_t bits, size_t funcs, BloomFilter** self) {
   if (bits < byte_size || !is_power_2(bits) || funcs == 0 ||
       funcs > hasher_count) {
-    ERROR(module_name, kArgumentOutOfRange);
-    return NULL;
+    return kArgumentOutOfRange;
   }
 
   BloomFilter* filter = malloc(sizeof(BloomFilter));
-  if (filter == NULL) {
-    ERROR(module_name, kFailedMemoryAllocation);
-    return NULL;
-  }
+  if (filter == NULL) return kFailedMemoryAllocation;
 
   filter->filter = calloc(1, bits / byte_size);
   if (filter->filter == NULL) {
     BloomFilter_Destroy(filter);
-    ERROR(module_name, kFailedMemoryAllocation);
-    return NULL;
+    return kFailedMemoryAllocation;
   }
 
   filter->n = 0;
   filter->bits = bits;
   filter->funcs = funcs;
 
-  return filter;
+  *self = filter;
+  return kSuccess;
 }
 
 size_t BloomFilter_GetN(const BloomFilter* self) {
-  if (self == NULL) {
-    ERROR(module_name, kNullParameter);
-    return N_ERROR;
-  }
+  if (self == NULL) return 0;
 
   return self->n;
 }
@@ -81,11 +72,9 @@ ResultCode BloomFilter_Insert(BloomFilter* self, const char* key) {
   return kSuccess;
 }
 
-bool BloomFilter_Lookup(const BloomFilter* self, const char* key) {
-  if (self == NULL || key == NULL) {
-    ERROR(module_name, kNullParameter);
-    return false;
-  }
+ResultCode BloomFilter_Lookup(const BloomFilter* self, const char* key,
+                              bool* result) {
+  if (self == NULL || key == NULL) return kNullParameter;
 
   size_t len = strlen(key);
 
@@ -95,10 +84,14 @@ bool BloomFilter_Lookup(const BloomFilter* self, const char* key) {
     size_t byte_index = index / byte_size;
     size_t bit_index = index % byte_size;
 
-    if (!(self->filter[byte_index] & 1 << bit_index)) return false;
+    if (!(self->filter[byte_index] & 1 << bit_index)) {
+      *result = false;
+      return kSuccess;
+    }
   }
 
-  return true;
+  *result = true;
+  return kSuccess;
 }
 
 void BloomFilter_Destroy(BloomFilter* self) {
