@@ -9,14 +9,68 @@
 
 #include <stdbool.h>
 
+#include "hash_functions.h"
 #include "result_code.h"
 
 typedef struct BloomFilter BloomFilter;
 
-ResultCode BloomFilter_Create(size_t bits, size_t funcs, BloomFilter**);
-ResultCode BloomFilter_Insert(BloomFilter*, const char* key);
-ResultCode BloomFilter_Lookup(const BloomFilter*, const char* key,
-                              bool* result);
+/*
+ * Allocates and initializes a BloomFilter data structure
+ *
+ * params:
+ *  <bits> = number of bits to track
+ *  <hashers> = array of <hashers> functions
+ *  <hasher_count> = number of items in the hasher array
+ *  <self> = Pointer to a null <BloomFilter>, the function is response for
+ *      allocating and initializing it. Passing in a non-null pointer will
+ *      result in a <kOutputPointerIsNotNull> result
+ *
+ * returns:
+ *  Result code indicating kSuccess or failure code
+ */
+ResultCode BloomFilter_Create(size_t bits, const hasher hashers[],
+                              size_t hasher_count, BloomFilter** self);
 
+/*
+ * Adds a key to the bloom filter
+ *
+ * params:
+ *  <self> = bloom filter data structure
+ *  <key> = key to add to the filter
+ *  <key_size> = size of <key>, in bytes
+ *
+ * returns:
+ *  Result code indicating kSuccess or failure code
+ */
+ResultCode BloomFilter_Insert(BloomFilter* self, const void* key,
+                              size_t key_size);
+
+/*
+ * Determine if the specified key exists in the filter
+ *
+ * params:
+ *  <self> = bloom filter data structure
+ *  <key> = Null terminated string containing a key to lookup
+ *  <key_size> = size of <key>, in bytes
+ *  <result> = Output parameter that will be set to true if the item was found
+ *      and false otherwise
+ *
+ * returns:
+ *  Result code indicating kSuccess or failure code
+ */
+ResultCode BloomFilter_Lookup(const BloomFilter*, const void* key,
+                              size_t key_size, bool* result);
+
+/*
+ * Returns the numbers the of items that have inserted into the bloom filter.
+ * WARNING: Multiple inserts of the same item will increment this count.
+ *
+ * params:
+ *  <self> = bloom filter data structure
+ *
+ * returns:
+ *  Number of items inserted into the filter
+ */
 size_t BloomFilter_GetN(const BloomFilter*);
+
 void BloomFilter_Destroy(BloomFilter*);
