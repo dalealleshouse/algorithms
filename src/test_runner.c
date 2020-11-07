@@ -106,6 +106,8 @@ extern int RegisterQuickSelectPartitionTests();
 // Cache
 extern int RegisterCacheTests();
 
+extern int RegisterBitVectorTests();
+
 int RegisterTests() {
   return (
              // clang-format off
@@ -158,6 +160,7 @@ int RegisterTests() {
       RegisterMultiplySquareMatricesTests() != 0 +
       RegisterQuickSelectPartitionTests() != 0 +
       RegisterCacheTests() != 0 +
+      RegisterBitVectorTests() != 0 +
       0) * -1;
   // clang-format on
 }
