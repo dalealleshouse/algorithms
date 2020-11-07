@@ -53,4 +53,9 @@ ResultCode BitVector_Set(BitVector* self, size_t index, BitValue value);
  */
 ResultCode BitVector_Read(BitVector* self, size_t index, BitValue* result);
 
+/*
+ * returns the number of individual bits in the bit vector
+ */
+size_t BitVector_GetBitCount(BitVector* self);
+
 void BitVector_Destroy(BitVector*);

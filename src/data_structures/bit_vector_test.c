@@ -61,12 +61,14 @@ static void BitVector_Create_null_parameter() {
 }
 
 static void BitVector_Create_initalizes_bits() {
-  SUT(16, {
-    CU_ASSERT_EQUAL(sut->bits, 16);
+  const size_t bit_count = 128;
 
-    // 16 bit = 2 bytes
-    CU_ASSERT_EQUAL(sut->data[0], 0);
-    CU_ASSERT_EQUAL(sut->data[1], 0);
+  SUT(bit_count, {
+    CU_ASSERT_EQUAL(sut->bits, bit_count);
+
+    for (size_t i = 0; i < bit_count / kByteSize; i++) {
+      CU_ASSERT_EQUAL(sut->data[i], 0);
+    }
   });
 }
 

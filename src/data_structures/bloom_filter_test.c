@@ -9,6 +9,7 @@
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "bit_vector.h"
 #include "hash_functions.h"
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
@@ -16,8 +17,9 @@
 typedef struct BloomFilter {
   size_t n;
   size_t bits;
-  size_t hasher_n;
-  char* filter;
+  BitVector* filter;
+  size_t hasher_count;
+  const hasher* hashers;
 } BloomFilter;
 
 #define SUT(code_block)                                    \
@@ -45,15 +47,9 @@ static void BloomFilter_Create_failed_malloc() {
 }
 
 static void BloomFilter_Create_invalid_bits() {
-  // Less than 8
-  BloomFilter* sut = NULL;
-  ResultCode result_code = BloomFilter_Create(4, hashers, hasher_n, &sut);
-  CU_ASSERT_PTR_NULL(sut);
-  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
-
   // Round up to next power of 2
-  sut = NULL;
-  result_code = BloomFilter_Create(1050, hashers, hasher_n, &sut);
+  BloomFilter* sut = NULL;
+  ResultCode result_code = BloomFilter_Create(1050, hashers, hasher_n, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(sut->bits, 2048);
   BloomFilter_Destroy(sut);
@@ -95,24 +91,24 @@ static void BloomFilter_Insert_happy_path() {
 static void BloomFilter_Lookup_null_parameter() {
   char* key = "life is beauty";
 
-  bool result = false;
+  BloomFilterResult result = kDefiniteNo;
   Result result_code = BloomFilter_Lookup(NULL, key, strlen(key), &result);
   CU_ASSERT_EQUAL(result_code, kNullParameter);
-  CU_ASSERT_FALSE(result);
+  CU_ASSERT_EQUAL(result, kDefiniteNo);
 
   SUT({
     result_code = BloomFilter_Lookup(sut, NULL, strlen(key), &result);
     CU_ASSERT_EQUAL(result_code, kNullParameter);
-    CU_ASSERT_FALSE(result);
+    CU_ASSERT_EQUAL(result, kDefiniteNo);
   });
 }
 
 static void BloomFilter_Lookup_not_found() {
   SUT({
-    bool result;
+    BloomFilterResult result;
     ResultCode result_code = BloomFilter_Lookup(sut, "not found", 9, &result);
     CU_ASSERT_EQUAL(result_code, kSuccess);
-    CU_ASSERT_FALSE(result);
+    CU_ASSERT_EQUAL(result, kDefiniteNo);
   });
 }
 
@@ -122,10 +118,10 @@ static void BloomFilter_Lookup_found() {
     ResultCode result_code = BloomFilter_Insert(sut, (void*)key, strlen(key));
     CU_ASSERT_EQUAL(result_code, kSuccess);
 
-    bool result;
+    BloomFilterResult result;
     result_code = BloomFilter_Lookup(sut, (void*)key, strlen(key), &result);
     CU_ASSERT_EQUAL(result_code, kSuccess);
-    CU_ASSERT_TRUE(result);
+    CU_ASSERT_EQUAL(result, kHighlyProbable);
   });
 }
 
@@ -142,16 +138,16 @@ static void BloomFilter_Lookup_happy_path() {
     }
 
     for (size_t i = 0; i < n; i++) {
-      bool result;
+      BloomFilterResult result;
       ResultCode result_code =
           BloomFilter_Lookup(sut, exists[i], strlen(exists[i]), &result);
       CU_ASSERT_EQUAL(result_code, kSuccess);
-      CU_ASSERT_TRUE(result);
+      CU_ASSERT_EQUAL(result, kHighlyProbable);
 
       result_code =
           BloomFilter_Lookup(sut, not_found[i], strlen(not_found[i]), &result);
       CU_ASSERT_EQUAL(result_code, kSuccess);
-      CU_ASSERT_FALSE(result);
+      CU_ASSERT_EQUAL(result, kDefiniteNo);
     }
   });
 }
