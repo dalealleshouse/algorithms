@@ -10,6 +10,10 @@
 #include "hash_table.h"
 #include "result_code.h"
 
+typedef struct SetItem SetItem;
+
+typedef struct DisjointSet DisjointSet;
+
 typedef struct SetItem {
   const void* payload;
   struct SetItem* parent;

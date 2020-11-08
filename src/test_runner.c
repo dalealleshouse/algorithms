@@ -26,6 +26,7 @@ extern int RegisterHashTableTests();
 extern int RegisterBloomFilterTests();
 extern int RegisterHashFunctionTests();
 extern int RegisterDisjointSetTests();
+extern int RegisterDisjointSetTestCase();
 
 // Knapsack Problem
 extern int RegisterKnapsackProblemTests();
@@ -111,6 +112,7 @@ extern int RegisterBitVectorTests();
 int RegisterTests() {
   return (
              // clang-format off
+      /* RegisterDisjointSetTestCase() != 0 + */
       RegisterGraphTests() != 0 +
       RegisterOverflowTests() != 0 +
       RegisterMathTests() != 0 +
