@@ -2,8 +2,8 @@
 
 #include <stdlib.h>
 
-#include "../data_structures/disjoint_set.h"
-#include "../utils/overflow_checker.h"
+#include "disjoint_set.h"
+#include "overflow_checker.h"
 
 static int _edgeComparator(const void* x, const void* y) {
   Edge* _x = (Edge*)x;

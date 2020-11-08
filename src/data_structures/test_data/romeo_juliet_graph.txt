@@ -1,0 +1,12 @@
+Mercuito	knows	Romeo
+Tybalt	kin	Juliet
+Paris	kin	Prince
+Benvolio	knows	Romeo
+Friar Laurence	knows	Romeo
+Nurse	knows	Juliet
+Apothecary	knows	Romeo
+Friar John	knows	Friar Laurence
+Lord Capulet	kin	Juliet
+Lady Capulet	kin	Juliet
+Lady Montague	kin	Romeo
+Lord Montague	kin	Romeo
