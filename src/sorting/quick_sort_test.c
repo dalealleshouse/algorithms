@@ -50,7 +50,7 @@ static int* GenerateTestData() {
   return arr;
 }
 
-static void TestPivot(choose_pivot choose_pivot) {
+static void TestPivot(ChoosePivot choose_pivot) {
   int* arr = GenerateTestData();
   int* arr_cpy = Duplicate(arr, sizeof(int) * test_data_n);
 
@@ -65,13 +65,13 @@ static void TestPivot(choose_pivot choose_pivot) {
   free(arr_cpy);
 }
 
-static void QuickSort_piviot_on_zero_matches_c() { TestPivot(PivotOnZero); }
+static void QuickSort_pivot_on_zero_matches_c() { TestPivot(PivotOnZero); }
 
-static void QuickSort_piviot_on_random_matches_c() { TestPivot(PivotOnRandom); }
+static void QuickSort_pivot_on_random_matches_c() { TestPivot(PivotOnRandom); }
 
-static void QuickSort_piviot_on_last_matches_c() { TestPivot(PivotOnLast); }
+static void QuickSort_pivot_on_last_matches_c() { TestPivot(PivotOnLast); }
 
-static void QuickSort_piviot_on_median_matches_c() { TestPivot(PivotOnMedian); }
+static void QuickSort_pivot_on_median_matches_c() { TestPivot(PivotOnMedian); }
 
 static void QuickSort_pivot_on_median_finds_first() {
   const int n = 6;
@@ -106,10 +106,10 @@ static void QuickSort_pivot_on_median_finds_middle() {
 int RegisterExtraQuickSortTests() {
   CU_TestInfo quick_sort_tests[] = {
       CU_TEST_INFO(QuickSort_large),
-      CU_TEST_INFO(QuickSort_piviot_on_zero_matches_c),
-      CU_TEST_INFO(QuickSort_piviot_on_random_matches_c),
-      CU_TEST_INFO(QuickSort_piviot_on_last_matches_c),
-      CU_TEST_INFO(QuickSort_piviot_on_median_matches_c),
+      CU_TEST_INFO(QuickSort_pivot_on_zero_matches_c),
+      CU_TEST_INFO(QuickSort_pivot_on_random_matches_c),
+      CU_TEST_INFO(QuickSort_pivot_on_last_matches_c),
+      CU_TEST_INFO(QuickSort_pivot_on_median_matches_c),
       CU_TEST_INFO(QuickSort_pivot_on_median_finds_first),
       CU_TEST_INFO(QuickSort_pivot_on_median_finds_middle),
       CU_TEST_INFO(QuickSort_pivot_on_median_finds_last),

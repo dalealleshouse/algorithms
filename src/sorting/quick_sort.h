@@ -23,8 +23,8 @@
 ResultCode Partition(const size_t n, const size_t size, void* arr,
                      const comparator comparator, size_t* pivot_index);
 
-typedef int (*choose_pivot)(const size_t n, const size_t size, const void* arr,
-                            const comparator comparator);
+typedef int (*ChoosePivot)(const size_t n, const size_t size, const void* arr,
+                           const comparator comparator);
 
 int PivotOnZero(const size_t n, const size_t size, const void* arr,
                 const comparator comparator);
@@ -37,7 +37,7 @@ int PivotOnMedian(const size_t n, const size_t size, const void* arr,
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
                           const comparator comparator,
-                          choose_pivot choose_pivot);
+                          const ChoosePivot choose_pivot);
 
 ResultCode QuickSort(const size_t n, const size_t size, void* arr,
                      const comparator comparator);

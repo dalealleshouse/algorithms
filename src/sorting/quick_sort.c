@@ -130,7 +130,7 @@ ResultCode QuickSort(const size_t n, const size_t size, void* arr,
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
                           const comparator comparator,
-                          const choose_pivot choose_pivot) {
+                          const ChoosePivot choose_pivot) {
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 
