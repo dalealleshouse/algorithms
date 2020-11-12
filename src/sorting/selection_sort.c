@@ -1,22 +1,30 @@
-#include "./selection_sort.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "selection_sort.h"
 
 #include <stdbool.h>
 #include <string.h>
 
-static int swap(const size_t size, void* x, void* y) {
-  if (size == 0 || x == NULL || y == NULL) return -1;
+static int Swap(const size_t kSize, void* x, void* y) {
+  if (kSize == 0 || x == NULL || y == NULL) return -1;
 
-  char n[size];
-  memcpy(n, x, size);
-  memcpy(x, y, size);
-  memcpy(y, n, size);
+  char n[kSize];
+  memcpy(n, x, kSize);
+  memcpy(x, y, kSize);
+  memcpy(y, n, kSize);
 
   return 0;
 }
 
-int selection_sort(const size_t n, const size_t size, void* arr,
-                   const comparator comparator) {
-  if (n == 0 || size == 0 || arr == NULL || comparator == NULL) return -1;
+ResultCode SelectionSort(const size_t n, const size_t size, void* arr,
+                         const comparator comparator) {
+  if (arr == NULL || comparator == NULL) return kNullParameter;
+  if (n == 0 || size == 0) return kArgumentOutOfRange;
 
   for (size_t i = 0; i < n - 1; i++) {
     size_t lowest_index = i;
@@ -32,7 +40,7 @@ int selection_sort(const size_t n, const size_t size, void* arr,
     if (i != lowest_index) {
       void* ith = (char*)arr + (i * size);
       void* lowest = (char*)arr + (lowest_index * size);
-      swap(size, ith, lowest);
+      Swap(size, ith, lowest);
     }
   }
 

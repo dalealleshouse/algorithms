@@ -1,9 +1,16 @@
-#include "./bubble_sort.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "bubble_sort.h"
 
 #include <stdbool.h>
 #include <string.h>
 
-static int swap(const size_t size, void* x, void* y) {
+static int Swap(const size_t size, void* x, void* y) {
   if (size == 0 || x == NULL || y == NULL) return -1;
 
   char n[size];
@@ -14,9 +21,10 @@ static int swap(const size_t size, void* x, void* y) {
   return 0;
 }
 
-int bubble_sort(const size_t n, const size_t size, void* arr,
-                const comparator comparator) {
-  if (n == 0 || size == 0 || arr == NULL || comparator == NULL) return -1;
+ResultCode BubbleSort(const size_t n, const size_t size, void* arr,
+                      const comparator comparator) {
+  if (arr == NULL || comparator == NULL) return kNullParameter;
+  if (n == 0 || size == 0) return kArgumentOutOfRange;
 
   size_t unsorted_to = n - 1;
   bool sorted = false;
@@ -31,7 +39,7 @@ int bubble_sort(const size_t n, const size_t size, void* arr,
       int result = comparator(ith, ith_1);
 
       if (result > 0) {
-        swap(size, ith, ith_1);
+        Swap(size, ith, ith_1);
         sorted = false;
       }
     }

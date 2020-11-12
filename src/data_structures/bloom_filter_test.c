@@ -168,7 +168,7 @@ static void BloomFilter_GetN_happy_path() {
 }
 
 int RegisterBloomFilterTests() {
-  CU_TestInfo hash_table_tests[] = {
+  CU_TestInfo bloom_filter_tests[] = {
       CU_TEST_INFO(BloomFilter_Create_failed_malloc),
       CU_TEST_INFO(BloomFilter_Create_invalid_bits),
       CU_TEST_INFO(BloomFilter_Create_happy_path),
@@ -186,7 +186,7 @@ int RegisterBloomFilterTests() {
   CU_SuiteInfo suites[] = {{.pName = "Bloom Filters",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
-                            .pTests = hash_table_tests},
+                            .pTests = bloom_filter_tests},
                            CU_SUITE_INFO_NULL};
 
   return CU_register_suites(suites);

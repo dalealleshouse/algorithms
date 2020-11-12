@@ -1,17 +1,24 @@
-#include "./algo_timer.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "algo_timer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include "./bubble_sort.h"
-#include "./insertion_sort.h"
-#include "./merge_sort.h"
-#include "./quick_sort.h"
-#include "./selection_sort.h"
-#include "./sorting_test_helpers.h"
+#include "bubble_sort.h"
 #include "common_math.h"
+#include "insertion_sort.h"
+#include "merge_sort.h"
+#include "quick_sort.h"
+#include "selection_sort.h"
+#include "sorting_test_helpers.h"
 
 typedef int (*sorter)(const size_t n, const size_t size, void* arr,
                       const comparator comparator);
@@ -25,29 +32,29 @@ static int qsort_adapter(const size_t n, const size_t size, void* arr,
 static int merge_sort_adapter(const size_t n, const size_t size, void* arr,
                               const comparator comparator) {
   char* tmp[n * size];
-  int result = merge_sort(arr, tmp, n, size, comparator);
+  int result = MergeSort(arr, tmp, n, size, comparator);
 
   return result;
 }
 
 static int quick_random_adapter(const size_t n, const size_t size, void* arr,
                                 const comparator comparator) {
-  return quick_sort_pivot(n, size, arr, comparator, pivot_on_random);
+  return QuickSortPivot(n, size, arr, comparator, PivotOnRandom);
 }
 
 static int quick_first_adapter(const size_t n, const size_t size, void* arr,
                                const comparator comparator) {
-  return quick_sort_pivot(n, size, arr, comparator, pivot_on_zero);
+  return QuickSortPivot(n, size, arr, comparator, PivotOnZero);
 }
 
 static int quick_last_adapter(const size_t n, const size_t size, void* arr,
                               const comparator comparator) {
-  return quick_sort_pivot(n, size, arr, comparator, pivot_on_last);
+  return QuickSortPivot(n, size, arr, comparator, PivotOnLast);
 }
 
 static int quick_median_adapter(const size_t n, const size_t size, void* arr,
                                 const comparator comparator) {
-  return quick_sort_pivot(n, size, arr, comparator, pivot_on_median);
+  return QuickSortPivot(n, size, arr, comparator, PivotOnMedian);
 }
 
 static sorter get_sorter(const sort_algo algo) {
@@ -55,13 +62,13 @@ static sorter get_sorter(const sort_algo algo) {
     case C:
       return qsort_adapter;
     case BUBBLE:
-      return bubble_sort;
+      return BubbleSort;
     case INSERTION:
-      return insertion_sort;
+      return InsertionSort;
     case SELECTION:
-      return selection_sort;
+      return SelectionSort;
     case QUICK:
-      return quick_sort;
+      return QuickSort;
     case MERGE:
       return merge_sort_adapter;
     case QUICK_PIVOT_RANDOM:

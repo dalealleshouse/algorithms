@@ -40,6 +40,7 @@ cpplint src/list_data_structures/*.[ch]
 cpplint src/data_structures/*.[ch]
 cpplint src/hashing/*.[ch]
 cpplint src/cache/*.[ch]
+cpplint src/sorting/*.[ch]
 cpplint locality/*.[ch]
 print_success "Lint Passed"
 
@@ -49,6 +50,7 @@ clang-tidy src/list_data_structures/*.[ch]
 clang-tidy src/data_structures/*.[ch]
 clang-tidy src/hashing/*.[ch]
 clang-tidy src/cache/*.[ch]
+clang-tidy src/sorting/*.[ch]
 clang-tidy locality/*.[ch]
 print_success "Tidy Static Analysis Passed"
 
