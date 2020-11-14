@@ -32,7 +32,7 @@ static int* GenerateTestData() {
   int* arr = malloc(sizeof(int) * test_data_n);
   FILE* file;
 
-  file = fopen("src/sorting/test_data/quick_sort.txt", "r");
+  file = fopen("src/sorting/test_data/sort.txt", "r");
 
   size_t index = 0;
   int i = 0;
