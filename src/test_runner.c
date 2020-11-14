@@ -69,11 +69,12 @@ int RegisterScheduleOptimizerTests();
 
 // Sorting
 extern int RegisterQuickSortTests();
+extern int RegisterExtraQuickSortTests();
 extern int RegisterPartitionTests();
 extern int RegisterBubbleSortTests();
 extern int RegisterInsertionSortTests();
 extern int RegisterSelectionSortTests();
-extern int RegisterMergeSortTestTests();
+extern int RegisterMergeSortAdapterTests();
 
 // Traveling Salesman
 extern int RegisterTravelingSalesmanTests();
@@ -141,11 +142,12 @@ int RegisterTests() {
       RegisterMinCutTests() != 0 +
       RegisterSatisfiabilityTests() != 0 +
       RegisterQuickSortTests() != 0 +
+      RegisterExtraQuickSortTests() != 0 +
       RegisterPartitionTests() != 0 +
       RegisterBubbleSortTests() != 0 +
       RegisterInsertionSortTests() != 0 +
       RegisterSelectionSortTests() != 0 +
-      RegisterMergeSortTestTests() != 0 +
+      RegisterMergeSortAdapterTests() != 0 +
       RegisterTravelingSalesmanTests() != 0 +
       RegisterWeightedIndependentSetTests() != 0 +
       RegisterMallocTestWrapperTests() != 0 +

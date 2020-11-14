@@ -1,8 +1,16 @@
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stddef.h>
 
-#include "./sorting.h"
+#include "comparators.h"
+#include "result_code.h"
 
-int insertion_sort(const size_t n, const size_t size, void* arr,
-                   const comparator comparator);
+ResultCode InsertionSort(const size_t n, const size_t size, void* arr,
+                         const comparator comparator);

@@ -137,18 +137,17 @@ static Character** GenerateCharacters(char* path) {
     return NULL;
   }
 
+  FILE* file = fopen(path, "r");
+  if (file == NULL) {
+    fprintf(stderr, "Error opening file\n");
+    return NULL;
+  }
+
   // Use a hash table as an easy de-duping tool
   HashTable* deduper = NULL;
   ResultCode result_code = HashTable_Create(20, &deduper);
   if (result_code != kSuccess) {
     PRINT_ERROR("GenerateCharacters", result_code);
-    return NULL;
-  }
-
-  FILE* file = fopen(path, "r");
-  if (file == NULL) {
-    fprintf(stderr, "Error opening file\n");
-    HashTable_Destroy(deduper, NULL);
     return NULL;
   }
 
@@ -339,6 +338,13 @@ static void AnalyzeRomeoAndJulietGraph() {
   }
 
   CollectContext* context = malloc(sizeof(CollectContext));
+  if (context == NULL) {
+    PRINT_ERROR("AnalyzeRomeoAndJulietGraph", kFailedMemoryAllocation);
+    Characters_Destroy(characters);
+    DisjointSet_Destory(&ds);
+    return;
+  }
+
   context->collector = collector;
   context->sets = &ds;
 

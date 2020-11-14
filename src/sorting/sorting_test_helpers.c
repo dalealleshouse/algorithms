@@ -1,9 +1,19 @@
-#include "./sorting_test_helpers.h"
+/*******************************************************************************
+ * Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "sorting_test_helpers.h"
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "CUnit/CUnit.h"
+
+const size_t n = 200;
 
 void* Malloc(size_t size) {
   void* result = malloc(size);
@@ -25,33 +35,33 @@ int int_comparator(const void* x, const void* y) {
   return 1;
 }
 
-int struct_comparator(const void* x, const void* y) {
+int StructComparator(const void* x, const void* y) {
   if (x == y) return 0;
 
   if (x == NULL && y != NULL) return 0;
 
   if (y == NULL && x != NULL) return 1;
 
-  test_struct_t* _x = (test_struct_t*)x;
-  test_struct_t* _y = (test_struct_t*)y;
+  TestStruct* _x = (TestStruct*)x;
+  TestStruct* _y = (TestStruct*)y;
 
   return int_comparator(&_x->sorter, &_y->sorter);
 }
 
-int pointer_comparator(const void* x, const void* y) {
+int PointerComparator(const void* x, const void* y) {
   if (x == y || (x == NULL && y == NULL)) return 0;
 
   if (x == NULL && y != NULL) return 0;
 
   if (y == NULL && x != NULL) return 1;
 
-  test_struct_t* _x = *(test_struct_t**)x;
-  test_struct_t* _y = *(test_struct_t**)y;
+  TestStruct* _x = *(TestStruct**)x;
+  TestStruct* _y = *(TestStruct**)y;
 
   return int_comparator(&_x->sorter, &_y->sorter);
 }
 
-void* duplicate(const void* ptr, const size_t size) {
+void* Duplicate(const void* ptr, const size_t size) {
   void* new_ptr = Malloc(size);
   memcpy(new_ptr, ptr, size);
   return new_ptr;
@@ -64,7 +74,7 @@ void arrays_are_equal(const size_t n, const size_t size, const void* expected,
 
 void* sort_with_c(const size_t n, const size_t size, const void* arr,
                   const comparator comparator) {
-  void* new = duplicate(arr, n * size);
+  void* new = Duplicate(arr, n * size);
   qsort(new, n, size, comparator);
   return new;
 }
@@ -78,32 +88,37 @@ void* seq_arr(size_t n) {
 
 void* rev_arr(size_t n) {
   int* arr = Malloc(sizeof(int) * n);
-  for (size_t i = 0; i < n; i++) arr[i] = n - i;
+  for (size_t i = 0; i < n; i++) arr[i] = (int)n - (int)i;
 
   return arr;
 }
 
 void* rand_arr(size_t n) {
+  unsigned int seed = time(NULL);
   int* arr = Malloc(sizeof(int) * n);
-  for (size_t i = 0; i < n; i++) arr[i] = rand();
+  for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed);
 
   return arr;
 }
 
 void* rand_st_arr(size_t n) {
-  test_struct_t* arr = Malloc(sizeof(test_struct_t) * n);
+  unsigned int seed = time(NULL);
+  TestStruct* arr = Malloc(sizeof(TestStruct) * n);
 
-  for (size_t i = 0; i < n; i++) arr[i] = (test_struct_t){i, i + 1, rand()};
+  for (size_t i = 0; i < n; i++) {
+    arr[i] = (TestStruct){i, (int)i + 1, rand_r(&seed)};
+  }
 
   return arr;
 }
 
 void* rand_ptr_arr(size_t n) {
-  test_struct_t** arr = Malloc(sizeof(void*) * n);
+  unsigned int seed = time(NULL);
+  TestStruct** arr = Malloc(sizeof(void*) * n);
 
   for (size_t i = 0; i < n; i++) {
-    test_struct_t* tmp = Malloc(sizeof(test_struct_t));
-    *tmp = (test_struct_t){i, i + 1, rand()};
+    TestStruct* tmp = Malloc(sizeof(TestStruct));
+    *tmp = (TestStruct){i, (int)i + 1, rand_r(&seed)};
 
     arr[i] = tmp;
   }
@@ -112,8 +127,9 @@ void* rand_ptr_arr(size_t n) {
 }
 
 void* dup_val_arr(size_t n) {
+  unsigned int seed = time(NULL);
   int* arr = Malloc(sizeof(int) * n);
-  for (size_t i = 0; i < n; i++) arr[i] = rand() % 10;
+  for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed) % 10;
 
   return arr;
 }

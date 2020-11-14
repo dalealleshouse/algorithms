@@ -6,7 +6,7 @@ CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 LINKFLAGS 	 = -lcunit -flto -lm -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc
-SHAREDFLAGS	 = -std=c11 -D_POSIX_C_SOURCE=200809L -O3 -D NDEBUG -I src/utils -fPIC -shared
+SHAREDFLAGS	 = -std=c11 -D_POSIX_C_SOURCE=200809L -O3 -D NDEBUG -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures -fPIC -shared
 
 TARGET			= src/test_runner
 SHARED_TARGET	= algo.so

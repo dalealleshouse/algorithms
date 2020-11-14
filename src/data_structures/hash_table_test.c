@@ -15,7 +15,7 @@
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
-const size_t n = 16384;
+static const size_t n = 16384;
 static const double kEpsilon = 0.0000000000001;
 
 #define SUT(code_block)                                 \
