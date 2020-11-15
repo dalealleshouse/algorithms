@@ -14,6 +14,7 @@
 #include "test_helpers.h"
 
 const size_t n;
+const size_t test_data_n;
 
 typedef struct TestStruct {
   int foo;
@@ -41,6 +42,8 @@ void* rand_ptr_arr(size_t n);
 void* dup_val_arr(size_t n);
 
 void free_ptr_arr(size_t n, void** arr);
+
+int* GenerateTestData();
 
 #define STANDARD_SORTING_TESTS(sorter)                                         \
   static void* TestArray(const size_t n, const size_t size,                    \

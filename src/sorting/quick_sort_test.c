@@ -17,38 +17,11 @@
 #include "test_helpers.h"
 
 /************* quick sort ****************/
-static const size_t test_data_n = 10000;
-
 size_t comparisons = 0;
 
 STANDARD_SORTING_TESTS(QuickSort)
 
 static void QuickSort_large() { TestIntArray(100000, rev_arr); }
-
-// No error checking because this is only a test function
-static int* GenerateTestData() {
-  const size_t kBufferSize = 64;
-
-  int* arr = malloc(sizeof(int) * test_data_n);
-  FILE* file;
-
-  file = fopen("src/sorting/test_data/sort.txt", "r");
-
-  size_t index = 0;
-  int i = 0;
-
-  char line[kBufferSize];
-  char* garbage;
-  while (fgets(line, kBufferSize, file)) {
-    i = (int)strtol(line, &garbage, 10);
-    arr[index] = i;
-    index++;
-  }
-
-  fclose(file);
-
-  return arr;
-}
 
 static void TestPivot(ChoosePivot choose_pivot) {
   int* arr = GenerateTestData();
