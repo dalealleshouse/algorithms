@@ -14,6 +14,7 @@
 #include "CUnit/CUnit.h"
 
 const size_t n = 200;
+const size_t test_data_n = 10000;
 
 void* Malloc(size_t size) {
   void* result = malloc(size);
@@ -139,3 +140,29 @@ void free_ptr_arr(size_t n, void** arr) {
 
   free(arr);
 }
+
+// No error checking because this is only a test function
+int* GenerateTestData() {
+  const size_t kBufferSize = 64;
+
+  int* arr = malloc(sizeof(int) * test_data_n);
+  FILE* file;
+
+  file = fopen("src/sorting/test_data/sort.txt", "r");
+
+  size_t index = 0;
+  int i = 0;
+
+  char line[kBufferSize];
+  char* garbage;
+  while (fgets(line, kBufferSize, file)) {
+    i = (int)strtol(line, &garbage, 10);
+    arr[index] = i;
+    index++;
+  }
+
+  fclose(file);
+
+  return arr;
+}
+
