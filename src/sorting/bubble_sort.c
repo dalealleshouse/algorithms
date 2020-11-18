@@ -10,15 +10,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-static int Swap(const size_t size, void* x, void* y) {
-  if (size == 0 || x == NULL || y == NULL) return -1;
-
+static void Swap(const size_t size, void* x, void* y) {
   char n[size];
   memcpy(n, x, size);
   memcpy(x, y, size);
   memcpy(y, n, size);
-
-  return 0;
 }
 
 ResultCode BubbleSort(const size_t n, const size_t size, void* arr,
