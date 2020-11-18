@@ -21,23 +21,23 @@
  * partitioning around it
  */
 ResultCode Partition(const size_t n, const size_t size, void* arr,
-                     const comparator comparator, size_t* pivot_index);
+                     const sort_strategy comparator, size_t* pivot_index);
 
 typedef int (*ChoosePivot)(const size_t n, const size_t size, const void* arr,
-                           const comparator comparator);
+                           const sort_strategy comparator);
 
 int PivotOnZero(const size_t n, const size_t size, const void* arr,
-                const comparator comparator);
+                const sort_strategy comparator);
 int PivotOnRandom(const size_t n, const size_t size, const void* arr,
-                  const comparator comparator);
+                  const sort_strategy comparator);
 int PivotOnLast(const size_t n, const size_t size, const void* arr,
-                const comparator comparator);
+                const sort_strategy comparator);
 int PivotOnMedian(const size_t n, const size_t size, const void* arr,
-                  const comparator comparator);
+                  const sort_strategy comparator);
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
-                          const comparator comparator,
+                          const sort_strategy comparator,
                           const ChoosePivot choose_pivot);
 
 ResultCode QuickSort(const size_t n, const size_t size, void* arr,
-                     const comparator comparator);
+                     const sort_strategy comparator);

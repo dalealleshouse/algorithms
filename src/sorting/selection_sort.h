@@ -13,4 +13,4 @@
 #include "result_code.h"
 
 ResultCode SelectionSort(const size_t n, const size_t size, void* arr,
-                         const comparator comparator);
+                         const sort_strategy comparator);

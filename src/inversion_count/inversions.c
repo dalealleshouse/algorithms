@@ -4,7 +4,7 @@
 
 unsigned long _count_inversions(const void* arr, void* output,
                                 const size_t length, const size_t item_size,
-                                comparator comparator) {
+                                sort_strategy comparator) {
   unsigned long inversions = 0;
 
   if (arr == NULL || output == NULL) return -1;
@@ -58,7 +58,8 @@ unsigned long _count_inversions(const void* arr, void* output,
 }
 
 unsigned long count_inversions(const void* arr, const size_t length,
-                               const size_t item_size, comparator comparator) {
+                               const size_t item_size,
+                               sort_strategy comparator) {
   char sorted[length * item_size];
   return _count_inversions(arr, sorted, length, item_size, comparator);
 }

@@ -18,7 +18,7 @@
 struct Heap_t;
 typedef struct Heap_t Heap;
 
-ResultCode Heap_Create(size_t, comparator, Heap**);
+ResultCode Heap_Create(size_t, sort_strategy, Heap**);
 ResultCode Heap_Insert(Heap*, void*);
 ResultCode Heap_Resize(Heap*, size_t);
 ResultCode Heap_Reproiritize(Heap*, void*);

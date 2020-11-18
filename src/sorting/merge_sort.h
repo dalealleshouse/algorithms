@@ -13,4 +13,4 @@
 #include "result_code.h"
 
 ResultCode MergeSort(const void* arr, void* output, const size_t length,
-                     const size_t item_size, comparator comparator);
+                     const size_t item_size, sort_strategy comparator);

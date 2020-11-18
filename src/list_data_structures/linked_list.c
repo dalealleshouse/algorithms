@@ -140,7 +140,7 @@ static LinkedListItem* search(const LinkedList* self, const void* item) {
   return NULL;
 }
 
-ResultCode LinkedList_Create(freer freer, comparator comparator,
+ResultCode LinkedList_Create(freer freer, sort_strategy comparator,
                              LinkedList** result) {
   if (*result != NULL) return kOutputPointerIsNotNull;
   LinkedList* list = calloc(sizeof(LinkedList), 1);

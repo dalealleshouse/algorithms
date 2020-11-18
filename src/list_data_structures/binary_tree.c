@@ -45,7 +45,7 @@ static BinaryTreeNode* TreeNodeCreate(void* payload) {
 }
 
 static BinaryTreeNode* Traverse(BinaryTreeNode* node, const void* search_for,
-                                comparator comparator) {
+                                sort_strategy comparator) {
   if (node == &kNullNode) return NULL;
 
   int result = comparator(search_for, node->payload);
@@ -58,7 +58,7 @@ static BinaryTreeNode* Traverse(BinaryTreeNode* node, const void* search_for,
 }
 
 static void InsertNode(BinaryTreeNode* root, BinaryTreeNode* new,
-                       comparator comparator) {
+                       sort_strategy comparator) {
   root->size++;
   int result = comparator(new->payload, root->payload);
 
@@ -172,7 +172,7 @@ static ResultCode Max(BinaryTreeNode* root, BinaryTreeNode** result) {
 }
 
 static ResultCode ParentLessThan(BinaryTreeNode* root, const void* search_for,
-                                 comparator comparator,
+                                 sort_strategy comparator,
                                  BinaryTreeNode** result) {
   if (root == &kNullNode) return kArgumentOutOfRange;
 
@@ -187,7 +187,8 @@ static ResultCode ParentLessThan(BinaryTreeNode* root, const void* search_for,
 }
 
 static ResultCode Predecessor(BinaryTreeNode* root, const void* search_for,
-                              comparator comparator, BinaryTreeNode** result) {
+                              sort_strategy comparator,
+                              BinaryTreeNode** result) {
   const BinaryTreeNode* node = Traverse(root, search_for, comparator);
   if (node == NULL) return kNotFound;
 
@@ -198,7 +199,7 @@ static ResultCode Predecessor(BinaryTreeNode* root, const void* search_for,
 
 static ResultCode ParentGreaterThan(BinaryTreeNode* root,
                                     const void* search_for,
-                                    comparator comparator,
+                                    sort_strategy comparator,
                                     BinaryTreeNode** result) {
   if (root == &kNullNode) return kArgumentOutOfRange;
 
@@ -213,7 +214,7 @@ static ResultCode ParentGreaterThan(BinaryTreeNode* root,
 }
 
 static ResultCode Successor(BinaryTreeNode* root, const void* search_for,
-                            comparator comparator, BinaryTreeNode** result) {
+                            sort_strategy comparator, BinaryTreeNode** result) {
   const BinaryTreeNode* node = Traverse(root, search_for, comparator);
   if (node == NULL) return kNotFound;
   if (node->right != &kNullNode) return Min(node->right, result);
@@ -237,7 +238,8 @@ static const BinaryTreeNode* Select(const BinaryTreeNode* root,
 }
 
 static ResultCode rank(const BinaryTreeNode* root, const void* payload,
-                       comparator comparator, size_t offset, size_t* result) {
+                       sort_strategy comparator, size_t offset,
+                       size_t* result) {
   if (root == &kNullNode) return kNotFound;
 
   int comp_result = comparator(payload, root->payload);
@@ -456,7 +458,7 @@ static void FreeNodes(BinaryTreeNode* node, freer freer) {
   TreeNodeDestroy(node, freer);
 }
 
-ResultCode BinaryTree_Create(comparator comparator, BinaryTree** self) {
+ResultCode BinaryTree_Create(sort_strategy comparator, BinaryTree** self) {
   if (comparator == NULL) return kNullParameter;
   if (*self != NULL) return kOutputPointerIsNotNull;
 

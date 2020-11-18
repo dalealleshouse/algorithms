@@ -33,7 +33,7 @@ double MinDouble(const size_t count, ...) {
 }
 
 void* MaxPArray(const size_t n, const size_t size, void* arr,
-                const comparator comparator) {
+                const sort_strategy comparator) {
   if (arr == NULL || comparator == NULL || size == 0 || n == 0) return NULL;
 
   void* max = arr;
@@ -47,7 +47,7 @@ void* MaxPArray(const size_t n, const size_t size, void* arr,
 }
 
 void* MinPArray(const size_t n, const size_t size, void* arr,
-                const comparator comparator) {
+                const sort_strategy comparator) {
   if (arr == NULL || comparator == NULL || size == 0 || n == 0) return NULL;
 
   void* min = arr;
