@@ -15,7 +15,7 @@
 struct Heap_t {
   size_t n;
   size_t size;
-  comparator comparator;
+  sort_strategy comparator;
   void** data;
   HashTable* item_tracker;
 };
@@ -113,7 +113,7 @@ static ResultCode BubbleDown(Heap* self, size_t start) {
   return kSuccess;
 }
 
-ResultCode Heap_Create(size_t size, comparator comparator, Heap** self) {
+ResultCode Heap_Create(size_t size, sort_strategy comparator, Heap** self) {
   if (comparator == NULL || self == NULL) return kNullParameter;
   if (*self != NULL) return kOutputPointerIsNotNull;
   if (size == 0) return kArgumentOutOfRange;

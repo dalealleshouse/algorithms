@@ -25,14 +25,14 @@ typedef struct BinaryTreeNode {
 } BinaryTreeNode;
 
 typedef struct {
-  comparator comparator;
+  sort_strategy comparator;
   BinaryTreeNode* root;
   size_t n;
 } BinaryTree;
 
 BinaryTreeNode kNullNode;
 
-ResultCode BinaryTree_Create(comparator, BinaryTree**);
+ResultCode BinaryTree_Create(sort_strategy, BinaryTree**);
 ResultCode BinaryTree_Insert(BinaryTree*, void*);
 ResultCode BinaryTree_Enumerate(const BinaryTree*, item_handler);
 ResultCode BinaryTree_Delete(BinaryTree*, void*, void**);

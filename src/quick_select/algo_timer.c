@@ -9,10 +9,10 @@
 #include "common_math.h"
 
 typedef void* (*selector)(const size_t nth, const size_t n, const size_t size,
-                          void* arr, const comparator comparator);
+                          void* arr, const sort_strategy comparator);
 
 typedef void* (*linear_scan)(const size_t n, const size_t size, void* arr,
-                             const comparator comparator);
+                             const sort_strategy comparator);
 
 static selector get_selector(const algo algo) {
   switch (algo) {

@@ -26,7 +26,7 @@ static void _swap(const size_t size, void* x, void* y) {
 
 // It is assumed that the pivot will be the first item in the array
 int select_partition(const size_t n, const size_t size, void* arr,
-                     const comparator comparator) {
+                     const sort_strategy comparator) {
   if (arr == NULL || comparator == NULL || n == 0 || size == 0) return -1;
 
   int pivot_index = n - 1;
@@ -58,13 +58,13 @@ int select_partition(const size_t n, const size_t size, void* arr,
 }
 
 void* quick_select(const size_t nth, const size_t n, const size_t size,
-                   void* arr, const comparator comparator) {
+                   void* arr, const sort_strategy comparator) {
   return quick_select_pivot(nth, n, size, arr, comparator,
                             select_pivot_on_random);
 }
 
 void* quick_select_pivot(const size_t nth, const size_t n, const size_t size,
-                         void* arr, const comparator comparator,
+                         void* arr, const sort_strategy comparator,
                          const choose_pivot choose_pivot) {
   if (arr == NULL || comparator == NULL || nth > n - 1) return NULL;
 
@@ -98,7 +98,7 @@ void* quick_select_pivot(const size_t nth, const size_t n, const size_t size,
 }
 
 void* sort_select(const size_t nth, const size_t n, const size_t size,
-                  void* arr, const comparator comparator) {
+                  void* arr, const sort_strategy comparator) {
   if (arr == NULL || comparator == NULL) return NULL;
 
   if (n <= 1) return 0;

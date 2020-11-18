@@ -25,7 +25,7 @@ static ResultCode Swap(const size_t kSize, void* x, void* y) {
 }
 
 int PivotOnZero(const size_t n, const size_t size, const void* arr,
-                const comparator comparator) {
+                const sort_strategy comparator) {
   (void)n;
   (void)size;
   (void)arr;
@@ -39,7 +39,7 @@ int PivotOnZero(const size_t n, const size_t size, const void* arr,
  * not that important
  */
 int PivotOnRandom(const size_t n, const size_t size, const void* arr,
-                  const comparator comparator) {
+                  const sort_strategy comparator) {
   unsigned int seed = time(NULL);
 
   (void)size;
@@ -49,7 +49,7 @@ int PivotOnRandom(const size_t n, const size_t size, const void* arr,
 }
 
 int PivotOnLast(const size_t n, const size_t size, const void* arr,
-                const comparator comparator) {
+                const sort_strategy comparator) {
   (void)size;
   (void)arr;
   (void)comparator;
@@ -59,7 +59,7 @@ int PivotOnLast(const size_t n, const size_t size, const void* arr,
 }
 
 int PivotOnMedian(const size_t n, const size_t size, const void* arr,
-                  const comparator comparator) {
+                  const sort_strategy comparator) {
   if (n <= 2) return 0;
 
   size_t mid_point = 0;
@@ -92,7 +92,7 @@ int PivotOnMedian(const size_t n, const size_t size, const void* arr,
 
 // It is assumed that the pivot will be the first item in the array
 ResultCode Partition(const size_t n, const size_t size, void* arr,
-                     const comparator comparator, size_t* pivot_index) {
+                     const sort_strategy comparator, size_t* pivot_index) {
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 
@@ -124,12 +124,12 @@ ResultCode Partition(const size_t n, const size_t size, void* arr,
 }
 
 ResultCode QuickSort(const size_t n, const size_t size, void* arr,
-                     const comparator comparator) {
+                     const sort_strategy comparator) {
   return QuickSortPivot(n, size, arr, comparator, PivotOnRandom);
 }
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
-                          const comparator comparator,
+                          const sort_strategy comparator,
                           const ChoosePivot choose_pivot) {
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;

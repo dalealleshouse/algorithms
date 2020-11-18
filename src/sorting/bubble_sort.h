@@ -13,4 +13,4 @@
 #include "result_code.h"
 
 ResultCode BubbleSort(const size_t n, const size_t size, void* arr,
-                      const comparator comparator);
+                      const sort_strategy comparator);

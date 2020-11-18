@@ -18,7 +18,7 @@
 struct Heap_t {
   size_t n;
   size_t size;
-  comparator comparator;
+  sort_strategy comparator;
   void** data;
   HashTable* item_tracker;
 };

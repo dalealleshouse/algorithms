@@ -11,7 +11,7 @@
 #include <string.h>
 
 ResultCode MergeSort(const void* arr, void* output, const size_t n,
-                     const size_t item_size, comparator comparator) {
+                     const size_t item_size, sort_strategy comparator) {
   if (arr == NULL || output == NULL) return kNullParameter;
   if (n == 0 || item_size == 0) return kArgumentOutOfRange;
 

@@ -23,7 +23,7 @@ static ResultCode Array_CreateFirstItem(Array* self, const void* item) {
   return kSuccess;
 }
 
-ResultCode Array_Create(comparator comparator, size_t item_size,
+ResultCode Array_Create(sort_strategy comparator, size_t item_size,
                         Array** result) {
   if (comparator == NULL || result == NULL) return kNullParameter;
   if (*result != NULL) return kOutputPointerIsNotNull;

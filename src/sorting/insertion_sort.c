@@ -22,7 +22,7 @@ static void ShiftArray(const size_t size, void* ptr) {
 }
 
 ResultCode InsertionSort(const size_t n, const size_t size, void* arr,
-                         const comparator comparator) {
+                         const sort_strategy comparator) {
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 

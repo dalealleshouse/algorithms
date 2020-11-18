@@ -14,7 +14,7 @@
 #include "sorting_test_helpers.h"
 
 static ResultCode MergeSortAdapter(const size_t n, const size_t size, void* arr,
-                                   const comparator comparator) {
+                                   const sort_strategy comparator) {
   if (arr == NULL || comparator == NULL || n == 0 || size == 0) {
     return MergeSort(arr, arr, n, size, comparator);
   }

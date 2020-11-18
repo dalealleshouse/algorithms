@@ -21,16 +21,16 @@
 #include "sorting_test_helpers.h"
 
 typedef int (*sorter)(const size_t n, const size_t size, void* arr,
-                      const comparator comparator);
+                      const sort_strategy comparator);
 
 static int qsort_adapter(const size_t n, const size_t size, void* arr,
-                         const comparator comparator) {
+                         const sort_strategy comparator) {
   qsort(arr, n, size, comparator);
   return 0;
 }
 
 static int merge_sort_adapter(const size_t n, const size_t size, void* arr,
-                              const comparator comparator) {
+                              const sort_strategy comparator) {
   char* tmp[n * size];
   int result = MergeSort(arr, tmp, n, size, comparator);
 
@@ -38,22 +38,22 @@ static int merge_sort_adapter(const size_t n, const size_t size, void* arr,
 }
 
 static int quick_random_adapter(const size_t n, const size_t size, void* arr,
-                                const comparator comparator) {
+                                const sort_strategy comparator) {
   return QuickSortPivot(n, size, arr, comparator, PivotOnRandom);
 }
 
 static int quick_first_adapter(const size_t n, const size_t size, void* arr,
-                               const comparator comparator) {
+                               const sort_strategy comparator) {
   return QuickSortPivot(n, size, arr, comparator, PivotOnZero);
 }
 
 static int quick_last_adapter(const size_t n, const size_t size, void* arr,
-                              const comparator comparator) {
+                              const sort_strategy comparator) {
   return QuickSortPivot(n, size, arr, comparator, PivotOnLast);
 }
 
 static int quick_median_adapter(const size_t n, const size_t size, void* arr,
-                                const comparator comparator) {
+                                const sort_strategy comparator) {
   return QuickSortPivot(n, size, arr, comparator, PivotOnMedian);
 }
 

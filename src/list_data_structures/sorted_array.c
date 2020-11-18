@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-static ResultCode BinarySearch(const void* arr, comparator comparator,
+static ResultCode BinarySearch(const void* arr, sort_strategy comparator,
                                const void* search_for, const size_t n,
                                const size_t item_size, void** result) {
   if (n <= 0) return kNotFound;

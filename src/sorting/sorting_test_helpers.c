@@ -73,7 +73,7 @@ void arrays_are_equal(const size_t n, const size_t size, const void* expected,
 }
 
 void* sort_with_c(const size_t n, const size_t size, const void* arr,
-                  const comparator comparator) {
+                  const sort_strategy comparator) {
   void* new = Duplicate(arr, n * size);
   qsort(new, n, size, comparator);
   return new;
