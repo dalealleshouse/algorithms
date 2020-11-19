@@ -85,16 +85,16 @@ static sorter get_sorter(const sort_algo algo) {
   }
 }
 
-static arr_gen get_arr_get(const arr_type type) {
+static ArrayGenerator get_arr_get(const arr_type type) {
   switch (type) {
     case RANDOM:
-      return rand_arr;
+      return RandomArrayGenerator;
     case DUPLICATES:
-      return dup_val_arr;
+      return DuplicateValueArrayGenerator;
     case REVERSED:
-      return rev_arr;
+      return ReversedArrayGenerator;
     case SORTED:
-      return seq_arr;
+      return SequencedArrayGenerator;
     default:
       fprintf(stderr, "Invalid array type\n");
       return NULL;
@@ -105,10 +105,10 @@ double sort_time(const size_t n, const arr_type type, const sort_algo algo) {
   sorter sorter = get_sorter(algo);
   if (sorter == NULL) return -1;
 
-  arr_gen arr_gen = get_arr_get(type);
-  if (arr_gen == NULL) return -1;
+  ArrayGenerator ArrayGenerator = get_arr_get(type);
+  if (ArrayGenerator == NULL) return -1;
 
-  int* arr = arr_gen(n);
+  int* arr = ArrayGenerator(n);
 
   clock_t t = clock();
   int result = sorter(n, sizeof(int), arr, PIntComparator);

@@ -16,24 +16,12 @@
 const size_t n = 200;
 const size_t test_data_n = 10000;
 
-void* Malloc(size_t size) {
-  void* result = malloc(size);
-  if (result == NULL) fprintf(stderr, "malloc failed");
-
-  return result;
-}
-
-int int_comparator(const void* x, const void* y) {
+int IntComparator(const void* x, const void* y) {
   if (x == y) return 0;
 
   int _x = *(int*)x;
   int _y = *(int*)y;
-
-  if (_x == _y) return 0;
-
-  if (_x < _y) return -1;
-
-  return 1;
+  return _x - _y;
 }
 
 int StructComparator(const void* x, const void* y) {
@@ -46,7 +34,7 @@ int StructComparator(const void* x, const void* y) {
   TestStruct* _x = (TestStruct*)x;
   TestStruct* _y = (TestStruct*)y;
 
-  return int_comparator(&_x->sorter, &_y->sorter);
+  return IntComparator(&_x->sorter, &_y->sorter);
 }
 
 int PointerComparator(const void* x, const void* y) {
@@ -59,52 +47,52 @@ int PointerComparator(const void* x, const void* y) {
   TestStruct* _x = *(TestStruct**)x;
   TestStruct* _y = *(TestStruct**)y;
 
-  return int_comparator(&_x->sorter, &_y->sorter);
+  return IntComparator(&_x->sorter, &_y->sorter);
 }
 
 void* Duplicate(const void* ptr, const size_t size) {
-  void* new_ptr = Malloc(size);
+  void* new_ptr = malloc(size);
   memcpy(new_ptr, ptr, size);
   return new_ptr;
 }
 
-void arrays_are_equal(const size_t n, const size_t size, const void* expected,
-                      const void* actual) {
+void TestArraysAreEqual(const size_t n, const size_t size, const void* expected,
+                        const void* actual) {
   CU_ASSERT_EQUAL(memcmp(expected, actual, n * size), 0);
 }
 
-void* sort_with_c(const size_t n, const size_t size, const void* arr,
-                  const sort_strategy comparator) {
+void* SortWithC(const size_t n, const size_t size, const void* arr,
+                const sort_strategy comparator) {
   void* new = Duplicate(arr, n * size);
   qsort(new, n, size, comparator);
   return new;
 }
 
-void* seq_arr(size_t n) {
-  int* arr = Malloc(sizeof(int) * n);
+void* SequencedArrayGenerator(size_t n) {
+  int* arr = malloc(sizeof(int) * n);
   for (size_t i = 0; i < n; i++) arr[i] = i;
 
   return arr;
 }
 
-void* rev_arr(size_t n) {
-  int* arr = Malloc(sizeof(int) * n);
+void* ReversedArrayGenerator(size_t n) {
+  int* arr = malloc(sizeof(int) * n);
   for (size_t i = 0; i < n; i++) arr[i] = (int)n - (int)i;
 
   return arr;
 }
 
-void* rand_arr(size_t n) {
+void* RandomArrayGenerator(size_t n) {
   unsigned int seed = time(NULL);
-  int* arr = Malloc(sizeof(int) * n);
+  int* arr = malloc(sizeof(int) * n);
   for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed);
 
   return arr;
 }
 
-void* rand_st_arr(size_t n) {
+void* RandomStructArrayGenerator(size_t n) {
   unsigned int seed = time(NULL);
-  TestStruct* arr = Malloc(sizeof(TestStruct) * n);
+  TestStruct* arr = malloc(sizeof(TestStruct) * n);
 
   for (size_t i = 0; i < n; i++) {
     arr[i] = (TestStruct){i, (int)i + 1, rand_r(&seed)};
@@ -113,12 +101,12 @@ void* rand_st_arr(size_t n) {
   return arr;
 }
 
-void* rand_ptr_arr(size_t n) {
+void* RandomPointerArrayGenerator(size_t n) {
   unsigned int seed = time(NULL);
-  TestStruct** arr = Malloc(sizeof(void*) * n);
+  TestStruct** arr = malloc(sizeof(void*) * n);
 
   for (size_t i = 0; i < n; i++) {
-    TestStruct* tmp = Malloc(sizeof(TestStruct));
+    TestStruct* tmp = malloc(sizeof(TestStruct));
     *tmp = (TestStruct){i, (int)i + 1, rand_r(&seed)};
 
     arr[i] = tmp;
@@ -127,15 +115,15 @@ void* rand_ptr_arr(size_t n) {
   return arr;
 }
 
-void* dup_val_arr(size_t n) {
+void* DuplicateValueArrayGenerator(size_t n) {
   unsigned int seed = time(NULL);
-  int* arr = Malloc(sizeof(int) * n);
+  int* arr = malloc(sizeof(int) * n);
   for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed) % 10;
 
   return arr;
 }
 
-void free_ptr_arr(size_t n, void** arr) {
+void FreePointerArray(size_t n, void** arr) {
   for (size_t i = 0; i < n; i++) free(arr[i]);
 
   free(arr);
