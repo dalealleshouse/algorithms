@@ -74,6 +74,7 @@ extern int RegisterPartitionTests();
 extern int RegisterBubbleSortTests();
 extern int RegisterBubbleSortTestCase();
 extern int RegisterInsertionSortTests();
+extern int RegisterInsertionSortTestCase();
 extern int RegisterSelectionSortTests();
 extern int RegisterMergeSortAdapterTests();
 
@@ -117,6 +118,7 @@ int RegisterTests() {
       // Test Cases
       /* RegisterDisjointSetTestCase() != 0 + */
       /* RegisterBubbleSortTestCase() != 0 + */
+      /* RegisterInsertionSortTestCase() != 0 + */
 
       // Unit tests
       RegisterGraphTests() != 0 +

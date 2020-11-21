@@ -21,7 +21,7 @@ size_t comparisons = 0;
 
 STANDARD_SORTING_TESTS(QuickSort)
 
-static void QuickSort_large() { TestIntArray(100000, rev_arr); }
+static void QuickSort_large() { TestIntArray(100000, ReversedArrayGenerator); }
 
 static void TestPivot(ChoosePivot choose_pivot) {
   int* arr = GenerateTestData();
@@ -33,7 +33,7 @@ static void TestPivot(ChoosePivot choose_pivot) {
   qsort(arr_cpy, test_data_n, sizeof(int), PIntComparator);
 
   CU_ASSERT_EQUAL_FATAL(0, result);
-  arrays_are_equal(test_data_n, sizeof(int), arr_cpy, arr);
+  TestArraysAreEqual(test_data_n, sizeof(int), arr_cpy, arr);
   free(arr);
   free(arr_cpy);
 }
@@ -122,7 +122,7 @@ static void Partition_does_not_chage_sorted() {
 
   CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(pivot_index, 0);
-  arrays_are_equal(n, sizeof(expected[0]), expected, arr);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
 }
 
 static void Partition_QuickSort_pivot_on_center() {
@@ -135,7 +135,7 @@ static void Partition_QuickSort_pivot_on_center() {
 
   CU_ASSERT_EQUAL(result, 0);
   CU_ASSERT_EQUAL(pivot_index, 3);
-  arrays_are_equal(n, sizeof(expected[0]), expected, arr);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
 }
 
 static void Partition_reverse_sorted() {
@@ -149,7 +149,7 @@ static void Partition_reverse_sorted() {
 
   CU_ASSERT_EQUAL(result, 0);
   CU_ASSERT_EQUAL(pivot_index, 5);
-  arrays_are_equal(n, sizeof(expected[0]), expected, arr);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
 }
 
 static void Partition_first_in_correct_position() {
@@ -163,7 +163,7 @@ static void Partition_first_in_correct_position() {
 
   CU_ASSERT_EQUAL(result, 0);
   CU_ASSERT_EQUAL(pivot_index, 0);
-  arrays_are_equal(n, sizeof(expected[0]), expected, arr);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
 }
 
 int RegisterPartitionTests() {
