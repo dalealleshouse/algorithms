@@ -7,8 +7,10 @@
  ******************************************************************************/
 #include "insertion_sort.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
@@ -20,8 +22,9 @@ STANDARD_SORTING_TESTS(InsertionSort)
 /*******************************************************************************
  * WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
  *
- * There is no error checking to make the code more readable. This should not be
- * considered an example of best practices.
+ * assert is the primary form of error checking in this file and assert
+ * statements are NOT evaluated for release builds. This is NOT an example of
+ * code suitable for production use.
  *
  * WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
  *******************************************************************************/
@@ -31,52 +34,75 @@ typedef struct ContestantResult {
   float score;
 } ContestantResult;
 
-int DescendingScoreStrategy(const void* x, const void* y) {
-  ContestantResult* _x = (ContestantResult*)x;
-  ContestantResult* _y = (ContestantResult*)y;
+static void ScoreTracker(LinkedList* scores, ContestantResult* cr) {
+  assert(scores != NULL);
+  assert(cr != NULL);
 
-  if (_y->score > _x->score) return 1;
-
-  return -1;
-}
-
-void ScoreTracker(LinkedList* scores, ContestantResult* cr) {
   size_t index = 0;
 
   LinkedListItem* item = scores->head;
+
+  // Cycle through the list to find the ordered place for <cr>
   while (item != NULL) {
-    if (DescendingScoreStrategy(cr, item->payload) <= 0) break;
+    if (cr->score <= ((ContestantResult*)item->payload)->score) break;
 
     index++;
     item = item->next;
   }
 
-  LinkedList_InsertAt(scores, cr, index);
+  // Insert <cr> at the desired location place
+  ResultCode result_code = LinkedList_InsertAt(scores, cr, index);
+
+  (void)result_code;
+  assert(result_code == kSuccess);
 }
 
-void PrintTopTen(LinkedList* scores) {
-  LinkedListItem* item = scores->tail;
+static void PrintTopTen(LinkedList* scores) {
+  assert(scores != NULL);
 
-  for (size_t i = 0; i < 10; i++) {
+  LinkedListItem* item = scores->head;
+
+  // Print top 10, if there are less than 10 items in the list, print them all
+  for (size_t i = 0; i < 10 && item != NULL; i++) {
     ContestantResult* cr = (ContestantResult*)item->payload;
+    assert(cr != NULL);
+
     printf("%lu %s %f \n", i + 1, cr->name, cr->score);
-    item = item->prev;
+    item = item->next;
   }
 }
 
-void ParseDataFile(char* file_path) {
+static void ParseDataFile(char* file_path) {
   const size_t kBufferSize = 128;
   LinkedList* scores = NULL;
 
-  LinkedList_Create(free, NULL, &scores);
+  // Stop if user does not have access to the file or it does not exist
+  assert(access(file_path, R_OK) == 0);
 
+  // Create a linked list to store scores in
+  ResultCode result_code = LinkedList_Create(free, NULL, &scores);
+
+  (void)result_code;
+  assert(result_code == kSuccess);
+
+  // Open the file
   FILE* file;
   file = fopen(file_path, "r");
+  assert(file != NULL);
 
   char line[kBufferSize];
   while (fgets(line, kBufferSize, file)) {
+    // Stop if there is a read error
+    assert(feof(file) == 0);
+
     ContestantResult* cr = malloc(sizeof(ContestantResult));
-    sscanf(line, "%[^\t]%f", cr->name, &cr->score);
+    assert(cr != NULL);
+
+    int vars_parsed = sscanf(line, "%[^\t]%f", cr->name, &cr->score);
+    (void)vars_parsed;
+    assert(vars_parsed == 2);
+
+    // Add the contestant result to the running list of scores
     ScoreTracker(scores, cr);
   }
 
