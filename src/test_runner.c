@@ -77,6 +77,7 @@ extern int RegisterInsertionSortTests();
 extern int RegisterInsertionSortTestCase();
 extern int RegisterSelectionSortTests();
 extern int RegisterMergeSortAdapterTests();
+extern int RegisterSortInstrumentationTestCase();
 
 // Traveling Salesman
 extern int RegisterTravelingSalesmanTests();
@@ -119,6 +120,7 @@ int RegisterTests() {
       /* RegisterDisjointSetTestCase() != 0 + */
       /* RegisterBubbleSortTestCase() != 0 + */
       /* RegisterInsertionSortTestCase() != 0 + */
+      /* RegisterSortInstrumentationTestCase() != 0 + */
 
       // Unit tests
       RegisterGraphTests() != 0 +

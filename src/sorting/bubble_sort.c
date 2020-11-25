@@ -10,11 +10,15 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "sort_instrumentation.h"
+
 static void Swap(const size_t size, void* x, void* y) {
   char n[size];
   memcpy(n, x, size);
   memcpy(x, y, size);
   memcpy(y, n, size);
+
+  ++swap_count;
 }
 
 ResultCode BubbleSort(const size_t n, const size_t size, void* arr,

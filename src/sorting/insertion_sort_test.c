@@ -91,6 +91,7 @@ static void ParseDataFile(char* file_path) {
   assert(file != NULL);
 
   char line[kBufferSize];
+  char score_string[kBufferSize];
   while (fgets(line, kBufferSize, file)) {
     // Stop if there is a read error
     assert(feof(file) == 0);
@@ -98,9 +99,13 @@ static void ParseDataFile(char* file_path) {
     ContestantResult* cr = malloc(sizeof(ContestantResult));
     assert(cr != NULL);
 
-    int vars_parsed = sscanf(line, "%[^\t]%f", cr->name, &cr->score);
+    // intermediate score string to effectively test for failed conversions
+    int vars_parsed = sscanf(line, "%[^\t]%s", cr->name, score_string);
     (void)vars_parsed;
     assert(vars_parsed == 2);
+
+    cr->score = strtof(score_string, NULL);
+    assert(errno == 0);
 
     // Add the contestant result to the running list of scores
     ScoreTracker(scores, cr);
