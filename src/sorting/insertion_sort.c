@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "sort_instrumentation.h"
+
 static void* Duplicate(const size_t size, void* ptr) {
   void* tmp = malloc(size);
   memcpy(tmp, ptr, size);
@@ -18,6 +20,7 @@ static void* Duplicate(const size_t size, void* ptr) {
 }
 
 static void ShiftArray(const size_t size, void* ptr) {
+  ++swap_count;
   memmove((char*)ptr + size, ptr, size);
 }
 

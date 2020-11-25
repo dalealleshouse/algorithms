@@ -10,15 +10,15 @@
 #include <stdbool.h>
 #include <string.h>
 
-static int Swap(const size_t kSize, void* x, void* y) {
-  if (kSize == 0 || x == NULL || y == NULL) return -1;
+#include "sort_instrumentation.h"
+
+static void Swap(const size_t kSize, void* x, void* y) {
+  ++swap_count;
 
   char n[kSize];
   memcpy(n, x, kSize);
   memcpy(x, y, kSize);
   memcpy(y, n, kSize);
-
-  return 0;
 }
 
 ResultCode SelectionSort(const size_t n, const size_t size, void* arr,
