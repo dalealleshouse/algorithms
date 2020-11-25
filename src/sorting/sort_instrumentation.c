@@ -39,7 +39,7 @@ static void InstructionCounts(sorter sorter, char* name) {
   int* test_data = GenerateTestData();
 
   sorter(test_data_n, sizeof(int), test_data, InstrumentedComparator);
-  printf("%s Sort swaps = %lu, comparions = %lu\n", name, swap_count,
+  printf("%s Sort swaps = %lu, comparisons = %lu\n", name, swap_count,
          compare_count);
 
   free(test_data);
