@@ -10,13 +10,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "sort_instrumentation.h"
+
 ResultCode MergeSort(const void* arr, void* output, const size_t n,
                      const size_t item_size, sort_strategy comparator) {
   if (arr == NULL || output == NULL) return kNullParameter;
   if (n == 0 || item_size == 0) return kArgumentOutOfRange;
 
   if (n == 1) {
-    memcpy(output, arr, item_size);
+    INSTRUMENTED_MEMCPY(output, arr, item_size);
   } else {
     // If n is odd, this will assign the larger half to b.
     size_t a_n = n / 2;
@@ -35,19 +37,19 @@ ResultCode MergeSort(const void* arr, void* output, const size_t n,
     size_t b_pos = 0;
     for (size_t i = 0; i < n; i++) {
       if (a_pos >= a_size) {
-        memcpy(output, &b[b_pos], b_size - b_pos);
+        INSTRUMENTED_MEMCPY(output, &b[b_pos], b_size - b_pos);
         break;
       } else if (b_pos >= b_size) {
-        memcpy(output, &a[a_pos], a_size - a_pos);
+        INSTRUMENTED_MEMCPY(output, &a[a_pos], a_size - a_pos);
         break;
       } else {
         int result = comparator(&a[a_pos], &b[b_pos]);
 
         if (result < 0) {
-          memcpy(output, &a[a_pos], item_size);
+          INSTRUMENTED_MEMCPY(output, &a[a_pos], item_size);
           a_pos += item_size;
         } else {
-          memcpy(output, &b[b_pos], item_size);
+          INSTRUMENTED_MEMCPY(output, &b[b_pos], item_size);
           b_pos += item_size;
         }
       }
@@ -57,4 +59,15 @@ ResultCode MergeSort(const void* arr, void* output, const size_t n,
   }
 
   return 0;
+}
+
+ResultCode MergeSortAdapter(const size_t n, const size_t size, void* arr,
+                            const sort_strategy comparator) {
+  if (arr == NULL || comparator == NULL || n == 0 || size == 0) {
+    return MergeSort(arr, arr, n, size, comparator);
+  }
+
+  char* tmp[n * size];
+  memcpy(tmp, arr, n * size);
+  return MergeSort(tmp, arr, n, size, comparator);
 }
