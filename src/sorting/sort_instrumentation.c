@@ -41,8 +41,8 @@ static void InstructionCounts(sorter sorter, char* name) {
   int* test_data = GenerateTestData();
 
   sorter(test_data_n, sizeof(int), test_data, InstrumentedComparator);
-  printf("%10s Sort: copy = %'10lu, comparisons = %'10lu\n", name, copy_count,
-         compare_count);
+  printf("%10s Sort: copy = %'10lu comparisons = %'10lu total = %'11lu\n", name,
+         copy_count, compare_count, copy_count + compare_count);
 
   free(test_data);
 }
