@@ -14,11 +14,9 @@
 
 static void Swap(const size_t size, void* x, void* y) {
   char n[size];
-  memcpy(n, x, size);
-  memcpy(x, y, size);
-  memcpy(y, n, size);
-
-  ++swap_count;
+  INSTRUMENTED_MEMCPY(n, x, size);
+  INSTRUMENTED_MEMCPY(x, y, size);
+  INSTRUMENTED_MEMCPY(y, n, size);
 }
 
 ResultCode BubbleSort(const size_t n, const size_t size, void* arr,

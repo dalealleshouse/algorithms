@@ -13,15 +13,4 @@
 #include "CUnit/CUnit.h"
 #include "sorting_test_helpers.h"
 
-static ResultCode MergeSortAdapter(const size_t n, const size_t size, void* arr,
-                                   const sort_strategy comparator) {
-  if (arr == NULL || comparator == NULL || n == 0 || size == 0) {
-    return MergeSort(arr, arr, n, size, comparator);
-  }
-
-  char* tmp[n * size];
-  memcpy(tmp, arr, n * size);
-  return MergeSort(tmp, arr, n, size, comparator);
-}
-
 STANDARD_SORTING_TESTS(MergeSortAdapter)

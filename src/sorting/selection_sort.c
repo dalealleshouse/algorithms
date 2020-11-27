@@ -13,12 +13,10 @@
 #include "sort_instrumentation.h"
 
 static void Swap(const size_t kSize, void* x, void* y) {
-  ++swap_count;
-
   char n[kSize];
-  memcpy(n, x, kSize);
-  memcpy(x, y, kSize);
-  memcpy(y, n, kSize);
+  INSTRUMENTED_MEMCPY(n, x, kSize);
+  INSTRUMENTED_MEMCPY(x, y, kSize);
+  INSTRUMENTED_MEMCPY(y, n, kSize);
 }
 
 ResultCode SelectionSort(const size_t n, const size_t size, void* arr,

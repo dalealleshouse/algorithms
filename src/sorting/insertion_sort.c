@@ -15,13 +15,12 @@
 
 static void* Duplicate(const size_t size, void* ptr) {
   void* tmp = malloc(size);
-  memcpy(tmp, ptr, size);
+  INSTRUMENTED_MEMCPY(tmp, ptr, size);
   return tmp;
 }
 
 static void ShiftArray(const size_t size, void* ptr) {
-  ++swap_count;
-  memmove((char*)ptr + size, ptr, size);
+  INSTRUMENTED_MEMMOVE((char*)ptr + size, ptr, size);
 }
 
 ResultCode InsertionSort(const size_t n, const size_t size, void* arr,
@@ -45,7 +44,7 @@ ResultCode InsertionSort(const size_t n, const size_t size, void* arr,
       }
     }
 
-    memcpy((char*)arr + (open_index * size), ith, size);
+    INSTRUMENTED_MEMCPY((char*)arr + (open_index * size), ith, size);
     free(ith);
   }
 
