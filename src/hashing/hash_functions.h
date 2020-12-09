@@ -14,8 +14,8 @@ typedef uint64_t hash;
 typedef hash (*hasher)(void*, size_t);
 typedef size_t (*hash_compressor)(hash, size_t);
 
-const size_t hasher_count;
-const hasher hashers[14];
+extern const size_t hasher_count;
+extern const hasher hashers[14];
 
 hash rotating_hash(void*, size_t);
 hash djb_hash(void*, size_t);

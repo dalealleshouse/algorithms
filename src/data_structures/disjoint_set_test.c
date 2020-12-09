@@ -176,7 +176,7 @@ static void DisjointSet_FindSet_returns_self() {
   });
 }
 
-static size_t _getPathLength(SetItem* item) {
+static size_t getPathLength(SetItem* item) {
   size_t count = 0;
 
   while (item != item->parent) {
@@ -215,7 +215,7 @@ static void DisjointSet_FindSet_compresses_paths() {
       uintptr_t val = (uintptr_t)&vals[i];
       set = NULL;
       HashTable_Get(sut.items, &val, sizeof(void*), (void**)&set);
-      size_t path_len = _getPathLength(set);
+      size_t path_len = getPathLength(set);
 
       if (set == rep) {
         CU_ASSERT_EQUAL(path_len, 0);

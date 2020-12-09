@@ -20,7 +20,7 @@ typedef ResultCode (*PredOp)(const void*, const uintptr_t);
 typedef ResultCode (*RankOp)(const void*, const uintptr_t);
 
 static InsertOp GetInsertOperation(Structure str);
-static uintptr_t _enumerate_sum = 0;
+static uintptr_t enumerate_sum = 0;
 
 static int PointerAsIntComparator(const void* x, const void* y) {
   if (x == y) return 0;
@@ -226,7 +226,7 @@ static SearchOp GetSearchOperation(Structure str) {
  * Enumerate Operations
  ******************************************************************************/
 static void Array_EnumerateHandler(void* item) {
-  _enumerate_sum += *(uintptr_t*)item;
+  enumerate_sum += *(uintptr_t*)item;
 }
 
 static ResultCode Array_EnumerateOp(const void* array) {
@@ -234,7 +234,7 @@ static ResultCode Array_EnumerateOp(const void* array) {
 }
 
 static void ListAndTree_EnumerateHandler(void* item) {
-  _enumerate_sum += (uintptr_t)item;
+  enumerate_sum += (uintptr_t)item;
 }
 
 static ResultCode LinkedList_EnumerateOp(const void* list) {
@@ -452,7 +452,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
         PRINT_ERROR("GetEnumerateOperation", kNotFound);
         return -1;
       }
-      _enumerate_sum = 0;
+      enumerate_sum = 0;
 
       t = clock();
       // No error checking to avoid time overhead

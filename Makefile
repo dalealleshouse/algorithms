@@ -1,5 +1,5 @@
 SHELL 	= /bin/sh
-CC 		= clang-10
+CC 		= clang-11
 
 FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden -D_POSIX_C_SOURCE=200809L -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
@@ -55,16 +55,16 @@ ctags:
 	ctags -R .
 
 comp-db:
-	bear make -B
+	bear -- make -B
 
 lint:
 	cpplint src/*.[ch] src/*/*.[ch]
 
 format:
-	clang-format-10 -i src/*.[ch] src/*/*.[ch]
+	clang-format-11 -i src/*.[ch] src/*/*.[ch]
 
 tidy:
-	clang-tidy-10 src/*.[ch] src/*/*.[ch]
+	clang-tidy-11 src/*.[ch] src/*/*.[ch]
 
 clean:
 	-rm -f $(OBJECTS)

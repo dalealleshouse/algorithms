@@ -5,7 +5,7 @@
 #include "../utils/comparators.h"
 #include "../utils/result_code.h"
 
-const size_t INITAL_HEAP_SIZE;
+extern const size_t INITAL_HEAP_SIZE;
 
 typedef struct RunningMedian RunningMedian;
 

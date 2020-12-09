@@ -9,7 +9,7 @@
 
 #include <aio.h>
 
-size_t copy_count;
+extern size_t copy_count;
 
 // un-comment to enable instrumention
 /* #define INSTRUMENT_SORT */

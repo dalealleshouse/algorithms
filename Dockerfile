@@ -1,10 +1,12 @@
-FROM ubuntu:20.04
+FROM ubuntu:21.04
 LABEL maintainer="Dale Alleshouse dalealleshouse@gmail.com"
 
-RUN apt-get -y update && apt-get install -y \
+ENV DEBIAN_FRONTEND="noninteractive"
+
+RUN apt-get -qqy update && apt-get install -qqy \
     clang clang-format clang-tidy llvm lcov lldb libcunit1 libcunit1-doc \
     libcunit1-dev build-essential bear python3-pip && \
-    apt-get upgrade -y && \
+    apt-get upgrade -qqy && \
     apt-get clean
 
 RUN mkdir build/ && \

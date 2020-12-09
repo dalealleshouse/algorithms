@@ -4,10 +4,10 @@
 #include <stdio.h>
 
 // Initial size of vertex and edge allocation
-const size_t INITIAL_ALLOC;
+extern const size_t INITIAL_ALLOC;
 
 // Factor by when to increase allocation size when more space is required
-const size_t REALLOC_FACTOR;
+extern const size_t REALLOC_FACTOR;
 
 typedef enum {
   Graph_InvalidEdgeIndex = -6,

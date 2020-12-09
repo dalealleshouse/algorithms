@@ -3,4 +3,4 @@
 #include <limits.h>
 
 typedef int path_length;
-const int UNINITIALIZED;
+extern const int UNINITIALIZED;

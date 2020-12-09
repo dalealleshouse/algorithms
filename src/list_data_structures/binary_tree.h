@@ -30,7 +30,7 @@ typedef struct {
   size_t n;
 } BinaryTree;
 
-BinaryTreeNode kNullNode;
+extern BinaryTreeNode kNullNode;
 
 ResultCode BinaryTree_Create(sort_strategy, BinaryTree**);
 ResultCode BinaryTree_Insert(BinaryTree*, void*);

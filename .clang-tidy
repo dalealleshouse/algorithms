@@ -1,5 +1,6 @@
 ---
-Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
+Checks:
+'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-misc-no-recursion'
 WarningsAsErrors: 'google-*,bugprone-*,clang-analyzer-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
@@ -135,7 +136,7 @@ CheckOptions:
   - key:             modernize-make-shared.IgnoreMacros
     value:           '1'
   - key:             modernize-make-shared.IncludeStyle
-    value:           '0'
+    value:           llvm
   - key:             modernize-make-shared.MakeSmartPtrFunction
     value:           'std::make_shared'
   - key:             modernize-make-shared.MakeSmartPtrFunctionHeader
@@ -143,7 +144,7 @@ CheckOptions:
   - key:             modernize-make-unique.IgnoreMacros
     value:           '1'
   - key:             modernize-make-unique.IncludeStyle
-    value:           '0'
+    value:           llvm
   - key:             modernize-make-unique.MakeSmartPtrFunction
     value:           'std::make_unique'
   - key:             modernize-make-unique.MakeSmartPtrFunctionHeader
