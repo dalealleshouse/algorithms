@@ -395,8 +395,8 @@ static void HashTable_Enumerate_null_parameter() {
   CU_ASSERT_EQUAL(result, kNullParameter);
 }
 
-static void _itemHandler(const KeyValuePair* item, const size_t index,
-                         void* context) {
+static void itemHandler(const KeyValuePair* item, const size_t index,
+                        void* context) {
   *(int*)context += (*(int*)item->value + (int)index);
 }
 
@@ -411,7 +411,7 @@ static void HashTable_Enumerate_happy_path() {
     HashTable_Put(sut, key, strlen(key), &value);
     HashTable_Put(sut, key2, strlen(key2), &value2);
 
-    HashTable_Enumerate(sut, _itemHandler, &context);
+    HashTable_Enumerate(sut, itemHandler, &context);
 
     // results should be (order not guaranteed)
     // iteration 1 = 138 + 0

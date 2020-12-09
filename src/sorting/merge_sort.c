@@ -58,7 +58,7 @@ ResultCode MergeSort(const void* arr, void* output, const size_t n,
     }
   }
 
-  return 0;
+  return kSuccess;
 }
 
 ResultCode MergeSortAdapter(const size_t n, const size_t size, void* arr,

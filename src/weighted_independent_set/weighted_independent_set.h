@@ -46,7 +46,7 @@ void WeightedIndependentSet_Destroy(WeightedIndependentSet* wis);
 /*
  * Common representation for the empty set
  */
-const WeightedIndependentSet EMPTY_SET;
+extern const WeightedIndependentSet EMPTY_SET;
 
 Result WeightedIndependentSet_Recursive(PathGraph* graph,
                                         WeightedIndependentSet** conclusion);

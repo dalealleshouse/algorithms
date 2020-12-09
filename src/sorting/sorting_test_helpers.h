@@ -13,8 +13,8 @@
 #include "result_code.h"
 #include "test_helpers.h"
 
-const size_t n;
-const size_t test_data_n;
+extern const size_t n;
+extern const size_t test_data_n;
 
 typedef struct TestStruct {
   int foo;
