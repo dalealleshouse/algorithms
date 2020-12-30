@@ -13,7 +13,7 @@
 #include <time.h>
 
 static ResultCode Swap(const size_t kSize, void* x, void* y) {
-  if (kSize == 0 || x == NULL || y == NULL) return kNullParameter;
+  if (x == NULL || y == NULL) return kNullParameter;
   if (kSize == 0) return kArgumentOutOfRange;
 
   char n[kSize];
@@ -21,11 +21,11 @@ static ResultCode Swap(const size_t kSize, void* x, void* y) {
   memcpy(x, y, kSize);
   memcpy(y, n, kSize);
 
-  return 0;
+  return kSuccess;
 }
 
-int PivotOnZero(const size_t n, const size_t size, const void* arr,
-                const sort_strategy comparator) {
+size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
+                   const sort_strategy comparator) {
   (void)n;
   (void)size;
   (void)arr;
@@ -38,8 +38,8 @@ int PivotOnZero(const size_t n, const size_t size, const void* arr,
  * random number and it's not. However, for the purposes of this project, it's
  * not that important
  */
-int PivotOnRandom(const size_t n, const size_t size, const void* arr,
-                  const sort_strategy comparator) {
+size_t PivotOnRandom(const size_t n, const size_t size, const void* arr,
+                     const sort_strategy comparator) {
   unsigned int seed = time(NULL);
 
   (void)size;
@@ -48,8 +48,8 @@ int PivotOnRandom(const size_t n, const size_t size, const void* arr,
   return rand_r(&seed) % (int)n;
 }
 
-int PivotOnLast(const size_t n, const size_t size, const void* arr,
-                const sort_strategy comparator) {
+size_t PivotOnLast(const size_t n, const size_t size, const void* arr,
+                   const sort_strategy comparator) {
   (void)size;
   (void)arr;
   (void)comparator;
@@ -58,8 +58,8 @@ int PivotOnLast(const size_t n, const size_t size, const void* arr,
   return (int)n - 1;
 }
 
-int PivotOnMedian(const size_t n, const size_t size, const void* arr,
-                  const sort_strategy comparator) {
+size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
+                     const sort_strategy comparator) {
   if (n <= 2) return 0;
 
   size_t mid_point = 0;
@@ -130,40 +130,43 @@ ResultCode QuickSort(const size_t n, const size_t size, void* arr,
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
                           const sort_strategy comparator,
-                          const ChoosePivot choose_pivot) {
+                          const choose_pivot choose_pivot) {
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 
-  if (n <= 1) return 0;
+  if (n <= 1) return kSuccess;
 
   size_t pivot_index;
-  int pivot;
+  size_t pivot;
 
-  if ((pivot = choose_pivot(n, size, arr, comparator)) < 0) return -1;
+  pivot = choose_pivot(n, size, arr, comparator);
 
   // move the partition value to the first position
-  if (Swap(size, arr, (char*)arr + pivot * size) != 0) return -2;
+  ResultCode result_code = Swap(size, arr, (char*)arr + pivot * size);
+  if (result_code != kSuccess) return result_code;
 
-  if (Partition(n, size, arr, comparator, &pivot_index) != 0) return -3;
+  // This will move the item at index 0 to it's final placement
+  result_code = Partition(n, size, arr, comparator, &pivot_index);
+  if (result_code != kSuccess) return result_code;
 
-  int result;
   // items to the left of the partition
+  // The pivot index is zero based, so pivot_index is equivalent to n - 1
   if (pivot_index > 0) {
-    if ((result = QuickSortPivot(pivot_index, size, arr, comparator,
-                                 choose_pivot)) != 0) {
-      return result;
+    if ((result_code = QuickSortPivot(pivot_index, size, arr, comparator,
+                                      choose_pivot)) != kSuccess) {
+      return result_code;
     }
   }
 
   // items to the right of the partition
   pivot_index++;
   if (pivot_index < n) {
-    if ((result = QuickSortPivot(n - pivot_index, size,
-                                 (char*)arr + pivot_index * size, comparator,
-                                 choose_pivot)) != 0) {
-      return result;
+    if ((result_code = QuickSortPivot(n - pivot_index, size,
+                                      (char*)arr + pivot_index * size,
+                                      comparator, choose_pivot)) != kSuccess) {
+      return result_code;
     }
   }
 
-  return 0;
+  return kSuccess;
 }
