@@ -23,7 +23,7 @@ STANDARD_SORTING_TESTS(QuickSort)
 
 static void QuickSort_large() { TestIntArray(100000, ReversedArrayGenerator); }
 
-static void TestPivot(ChoosePivot choose_pivot) {
+static void TestPivot(choose_pivot choose_pivot) {
   int* arr = GenerateTestData();
   int* arr_cpy = Duplicate(arr, sizeof(int) * test_data_n);
 
