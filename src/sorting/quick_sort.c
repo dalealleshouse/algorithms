@@ -12,16 +12,11 @@
 #include <string.h>
 #include <time.h>
 
-static ResultCode Swap(const size_t kSize, void* x, void* y) {
-  if (x == NULL || y == NULL) return kNullParameter;
-  if (kSize == 0) return kArgumentOutOfRange;
-
+static void Swap(const size_t kSize, void* x, void* y) {
   char n[kSize];
   memcpy(n, x, kSize);
   memcpy(x, y, kSize);
   memcpy(y, n, kSize);
-
-  return kSuccess;
 }
 
 size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
@@ -90,9 +85,45 @@ size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
   return (int)n - 1;
 }
 
+static void* calc_pointer(void* arr, const size_t size, size_t index) {
+  return (char*)arr + size * index;
+}
+
 // It is assumed that the pivot will be the first item in the array
 ResultCode Partition(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator, size_t* pivot_index) {
+  if (arr == NULL || comparator == NULL) return kNullParameter;
+  if (n <= 1 || size == 0) return kArgumentOutOfRange;
+
+  char* pivot_value = arr;
+  size_t low = 1;
+  size_t high = n - 1;
+
+  while (true) {
+    while (low < high &&
+           comparator(calc_pointer(arr, size, low), pivot_value) <= 0) {
+      low++;
+    }
+
+    while (high >= low &&
+           comparator(calc_pointer(arr, size, high), pivot_value) >= 0) {
+      high--;
+    }
+
+    if (low >= high) break;
+    Swap(size, calc_pointer(arr, size, low), calc_pointer(arr, size, high));
+  }
+
+  // Move the pivot into the correct place
+  Swap(size, arr, calc_pointer(arr, size, high));
+  *pivot_index = high;
+
+  return kSuccess;
+}
+
+ResultCode InefficentPartition(const size_t n, const size_t size, void* arr,
+                               const sort_strategy comparator,
+                               size_t* pivot_index) {
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 
@@ -105,7 +136,7 @@ ResultCode Partition(const size_t n, const size_t size, void* arr,
   for (size_t i = 1; i < n; i++) {
     // If the item is less, swap it, otherwise do nothing
     if (comparator(t_arr, pivot_value) < 0) {
-      if (Swap(size, t_arr, pivot_pos) < 0) return -1;
+      Swap(size, t_arr, pivot_pos);
 
       pivot_pos += size;
       (*pivot_index)++;
@@ -115,9 +146,7 @@ ResultCode Partition(const size_t n, const size_t size, void* arr,
   }
 
   if (*pivot_index > 0) {
-    ResultCode result_code =
-        Swap(size, pivot_value, pivot_value + *pivot_index * size);
-    if (result_code != kSuccess) return result_code;
+    Swap(size, pivot_value, pivot_value + *pivot_index * size);
   }
 
   return kSuccess;
@@ -142,11 +171,10 @@ ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
   pivot = choose_pivot(n, size, arr, comparator);
 
   // move the partition value to the first position
-  ResultCode result_code = Swap(size, arr, (char*)arr + pivot * size);
-  if (result_code != kSuccess) return result_code;
+  Swap(size, arr, (char*)arr + pivot * size);
 
   // This will move the item at index 0 to it's final placement
-  result_code = Partition(n, size, arr, comparator, &pivot_index);
+  ResultCode result_code = Partition(n, size, arr, comparator, &pivot_index);
   if (result_code != kSuccess) return result_code;
 
   // items to the left of the partition

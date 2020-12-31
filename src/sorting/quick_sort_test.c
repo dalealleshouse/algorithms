@@ -131,9 +131,10 @@ static void Partition_QuickSort_pivot_on_center() {
   int arr[] = {4, 2, 3, 1, 5, 6};
   size_t pivot_index;
 
-  int result = Partition(n, sizeof(int), arr, PIntComparator, &pivot_index);
+  ResultCode result =
+      Partition(n, sizeof(int), arr, PIntComparator, &pivot_index);
 
-  CU_ASSERT_EQUAL(result, 0);
+  CU_ASSERT_EQUAL(result, kSuccess);
   CU_ASSERT_EQUAL(pivot_index, 3);
   TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
 }
