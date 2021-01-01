@@ -12,11 +12,13 @@
 #include <string.h>
 #include <time.h>
 
+#include "sort_instrumentation.h"
+
 static void Swap(const size_t kSize, void* x, void* y) {
   char n[kSize];
-  memcpy(n, x, kSize);
-  memcpy(x, y, kSize);
-  memcpy(y, n, kSize);
+  INSTRUMENTED_MEMCPY(n, x, kSize);
+  INSTRUMENTED_MEMCPY(x, y, kSize);
+  INSTRUMENTED_MEMCPY(y, n, kSize);
 }
 
 size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
@@ -101,7 +103,7 @@ ResultCode Partition(const size_t n, const size_t size, void* arr,
 
   while (true) {
     while (low < high &&
-           comparator(calc_pointer(arr, size, low), pivot_value) <= 0) {
+           comparator(calc_pointer(arr, size, low), pivot_value) < 0) {
       low++;
     }
 
@@ -112,6 +114,8 @@ ResultCode Partition(const size_t n, const size_t size, void* arr,
 
     if (low >= high) break;
     Swap(size, calc_pointer(arr, size, low), calc_pointer(arr, size, high));
+    low++;
+    high--;
   }
 
   // Move the pivot into the correct place

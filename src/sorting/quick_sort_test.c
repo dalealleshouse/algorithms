@@ -76,6 +76,39 @@ static void QuickSort_pivot_on_median_finds_middle() {
   CU_ASSERT_EQUAL(expected, result);
 }
 
+static void QuickSort_one_item() {
+  const int n = 1;
+  const int expected[] = {1};
+  int arr[] = {1};
+
+  ResultCode result = QuickSort(n, sizeof(int), arr, PIntComparator);
+
+  CU_ASSERT_EQUAL(result, kSuccess);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
+}
+
+static void QuickSort_two_items() {
+  const int n = 2;
+  const int expected[] = {1, 2};
+  int arr[] = {2, 1};
+
+  ResultCode result = QuickSort(n, sizeof(int), arr, PIntComparator);
+
+  CU_ASSERT_EQUAL(result, kSuccess);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
+}
+
+static void QuickSort_three_items() {
+  const int n = 2;
+  const int expected[] = {1, 2, 3};
+  int arr[] = {2, 1, 3};
+
+  ResultCode result = QuickSort(n, sizeof(int), arr, PIntComparator);
+
+  CU_ASSERT_EQUAL(result, kSuccess);
+  TestArraysAreEqual(n, sizeof(expected[0]), expected, arr);
+}
+
 int RegisterExtraQuickSortTests() {
   CU_TestInfo quick_sort_tests[] = {
       CU_TEST_INFO(QuickSort_large),
@@ -86,6 +119,9 @@ int RegisterExtraQuickSortTests() {
       CU_TEST_INFO(QuickSort_pivot_on_median_finds_first),
       CU_TEST_INFO(QuickSort_pivot_on_median_finds_middle),
       CU_TEST_INFO(QuickSort_pivot_on_median_finds_last),
+      CU_TEST_INFO(QuickSort_one_item),
+      CU_TEST_INFO(QuickSort_two_items),
+      CU_TEST_INFO(QuickSort_three_items),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "QuickSort Extra",

@@ -96,7 +96,7 @@ extern int RegisterClosestDistanceSlowTests();
 // Quick Select
 extern int RegisterSelectTests();
 extern int RegisterQuickSelectTests();
-extern int RegisterPartitionTests();
+extern int RegisterQuickSelectPartitionTests();
 
 // Inversion Couht
 extern int RegisterInversionCountTests();
@@ -104,9 +104,6 @@ extern int RegisterInversionCountTests();
 // Matrix Multiplication
 extern int RegisterIsPowerOfTwoTests();
 extern int RegisterMultiplySquareMatricesTests();
-
-// Quick Select
-extern int RegisterQuickSelectPartitionTests();
 
 // Cache
 extern int RegisterCacheTests();
@@ -167,7 +164,6 @@ int RegisterTests() {
       RegisterClosestDistanceSlowTests() != 0 +
       RegisterSelectTests() != 0 +
       RegisterQuickSelectTests() != 0 +
-      RegisterPartitionTests() != 0 +
       RegisterInversionCountTests() != 0 +
       RegisterIsPowerOfTwoTests() != 0 +
       RegisterMultiplySquareMatricesTests() != 0 +
