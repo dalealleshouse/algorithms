@@ -1,3 +1,12 @@
+"""
+/*******************************************************************************
+* Copyright (C) 2020 Dale Alleshouse (AKA Hideous Humpback Freak)
+*  dale@alleshouse.net https://hideoushumpbackfreak.com/
+*
+* This file is subject to the terms and conditions defined in the 'LICENSE'
+* file, which is part of this source code package.
+******************************************************************************/
+"""
 import ctypes
 import sys
 from enum import IntEnum
@@ -26,21 +35,25 @@ class SortingAlgo(CtypesEnum):
     SELECTION = 4,
     QUICK = 5,
     MERGE = 6
-    QUICK_PIVOT_RANDOM = 7,
-    QUICK_PIVOT_MEDIAN = 8,
-    QUICK_PIVOT_FIRST = 9,
-    QUICK_PIVOT_LAST = 10
+    PIVOT_ON_RANDOM = 7,
+    PIVOT_ON_MEDIAN = 8,
+    PIVOT_ON_FIRST = 9,
+    PIVOT_ON_LAST = 10
 
 
 class ArrayType(CtypesEnum):
-    RANDOM = 1,
-    SORTED = 2,
-    REVERSED = 3,
+    RANDOMLY_ORDERED = 1,
+    SORTED_IN_ASCENDING_ORDER = 2,
+    SORTED_IN_DESCENDING_ORDER = 3,
     # DUPLICATES = 4
 
 
 lib.sort_time.argtypes = [ctypes.c_size_t, ArrayType, SortingAlgo]
 lib.sort_time.restype = ctypes.c_double
+
+def format_name(enum_val):
+    return enum_val.name.replace('_', ' ').title()
+
 
 
 def median_run_time(n, array_type, algo):
@@ -53,8 +66,8 @@ def median_run_time(n, array_type, algo):
 
 
 def generate_md_table(ns, data, arr_type):
-    f = open("run_results.txt", "a+")
-    f.write(arr_type.name)
+    f = open("run_time_data/run_results.txt", "a+")
+    f.write(f'{format_name(arr_type)} Array')
     f.write("\n")
 
     n_headers = ""
@@ -64,7 +77,7 @@ def generate_md_table(ns, data, arr_type):
         n_headers += 'n={:d} |'.format(n)
         header_sep += "--|"
 
-    f.write("|ALGORITHM|")
+    f.write("|Algorithm|")
     f.write(n_headers)
     f.write("\n")
     f.write(header_sep)
@@ -75,17 +88,16 @@ def generate_md_table(ns, data, arr_type):
         for v in d[1]:
             times += '{:.6f} sec|'.format(v)
 
-        f.write('|{} |{}'.format(d[0].name, times))
+        f.write('|{} |{}'.format(format_name(d[0]), times))
         f.write("\n")
 
 
 def generate_chart(arr_type, algos, save_as):
-    print("generating " + arr_type.name)
-    sys.stdout.flush()
+    print("generating " + arr_type.name, flush=True)
 
     full_data = []
     plt.figure(figsize=(8, 6))
-    plt.title(arr_type.name + ' ARRAY')
+    plt.title(format_name(arr_type) + ' Array')
     plt.ylabel('sec')
     plt.xlabel('n')
 
@@ -95,14 +107,14 @@ def generate_chart(arr_type, algos, save_as):
             time = median_run_time(n, arr_type, algo)
             data.append(time)
 
-        plt.plot(TEST_FOR_Ns, data, label=algo.name)
+        plt.plot(TEST_FOR_Ns, data, label=format_name(algo))
         full_data.append((algo, data))
 
     plt.legend()
-    plt.savefig('{}{}.png'.format(save_as, arr_type.name))
+    plt.savefig('run_time_data/{}{}.png'.format(save_as, arr_type.name))
     plt.clf()
 
-    print('chart created')
+    print('chart created', flush=True)
 
     generate_md_table(TEST_FOR_Ns, full_data, arr_type)
 
@@ -114,8 +126,7 @@ if __name__ == "__main__":
                                   SortingAlgo.QUICK, SortingAlgo.MERGE],
                        "")
 
-        generate_chart(arr_type, [SortingAlgo.QUICK_PIVOT_LAST,
-                                  SortingAlgo.QUICK_PIVOT_FIRST,
-                                  SortingAlgo.QUICK_PIVOT_RANDOM,
-                                  SortingAlgo.QUICK_PIVOT_MEDIAN],
-                       "PIVOT-")
+        # generate_chart(arr_type, [SortingAlgo.PIVOT_ON_LAST,
+        #                           SortingAlgo.PIVOT_ON_FIRST,
+        #                           SortingAlgo.PIVOT_ON_RANDOM],
+        #                "PIVOT-")

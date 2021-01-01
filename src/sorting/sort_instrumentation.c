@@ -15,6 +15,7 @@
 #include "bubble_sort.h"
 #include "insertion_sort.h"
 #include "merge_sort.h"
+#include "quick_sort.h"
 #include "selection_sort.h"
 #include "sorting_test_helpers.h"
 #include "test_helpers.h"
@@ -47,6 +48,11 @@ static void InstructionCounts(sorter sorter, char* name) {
   free(test_data);
 }
 
+static ResultCode QuickSortAdapter(const size_t n, const size_t size, void* arr,
+                                   const sort_strategy comparator) {
+  return QuickSortPivot(n, size, arr, comparator, PivotOnZero);
+}
+
 static void SortInstrumentation() {
   // Format numbers with comma separators
   setlocale(LC_NUMERIC, "");
@@ -55,6 +61,7 @@ static void SortInstrumentation() {
   InstructionCounts(InsertionSort, "Insertion");
   InstructionCounts(SelectionSort, "Selection");
   InstructionCounts(MergeSortAdapter, "Merge");
+  InstructionCounts(QuickSortAdapter, "Quick");
 }
 
 int RegisterSortInstrumentationTestCase() {
