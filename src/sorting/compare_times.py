@@ -126,7 +126,7 @@ if __name__ == "__main__":
                                   SortingAlgo.QUICK, SortingAlgo.MERGE],
                        "")
 
-        # generate_chart(arr_type, [SortingAlgo.PIVOT_ON_LAST,
-        #                           SortingAlgo.PIVOT_ON_FIRST,
-        #                           SortingAlgo.PIVOT_ON_RANDOM],
-        #                "PIVOT-")
+        generate_chart(arr_type, [SortingAlgo.PIVOT_ON_LAST,
+                                  SortingAlgo.PIVOT_ON_FIRST,
+                                  SortingAlgo.PIVOT_ON_RANDOM],
+                       "PIVOT-")

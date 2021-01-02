@@ -12,28 +12,28 @@
 extern size_t copy_count;
 
 // un-comment to enable instrumention
-/* #define INSTRUMENT_SORT */
+#define INSTRUMENT_SORT
 
 #ifdef INSTRUMENT_SORT
 
-#define INSTRUMENTED_MEMCPY(dest, src, n) \
-  {                                       \
-    ++copy_count;                         \
-    memcpy(dest, src, n);                 \
+#define INSTRUMENTED_MEMCPY(dest, src, n, size) \
+  {                                             \
+    copy_count += n / size;                     \
+    memcpy(dest, src, n);                       \
   }
 
-#define INSTRUMENTED_MEMMOVE(str1, str2, n) \
-  {                                         \
-    ++copy_count;                           \
-    memmove(str1, str2, n);                 \
+#define INSTRUMENTED_MEMMOVE(str1, str2, n, size) \
+  {                                               \
+    ++copy_count;                                 \
+    memmove(str1, str2, n);                       \
   }
 
 #else
 
-#define INSTRUMENTED_MEMCPY(dest, src, n) \
+#define INSTRUMENTED_MEMCPY(dest, src, n, size) \
   { memcpy(dest, src, n); }
 
-#define INSTRUMENTED_MEMMOVE(str1, str2, n) \
+#define INSTRUMENTED_MEMMOVE(str1, str2, n, size) \
   { memmove(str1, str2, n); }
 
 #endif
