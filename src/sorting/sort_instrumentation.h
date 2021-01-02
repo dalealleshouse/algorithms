@@ -11,29 +11,34 @@
 
 extern size_t copy_count;
 
-// un-comment to enable instrumention
+// There are definitely better ways to do this. However, I need a macro that can
+// completely remove the tracking code so it does not have an effect on the
+// runtime data. Also, I'm not concerned about concurrency and other common
+// problems associated with global variables
+//
+// un-comment to enable instrumentation
 /* #define INSTRUMENT_SORT */
 
 #ifdef INSTRUMENT_SORT
 
-#define INSTRUMENTED_MEMCPY(dest, src, n) \
-  {                                       \
-    ++copy_count;                         \
-    memcpy(dest, src, n);                 \
+#define INSTRUMENTED_MEMCPY(dest, src, n, item_size) \
+  {                                                  \
+    copy_count += (n) / (item_size);                 \
+    memcpy(dest, src, n);                            \
   }
 
-#define INSTRUMENTED_MEMMOVE(str1, str2, n) \
-  {                                         \
-    ++copy_count;                           \
-    memmove(str1, str2, n);                 \
+#define INSTRUMENTED_MEMMOVE(str1, str2, n, item_size) \
+  {                                                    \
+    copy_count += (n) / (item_size);                   \
+    memmove(str1, str2, n);                            \
   }
 
 #else
 
-#define INSTRUMENTED_MEMCPY(dest, src, n) \
+#define INSTRUMENTED_MEMCPY(dest, src, n, item_size) \
   { memcpy(dest, src, n); }
 
-#define INSTRUMENTED_MEMMOVE(str1, str2, n) \
+#define INSTRUMENTED_MEMMOVE(str1, str2, n, item_size) \
   { memmove(str1, str2, n); }
 
 #endif

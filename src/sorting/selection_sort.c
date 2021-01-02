@@ -14,9 +14,9 @@
 
 static void Swap(const size_t kSize, void* x, void* y) {
   char n[kSize];
-  INSTRUMENTED_MEMCPY(n, x, kSize);
-  INSTRUMENTED_MEMCPY(x, y, kSize);
-  INSTRUMENTED_MEMCPY(y, n, kSize);
+  INSTRUMENTED_MEMCPY(n, x, kSize, kSize);
+  INSTRUMENTED_MEMCPY(x, y, kSize, kSize);
+  INSTRUMENTED_MEMCPY(y, n, kSize, kSize);
 }
 
 ResultCode SelectionSort(const size_t n, const size_t size, void* arr,

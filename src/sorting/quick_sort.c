@@ -14,11 +14,11 @@
 
 #include "sort_instrumentation.h"
 
-static void Swap(const size_t kSize, void* x, void* y) {
-  char n[kSize];
-  INSTRUMENTED_MEMCPY(n, x, kSize);
-  INSTRUMENTED_MEMCPY(x, y, kSize);
-  INSTRUMENTED_MEMCPY(y, n, kSize);
+static void Swap(const size_t size, void* x, void* y) {
+  char n[size];
+  INSTRUMENTED_MEMCPY(n, x, size, size);
+  INSTRUMENTED_MEMCPY(x, y, size, size);
+  INSTRUMENTED_MEMCPY(y, n, size, size);
 }
 
 size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
