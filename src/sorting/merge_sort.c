@@ -7,6 +7,7 @@
  ******************************************************************************/
 #include "merge_sort.h"
 
+#include <alloca.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -17,10 +18,6 @@ ResultCode MergeSort(const void* arr, void* output, const size_t n,
   if (arr == NULL || output == NULL) return kNullParameter;
   if (n == 0 || item_size == 0) return kArgumentOutOfRange;
 
-  if (n == 1) {
-    INSTRUMENTED_MEMCPY(output, arr, item_size, item_size);
-    return kSuccess;
-  }
   // If n is odd, this will assign the larger half to b.
   size_t a_n = n / 2;
   size_t b_n = n - a_n;
@@ -28,11 +25,22 @@ ResultCode MergeSort(const void* arr, void* output, const size_t n,
   size_t a_size = a_n * item_size;
   size_t b_size = b_n * item_size;
 
-  char a[a_size];
-  char b[b_size];
+  char* a;
+  char* b;
 
-  MergeSort(arr, a, a_n, item_size, comparator);
-  MergeSort((char*)arr + a_size, b, b_n, item_size, comparator);
+  if (a_n == 1) {
+    a = (char*)arr;
+  } else {
+    a = alloca(a_size);
+    MergeSort(arr, a, a_n, item_size, comparator);
+  }
+
+  if (b_n == 1) {
+    b = (char*)arr + a_size;
+  } else {
+    b = alloca(b_size);
+    MergeSort((char*)arr + a_size, b, b_n, item_size, comparator);
+  }
 
   size_t a_pos = 0;
   size_t b_pos = 0;
