@@ -14,9 +14,9 @@
 
 static void Swap(const size_t size, void* x, void* y) {
   char n[size];
-  INSTRUMENTED_MEMCPY(n, x, size);
-  INSTRUMENTED_MEMCPY(x, y, size);
-  INSTRUMENTED_MEMCPY(y, n, size);
+  INSTRUMENTED_MEMCPY(n, x, size, size);
+  INSTRUMENTED_MEMCPY(x, y, size, size);
+  INSTRUMENTED_MEMCPY(y, n, size, size);
 }
 
 ResultCode BubbleSort(const size_t n, const size_t size, void* arr,
