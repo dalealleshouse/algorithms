@@ -23,12 +23,6 @@
 typedef int (*sorter)(const size_t n, const size_t size, void* arr,
                       const sort_strategy comparator);
 
-static int qsort_adapter(const size_t n, const size_t size, void* arr,
-                         const sort_strategy comparator) {
-  qsort(arr, n, size, comparator);
-  return 0;
-}
-
 static int merge_sort_adapter(const size_t n, const size_t size, void* arr,
                               const sort_strategy comparator) {
   char* tmp[n * size];
@@ -60,7 +54,7 @@ static int quick_median_adapter(const size_t n, const size_t size, void* arr,
 static sorter get_sorter(const sort_algo algo) {
   switch (algo) {
     case C:
-      return qsort_adapter;
+      return QuickSort;
     case BUBBLE:
       return BubbleSort;
     case INSERTION:
