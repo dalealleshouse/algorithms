@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "common_math.h"
 
 #include <limits.h>

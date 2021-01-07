@@ -1,4 +1,11 @@
-#include "./quick_select.h"
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "quick_select.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -25,7 +32,10 @@ static int int_comparator(const void* x, const void* y) {
 
 /************* select ****************/
 static void select_null() {
-  void* result = sort_select(0, 0, 0, NULL, NULL);
+  void* result = NULL;
+
+  ResultCode result_code = SortSelect(0, 0, 0, NULL, NULL, &result);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
   CU_ASSERT_EQUAL(NULL, result);
 }
 
@@ -35,8 +45,11 @@ static void select_pre_sorted() {
   const int expected = 3;
   int arr[] = {1, 2, 3, 4, 5, 6};
 
-  void* result = sort_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      SortSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
@@ -47,8 +60,11 @@ static void select_reversed() {
   const int expected = 3;
   int arr[] = {6, 5, 4, 3, 2, 1};
 
-  void* result = sort_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      SortSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
@@ -68,31 +84,39 @@ int RegisterSelectTests() {
 }
 
 /************* quick select ****************/
-static void quick_select_null() {
-  void* result = quick_select(0, 0, 0, NULL, NULL);
-  CU_ASSERT_EQUAL(NULL, result);
+static void QuickSelect_null() {
+  void* result = NULL;
+
+  ResultCode result_code = QuickSelect(0, 0, 0, NULL, NULL, &result);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
 }
 
-static void quick_select_pre_sorted() {
+static void QuickSelect_pre_sorted() {
   const size_t n = 6;
   const size_t nth = 3;
   const int expected = 4;
   int arr[] = {1, 2, 3, 4, 5, 6};
 
-  void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      QuickSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
 
-static void quick_select_reversed() {
+static void QuickSelect_reversed() {
   const size_t n = 6;
   const size_t nth = 2;
   const int expected = 3;
   int arr[] = {6, 5, 4, 3, 2, 1};
 
-  void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      QuickSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
@@ -103,8 +127,11 @@ static void quick_nth_equals_zero() {
   const int expected = 1;
   int arr[] = {3, 2, 1, 6, 5, 4};
 
-  void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      QuickSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
@@ -115,159 +142,66 @@ static void quick_nth_equals_n() {
   const int expected = 6;
   int arr[] = {3, 2, 1, 6, 5, 4};
 
-  void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      QuickSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
 
-static void quick_select_nth_out_of_bounds() {
+static void QuickSelect_nth_out_of_bounds() {
   const size_t n = 6;
   const size_t nth = 6;
   int arr[] = {3, 2, 1, 6, 5, 4};
 
-  void* result = quick_select(nth, n, sizeof(arr[0]), arr, int_comparator);
+  void* result = NULL;
+  ResultCode result_code =
+      QuickSelect(nth, n, sizeof(arr[0]), arr, int_comparator, &result);
 
+  CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
   CU_ASSERT_PTR_NULL_FATAL(result);
 }
 
-static void quick_select_matches_select() {
+static void QuickSelect_matches_select() {
+  unsigned int seed = time(NULL);
   const size_t n = 100000;
-  const size_t nth = rand() % n;
+  const size_t nth = rand_r(&seed) % n;
   int s[n];
   int qs[n];
 
   for (size_t i = 0; i < n; i++) {
-    int num = rand();
+    int num = rand_r(&seed);
     s[i] = num;
     qs[i] = num;
   }
 
-  void* s_result = sort_select(nth, n, sizeof(s[0]), s, int_comparator);
-  void* qs_result = quick_select(nth, n, sizeof(qs[0]), s, int_comparator);
+  void* s_result = NULL;
+  void* qs_result = NULL;
+
+  ResultCode result_code =
+      SortSelect(nth, n, sizeof(s[0]), s, int_comparator, &s_result);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
+  result_code =
+      QuickSelect(nth, n, sizeof(qs[0]), s, int_comparator, &qs_result);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
   CU_ASSERT_EQUAL(0, memcmp(s_result, qs_result, sizeof(s[0])));
 }
 
 int RegisterQuickSelectTests() {
-  CU_TestInfo partition_tests[] = {CU_TEST_INFO(quick_select_null),
-                                   CU_TEST_INFO(quick_select_pre_sorted),
+  CU_TestInfo partition_tests[] = {CU_TEST_INFO(QuickSelect_null),
+                                   CU_TEST_INFO(QuickSelect_pre_sorted),
                                    CU_TEST_INFO(quick_nth_equals_zero),
                                    CU_TEST_INFO(quick_nth_equals_n),
-                                   CU_TEST_INFO(quick_select_nth_out_of_bounds),
-                                   CU_TEST_INFO(quick_select_matches_select),
-                                   CU_TEST_INFO(quick_select_reversed),
+                                   CU_TEST_INFO(QuickSelect_nth_out_of_bounds),
+                                   CU_TEST_INFO(QuickSelect_matches_select),
+                                   CU_TEST_INFO(QuickSelect_reversed),
                                    CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "quick select suite",
-                            .pInitFunc = noop,
-                            .pCleanupFunc = noop,
-                            .pTests = partition_tests},
-                           CU_SUITE_INFO_NULL};
-
-  return CU_register_suites(suites);
-}
-
-/************* partition ****************/
-static void partition_null() {
-  int result = select_partition(0, 0, NULL, NULL);
-  CU_ASSERT_EQUAL(-1, result);
-}
-
-static void partition_does_not_chage_sorted() {
-  const size_t n = 6;
-  const int expected[] = {1, 2, 3, 4, 5, 6};
-  int arr[] = {1, 2, 3, 4, 5, 6};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 0);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-static void partition_pivot_on_center() {
-  const size_t n = 6;
-  const int expected[] = {1, 2, 3, 4, 5, 6};
-  int arr[] = {4, 2, 3, 1, 5, 6};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 3);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-static void partition_reverse_sorted() {
-  const size_t n = 6;
-  const int expected[] = {1, 5, 4, 3, 2, 6};
-
-  int arr[] = {6, 5, 4, 3, 2, 1};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 5);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-static void partition_first_in_correct_position() {
-  const size_t n = 5;
-  const int expected[] = {1, 5, 4, 3, 2};
-
-  int arr[] = {1, 5, 4, 3, 2};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 0);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-static void partition_dup_values() {
-  const size_t n = 6;
-  const int expected[] = {6, 6, 6, 6, 6, 6};
-
-  int arr[] = {6, 6, 6, 6, 6, 6};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 0);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-static void partition_single_value() {
-  const size_t n = 1;
-  const int expected[] = {6};
-
-  int arr[] = {6};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 0);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-static void partition_two_values() {
-  const size_t n = 2;
-  const int expected[] = {5, 6};
-
-  int arr[] = {6, 5};
-
-  int result = select_partition(n, sizeof(int), arr, int_comparator);
-
-  CU_ASSERT_EQUAL(result, 1);
-  CU_ASSERT_EQUAL(memcmp(expected, arr, n * sizeof(arr[0])), 0)
-}
-
-int RegisterQuickSelectPartitionTests() {
-  CU_TestInfo partition_tests[] = {
-      CU_TEST_INFO(partition_null),
-      CU_TEST_INFO(partition_does_not_chage_sorted),
-      CU_TEST_INFO(partition_pivot_on_center),
-      CU_TEST_INFO(partition_reverse_sorted),
-      CU_TEST_INFO(partition_first_in_correct_position),
-      CU_TEST_INFO(partition_dup_values),
-      CU_TEST_INFO(partition_single_value),
-      CU_TEST_INFO(partition_two_values),
-      CU_TEST_INFO_NULL};
-
-  CU_SuiteInfo suites[] = {{.pName = "partition suite",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
                             .pTests = partition_tests},

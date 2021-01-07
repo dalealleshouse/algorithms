@@ -1,6 +1,6 @@
 ---
 Checks:
-'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-misc-no-recursion'
+'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-misc-no-recursion,-cert-msc32-c,-cert-msc51-cpp,-cert-msc30-c,-cert-msc50-cpp'
 WarningsAsErrors: 'google-*,bugprone-*,clang-analyzer-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

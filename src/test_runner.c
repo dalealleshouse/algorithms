@@ -5,6 +5,9 @@
  * This file is subject to the terms and conditions defined in the 'LICENSE'
  * file, which is part of this source code package.
  ******************************************************************************/
+#include <stdlib.h>
+#include <time.h>
+
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
@@ -96,7 +99,6 @@ extern int RegisterClosestDistanceSlowTests();
 // Quick Select
 extern int RegisterSelectTests();
 extern int RegisterQuickSelectTests();
-extern int RegisterQuickSelectPartitionTests();
 
 // Inversion Couht
 extern int RegisterInversionCountTests();
@@ -111,6 +113,7 @@ extern int RegisterCacheTests();
 extern int RegisterBitVectorTests();
 
 int RegisterTests() {
+  srand(time(NULL));
   return (
              // clang-format off
       // Test Cases
@@ -167,7 +170,6 @@ int RegisterTests() {
       RegisterInversionCountTests() != 0 +
       RegisterIsPowerOfTwoTests() != 0 +
       RegisterMultiplySquareMatricesTests() != 0 +
-      RegisterQuickSelectPartitionTests() != 0 +
       RegisterCacheTests() != 0 +
       RegisterBitVectorTests() != 0 +
       0) * -1;
