@@ -1,44 +1,51 @@
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stddef.h>
 
-#include "../utils/comparators.h"
-
-typedef int (*choose_pivot)(const size_t n);
-
-/*
- * Partitions the array around the first item. All items less than the first
- * item will be before it and all items greater that the first item will be
- * after it.
- *
- * returns: On kkSuccess, the index of the first item after partitioning around
- * it. A value less than 0 on failure.
- */
-int select_partition(const size_t n, const size_t size, void* arr,
-                     const sort_strategy comparator);
-
-typedef int (*choose_pivot)(const size_t n);
-
-int select_pivot_on_zero(const size_t n);
-int select_pivot_on_random(const size_t n);
-
-void* quick_select_pivot(const size_t nth, const size_t n, const size_t size,
-                         void* arr, const sort_strategy comparator,
-                         const choose_pivot choose_pivot);
+#include "comparators.h"
+#include "result_code.h"
 
 /*
- * Finds the <nth> ranked value in the array without sorting the entire array.
+ * Find the value that belongs in the <nth> ordinal position
  *
- * WARNING: the order of the items in <arr> will be modified
+ * params:
+ *  <nth>        the ordinal position to identify
+ *  <n>          number of items in input array
+ *  <size>       size, in bytes, of each array item
+ *  <arr>        the array
+ *  <comparator> strategy for sorting items
+ *  <result>     output parameter that will be set to the address of the <nth>
+ *               ordinal item
  *
- * returns: pointer to the value that represents the <nth> ranked value in <arr>
+ * returns:
+ *  Result code indicating kSuccess or failure code
  */
-void* quick_select(const size_t nth, const size_t n, const size_t size,
-                   void* arr, const sort_strategy comparator);
+ResultCode QuickSelect(const size_t nth, const size_t n, const size_t size,
+                       void* arr, const sort_strategy comparator,
+                       void** result);
 
 /*
- * Same function as quick_select, but instead of partitioning, it just sorts the
- * array with qsort and then selected the nth item.
+ * Same functionality as QuickSelect; however, instead of using the quick sort
+ * partitioning algorithm, it simply sorts the array and returns the <nth> item
+ *
+ * params:
+ *  <nth>        the ordinal position to identify
+ *  <n>          number of items in input array
+ *  <size>       size, in bytes, of each array item
+ *  <arr>        the array
+ *  <comparator> strategy for sorting items
+ *  <result>     output parameter that will be set to the address of the <nth>
+ *               ordinal item
+ *
+ * returns:
+ *  Result code indicating kSuccess or failure code
  */
-void* sort_select(const size_t nth, const size_t n, const size_t size,
-                  void* arr, const sort_strategy comparator);
+ResultCode SortSelect(const size_t nth, const size_t n, const size_t size,
+                      void* arr, const sort_strategy comparator, void** result);

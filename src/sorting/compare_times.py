@@ -55,7 +55,6 @@ def format_name(enum_val):
     return enum_val.name.replace('_', ' ').title()
 
 
-
 def median_run_time(n, array_type, algo):
     times = []
 

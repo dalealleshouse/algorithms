@@ -37,12 +37,10 @@ size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
  */
 size_t PivotOnRandom(const size_t n, const size_t size, const void* arr,
                      const sort_strategy comparator) {
-  unsigned int seed = time(NULL);
-
   (void)size;
   (void)arr;
   (void)comparator;
-  return rand_r(&seed) % (int)n;
+  return rand() % n;
 }
 
 size_t PivotOnLast(const size_t n, const size_t size, const void* arr,

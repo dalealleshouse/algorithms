@@ -1,10 +1,14 @@
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #pragma once
 
 #include <stddef.h>
 
-typedef enum { QUICK_SELECT = 1, QSORT_SELECT = 2 } algo;
+typedef enum { kQuickSelect = 1, kSortSelect = 2 } SelectAlgorithm;
 
-typedef enum { MAX = 1, MIN = 2 } linear_algo;
-
-double select_time(const size_t n, const size_t nth, const algo algo);
-double linear_time(const size_t n, const linear_algo algo);
+double SelectTime(const size_t n, const size_t nth, const SelectAlgorithm algo);

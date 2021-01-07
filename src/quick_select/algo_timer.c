@@ -1,73 +1,58 @@
-#include "./algo_timer.h"
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "algo_timer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include "./quick_select.h"
 #include "common_math.h"
+#include "quick_select.h"
 
-typedef void* (*selector)(const size_t nth, const size_t n, const size_t size,
-                          void* arr, const sort_strategy comparator);
+typedef ResultCode (*selector)(const size_t nth, const size_t n,
+                               const size_t size, void* arr,
+                               const sort_strategy comparator, void** result);
 
-typedef void* (*linear_scan)(const size_t n, const size_t size, void* arr,
-                             const sort_strategy comparator);
-
-static selector get_selector(const algo algo) {
+static selector GetSelector(const SelectAlgorithm algo) {
   switch (algo) {
-    case QUICK_SELECT:
-      return quick_select;
-    case QSORT_SELECT:
-      return sort_select;
+    case kQuickSelect:
+      return QuickSelect;
+    case kSortSelect:
+      return SortSelect;
     default:
-      fprintf(stderr, "Invalid select algorithm\n");
       return NULL;
   }
 }
 
-static linear_scan get_linear_scan(const linear_algo algo) {
-  switch (algo) {
-    case MIN:
-      return MinPArray;
-    case MAX:
-      return MaxPArray;
-    default:
-      fprintf(stderr, "Invalid linear scan algorithm\n");
-      return NULL;
+double SelectTime(const size_t n, const size_t nth,
+                  const SelectAlgorithm algo) {
+  selector selector = GetSelector(algo);
+  if (selector == NULL) {
+    fprintf(stderr, "Invalid select algorithm, %d\n", algo);
+    return -1;
   }
-}
-
-double select_time(const size_t n, const size_t nth, const algo algo) {
-  selector selector = get_selector(algo);
-  if (selector == NULL) return -1;
 
   int arr[n];
-  for (size_t i = 0; i < n; i++) arr[i] = rand();
+  unsigned int seed = time(NULL);
+  for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed);
 
   clock_t t = clock();
-  void* result = selector(nth, n, sizeof(int), arr, PIntComparator);
+  void* result = NULL;
+  ResultCode result_code =
+      selector(nth, n, sizeof(int), arr, PIntComparator, &result);
   t = clock() - t;
 
-  if (result == NULL) return -1;
-
-  double time = ((double)t) / CLOCKS_PER_SEC;
-
-  return time;
-}
-
-double linear_time(const size_t n, const linear_algo algo) {
-  linear_scan scan_algo = get_linear_scan(algo);
-  if (scan_algo == NULL) return -1;
-
-  int arr[n];
-  for (size_t i = 0; i < n; i++) arr[i] = rand();
-
-  clock_t t = clock();
-  void* result = scan_algo(n, sizeof(int), arr, PIntComparator);
-  t = clock() - t;
-
-  if (result == NULL) return -1;
+  if (result_code != kSuccess) {
+    fprintf(stderr, "Selector returned an error code: %s",
+            Result_ErrorMessage(result_code));
+    return -1;
+  }
 
   double time = ((double)t) / CLOCKS_PER_SEC;
 
