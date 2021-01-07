@@ -48,31 +48,36 @@ static void QuickSort_pivot_on_median_matches_c() { TestPivot(PivotOnMedian); }
 
 static void QuickSort_pivot_on_median_finds_first() {
   const int n = 6;
-  const int expected = 0;
-  const int arr[] = {3, 1, 2, 4, 5, 6};
+  const int expected = 3;
+  const int expected_mid = 3;
+  const int arr[] = {3, 2, 4, 1, 5, 6};
 
   const int result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
-
+  CU_ASSERT_EQUAL(expected_mid, arr[expected]);
   CU_ASSERT_EQUAL(expected, result);
 }
 
 static void QuickSort_pivot_on_median_finds_last() {
-  const int n = 6;
-  const int expected = 5;
-  const int arr[] = {6, 1, 2, 4, 5, 3};
+  const int n = 5;
+  const int expected = 2;
+  const int expected_mid = 4;
+  const int arr[] = {6, 1, 3, 5, 4};
 
   const int result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
 
+  CU_ASSERT_EQUAL(expected_mid, arr[expected]);
   CU_ASSERT_EQUAL(expected, result);
 }
 
 static void QuickSort_pivot_on_median_finds_middle() {
   const int n = 6;
-  const int expected = 2;
-  const int arr[] = {6, 1, 3, 4, 5, 2};
+  const int expected = 3;
+  const int expected_mid = 4;
+  const int arr[] = {6, 1, 3, 2, 5, 4};
 
   const int result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
 
+  CU_ASSERT_EQUAL(expected_mid, arr[expected]);
   CU_ASSERT_EQUAL(expected, result);
 }
 

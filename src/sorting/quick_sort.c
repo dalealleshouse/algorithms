@@ -57,32 +57,16 @@ size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
                      const sort_strategy comparator) {
   if (n <= 2) return 0;
 
-  size_t mid_point = 0;
+  size_t mid_point = (n >> 1);
 
-  if (n % 2 == 0) {
-    mid_point = n / 2 - 1;
-  } else {
-    mid_point = n / 2;
-  }
+  void* first = (void*)arr;
+  void* last = (char*)arr + size * (n - 1);
+  void* middle = (char*)arr + size * mid_point;
 
-  const void* first = arr;
-  const void* last = (char*)arr + size * (n - 1);
-  const void* middle = (char*)arr + size * mid_point;
-
-  // first
-  if ((comparator(first, last) >= 0 && comparator(first, middle) <= 0) ||
-      (comparator(first, last) <= 0 && comparator(first, middle) >= 0)) {
-    return 0;
-  }
-
-  // middle
-  if ((comparator(middle, first) >= 0 && comparator(middle, last) <= 0) ||
-      (comparator(middle, first) <= 0 && comparator(middle, last) >= 0)) {
-    return mid_point;
-  }
-
-  // the only choice left is last
-  return (int)n - 1;
+  if (comparator(middle, first) < 0) Swap(size, middle, first);
+  if (comparator(last, middle) < 0) Swap(size, last, middle);
+  if (comparator(middle, first) < 0) Swap(size, middle, first);
+  return mid_point;
 }
 
 static void* calc_pointer(void* arr, const size_t size, size_t index) {
@@ -156,7 +140,7 @@ ResultCode InefficentPartition(const size_t n, const size_t size, void* arr,
 
 ResultCode QuickSort(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator) {
-  return QuickSortPivot(n, size, arr, comparator, PivotOnRandom);
+  return QuickSortPivot(n, size, arr, comparator, PivotOnMedian);
 }
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
