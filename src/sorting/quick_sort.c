@@ -63,10 +63,10 @@ size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
   void* last = (char*)arr + size * (n - 1);
   void* middle = (char*)arr + size * mid_point;
 
-  if (comparator(middle, first) < 0) Swap(size, middle, first);
-  if (comparator(last, middle) < 0) Swap(size, last, middle);
-  if (comparator(middle, first) < 0) Swap(size, middle, first);
-  return mid_point;
+  if (comparator(first, middle) < 0) Swap(size, middle, first);
+  if (comparator(last, first) < 0) Swap(size, last, first);
+  if (comparator(first, middle) < 0) Swap(size, middle, first);
+  return 0;
 }
 
 static void* calc_pointer(void* arr, const size_t size, size_t index) {
