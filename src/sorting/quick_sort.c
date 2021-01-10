@@ -21,6 +21,42 @@ static void Swap(const size_t size, void* x, void* y) {
   INSTRUMENTED_MEMCPY(y, n, size, size);
 }
 
+static void* calc_pointer(void* arr, const size_t size, size_t index) {
+  return (char*)arr + size * index;
+}
+
+static ResultCode QuickSortRecursive(const size_t n, const size_t size,
+                                     void* arr, const sort_strategy comparator,
+                                     const choose_pivot choose_pivot) {
+  if (n <= 1) return kSuccess;
+
+  // divine the partition index
+  size_t pivot = choose_pivot(n, size, arr, comparator);
+
+  // move the partition value to the first position
+  if (pivot > 0) Swap(size, arr, (char*)arr + pivot * size);
+
+  // Partition - this will move the item at index 0 to it's final placement
+  size_t pivot_index;
+  ResultCode result_code = Partition(n, size, arr, comparator, &pivot_index);
+  if (result_code != kSuccess) return result_code;
+
+  // items to the left of the partition
+  // The pivot index is zero based, so pivot_index is equivalent to n - 1
+  if (pivot_index > 0) {
+    result_code =
+        QuickSortPivot(pivot_index, size, arr, comparator, choose_pivot);
+    if (result_code != kSuccess) return result_code;
+  }
+
+  // items to the right of the partition
+  pivot_index++;
+  if (pivot_index >= n) return kSuccess;
+
+  return QuickSortPivot(n - pivot_index, size, (char*)arr + pivot_index * size,
+                        comparator, choose_pivot);
+}
+
 size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
                    const sort_strategy comparator) {
   (void)n;
@@ -63,14 +99,10 @@ size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
   void* last = (char*)arr + size * (n - 1);
   void* middle = (char*)arr + size * mid_point;
 
-  if (comparator(middle, first) < 0) Swap(size, middle, first);
-  if (comparator(last, middle) < 0) Swap(size, last, middle);
-  if (comparator(middle, first) < 0) Swap(size, middle, first);
-  return mid_point;
-}
-
-static void* calc_pointer(void* arr, const size_t size, size_t index) {
-  return (char*)arr + size * index;
+  if (comparator(first, middle) < 0) Swap(size, middle, first);
+  if (comparator(last, first) < 0) Swap(size, last, first);
+  if (comparator(first, middle) < 0) Swap(size, middle, first);
+  return 0;
 }
 
 // It is assumed that the pivot will be the first item in the array
@@ -107,37 +139,6 @@ ResultCode Partition(const size_t n, const size_t size, void* arr,
   return kSuccess;
 }
 
-ResultCode InefficentPartition(const size_t n, const size_t size, void* arr,
-                               const sort_strategy comparator,
-                               size_t* pivot_index) {
-  if (arr == NULL || comparator == NULL) return kNullParameter;
-  if (n == 0 || size == 0) return kArgumentOutOfRange;
-
-  char* t_arr = (char*)arr;
-  char* pivot_value = t_arr;
-  t_arr += size;
-  char* pivot_pos = t_arr;
-  *pivot_index = 0;
-
-  for (size_t i = 1; i < n; i++) {
-    // If the item is less, swap it, otherwise do nothing
-    if (comparator(t_arr, pivot_value) < 0) {
-      Swap(size, t_arr, pivot_pos);
-
-      pivot_pos += size;
-      (*pivot_index)++;
-    }
-
-    t_arr += size;
-  }
-
-  if (*pivot_index > 0) {
-    Swap(size, pivot_value, pivot_value + *pivot_index * size);
-  }
-
-  return kSuccess;
-}
-
 ResultCode QuickSort(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator) {
   return QuickSortPivot(n, size, arr, comparator, PivotOnMedian);
@@ -149,38 +150,5 @@ ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,
   if (arr == NULL || comparator == NULL) return kNullParameter;
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 
-  if (n <= 1) return kSuccess;
-
-  size_t pivot_index;
-  size_t pivot;
-
-  pivot = choose_pivot(n, size, arr, comparator);
-
-  // move the partition value to the first position
-  Swap(size, arr, (char*)arr + pivot * size);
-
-  // This will move the item at index 0 to it's final placement
-  ResultCode result_code = Partition(n, size, arr, comparator, &pivot_index);
-  if (result_code != kSuccess) return result_code;
-
-  // items to the left of the partition
-  // The pivot index is zero based, so pivot_index is equivalent to n - 1
-  if (pivot_index > 0) {
-    if ((result_code = QuickSortPivot(pivot_index, size, arr, comparator,
-                                      choose_pivot)) != kSuccess) {
-      return result_code;
-    }
-  }
-
-  // items to the right of the partition
-  pivot_index++;
-  if (pivot_index < n) {
-    if ((result_code = QuickSortPivot(n - pivot_index, size,
-                                      (char*)arr + pivot_index * size,
-                                      comparator, choose_pivot)) != kSuccess) {
-      return result_code;
-    }
-  }
-
-  return kSuccess;
+  return QuickSortRecursive(n, size, arr, comparator, choose_pivot);
 }

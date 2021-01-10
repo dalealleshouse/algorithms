@@ -38,7 +38,7 @@ double SelectTime(const size_t n, const size_t nth,
     return -1;
   }
 
-  int arr[n];
+  int* arr = malloc(n * sizeof(int));
   unsigned int seed = time(NULL);
   for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed);
 
@@ -47,6 +47,8 @@ double SelectTime(const size_t n, const size_t nth,
   ResultCode result_code =
       selector(nth, n, sizeof(int), arr, PIntComparator, &result);
   t = clock() - t;
+
+  free(arr);
 
   if (result_code != kSuccess) {
     fprintf(stderr, "Selector returned an error code: %s",

@@ -10,12 +10,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-
-#define CU_TEST_INFO(test_func) \
-  { #test_func, test_func }
+#include "sorting_test_helpers.h"
+#include "test_helpers.h"
 
 static int int_comparator(const void* x, const void* y) {
   if (x == y) return 0;
@@ -191,6 +189,20 @@ static void QuickSelect_matches_select() {
   CU_ASSERT_EQUAL(0, memcmp(s_result, qs_result, sizeof(s[0])));
 }
 
+static void QuickSelect_find_median_value() {
+  const size_t n = 10000;
+  const size_t nth = 5000;
+  int* result = NULL;
+  int* test_data = GenerateTestData();
+
+  ResultCode result_code = QuickSelect(nth, n, sizeof(test_data[0]), test_data,
+                                       int_comparator, (void**)&result);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+  CU_ASSERT_EQUAL(5001, *result);
+
+  free(test_data);
+}
+
 int RegisterQuickSelectTests() {
   CU_TestInfo partition_tests[] = {CU_TEST_INFO(QuickSelect_null),
                                    CU_TEST_INFO(QuickSelect_pre_sorted),
@@ -199,6 +211,7 @@ int RegisterQuickSelectTests() {
                                    CU_TEST_INFO(QuickSelect_nth_out_of_bounds),
                                    CU_TEST_INFO(QuickSelect_matches_select),
                                    CU_TEST_INFO(QuickSelect_reversed),
+                                   CU_TEST_INFO(QuickSelect_find_median_value),
                                    CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "quick select suite",
