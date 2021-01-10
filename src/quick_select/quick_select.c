@@ -23,25 +23,17 @@ static void Swap(const size_t size, void* x, void* y) {
   memcpy(y, n, size);
 }
 
-static size_t SelectPivotOnRandom(const size_t n) { return rand() % n; }
-
-ResultCode QuickSelect(const size_t nth, const size_t n, const size_t size,
-                       void* arr, const sort_strategy comparator,
-                       void** result) {
-  if (arr == NULL || comparator == NULL || result == NULL) {
-    return kNullParameter;
-  }
-
-  if (nth > n - 1) return kArgumentOutOfRange;
-  if (*result != NULL) return kOutputPointerIsNotNull;
-
+static ResultCode QuickSelectRecursive(const size_t nth, const size_t n,
+                                       const size_t size, void* arr,
+                                       const sort_strategy comparator,
+                                       void** result) {
   if (n <= 1) {
     *result = arr;
     return kSuccess;
   }
 
   // find the index of an element to partition around
-  size_t pivot = SelectPivotOnRandom(n);
+  size_t pivot = rand() % n;
 
   // move the partition value to the first position
   Swap(size, arr, (char*)arr + pivot * size);
@@ -60,6 +52,19 @@ ResultCode QuickSelect(const size_t nth, const size_t n, const size_t size,
   } else {
     return QuickSelect(nth, pivot_index, size, arr, comparator, result);
   }
+}
+
+ResultCode QuickSelect(const size_t nth, const size_t n, const size_t size,
+                       void* arr, const sort_strategy comparator,
+                       void** result) {
+  if (arr == NULL || comparator == NULL || result == NULL) {
+    return kNullParameter;
+  }
+
+  if (nth > n - 1) return kArgumentOutOfRange;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+
+  return QuickSelectRecursive(nth, n, size, arr, comparator, result);
 }
 
 ResultCode SortSelect(const size_t nth, const size_t n, const size_t size,

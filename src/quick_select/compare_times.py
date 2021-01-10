@@ -10,6 +10,7 @@ lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
 TEST_FOR_Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5, 10 ** 6]
+TEST_FOR_Ns = [10 ** 2, 10 ** 4, 10 ** 5, 10 ** 6, 10 ** 7, 10 ** 8]
 
 
 class CtypesEnum(IntEnum):
@@ -102,15 +103,15 @@ def generate_chart(nth):
         full_data.append((algo, data))
 
     plt.legend()
+    plt.ticklabel_format(style='plain')
     plt.savefig('./run_time_data/QUICK_SELECT-' + str(nth) + '.png')
     plt.clf()
 
-    print('chart created')
+    print('chart created', flush=True)
 
     generate_md_table(TEST_FOR_Ns, full_data, nth)
 
 
 if __name__ == "__main__":
     generate_chart(5)
-    generate_chart(1)
     generate_chart(-1)
