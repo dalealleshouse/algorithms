@@ -33,7 +33,7 @@ static ResultCode QuickSelectRecursive(const size_t nth, const size_t n,
   }
 
   // find the index of an element to partition around
-  size_t pivot = rand() % n;
+  size_t pivot = rand() % n;  // NOLINT
 
   // move the partition value to the first position
   Swap(size, arr, (char*)arr + pivot * size);
@@ -49,9 +49,9 @@ static ResultCode QuickSelectRecursive(const size_t nth, const size_t n,
   } else if (pivot_index < nth) {
     return QuickSelect(nth - pivot_index, n - pivot_index, size,
                        (char*)arr + pivot_index * size, comparator, result);
-  } else {
-    return QuickSelect(nth, pivot_index, size, arr, comparator, result);
   }
+
+  return QuickSelect(nth, pivot_index, size, arr, comparator, result);
 }
 
 ResultCode QuickSelect(const size_t nth, const size_t n, const size_t size,
