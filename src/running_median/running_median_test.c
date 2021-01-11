@@ -20,12 +20,14 @@ static const double kEpsilon = 0.0000000000000000001;
   }
 
 static void RunningMedian_Create_failed_mem_allocation() {
+#if !defined(NDEBUG)
   ErrorReporter_Clear();
   RunningMedian* sut;
 
   FAILED_MALLOC_TEST({ sut = RunningMedian_Create(); });
   CU_ASSERT_PTR_NULL(sut);
   CU_ASSERT_EQUAL(kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
+#endif
 }
 
 static void RunningMedian_Create_happy_path() {
@@ -44,6 +46,7 @@ static void RunningMedian_Insert_null_parameter() {
 }
 
 static void RunningMedian_Insert_failed_mem_allocation() {
+#if !defined(NDEBUG)
   SUT({
     ErrorReporter_Clear();
     FAILED_MALLOC_TEST({
@@ -51,6 +54,7 @@ static void RunningMedian_Insert_failed_mem_allocation() {
       CU_ASSERT_EQUAL(kFailedMemoryAllocation, result);
     });
   });
+#endif
 }
 
 static void RunningMedian_Insert_nan_or_inf() {

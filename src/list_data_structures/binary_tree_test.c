@@ -266,6 +266,7 @@ static void BinaryTree_Create_init_values() {
 
 /*************************** BinaryTree_Insert ********************************/
 static void BinaryTree_Insert_failed_mem_allocation() {
+#if !defined(NDEBUG)
   BinaryTree* sut = NULL;
   ResultCode result_code = BinaryTree_Create(PIntComparator, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
@@ -276,6 +277,7 @@ static void BinaryTree_Insert_failed_mem_allocation() {
 
   CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
   BinaryTree_Destroy(sut, NULL);
+#endif
 }
 
 static void BinaryTree_Insert_creates_root() {
@@ -933,6 +935,7 @@ static BinaryTree* create_red_black_sut(int* vals) {
 
 /*************************** RedBlackTree_Insert ******************************/
 static void RedBlackTree_Insert_failed_mem_allocation() {
+#if !defined(NDEBUG)
   BinaryTree* sut = NULL;
   ResultCode result_code = BinaryTree_Create(PIntComparator, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
@@ -942,6 +945,7 @@ static void RedBlackTree_Insert_failed_mem_allocation() {
 
   CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
   BinaryTree_Destroy(sut, NULL);
+#endif
 }
 
 static void RedBlackTree_Insert_creates_root() {

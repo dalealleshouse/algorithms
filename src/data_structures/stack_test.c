@@ -60,6 +60,7 @@ static void Stack_Create_initalizes_values() {
 
 /*************************** Stack_Push ***************************************/
 static void Stack_Push_failed_malloc() {
+#if !defined(NDEBUG)
   Stack* sut = NULL;
   ResultCode result_code = Stack_Create(&sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
@@ -70,6 +71,7 @@ static void Stack_Push_failed_malloc() {
     CU_ASSERT_EQUAL(kFailedMemoryAllocation, result);
   });
   Stack_Destroy(sut);
+#endif
 }
 
 static void Stack_Push_null_parameter() {

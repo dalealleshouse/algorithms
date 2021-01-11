@@ -93,6 +93,7 @@ static void DisjointSet_MakeSet_item_exists() {
 }
 
 static void DisjointSet_MakeSet_failed_malloc() {
+#if !defined(NDEBUG)
   int some_pointer = 1;
   SetItem* item = NULL;
   SUT(10, {
@@ -101,6 +102,7 @@ static void DisjointSet_MakeSet_failed_malloc() {
       CU_ASSERT_EQUAL(_result, kFailedMemoryAllocation);
     });
   });
+#endif
 }
 
 static void DisjointSet_MakeSet_inits_set_values() {

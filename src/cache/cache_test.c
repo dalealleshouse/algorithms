@@ -52,11 +52,13 @@ static void Cache_Create_null_parameter() {
 }
 
 static void Cache_Create_failed_malloc() {
+#if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
     Cache* sut = NULL;
     ResultCode result_code = Cache_Create(5, free, &sut);
     CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
   });
+#endif
 }
 
 static void Cache_Create_invalid_parameter() {
