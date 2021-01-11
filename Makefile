@@ -38,6 +38,9 @@ release: $(SOURCES)
 profile: CFLAGS += -pg
 profile: $(TARGET)
 
+test-cases: FLAGS += -DTEST_CASES -DINSTRUMENT_SORT
+test-cases: release
+
 code-coverage: CFLAGS += -fprofile-arcs -ftest-coverage
 code-coverage: $(TARGET)
 

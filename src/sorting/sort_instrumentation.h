@@ -15,10 +15,6 @@ extern size_t copy_count;
 // completely remove the tracking code so it does not have an effect on the
 // runtime data. Also, I'm not concerned about concurrency and other common
 // problems associated with global variables
-//
-// un-comment to enable instrumentation
-/* #define INSTRUMENT_SORT */
-
 #ifdef INSTRUMENT_SORT
 
 #define INSTRUMENTED_MEMCPY(dest, src, n, item_size) \
