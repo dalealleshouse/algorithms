@@ -91,7 +91,7 @@ static Result _wisResursive(WeightedIndependentSet** wis,
     return result2;
   }
 
-  if (is_add_overflow_uint(wis2->weight, vertices[n - 1]->weight)) {
+  if (IsAddOverflow_uint(wis2->weight, vertices[n - 1]->weight)) {
     WeightedIndependentSet_Destroy(wis1);
     WeightedIndependentSet_Destroy(wis2);
     return kArithmeticOverflow;
@@ -266,7 +266,7 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
     unsigned long iminus2 = solutions[i - 2];
     unsigned long w = graph->vertices[i - 1]->weight;
 
-    if (is_add_overflow_ulong(iminus1, w)) return kArithmeticOverflow;
+    if (IsAddOverflow_ulong(iminus1, w)) return kArithmeticOverflow;
 
     // overflow checked above
     if (iminus1 >= iminus2 + w) {
@@ -318,7 +318,7 @@ Result WeightedIndependentSet_Dynamic(PathGraph* graph,
     WeightedIndependentSet* iminus2 = solutions[i - 2];
     WeightedVertex* w = graph->vertices[i - 1];
 
-    if (is_add_overflow_uint(iminus1->weight, w->weight)) {
+    if (IsAddOverflow_uint(iminus1->weight, w->weight)) {
       _solutionsDestroy(solutions, solutions_n);
       return kArithmeticOverflow;
     }

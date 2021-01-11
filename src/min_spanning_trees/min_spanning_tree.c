@@ -123,7 +123,7 @@ static Result _addEdgeToMst(MinSpanTree* mst, Edge* edge) {
     mst->edge_tail = current;
   }
 
-  if (is_add_overflow_int(mst->cost, current->weight)) {
+  if (IsAddOverflow_int(mst->cost, current->weight)) {
     return kArithmeticOverflow;
   }
 

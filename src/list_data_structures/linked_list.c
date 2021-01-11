@@ -231,7 +231,7 @@ ResultCode LinkedList_Max(const LinkedList* self, void** result) {
   LinkedListItem* current = self->head->next;
 
   while (current != NULL) {
-    if (self->comparator(max, current->payload) == -1) max = current->payload;
+    if (self->comparator(max, current->payload) < 0) max = current->payload;
     current = current->next;
   }
 

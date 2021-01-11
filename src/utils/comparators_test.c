@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
 #include "comparators.h"
 
 #include "CUnit/Basic.h"
@@ -17,7 +24,7 @@ static void PIntComparator_ReturnsNegativeWhenXLessThanY() {
   int y = 10;
 
   int result = PIntComparator(&x, &y);
-  CU_ASSERT_EQUAL(-1, result);
+  CU_ASSERT(result < 0);
 }
 
 static void PIntComparator_ReturnsOneWhenXGreaterThanY() {
@@ -25,7 +32,7 @@ static void PIntComparator_ReturnsOneWhenXGreaterThanY() {
   int y = -10;
 
   int result = PIntComparator(&x, &y);
-  CU_ASSERT_EQUAL(1, result);
+  CU_ASSERT(result > 0);
 }
 
 int RegisterCommonTests() {

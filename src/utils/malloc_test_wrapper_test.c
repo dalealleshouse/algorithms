@@ -7,13 +7,13 @@
 #include "CUnit/CUnit.h"
 #include "test_helpers.h"
 
-static void _MallocWorksWithoutIntercept() {
+static void MallocWorksWithoutIntercept() {
   void* test = malloc(100);
   CU_ASSERT_PTR_NOT_NULL(test);
   free(test);
 }
 
-static void _MallocInterceptReturnNullAndResetReturnsPointer() {
+static void MallocInterceptReturnNullAndResetReturnsPointer() {
 #if !defined(NDEBUG)
   InterceptMalloc();
   void* test = malloc(100);
@@ -21,35 +21,38 @@ static void _MallocInterceptReturnNullAndResetReturnsPointer() {
 
   ResetMalloc();
   test = malloc(100);
-  CU_ASSERT_PTR_NOT_NULL(test);
+  CU_ASSERT_PTR_NOT_NULL(test);  // NOLINT(clang-analyzer-unix.Malloc)
   free(test);
 #endif
 }
 
-static void _MallocInterceptCountIncrementsAndResets() {
+static void MallocInterceptCountIncrementsAndResets() {
 #if !defined(NDEBUG)
   CU_ASSERT_EQUAL(0, MallocInterceptCount());
 
   InterceptMalloc();
   void* test = malloc(100);
   CU_ASSERT_EQUAL(1, MallocInterceptCount());
+  free(test);
   test = malloc(100);
   CU_ASSERT_EQUAL(2, MallocInterceptCount());
+  free(test);
   test = malloc(100);
   CU_ASSERT_EQUAL(3, MallocInterceptCount());
+  free(test);
 
   ResetMalloc();
   CU_ASSERT_EQUAL(0, MallocInterceptCount());
 #endif
 }
 
-static void _CallocWorksWithoutIntercept() {
+static void CallocWorksWithoutIntercept() {
   void* test = calloc(100, 1);
   CU_ASSERT_PTR_NOT_NULL(test);
   free(test);
 }
 
-static void _CallocInterceptReturnNullAndResetReturnsPointer() {
+static void CallocInterceptReturnNullAndResetReturnsPointer() {
 #if !defined(NDEBUG)
   InterceptMalloc();
   void* test = calloc(100, 1);
@@ -57,36 +60,41 @@ static void _CallocInterceptReturnNullAndResetReturnsPointer() {
 
   ResetMalloc();
   test = calloc(100, 1);
-  CU_ASSERT_PTR_NOT_NULL(test);
+  CU_ASSERT_PTR_NOT_NULL(test);  // NOLINT(clang-analyzer-unix.Malloc)
   free(test);
 #endif
 }
 
-static void _CallocInterceptCountIncrementsAndResets() {
+static void CallocInterceptCountIncrementsAndResets() {
 #if !defined(NDEBUG)
   CU_ASSERT_EQUAL(0, MallocInterceptCount());
 
   InterceptMalloc();
   void* test = calloc(100, 1);
   CU_ASSERT_EQUAL(1, MallocInterceptCount());
+  free(test);
+
   test = calloc(100, 1);
   CU_ASSERT_EQUAL(2, MallocInterceptCount());
+  free(test);
+
   test = calloc(100, 1);
   CU_ASSERT_EQUAL(3, MallocInterceptCount());
+  free(test);
 
   ResetMalloc();
   CU_ASSERT_EQUAL(0, MallocInterceptCount());
 #endif
 }
 
-static void _ReallocWorksWithoutIntercept() {
+static void ReallocWorksWithoutIntercept() {
   void* test = malloc(100);
   test = realloc(test, 1);
   CU_ASSERT_PTR_NOT_NULL(test);
-  free(test);
+  free(test);  // NOLINT(clang-analyzer-unix.Malloc)
 }
 
-static void _ReallocInterceptReturnNullAndResetReturnsPointer() {
+static void ReallocInterceptReturnNullAndResetReturnsPointer() {
 #if !defined(NDEBUG)
   void* test = malloc(100);
 
@@ -96,13 +104,13 @@ static void _ReallocInterceptReturnNullAndResetReturnsPointer() {
 
   ResetMalloc();
 
-  test = realloc(test, 1);
+  test = realloc(test, 1);  // NOLINT(clang-analyzer-unix.Malloc)
   CU_ASSERT_PTR_NOT_NULL(test);
-  free(test);
+  free(test);  // NOLINT(clang-analyzer-unix.Malloc)
 #endif
 }
 
-static void _ReallocInterceptCountIncrementsAndResets() {
+static void ReallocInterceptCountIncrementsAndResets() {
 #if !defined(NDEBUG)
   void* test = malloc(100);
 
@@ -111,10 +119,15 @@ static void _ReallocInterceptCountIncrementsAndResets() {
   InterceptMalloc();
   void* test2 = realloc(test, 1);
   CU_ASSERT_EQUAL(1, MallocInterceptCount());
-  test2 = realloc(test, 1);
+  free(test2);
+
+  void* test3 = realloc(test, 1);  // NOLINT(clang-analyzer-unix.Malloc)
   CU_ASSERT_EQUAL(2, MallocInterceptCount());
+  free(test3);
+
   test2 = realloc(test, 1);
   CU_ASSERT_EQUAL(3, MallocInterceptCount());
+  free(test2);
 
   ResetMalloc();
   CU_ASSERT_EQUAL(0, MallocInterceptCount());
@@ -124,18 +137,18 @@ static void _ReallocInterceptCountIncrementsAndResets() {
 
 int RegisterMallocTestWrapperTests() {
   CU_TestInfo tests[] = {
-      CU_TEST_INFO(_MallocWorksWithoutIntercept),
-      CU_TEST_INFO(_MallocInterceptReturnNullAndResetReturnsPointer),
-      CU_TEST_INFO(_MallocInterceptCountIncrementsAndResets),
-      CU_TEST_INFO(_CallocWorksWithoutIntercept),
-      CU_TEST_INFO(_CallocInterceptReturnNullAndResetReturnsPointer),
-      CU_TEST_INFO(_CallocInterceptCountIncrementsAndResets),
-      CU_TEST_INFO(_ReallocWorksWithoutIntercept),
-      CU_TEST_INFO(_ReallocInterceptReturnNullAndResetReturnsPointer),
-      CU_TEST_INFO(_ReallocInterceptCountIncrementsAndResets),
+      CU_TEST_INFO(MallocWorksWithoutIntercept),
+      CU_TEST_INFO(MallocInterceptReturnNullAndResetReturnsPointer),
+      CU_TEST_INFO(MallocInterceptCountIncrementsAndResets),
+      CU_TEST_INFO(CallocWorksWithoutIntercept),
+      CU_TEST_INFO(CallocInterceptReturnNullAndResetReturnsPointer),
+      CU_TEST_INFO(CallocInterceptCountIncrementsAndResets),
+      CU_TEST_INFO(ReallocWorksWithoutIntercept),
+      CU_TEST_INFO(ReallocInterceptReturnNullAndResetReturnsPointer),
+      CU_TEST_INFO(ReallocInterceptCountIncrementsAndResets),
       CU_TEST_INFO_NULL};
 
-  CU_SuiteInfo suites[] = {{.pName = "size_t_tests",
+  CU_SuiteInfo suites[] = {{.pName = "Malloc Wrapper Tests",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
                             .pTests = tests},

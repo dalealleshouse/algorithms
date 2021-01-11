@@ -14,8 +14,6 @@
 
 #include "quick_sort.h"
 
-typedef size_t (*choose_select_pivot)(const size_t n);
-
 static void Swap(const size_t size, void* x, void* y) {
   char n[size];
   memcpy(n, x, size);

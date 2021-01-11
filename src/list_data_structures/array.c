@@ -114,7 +114,7 @@ ResultCode Array_Max(const Array* self, void** result) {
   for (size_t i = 1; i < self->n; i++) {
     size_t offset = i * self->item_size;
     int cmp_result = self->comparator(max, (char*)self->array + offset);
-    if (cmp_result == -1) {
+    if (cmp_result < 0) {
       max = (char*)self->array + offset;
     }
   }

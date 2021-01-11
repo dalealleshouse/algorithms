@@ -20,7 +20,6 @@
     CU_ASSERT_EQUAL(1, MallocInterceptCount()); \
     ResetMalloc();                              \
   }
-
 #endif
 
 void InterceptMalloc();

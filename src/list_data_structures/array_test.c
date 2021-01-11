@@ -395,7 +395,7 @@ static void Array_Max_standard() {
 
   void* result = NULL;
   result_code = Array_Max(sut, &result);
-  CU_ASSERT_EQUAL(result_code, kSuccess);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_EQUAL(95, *(int*)result);
 
   Array_Destroy(sut);
