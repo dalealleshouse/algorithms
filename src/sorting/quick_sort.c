@@ -57,7 +57,7 @@ static ResultCode QuickSortRecursive(const size_t n, const size_t size,
                         comparator, choose_pivot);
 }
 
-size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
+size_t PivotOnZero(const size_t n, const size_t size, void* arr,
                    const sort_strategy comparator) {
   (void)n;
   (void)size;
@@ -71,7 +71,7 @@ size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
  * random number and it's not. However, for the purposes of this project, it's
  * not that important
  */
-size_t PivotOnRandom(const size_t n, const size_t size, const void* arr,
+size_t PivotOnRandom(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator) {
   (void)size;
   (void)arr;
@@ -79,7 +79,7 @@ size_t PivotOnRandom(const size_t n, const size_t size, const void* arr,
   return rand() % n;
 }
 
-size_t PivotOnLast(const size_t n, const size_t size, const void* arr,
+size_t PivotOnLast(const size_t n, const size_t size, void* arr,
                    const sort_strategy comparator) {
   (void)size;
   (void)arr;
@@ -89,13 +89,13 @@ size_t PivotOnLast(const size_t n, const size_t size, const void* arr,
   return (int)n - 1;
 }
 
-size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
+size_t PivotOnMedian(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator) {
   if (n <= 2) return 0;
 
   size_t mid_point = (n >> 1);
 
-  void* first = (void*)arr;
+  void* first = arr;
   void* last = (char*)arr + size * (n - 1);
   void* middle = (char*)arr + size * mid_point;
 
