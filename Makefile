@@ -2,7 +2,7 @@ SHELL 	= /bin/sh
 CC 		= clang-11
 
 INCLUDES     = -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures -I src/sorting
-FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden -D_POSIX_C_SOURCE=200809L 
+FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden -D_DEFAULT_SOURCE
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG

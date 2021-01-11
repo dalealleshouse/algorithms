@@ -1148,14 +1148,11 @@ static void RedBlackTree_Delete_one_red_child() {
 static void RedBlackTree_fuzz_test() {
   (void)print_tree;
   const size_t kN = 500;
-  static unsigned int seed;
   size_t size = kN;
   void* result = NULL;
   int vals[kN + 1];
 
-  for (size_t i = 0; i < kN; i++) {
-    vals[i] = rand_r(&seed);
-  }
+  for (size_t i = 0; i < kN; i++) vals[i] = (int)(random() % INT_MAX);
 
   vals[kN] = TERMINATOR;
 

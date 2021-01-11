@@ -10,7 +10,7 @@ static bool graph_is_invalid(const Deprecated_Graph* graph) {
 
 Deprecated_Graph* _CollaspeTo(Deprecated_Graph* graph, size_t size) {
   while (graph->n > size && graph->m > 1) {
-    int edge_index = rand() % (graph->m - 1);
+    int edge_index = random() % (graph->m - 1);
     Graph_CollapseEdge(graph, edge_index);
   }
 

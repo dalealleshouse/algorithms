@@ -83,31 +83,28 @@ void* ReversedArrayGenerator(size_t n) {
 }
 
 void* RandomArrayGenerator(size_t n) {
-  unsigned int seed = time(NULL);
   int* arr = malloc(sizeof(int) * n);
-  for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed);
+  for (size_t i = 0; i < n; i++) arr[i] = (int)(random() % INT_MAX);
 
   return arr;
 }
 
 void* RandomStructArrayGenerator(size_t n) {
-  unsigned int seed = time(NULL);
   TestStruct* arr = malloc(sizeof(TestStruct) * n);
 
   for (size_t i = 0; i < n; i++) {
-    arr[i] = (TestStruct){i, (int)i + 1, rand_r(&seed)};
+    arr[i] = (TestStruct){i, (int)i + 1, (int)(random() % INT_MAX)};
   }
 
   return arr;
 }
 
 void* RandomPointerArrayGenerator(size_t n) {
-  unsigned int seed = time(NULL);
   TestStruct** arr = malloc(sizeof(void*) * n);
 
   for (size_t i = 0; i < n; i++) {
     TestStruct* tmp = malloc(sizeof(TestStruct));
-    *tmp = (TestStruct){i, (int)i + 1, rand_r(&seed)};
+    *tmp = (TestStruct){i, (int)i + 1, (int)(random() % INT_MAX)};
 
     arr[i] = tmp;
   }
@@ -116,9 +113,8 @@ void* RandomPointerArrayGenerator(size_t n) {
 }
 
 void* DuplicateValueArrayGenerator(size_t n) {
-  unsigned int seed = time(NULL);
   int* arr = malloc(sizeof(int) * n);
-  for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed) % 10;
+  for (size_t i = 0; i < n; i++) arr[i] = (int)(random() % 10);
 
   return arr;
 }

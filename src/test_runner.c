@@ -113,7 +113,14 @@ extern int RegisterCacheTests();
 extern int RegisterBitVectorTests();
 
 int RegisterTests() {
-  srand(time(NULL));
+  // Seed the random number generator
+  struct timespec ts;
+  if (timespec_get(&ts, TIME_UTC) == 0) {
+    fprintf(stderr, "timespec_get failed");
+    return -1;
+  }
+  srandom(ts.tv_nsec ^ ts.tv_sec); 
+
   return (
              // clang-format off
       // Test Cases

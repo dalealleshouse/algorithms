@@ -132,8 +132,8 @@ void matches_brute_force(void) {
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      a[i][j] = rand() % 100 + 1;
-      b[i][j] = rand() % 100 + 1;
+      a[i][j] = random() % 100 + 1;
+      b[i][j] = random() % 100 + 1;
     }
   }
 

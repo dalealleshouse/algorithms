@@ -76,7 +76,7 @@ size_t PivotOnRandom(const size_t n, const size_t size, void* arr,
   (void)size;
   (void)arr;
   (void)comparator;
-  return rand() % n;
+  return random() % n;
 }
 
 size_t PivotOnLast(const size_t n, const size_t size, void* arr,

@@ -163,14 +163,13 @@ static void QuickSelect_nth_out_of_bounds() {
 }
 
 static void QuickSelect_matches_select() {
-  unsigned int seed = time(NULL);
   const size_t n = 100000;
-  const size_t nth = rand_r(&seed) % n;
+  const size_t nth = random() % n;
   int s[n];
   int qs[n];
 
   for (size_t i = 0; i < n; i++) {
-    int num = rand_r(&seed);
+    int num = (int)(random() % INT_MAX);
     s[i] = num;
     qs[i] = num;
   }

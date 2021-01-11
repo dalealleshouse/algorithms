@@ -33,7 +33,7 @@ static ResultCode QuickSelectRecursive(const size_t nth, const size_t n,
   }
 
   // find the index of an element to partition around
-  size_t pivot = rand() % n;  // NOLINT
+  size_t pivot = random() % n;
 
   // move the partition value to the first position
   Swap(size, arr, (char*)arr + pivot * size);

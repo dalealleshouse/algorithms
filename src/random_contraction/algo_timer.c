@@ -21,7 +21,7 @@ static min_cut get_selector(const algo algo) {
 }
 
 static unsigned RandomNumberBetween(unsigned low, unsigned high) {
-  return (rand() % (high - low)) + low;
+  return (random() % (high - low)) + low;
 }
 
 double AlgoTime(const size_t n, const size_t m, const algo algo) {

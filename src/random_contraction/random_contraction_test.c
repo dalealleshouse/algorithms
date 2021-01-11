@@ -9,10 +9,7 @@
 #define CU_TEST_INFO(test_func) \
   { #test_func, test_func }
 
-static int noop(void) {
-  srand(time(0));
-  return 0;
-}
+static int noop(void) { return 0; }
 
 /*************************** RC_KargerMinCut **********************************/
 static void RC_KargerMinCut_null() {
