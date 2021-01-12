@@ -11,8 +11,8 @@
 #include <stddef.h>
 
 bool IsMulOverflow_size_t(size_t x, size_t y);
-bool is_add_overflow_size_t(size_t x, size_t y);
-bool is_add_overflow_int(int x, int y);
-bool is_add_overflow_uint(unsigned int x, unsigned int y);
-bool is_add_overflow_ulong(unsigned long x, unsigned long y);
-bool is_mul_overflow_ulong(unsigned long x, unsigned long y);
+bool IsAddOverflow_size_t(size_t x, size_t y);
+bool IsAddOverflow_int(int x, int y);
+bool IsAddOverflow_uint(unsigned int x, unsigned int y);
+bool IsAddOverflow_ulong(unsigned long x, unsigned long y);
+bool IsMulOverflow_ulong(unsigned long x, unsigned long y);

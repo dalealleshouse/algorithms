@@ -69,6 +69,7 @@ static void KruskalCluster_CalcsMaxSpacingForGiantCluster() {
 }
 
 static void KruskalCluster_FailedMallocTest() {
+#if !defined(NDEBUG)
   Graph* input = SmallGraph();
   Result result;
   int max_space;
@@ -77,6 +78,7 @@ static void KruskalCluster_FailedMallocTest() {
   CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
 
   Graph_Destroy(input, free);
+#endif
 }
 
 static void KruskalCluster_InvalidInput() {

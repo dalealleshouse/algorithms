@@ -19,6 +19,7 @@
 // THE SOFTWARE.
 //
 // FarmHash, by Geoff Pike
+#pragma GCC diagnostic ignored "-Wall"
 
 #include "farmhash.h"
 

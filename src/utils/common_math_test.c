@@ -43,23 +43,23 @@ static void MinDouble_neg_value_returns_lowest() {
   CU_ASSERT_EQUAL(result, -5.3);
 }
 
-static void MaxPArray_returns_max_value_in_array() {
+static void MaxArray_returns_max_value_in_array() {
   const size_t n = 6;
   const int expected = 6;
   int arr[] = {6, 5, 4, 3, 2, 1};
 
-  void* result = MaxPArray(n, sizeof(arr[0]), arr, PIntComparator);
+  void* result = MaxArray(n, sizeof(arr[0]), arr, PIntComparator);
 
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
 }
 
-static void MinPArray_returns_min_value_in_array() {
+static void MinArray_returns_min_value_in_array() {
   const size_t n = 6;
   const int expected = 1;
   int arr[] = {6, 5, 4, 3, 2, 1};
 
-  void* result = MinPArray(n, sizeof(arr[0]), arr, PIntComparator);
+  void* result = MinArray(n, sizeof(arr[0]), arr, PIntComparator);
 
   CU_ASSERT_PTR_NOT_NULL_FATAL(result);
   CU_ASSERT_EQUAL(0, memcmp(&expected, result, sizeof(arr[0])));  // NOLINT
@@ -96,8 +96,8 @@ int RegisterMathTests() {
       CU_TEST_INFO(MinDouble_single_value_returns_value),
       CU_TEST_INFO(MinDouble_two_values_returns_lowest),
       CU_TEST_INFO(MinDouble_neg_value_returns_lowest),
-      CU_TEST_INFO(MaxPArray_returns_max_value_in_array),
-      CU_TEST_INFO(MinPArray_returns_min_value_in_array),
+      CU_TEST_INFO(MaxArray_returns_max_value_in_array),
+      CU_TEST_INFO(MinArray_returns_min_value_in_array),
       CU_TEST_INFO(NextPowerOfTwo_zero),
       CU_TEST_INFO(NextPowerOfTwo_returns_value_if_already_pow_2),
       CU_TEST_INFO(NextPowerOfTwo_happy_path),

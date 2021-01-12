@@ -1,11 +1,13 @@
 SHELL 	= /bin/sh
 CC 		= clang-11
 
-FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden -D_POSIX_C_SOURCE=200809L -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures -I src/sorting
+INCLUDES     = -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures -I src/sorting
+FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden -D_DEFAULT_SOURCE
 CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
-LINKFLAGS 	 = -lcunit -flto -lm -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc
+LINKFLAGS 	 = -lcunit -flto -lm
+WRAPFLAGS 	 = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc
 SHAREDFLAGS	 = -std=c11 -D_POSIX_C_SOURCE=200809L -O3 -D NDEBUG -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures -I src/sorting -fPIC -shared
 
 TARGET			= src/test_runner
@@ -18,23 +20,26 @@ all: $(TARGET)
 all: CFLAGS += -fsanitize=safe-stack,undefined
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) -o $(TARGET)
+	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) $(WRAPFLAGS) -o $(TARGET)
 	ASAN_OPTIONS=detect_leaks=1 ./$(TARGET)
 
 release: $(SOURCES)
-	$(CC) $(FLAGS) $(CFLAGS) $(RELEASEFLAGS) -o $(TARGET) $(SOURCES) $(LINKFLAGS)
+	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(RELEASEFLAGS) -o $(TARGET) $(SOURCES) $(LINKFLAGS)
 	./$(TARGET)
 
 -include $(DEPS)
 
 %.o: %.c
-	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $< -flto
+	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $< -flto
 
 %.d: %.c
-	@$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) $< -MM -MT $(@:.d=.o) >$@ -flto
+	@$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(DEBUGFLAGS) $< -MM -MT $(@:.d=.o) >$@ -flto
 
 profile: CFLAGS += -pg
 profile: $(TARGET)
+
+test-cases: FLAGS += -DTEST_CASES -DINSTRUMENT_SORT
+test-cases: release
 
 code-coverage: CFLAGS += -fprofile-arcs -ftest-coverage
 code-coverage: $(TARGET)

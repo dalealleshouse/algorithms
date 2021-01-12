@@ -80,6 +80,7 @@ static void HashTable_Put_null_parameter() {
 }
 
 static void HashTable_Put_failed_malloc() {
+#if !defined(NDEBUG)
   char* key = "we are";
   int value = 138;
 
@@ -89,6 +90,7 @@ static void HashTable_Put_failed_malloc() {
       CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
     });
   });
+#endif
 }
 
 static void HashTable_Put_happy_path() {

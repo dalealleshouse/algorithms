@@ -66,7 +66,7 @@ GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
 
         if (previous[v + n * k] != UNINITIALIZED &&
             previous[k + n * w] != UNINITIALIZED) {
-          if (is_add_overflow_int(previous[v + n * k], previous[k + n * w])) {
+          if (IsAddOverflow_int(previous[v + n * k], previous[k + n * w])) {
             free(previous);
             free(current);
             return Graph_kArithmeticOverflow;

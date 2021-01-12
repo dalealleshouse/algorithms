@@ -116,6 +116,7 @@ static void LinkedList_InsertAt_bad_index() {
 }
 
 static void LinkedList_InsertAt_bad_malloc() {
+#if !defined(NDEBUG)
   int dummy = 5;
   LinkedList* sut = NULL;
   ResultCode result_code = LinkedList_Create(free, PIntComparator, &sut);
@@ -127,6 +128,7 @@ static void LinkedList_InsertAt_bad_malloc() {
   })
 
   LinkedList_Destroy(sut);
+#endif
 }
 
 static void LinkedList_InsertAt_empty() {

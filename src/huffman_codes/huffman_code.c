@@ -29,7 +29,7 @@ static int _codeNodeComparer(const void* x, const void* y) {
 }
 
 static Result _combineNodes(HuffmanCode* x, HuffmanCode* y, HuffmanCode** new) {
-  if (is_add_overflow_size_t(x->frequency, y->frequency)) {
+  if (IsAddOverflow_size_t(x->frequency, y->frequency)) {
     return kArithmeticOverflow;
   }
 

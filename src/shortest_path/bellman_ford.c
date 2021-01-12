@@ -37,7 +37,7 @@ static GraphResult _shortest(Graph* graph, Vertex* v, BFData cache[graph->n],
     BFData contender = {UNINITIALIZED, NULL};
 
     if (cache[e->tail].distance != UNINITIALIZED) {
-      if (is_add_overflow_int(cache[e->tail].distance, e->weight)) {
+      if (IsAddOverflow_int(cache[e->tail].distance, e->weight)) {
         return Graph_kArithmeticOverflow;
       }
 

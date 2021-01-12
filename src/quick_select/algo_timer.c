@@ -39,8 +39,7 @@ double SelectTime(const size_t n, const size_t nth,
   }
 
   int* arr = malloc(n * sizeof(int));
-  unsigned int seed = time(NULL);
-  for (size_t i = 0; i < n; i++) arr[i] = rand_r(&seed);
+  for (size_t i = 0; i < n; i++) arr[i] = (int)(random() % INT_MAX);
 
   clock_t t = clock();
   void* result = NULL;

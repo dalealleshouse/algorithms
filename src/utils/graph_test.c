@@ -12,9 +12,11 @@ static Graph* _graph;
 
 /*************************** Graph_Create *************************************/
 static void Graph_Create_malloc_tester(void) {
+#if !defined(NDEBUG)
   Graph* graph = Graph_Create(1);
   CU_ASSERT_PTR_NULL(graph);
   CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
+#endif
 }
 
 static void Graph_Create_failed_malloc() {
@@ -45,8 +47,10 @@ static void Graph_Create_initalizes_values() {
 
 /*************************** Graph_AddEdge ************************************/
 static void Graph_AddEdge_malloc_tester(void) {
+#if !defined(NDEBUG)
   GraphResult result = Graph_AddEdge(_graph, 1, 2);
   CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, result);
+#endif
 }
 
 static void Graph_AddEdge_failed_malloc() {
@@ -189,9 +193,11 @@ static void Graph_FromFile_null_parameter() {
 }
 
 static void Graph_FromFile_malloc_tester(void) {
+#if !defined(NDEBUG)
   Graph* graph = Graph_FromFile(6, "src/utils/test_data/graph-4-2.txt");
   CU_ASSERT_EQUAL(Graph_kFailedMemoryAllocation, ErrorReporter_LastErrorCode());
   CU_ASSERT_PTR_NULL(graph);
+#endif
 }
 
 static void Graph_FromFile_failed_malloc() {

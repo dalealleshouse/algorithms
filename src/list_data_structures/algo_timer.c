@@ -53,7 +53,6 @@ static ResultCode BuildEmptyDataStructure(Structure str, void** result) {
 }
 
 static ResultCode BuildDataStructure(Structure str, size_t n, void** result) {
-  unsigned int seed = time(NULL);
   void* ds = NULL;
 
   ResultCode result_code = BuildEmptyDataStructure(str, &ds);
@@ -67,10 +66,10 @@ static ResultCode BuildDataStructure(Structure str, size_t n, void** result) {
     case kLinkedList:
     case kBinaryTree:
     case kRedBlackTree:
-      for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
+      for (size_t i = 0; i < n; i++) op(ds, random());
       break;
     case kSortedArray:
-      for (size_t i = 0; i < n; i++) op(ds, rand_r(&seed));
+      for (size_t i = 0; i < n; i++) op(ds, random());
 
       Array* arr = (Array*)ds;
       qsort(arr->array, arr->n, arr->item_size, arr->comparator);
@@ -78,13 +77,13 @@ static ResultCode BuildDataStructure(Structure str, size_t n, void** result) {
     case kLinkedListPoorLocality:
       for (size_t i = 0; i < n * 4; i++) {
         void* temp = malloc(10000);
-        op(ds, rand_r(&seed));
+        op(ds, random());
         free(temp);
       }
 
       LinkedList* list = (LinkedList*)ds;
       for (size_t i = 0; i < n * 3; i++) {
-        LinkedList_DeleteAt(list, rand_r(&seed) % list->size);
+        LinkedList_DeleteAt(list, random() % list->size);
       }
       break;
     case kBinaryTreeUnbalanced:
@@ -389,7 +388,6 @@ RankOp GetRankOp(Structure str) {
 }
 
 double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
-  unsigned int seed = time(NULL);
   clock_t t;
   ResultCode result_code;
   void* ds = NULL;
@@ -418,7 +416,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
         // Insert in sequential order so tree is completely unbalanced
         for (size_t i = 0; i < n; i++) i_op(ds, i);
       } else {
-        for (size_t i = 0; i < n; i++) i_op(ds, rand_r(&seed));
+        for (size_t i = 0; i < n; i++) i_op(ds, random());
       }
       t = clock() - t;
       break;
@@ -437,7 +435,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
 
       t = clock();
       // No error checking to avoid time overhead
-      for (size_t i = 0; i < n; i++) s_op(ds, rand_r(&seed));
+      for (size_t i = 0; i < n; i++) s_op(ds, random());
       t = clock() - t;
       break;
     case kEnumerate:
@@ -491,7 +489,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
 
       t = clock();
       // No error checking to avoid time overhead
-      for (size_t i = 0; i < n; i++) p_op(ds, rand_r(&seed));
+      for (size_t i = 0; i < n; i++) p_op(ds, random());
       t = clock() - t;
       break;
     case kRank:
@@ -509,7 +507,7 @@ double ListDataStructures_OperationTime(Operation op, Structure st, size_t n) {
 
       t = clock();
       // No error checking to avoid time overhead
-      for (size_t i = 0; i < n; i++) r_op(ds, rand_r(&seed));
+      for (size_t i = 0; i < n; i++) r_op(ds, random());
       t = clock() - t;
       break;
   }

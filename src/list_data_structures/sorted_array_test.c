@@ -5,9 +5,8 @@
  * This file is subject to the terms and conditions defined in the 'LICENSE'
  * file, which is part of this source code package.
  ******************************************************************************/
-#include "./sorted_array.h"
+#include "sorted_array.h"
 
-#include <pthread.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -19,7 +18,6 @@
 
 typedef ResultCode (*SortedArrayOp)(const Array*, const void*, void**);
 typedef ResultCode (*SortedArrayOpUnary)(const Array*, void**);
-static unsigned int seed;
 
 static Array* CreateSut(size_t n) {
   Array* sut = NULL;
@@ -28,7 +26,9 @@ static Array* CreateSut(size_t n) {
 
   sut->array = calloc(sizeof(int), n);
 
-  for (size_t i = 0; i < n; i++) ((int*)sut->array)[i] = rand_r(&seed);
+  for (size_t i = 0; i < n; i++) {
+    ((int*)sut->array)[i] = (int)(random() % INT_MAX);
+  }
 
   qsort(sut->array, n, sizeof(int), PIntComparator);
   sut->n = n;
@@ -351,8 +351,6 @@ static void SortedArray_Rank_standard() {
 }
 
 int RegisterSortedArrayTests() {
-  seed = time(NULL);
-
   CU_TestInfo Common_tests[] = {CU_TEST_INFO(SortedArray_null_parameter),
                                 CU_TEST_INFO_NULL};
 

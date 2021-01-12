@@ -98,6 +98,7 @@ static void Heap_Create_invalid_size() {
 }
 
 static void Heap_Create_failed_malloc() {
+#if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
     Heap* sut = NULL;
     ResultCode result_code = Heap_Create(5, TestComparator, &sut);
@@ -105,6 +106,7 @@ static void Heap_Create_failed_malloc() {
     CU_ASSERT_EQUAL(kFailedMemoryAllocation, result_code);
     CU_ASSERT_PTR_NULL(sut);
   });
+#endif
 }
 
 static void Heap_Create_intializes_variables() {
@@ -322,12 +324,14 @@ static void Heap_Resize_arith_overflow() {
 }
 
 static void Heap_Resize_failed_malloc() {
+#if !defined(NDEBUG)
   SUT(10, {
     FAILED_MALLOC_TEST({
       ResultCode result_code = Heap_Resize(sut, 20);
       CU_ASSERT_EQUAL(result_code, kFailedMemoryAllocation);
     });
   });
+#endif
 }
 
 static void Heap_Resize_smaller_happy_path() {

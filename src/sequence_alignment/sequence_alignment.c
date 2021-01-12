@@ -17,8 +17,8 @@ typedef struct SeqAlign {
   penalty mismatch_penalty;
 } SeqAlign;
 
-static void _printSolutions(size_t x_n, size_t y_n,
-                            penalty solutions[x_n + 1][y_n + 1]) {
+static void printSolutions(size_t x_n, size_t y_n,
+                           penalty solutions[x_n + 1][y_n + 1]) {
   printf("\n");
   for (size_t x = 0; x <= x_n; x++) {
     printf("i=%-3zu", x);
@@ -38,8 +38,8 @@ static void _printSolutions(size_t x_n, size_t y_n,
 /*
  * It's assumed that <x> and <y> strings are the same length
  */
-static ResultCode _seqAlignSolution_Init(char* x, char* y, penalty nw_score,
-                                         SeqAlignSolution** solution) {
+static ResultCode seqAlignSolution_Init(char* x, char* y, penalty nw_score,
+                                        SeqAlignSolution** solution) {
   if (x == NULL || y == NULL || solution == NULL) return kNullParameter;
   if (*solution != NULL) return kOutputPointerIsNotNull;
 
@@ -55,7 +55,7 @@ static ResultCode _seqAlignSolution_Init(char* x, char* y, penalty nw_score,
   return kSuccess;
 }
 
-static penalty _min(penalty x, penalty y, penalty z) {
+static penalty min(penalty x, penalty y, penalty z) {
   penalty _min = 0;
 
   _min = (x < y) ? x : y;
@@ -64,10 +64,10 @@ static penalty _min(penalty x, penalty y, penalty z) {
   return _min;
 }
 
-static ResultCode _reconstruct(
+static ResultCode reconstruct(
     SeqAlign* problem, penalty solutions[problem->x_n + 1][problem->y_n + 1],
     SeqAlignSolution** solution) {
-  if (is_add_overflow_size_t(problem->x_n, problem->y_n)) {
+  if (IsAddOverflow_size_t(problem->x_n, problem->y_n)) {
     return kArithmeticOverflow;
   }
 
@@ -141,7 +141,7 @@ static ResultCode _reconstruct(
   strncpy(new_x, &x[maxpos + 1], new_size);
   strncpy(new_y, &y[maxpos + 1], new_size);
 
-  ResultCode code = _seqAlignSolution_Init(
+  ResultCode code = seqAlignSolution_Init(
       new_x, new_y, solutions[problem->x_n][problem->y_n], solution);
   if (code != kSuccess) {
     free(new_x);
@@ -187,14 +187,14 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
   penalty solutions[problem->x_n + 1][problem->y_n + 1];
 
   for (size_t i = 0; i <= problem->x_n; i++) {
-    if (is_mul_overflow_ulong(i, problem->gap_penalty)) {
+    if (IsMulOverflow_ulong(i, problem->gap_penalty)) {
       return kArithmeticOverflow;
     }
     solutions[i][0] = i * problem->gap_penalty;
   }
 
   for (size_t j = 0; j <= problem->y_n; j++) {
-    if (is_mul_overflow_ulong(j, problem->gap_penalty)) {
+    if (IsMulOverflow_ulong(j, problem->gap_penalty)) {
       return kArithmeticOverflow;
     }
     solutions[0][j] = j * problem->gap_penalty;
@@ -208,28 +208,28 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
       if (x == y) {
         solutions[i][j] = solutions[i - 1][j - 1];
       } else {
-        if (is_add_overflow_ulong(solutions[i - 1][j - 1],
-                                  problem->mismatch_penalty)) {
+        if (IsAddOverflow_ulong(solutions[i - 1][j - 1],
+                                problem->mismatch_penalty)) {
           return kArithmeticOverflow;
         }
         penalty case1 = solutions[i - 1][j - 1] + problem->mismatch_penalty;
 
-        if (is_add_overflow_ulong(solutions[i - 1][j], problem->gap_penalty)) {
+        if (IsAddOverflow_ulong(solutions[i - 1][j], problem->gap_penalty)) {
           return kArithmeticOverflow;
         }
         penalty case2 = solutions[i - 1][j] + problem->gap_penalty;
 
-        if (is_add_overflow_ulong(solutions[i][j - 1], problem->gap_penalty)) {
+        if (IsAddOverflow_ulong(solutions[i][j - 1], problem->gap_penalty)) {
           return kArithmeticOverflow;
         }
         penalty case3 = solutions[i][j - 1] + problem->gap_penalty;
 
-        solutions[i][j] = _min(case1, case2, case3);
+        solutions[i][j] = min(case1, case2, case3);
       }
     }
   }
 
-  (void)_printSolutions;
+  (void)printSolutions;
   /* _printSolutions(problem->x_n, problem->y_n, solutions); */
-  return _reconstruct(problem, solutions, solution);
+  return reconstruct(problem, solutions, solution);
 }

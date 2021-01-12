@@ -9,6 +9,10 @@
 
 #include <stddef.h>
 
+#if defined(NDEBUG)
+#define FAILED_MALLOC_TEST(code_block) \
+  { code_block; }
+#else
 #define FAILED_MALLOC_TEST(code_block)          \
   {                                             \
     InterceptMalloc();                          \
@@ -16,6 +20,7 @@
     CU_ASSERT_EQUAL(1, MallocInterceptCount()); \
     ResetMalloc();                              \
   }
+#endif
 
 void InterceptMalloc();
 size_t MallocInterceptCount();

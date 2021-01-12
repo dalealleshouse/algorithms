@@ -14,8 +14,6 @@
 
 #include "quick_sort.h"
 
-typedef size_t (*choose_select_pivot)(const size_t n);
-
 static void Swap(const size_t size, void* x, void* y) {
   char n[size];
   memcpy(n, x, size);
@@ -33,7 +31,7 @@ static ResultCode QuickSelectRecursive(const size_t nth, const size_t n,
   }
 
   // find the index of an element to partition around
-  size_t pivot = rand() % n;  // NOLINT
+  size_t pivot = random() % n;
 
   // move the partition value to the first position
   Swap(size, arr, (char*)arr + pivot * size);

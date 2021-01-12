@@ -11,6 +11,8 @@
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
+const char* kSuiteName = "CUNIT_SUITE";
+
 // utils
 extern int RegisterGraphTests();
 extern int RegisterOverflowTests();
@@ -113,15 +115,23 @@ extern int RegisterCacheTests();
 extern int RegisterBitVectorTests();
 
 int RegisterTests() {
-  srand(time(NULL));
-  return (
-             // clang-format off
-      // Test Cases
-      /* RegisterDisjointSetTestCase() != 0 + */
-      /* RegisterBubbleSortTestCase() != 0 + */
-      /* RegisterInsertionSortTestCase() != 0 + */
-      /* RegisterSortInstrumentationTestCase() != 0 + */
+  // Seed the random number generator
+  struct timespec ts;
+  if (timespec_get(&ts, TIME_UTC) == 0) {
+    fprintf(stderr, "timespec_get failed");
+    return -1;
+  }
+  srandom(ts.tv_nsec ^ ts.tv_sec);
 
+  return (
+  // clang-format off
+#if defined(TEST_CASES)
+      // Test Cases
+      RegisterDisjointSetTestCase() != 0 +
+      RegisterBubbleSortTestCase() != 0 +
+      RegisterInsertionSortTestCase() != 0 +
+      RegisterSortInstrumentationTestCase() != 0 +
+#else
       // Unit tests
       RegisterGraphTests() != 0 +
       RegisterOverflowTests() != 0 +
@@ -172,8 +182,22 @@ int RegisterTests() {
       RegisterMultiplySquareMatricesTests() != 0 +
       RegisterCacheTests() != 0 +
       RegisterBitVectorTests() != 0 +
+#endif
       0) * -1;
   // clang-format on
+}
+
+static CU_pSuite FindSuite(char* suite_name) {
+  CU_pTestRegistry registry = CU_get_registry();
+  CU_pSuite suite = registry->pSuite;
+
+  while (suite != NULL) {
+    if (strcmp(suite_name, suite->pName) == 0) return suite;
+    suite = suite->pNext;
+  }
+
+  fprintf(stderr, "Suite not found: %s\n", suite_name);
+  return NULL;
 }
 
 int TestRunner(int (*register_tests)()) {
@@ -186,7 +210,15 @@ int TestRunner(int (*register_tests)()) {
 
   // Run all tests using the basic interface
   CU_basic_set_mode(CU_BRM_VERBOSE);
-  CU_basic_run_tests();
+
+  // If the env variable is set, run just that suite, otherwise run them all
+  char* suite_name = getenv(kSuiteName);
+  if (suite_name == NULL) {
+    CU_basic_run_tests();
+  } else {
+    CU_pSuite suite = FindSuite(suite_name);
+    if (suite) CU_basic_run_suite(suite);
+  }
 
   // Get this value before CU_cleanup_registry() or it will revert to zero
   int ret = CU_get_number_of_failures() != 0;

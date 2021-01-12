@@ -58,6 +58,7 @@ static void Queue_Create_initalizes_values() {
 
 /*************************** Queue_Enqueue ************************************/
 static void Queue_Enqueue_failed_malloc() {
+#if !defined(NDEBUG)
   SUT({
     const int dummy = 5;
     FAILED_MALLOC_TEST({
@@ -65,6 +66,7 @@ static void Queue_Enqueue_failed_malloc() {
       CU_ASSERT_EQUAL(kFailedMemoryAllocation, result);
     })
   });
+#endif
 }
 
 static void Queue_Enqueue_null_parameter() {

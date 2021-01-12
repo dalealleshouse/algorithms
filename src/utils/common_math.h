@@ -15,9 +15,9 @@
 int Min(const size_t count, ...);
 double MinDouble(const size_t count, ...);
 
-void* MaxPArray(const size_t n, const size_t size, void* arr,
-                const sort_strategy comparator);
-void* MinPArray(const size_t n, const size_t size, void* arr,
-                const sort_strategy comparator);
+void* MaxArray(const size_t n, const size_t size, void* arr,
+               const sort_strategy comparator);
+void* MinArray(const size_t n, const size_t size, void* arr,
+               const sort_strategy comparator);
 
 size_t NextPowerOfTwo(size_t n);

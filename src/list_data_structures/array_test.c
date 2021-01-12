@@ -76,6 +76,7 @@ static void Array_InsertAtHead_null_paramter() {
 }
 
 static void Array_InsertAtHead_bad_malloc() {
+#if !defined(NDEBUG)
   int first = 1;
 
   Array* array = NULL;
@@ -90,6 +91,7 @@ static void Array_InsertAtHead_bad_malloc() {
   });
 
   Array_Destroy(array);
+#endif
 }
 
 static void Array_InsertAtHead_first_item() {
@@ -130,6 +132,7 @@ static void Array_InsertAtHead_standard() {
 }
 
 static void Array_InsertAtHead_bad_malloc_on_realloc() {
+#if !defined(NDEBUG)
   int first = 1;
   int second = 2;
 
@@ -147,6 +150,7 @@ static void Array_InsertAtHead_bad_malloc_on_realloc() {
   });
 
   Array_Destroy(array);
+#endif
 }
 
 /*************************** Array_InsertAtTail *******************************/
@@ -168,6 +172,7 @@ static void Array_InsertAtTail_null_paramter() {
 }
 
 static void Array_InsertAtTail_bad_malloc() {
+#if !defined(NDEBUG)
   int first = 1;
 
   Array* array = NULL;
@@ -182,6 +187,7 @@ static void Array_InsertAtTail_bad_malloc() {
   });
 
   Array_Destroy(array);
+#endif
 }
 
 static void Array_InsertAtTail_first_item() {
@@ -222,6 +228,7 @@ static void Array_InsertAtTail_standard() {
 }
 
 static void Array_InsertAtTail_bad_malloc_on_realloc() {
+#if !defined(NDEBUG)
   int first = 1;
   int second = 2;
 
@@ -239,6 +246,7 @@ static void Array_InsertAtTail_bad_malloc_on_realloc() {
   });
 
   Array_Destroy(array);
+#endif
 }
 
 /*************************** Array_Search *************************************/
@@ -387,7 +395,7 @@ static void Array_Max_standard() {
 
   void* result = NULL;
   result_code = Array_Max(sut, &result);
-  CU_ASSERT_EQUAL(result_code, kSuccess);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_EQUAL(95, *(int*)result);
 
   Array_Destroy(sut);

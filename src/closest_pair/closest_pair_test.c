@@ -17,7 +17,7 @@
 const double kTolerance = 0.000001;
 
 double drand(double low, double high) {
-  return ((double)rand() * (high - low)) / (double)RAND_MAX + low;
+  return ((double)random() * (high - low)) / (double)RAND_MAX + low;
 }
 
 /* Test Suite setup and cleanup functions: */

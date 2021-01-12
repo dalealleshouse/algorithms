@@ -42,6 +42,7 @@ static void kNullParameterTest(min_span_tree minSpanTree) {
 }
 
 static void FailedMallocTest(min_span_tree minSpanTree) {
+#if !defined(NDEBUG)
   Graph* input = SimpleGraph();
   Result result;
 
@@ -51,6 +52,9 @@ static void FailedMallocTest(min_span_tree minSpanTree) {
   CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
 
   Graph_Destroy(input, free);
+#else
+  (void)minSpanTree;
+#endif
 }
 
 static void _validateSimpleGraphResults(const MinSpanTree* mst) {

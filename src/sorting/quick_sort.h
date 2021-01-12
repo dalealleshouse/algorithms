@@ -23,16 +23,16 @@
 ResultCode Partition(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator, size_t* pivot_index);
 
-typedef size_t (*choose_pivot)(const size_t n, const size_t size,
-                               const void* arr, const sort_strategy comparator);
+typedef size_t (*choose_pivot)(const size_t n, const size_t size, void* arr,
+                               const sort_strategy comparator);
 
-size_t PivotOnZero(const size_t n, const size_t size, const void* arr,
+size_t PivotOnZero(const size_t n, const size_t size, void* arr,
                    const sort_strategy comparator);
-size_t PivotOnRandom(const size_t n, const size_t size, const void* arr,
+size_t PivotOnRandom(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator);
-size_t PivotOnLast(const size_t n, const size_t size, const void* arr,
+size_t PivotOnLast(const size_t n, const size_t size, void* arr,
                    const sort_strategy comparator);
-size_t PivotOnMedian(const size_t n, const size_t size, const void* arr,
+size_t PivotOnMedian(const size_t n, const size_t size, void* arr,
                      const sort_strategy comparator);
 
 ResultCode QuickSortPivot(const size_t n, const size_t size, void* arr,

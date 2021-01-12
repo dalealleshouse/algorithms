@@ -157,6 +157,7 @@ static void HuffmanCode_Calculate_NullParamerter() {
 }
 
 static void HuffmanCode_Calculate_FailedMalloc() {
+#if !defined(NDEBUG)
   SymbolFreq* freqs = _createSymbolFreq("ABCD");
   HuffmanCode* code;
   Result result;
@@ -166,6 +167,7 @@ static void HuffmanCode_Calculate_FailedMalloc() {
   CU_ASSERT_EQUAL(result, kFailedMemoryAllocation);
 
   SymbolFreq_Destroy(freqs);
+#endif
 }
 
 static void HuffmanCode_Calculate_SmallCode() {
