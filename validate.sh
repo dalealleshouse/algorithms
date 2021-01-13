@@ -42,6 +42,7 @@ cpplint src/hashing/*.[ch]
 cpplint src/cache/*.[ch]
 cpplint src/sorting/*.[ch]
 cpplint src/quick_select/*.[ch]
+cpplint src/matrix_operations/*.[ch]
 cpplint locality/*.[ch]
 print_success "Lint Passed"
 
@@ -53,6 +54,7 @@ clang-tidy src/hashing/*.[ch]
 clang-tidy src/cache/*.[ch]
 clang-tidy src/sorting/*.[ch]
 clang-tidy src/quick_select/*.[ch]
+clang-tidy src/matrix_operations/*.[ch]
 clang-tidy locality/*.[ch]
 print_success "Tidy Static Analysis Passed"
 

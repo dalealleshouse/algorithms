@@ -17,7 +17,7 @@ int Min(const size_t count, ...) {
   va_start(valist, count);
 
   for (size_t i = 0; i < count; i++) {
-    int val = va_arg(valist, int);  // NOLINT
+    int val = va_arg(valist, int);
     min_val = (val < min_val) ? val : min_val;
   }
 
@@ -31,7 +31,7 @@ double MinDouble(const size_t count, ...) {
   va_start(valist, count);
 
   for (size_t i = 0; i < count; i++) {
-    double val = va_arg(valist, double);  // NOLINT
+    double val = va_arg(valist, double);
     min_val = (val < min_val) ? val : min_val;
   }
 

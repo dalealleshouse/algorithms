@@ -106,8 +106,7 @@ extern int RegisterQuickSelectTests();
 extern int RegisterInversionCountTests();
 
 // Matrix Multiplication
-extern int RegisterIsPowerOfTwoTests();
-extern int RegisterMultiplySquareMatricesTests();
+extern int RegisterMatrixOperationsTests();
 
 // Cache
 extern int RegisterCacheTests();
@@ -178,8 +177,7 @@ int RegisterTests() {
       RegisterSelectTests() != 0 +
       RegisterQuickSelectTests() != 0 +
       RegisterInversionCountTests() != 0 +
-      RegisterIsPowerOfTwoTests() != 0 +
-      RegisterMultiplySquareMatricesTests() != 0 +
+      RegisterMatrixOperationsTests() != 0 +
       RegisterCacheTests() != 0 +
       RegisterBitVectorTests() != 0 +
 #endif
