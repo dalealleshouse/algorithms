@@ -265,6 +265,9 @@ void Matrices_Destroy(const size_t count, ...) {
   va_start(valist, count);
 
   for (size_t i = 0; i < count; i++) {
+    // Bug in clang-tidy that produces a false positive for
+    // va_arg() is called on an uninitialized va_list
+    // NOLINTNEXTLINE
     void* matrix = va_arg(valist, void*);
     free(matrix);
   }
@@ -278,6 +281,9 @@ ResultCode Matrices_Initalize(const size_t n, const size_t count, ...) {
   va_start(valist, count);
 
   for (size_t i = 0; i < count; i++) {
+    // Bug in clang-tidy that produces a false positive for
+    // va_arg() is called on an uninitialized va_list
+    // NOLINTNEXTLINE
     matrix_value(**matrix)[n][n] = va_arg(valist, void*);
     result_code = Matrix_Initalize(n, matrix);
     if (result_code != kSuccess) break;
