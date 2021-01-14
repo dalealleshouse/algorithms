@@ -16,15 +16,14 @@ static matrix_value Min(matrix_value x, matrix_value y) {
 
 static bool IsPowerOfTwo(matrix_value x) { return (x & (x - 1)) == 0; }
 
-static void SplitMatrixInQuads(size_t n, matrix_value (*x)[n * 2][n * 2],
-                               matrix_value (*A)[n][n],
-                               matrix_value (*block_size)[n][n],
+static void SplitMatrixInQuads(size_t n, const matrix_value (*x)[n * 2][n * 2],
+                               matrix_value (*A)[n][n], matrix_value (*B)[n][n],
                                matrix_value (*C)[n][n],
                                matrix_value (*D)[n][n]) {
   for (size_t i = 0; i < n; i++) {
     for (size_t j = 0; j < n; j++) {
       (*A)[i][j] = (*x)[i][j];
-      (*block_size)[i][j] = (*x)[i][n + j];
+      (*B)[i][j] = (*x)[i][n + j];
       (*C)[i][j] = (*x)[n + i][j];
       (*D)[i][j] = (*x)[n + i][n + j];
     }
@@ -32,13 +31,13 @@ static void SplitMatrixInQuads(size_t n, matrix_value (*x)[n * 2][n * 2],
 }
 
 static void JoinQuads(size_t n, matrix_value (*A)[n][n],
-                      matrix_value (*block_size)[n][n], matrix_value (*C)[n][n],
+                      matrix_value (*B)[n][n], matrix_value (*C)[n][n],
                       matrix_value (*D)[n][n],
                       matrix_value (*result)[n * 2][n * 2]) {
   for (size_t i = 0; i < n; i++) {
     for (size_t j = 0; j < n; j++) {
       (*result)[i][j] = (*A)[i][j];
-      (*result)[i][j + n] = (*block_size)[i][j];
+      (*result)[i][j + n] = (*B)[i][j];
       (*result)[n + i][j] = (*C)[i][j];
       (*result)[n + i][n + j] = (*D)[i][j];
     }
@@ -46,7 +45,7 @@ static void JoinQuads(size_t n, matrix_value (*A)[n][n],
 }
 
 static ResultCode Matrix_StrassenMultiplyRecursive(
-    size_t n, matrix_value (*x)[n][n], matrix_value (*y)[n][n],
+    size_t n, const matrix_value (*x)[n][n], const matrix_value (*y)[n][n],
     matrix_value (*result)[n][n]) {
   ResultCode result_code;
 
@@ -56,124 +55,124 @@ static ResultCode Matrix_StrassenMultiplyRecursive(
   typedef matrix_value(*matrix)[sub_size][sub_size];
 
   matrix A = NULL;
-  matrix block_size = NULL;
+  matrix B = NULL;
   matrix C = NULL;
   matrix D = NULL;
   matrix E = NULL;
   matrix F = NULL;
   matrix G = NULL;
   matrix H = NULL;
-  matrix S1 = NULL;
-  matrix S2 = NULL;
-  matrix S3 = NULL;
-  matrix S4 = NULL;
-  matrix S5 = NULL;
-  matrix S6 = NULL;
-  matrix S7 = NULL;
+  matrix P1 = NULL;
+  matrix P2 = NULL;
+  matrix P3 = NULL;
+  matrix P4 = NULL;
+  matrix P5 = NULL;
+  matrix P6 = NULL;
+  matrix P7 = NULL;
   matrix temp = NULL;
   matrix temp2 = NULL;
 
   result_code =
-      Matrices_Initalize(sub_size, 17, &A, &block_size, &C, &D, &E, &F, &G, &H,
-                         &S1, &S2, &S3, &S4, &S5, &S6, &S7, &temp, &temp2);
+      Matrices_Initalize(sub_size, 17, &A, &B, &C, &D, &E, &F, &G, &H, &P1, &P2,
+                         &P3, &P4, &P5, &P6, &P7, &temp, &temp2);
   if (result_code != kSuccess) goto done;
 
-  SplitMatrixInQuads(sub_size, x, A, block_size, C, D);
+  SplitMatrixInQuads(sub_size, x, A, B, C, D);
   SplitMatrixInQuads(sub_size, y, E, F, G, H);
 
-  // S1
+  // P1
   result_code = Matrix_Subtract(sub_size, F, H, temp);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, A, temp, S1);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, A, temp, P1);
   if (result_code != kSuccess) goto done;
 
-  // S2
-  result_code = Matrix_Add(sub_size, A, block_size, temp);
+  // P2
+  result_code = Matrix_Add(sub_size, A, B, temp);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, H, S2);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, H, P2);
   if (result_code != kSuccess) goto done;
 
-  // S3
+  // P3
   result_code = Matrix_Add(sub_size, C, D, temp);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, E, S3);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, E, P3);
   if (result_code != kSuccess) goto done;
 
-  // S4
+  // P4
   result_code = Matrix_Subtract(sub_size, G, E, temp);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, D, temp, S4);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, D, temp, P4);
   if (result_code != kSuccess) goto done;
 
-  // S5
+  // P5
   result_code = Matrix_Add(sub_size, A, D, temp);
   if (result_code != kSuccess) goto done;
 
   result_code = Matrix_Add(sub_size, E, H, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, temp2, S5);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, temp2, P5);
   if (result_code != kSuccess) goto done;
 
-  // S6
-  result_code = Matrix_Subtract(sub_size, block_size, D, temp);
+  // P6
+  result_code = Matrix_Subtract(sub_size, B, D, temp);
   if (result_code != kSuccess) goto done;
 
   result_code = Matrix_Add(sub_size, G, H, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, temp2, S6);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, temp2, P6);
   if (result_code != kSuccess) goto done;
 
-  // S7
+  // P7
   result_code = Matrix_Subtract(sub_size, A, C, temp);
   if (result_code != kSuccess) goto done;
 
   result_code = Matrix_Add(sub_size, E, F, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, temp2, S7);
+  result_code = Matrix_StrassenMultiplyRecursive(sub_size, temp, temp2, P7);
   if (result_code != kSuccess) goto done;
 
   // Quad 1
-  result_code = Matrix_Add(sub_size, S4, S5, temp);
+  result_code = Matrix_Add(sub_size, P4, P5, temp);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Subtract(sub_size, temp, S2, temp2);
+  result_code = Matrix_Subtract(sub_size, temp, P2, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Add(sub_size, temp2, S6, A);
+  result_code = Matrix_Add(sub_size, temp2, P6, A);
   if (result_code != kSuccess) goto done;
 
   // Quad 2
-  result_code = Matrix_Add(sub_size, S1, S2, block_size);
+  result_code = Matrix_Add(sub_size, P1, P2, B);
   if (result_code != kSuccess) goto done;
 
   // Quad 3
-  result_code = Matrix_Add(sub_size, S3, S4, C);
+  result_code = Matrix_Add(sub_size, P3, P4, C);
   if (result_code != kSuccess) goto done;
 
   // Quad 4
-  result_code = Matrix_Add(sub_size, S1, S5, temp);
+  result_code = Matrix_Add(sub_size, P1, P5, temp);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Subtract(sub_size, temp, S3, temp2);
+  result_code = Matrix_Subtract(sub_size, temp, P3, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Subtract(sub_size, temp2, S7, D);
+  result_code = Matrix_Subtract(sub_size, temp2, P7, D);
   if (result_code != kSuccess) goto done;
 
-  JoinQuads(sub_size, A, block_size, C, D, result);
+  JoinQuads(sub_size, A, B, C, D, result);
 
   result_code = kSuccess;
 
 done:
-  Matrices_Destroy(17, A, block_size, C, D, E, F, G, H, S1, S2, S3, S4, S5, S6,
-                   S7, temp, temp2);
+  Matrices_Destroy(17, A, B, C, D, E, F, G, H, P1, P2, P3, P4, P5, P6, P7, temp,
+                   temp2);
 
   return result_code;
 }
@@ -186,7 +185,7 @@ ResultCode Matrix_Initalize(size_t n, matrix_value (**result)[n][n]) {
   size_t size = 0;
   if (__builtin_mul_overflow(n, n, &size)) return kArithmeticOverflow;
 
-  matrix_value* matrix = calloc(sizeof(matrix_value), n * n);
+  matrix_value* matrix = calloc(sizeof(matrix_value), size);
   if (matrix == NULL) return kFailedMemoryAllocation;
 
   *result = (matrix_value(*)[n][n])matrix;
@@ -198,7 +197,7 @@ void Matrices_Destroy(const size_t count, ...) {
   va_start(valist, count);
 
   for (size_t i = 0; i < count; i++) {
-    // block_sizeug in clang-tidy that produces a false positive for
+    // Bug in clang-tidy that produces a false positive for
     // va_arg() is called on an uninitialized va_list
     // NOLINTNEXTLINE
     void* matrix = va_arg(valist, void*);
@@ -214,7 +213,7 @@ ResultCode Matrices_Initalize(const size_t n, const size_t count, ...) {
   va_start(valist, count);
 
   for (size_t i = 0; i < count; i++) {
-    // block_sizeug in clang-tidy that produces a false positive for
+    // Bug in clang-tidy that produces a false positive for
     // va_arg() is called on an uninitialized va_list
     // NOLINTNEXTLINE
     matrix_value(**matrix)[n][n] = va_arg(valist, void*);
@@ -226,8 +225,9 @@ ResultCode Matrices_Initalize(const size_t n, const size_t count, ...) {
   return result_code;
 }
 
-ResultCode Matrix_Add(size_t n, matrix_value (*x)[n][n],
-                      matrix_value (*y)[n][n], matrix_value (*result)[n][n]) {
+ResultCode Matrix_Add(size_t n, const matrix_value (*x)[n][n],
+                      const matrix_value (*y)[n][n],
+                      matrix_value (*result)[n][n]) {
   if (x == NULL || y == NULL || result == NULL) return kNullParameter;
   if (n == 0) return kArgumentOutOfRange;
 
@@ -242,8 +242,8 @@ ResultCode Matrix_Add(size_t n, matrix_value (*x)[n][n],
   return kSuccess;
 }
 
-ResultCode Matrix_Subtract(size_t n, matrix_value (*x)[n][n],
-                           matrix_value (*y)[n][n],
+ResultCode Matrix_Subtract(size_t n, const matrix_value (*x)[n][n],
+                           const matrix_value (*y)[n][n],
                            matrix_value (*result)[n][n]) {
   if (x == NULL || y == NULL || result == NULL) return kNullParameter;
   if (n == 0) return kArgumentOutOfRange;
@@ -259,8 +259,8 @@ ResultCode Matrix_Subtract(size_t n, matrix_value (*x)[n][n],
   return kSuccess;
 }
 
-ResultCode Matrix_Multiply(size_t n, matrix_value (*x)[n][n],
-                           matrix_value (*y)[n][n],
+ResultCode Matrix_Multiply(size_t n, const matrix_value (*x)[n][n],
+                           const matrix_value (*y)[n][n],
                            matrix_value (*result)[n][n]) {
   if (x == NULL || y == NULL || result == NULL) return kNullParameter;
   if (n == 0) return kArgumentOutOfRange;
@@ -283,8 +283,8 @@ ResultCode Matrix_Multiply(size_t n, matrix_value (*x)[n][n],
   return kSuccess;
 }
 
-ResultCode Matrix_TilingMultiply(size_t n, matrix_value (*x)[n][n],
-                                 matrix_value (*y)[n][n],
+ResultCode Matrix_TilingMultiply(size_t n, const matrix_value (*x)[n][n],
+                                 const matrix_value (*y)[n][n],
                                  matrix_value (*result)[n][n]) {
   if (x == NULL || y == NULL || result == NULL) return kNullParameter;
   if (n == 0) return kArgumentOutOfRange;
@@ -318,8 +318,8 @@ ResultCode Matrix_TilingMultiply(size_t n, matrix_value (*x)[n][n],
   return kSuccess;
 }
 
-ResultCode Matrix_StrassenMultiply(size_t n, matrix_value (*x)[n][n],
-                                   matrix_value (*y)[n][n],
+ResultCode Matrix_StrassenMultiply(size_t n, const matrix_value (*x)[n][n],
+                                   const matrix_value (*y)[n][n],
                                    matrix_value (*result)[n][n]) {
   if (x == NULL || y == NULL || result == NULL) return kNullParameter;
   if (n == 0 || !IsPowerOfTwo(n)) return kArgumentOutOfRange;

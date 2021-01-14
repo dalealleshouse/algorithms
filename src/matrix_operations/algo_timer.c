@@ -15,8 +15,8 @@
 #include "common_math.h"
 #include "matrix_operations.h"
 
-typedef ResultCode (*matrix_algo)(size_t n, matrix_value (*x)[n][n],
-                                  matrix_value (*y)[n][n],
+typedef ResultCode (*matrix_algo)(size_t n, const matrix_value (*x)[n][n],
+                                  const matrix_value (*y)[n][n],
                                   matrix_value (*result)[n][n]);
 
 static matrix_algo GetAlgorithm(const MatrixAlgoirthm algo) {
