@@ -28,6 +28,10 @@ ResultCode Matrix_Multiply(size_t n, matrix_value (*x)[n][n],
                            matrix_value (*y)[n][n],
                            matrix_value (*result)[n][n]);
 
+ResultCode Matrix_TilingMultiply(size_t n, matrix_value (*x)[n][n],
+                                 matrix_value (*y)[n][n],
+                                 matrix_value (*result)[n][n]);
+
 ResultCode Matrix_StrassenMultiply(size_t n, matrix_value (*x)[n][n],
                                    matrix_value (*y)[n][n],
                                    matrix_value (*result)[n][n]);

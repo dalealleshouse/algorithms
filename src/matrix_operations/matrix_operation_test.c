@@ -311,6 +311,78 @@ static void Matrix_Multiply_arithmetic_overflow() {
   });
 }
 
+static void Matrix_Tiling_null_parameters() {
+  const size_t n = 2;
+
+  matrix_value(*x)[n][n] = NULL;
+  matrix_value(*y)[n][n] = NULL;
+
+  ResultCode result_code = Matrix_Initalize(n, &x);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
+  result_code = Matrix_Initalize(n, &y);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
+  result_code = Matrix_TilingMultiply(n, x, y, NULL);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
+
+  result_code = Matrix_TilingMultiply(n, x, NULL, y);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
+
+  result_code = Matrix_TilingMultiply(n, NULL, x, y);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
+
+  free(x);
+  free(y);
+}
+
+static void Matrix_Tiling_invalid_size() {
+  SUT(2, {
+    result_code = Matrix_TilingMultiply(0, x, y, z);
+    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
+  });
+}
+
+static void Matrix_Tiling_happy_path() {
+  SUT(2, {
+    matrix_value(*expected)[n][n] = NULL;
+
+    ResultCode result_code = Matrix_Initalize(n, &expected);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
+
+    (*expected)[0][0] = 38;
+    (*expected)[0][1] = 17;
+    (*expected)[1][0] = 26;
+    (*expected)[1][1] = 14;
+
+    (*x)[0][0] = 1;
+    (*x)[0][1] = 7;
+    (*x)[1][0] = 2;
+    (*x)[1][1] = 4;
+
+    (*y)[0][0] = 3;
+    (*y)[0][1] = 3;
+    (*y)[1][0] = 5;
+    (*y)[1][1] = 2;
+
+    result_code = Matrix_TilingMultiply(2, x, y, z);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
+    CU_ASSERT_EQUAL(0, memcmp(z, expected, sizeof(*expected)));
+
+    free(expected);
+  });
+}
+
+static void Matrix_Tiling_arithmetic_overflow() {
+  SUT(2, {
+    (*x)[0][0] = INT64_MAX;
+    (*y)[0][0] = 2;
+
+    result_code = Matrix_TilingMultiply(n, x, y, z);
+    CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
+  });
+}
+
 static void Matrix_StrassenMultiply_null_parameters() {
   const size_t n = 2;
 
@@ -389,7 +461,7 @@ static void Matrix_StrassenMultiply_arithmetic_overflow() {
 
 static void Matrix_StrassenMultiply_failed_malloc() {
 #if !defined(NDEBUG)
-  SUT(16, {
+  SUT(32, {
     FAILED_MALLOC_TEST({
       result_code = Matrix_StrassenMultiply(n, x, y, z);
       CU_ASSERT_EQUAL(kFailedMemoryAllocation, result_code);
@@ -405,8 +477,9 @@ static void Matrix_StrassenMultiply_matches_brute_force() {
   matrix y = NULL;
   matrix z1 = NULL;
   matrix z2 = NULL;
+  matrix z3 = NULL;
 
-  ResultCode result_code = Matrices_Initalize(n, 4, &x, &y, &z1, &z2);
+  ResultCode result_code = Matrices_Initalize(n, 5, &x, &y, &z1, &z2, &z3);
   CU_ASSERT_EQUAL(kSuccess, result_code);
 
   for (size_t i = 0; i < n; i++) {
@@ -416,36 +489,19 @@ static void Matrix_StrassenMultiply_matches_brute_force() {
     }
   }
 
-  /* result_code = Matrix_Multiply(n, x, y, z1); */
-  /* CU_ASSERT_EQUAL(kSuccess, result_code); */
+  result_code = Matrix_Multiply(n, x, y, z1);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
 
   result_code = Matrix_StrassenMultiply(n, x, y, z2);
   CU_ASSERT_EQUAL(kSuccess, result_code);
 
-  Matrices_Destroy(4, x, y, z1, z2);
+  result_code = Matrix_TilingMultiply(n, x, y, z3);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
 
-  /* ResultCode result_code = Matrix_Initalize(n, &x); */
-  /* CU_ASSERT_EQUAL(kSuccess, result_code); */
+  CU_ASSERT_EQUAL(0, memcmp(z1, z2, sizeof(*x)));
+  CU_ASSERT_EQUAL(0, memcmp(z1, z3, sizeof(*x)));
 
-  /* int bf[n][n]; */
-  /* int st[n][n]; */
-  /* int a[n][n]; */
-  /* int b[n][n]; */
-
-  /* for (int i = 0; i < n; i++) { */
-  /*   for (int j = 0; j < n; j++) { */
-  /*     a[i][j] = random() % 100 + 1; */
-  /*     b[i][j] = random() % 100 + 1; */
-  /*   } */
-  /* } */
-
-  /* int result = multiply_square_matrices(n, a, b, st); */
-  /* CU_ASSERT_EQUAL_FATAL(result, 0); */
-
-  /* result = brute_force(n, a, b, bf); */
-  /* CU_ASSERT_EQUAL_FATAL(result, 0); */
-
-  /* compare_matrices(n, n, bf, st); */
+  Matrices_Destroy(5, x, y, z1, z2, z3);
 }
 
 int RegisterMatrixOperationsTests() {
@@ -468,6 +524,10 @@ int RegisterMatrixOperationsTests() {
       CU_TEST_INFO(Matrix_Multiply_invalid_size),
       CU_TEST_INFO(Matrix_Multiply_happy_path),
       CU_TEST_INFO(Matrix_Multiply_arithmetic_overflow),
+      CU_TEST_INFO(Matrix_Tiling_null_parameters),
+      CU_TEST_INFO(Matrix_Tiling_invalid_size),
+      CU_TEST_INFO(Matrix_Tiling_happy_path),
+      CU_TEST_INFO(Matrix_Tiling_arithmetic_overflow),
       CU_TEST_INFO(Matrix_StrassenMultiply_null_parameters),
       CU_TEST_INFO(Matrix_StrassenMultiply_invalid_size),
       CU_TEST_INFO(Matrix_StrassenMultiply_happy_path),
