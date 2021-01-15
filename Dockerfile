@@ -12,7 +12,7 @@ RUN apt-get -qqy update && apt-get install -qqy \
 RUN mkdir build/ && \
     mkdir build/src
 
-RUN python3 -m pip install cpplint matplotlib
+RUN python3 -m pip install cpplint matplotlib numpy
 
 VOLUME ["/build"]
 

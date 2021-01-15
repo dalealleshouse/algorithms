@@ -1,15 +1,16 @@
+from matplotlib import pyplot as plt
+import numpy as np
 import ctypes
-import sys
 from enum import IntEnum
 import statistics
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib import pyplot as plt #noqa
 
 lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
-TEST_FOR_Ns = [10 ** 2, 10 ** 4, 10 ** 5, 10 ** 6, 10 ** 7, 10 ** 8]
+SMALL_Ns = [2 ** 4, 2 ** 5, 2 ** 6, 2 ** 7, 2 ** 8, 2 ** 9]
+LARGE_Ns = [2 ** 10, 2 ** 11]
 
 
 class CtypesEnum(IntEnum):
@@ -20,24 +21,19 @@ class CtypesEnum(IntEnum):
 
 
 class Algo(CtypesEnum):
-    QUICK_SELECT = 1,
-    SORT_SELECT = 2,
+    NAIVE_MATRIX_MULTIPLY = 1
+    TILING_MATRIX_MULTIPLY = 2
+    TRANSPOSE_MATRIX_MULTIPLY = 4
+    RECURSIVE_MATRIX_MULTIPLY = 5
+    STRASSEN_MATRIX_MULTIPLY = 3
 
 
-lib.SelectTime.argtypes = [ctypes.c_size_t, Algo]
-lib.SelectTime.restype = ctypes.c_double
+lib.MatrixMultiplyTime.argtypes = [ctypes.c_size_t, Algo]
+lib.MatrixMultiplyTime.restype = ctypes.c_double
+
 
 def format_name(enum_val):
     return enum_val.name.replace('_', ' ').title()
-
-
-def get_title(nth):
-    if nth == 1:
-        return 'Find the Minimum Value'
-    if nth == -1:
-        return 'Find the Median Value'
-    else:
-        return 'Find the {}th Value'.format(nth)
 
 
 def median_run_time(func):
@@ -49,10 +45,8 @@ def median_run_time(func):
     return statistics.median(times)
 
 
-def generate_md_table(ns, data, nth):
+def generate_md_table(ns, data):
     f = open("run_time_data/run_results.txt", "a+")
-    f.write("\n")
-    f.write(get_title(nth))
     f.write("\n")
 
     n_headers = ""
@@ -77,40 +71,38 @@ def generate_md_table(ns, data, nth):
         f.write("\n")
 
 
-def generate_chart(nth):
+def generate_chart(ns, file_name):
     full_data = []
     plt.figure(figsize=(8, 6))
 
-    plt.title(get_title(nth))
+    bar_width = 0.15
+    n_count = len(ns)
+    X = np.arange(n_count)
+
     plt.ylabel('sec')
     plt.xlabel('n')
 
     for algo in Algo:
-        print('running {} {}'.format(algo.name, nth), flush=True)
+        print('running {}'.format(algo.name), flush=True)
 
         data = []
-        for n in TEST_FOR_Ns:
-            this_nth = nth
-
-            if nth == -1:
-                this_nth = n / 2
-
-            time = median_run_time(lambda: lib.SelectTime(n, this_nth, algo))
+        for n in ns:
+            time = median_run_time(lambda: lib.MatrixMultiplyTime(n, algo))
             data.append(time)
 
-        plt.plot(TEST_FOR_Ns, data, label=format_name(algo))
+        plt.bar(X, data, bar_width, label=format_name(algo))
         full_data.append((algo, data))
+        X = X + bar_width
 
     plt.legend()
-    plt.ticklabel_format(style='plain')
-    plt.savefig('./run_time_data/QUICK_SELECT-' + str(nth) + '.png')
+    plt.xticks(np.arange(n_count) + (bar_width * n_count) / 2 - bar_width, ns)
+    plt.savefig(f'./run_time_data/MATRIX_MULTIPLY-{file_name}.png')
     plt.clf()
 
     print('chart created', flush=True)
-
-    generate_md_table(TEST_FOR_Ns, full_data, nth)
+    generate_md_table(ns, full_data)
 
 
 if __name__ == "__main__":
-    generate_chart(5)
-    generate_chart(-1)
+    generate_chart(SMALL_Ns, 'SMALL')
+    # generate_chart(LARGE_Ns, 'LARGE')
