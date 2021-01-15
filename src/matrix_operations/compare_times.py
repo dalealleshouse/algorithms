@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import numpy as np
 import ctypes
 from enum import IntEnum
 import statistics
@@ -8,8 +9,7 @@ matplotlib.use('Agg')
 lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
-TEST_FOR_Ns = [2 ** 2, 2 ** 3, 2 ** 4, 2 ** 5, 2 ** 6, 2 ** 7,
-               2 ** 8, 2 ** 9, 2 ** 10, 2 ** 11]
+TEST_FOR_Ns = [2 ** 5, 2 ** 7, 2 ** 8, 2 ** 9, 2 ** 10, 2 ** 11]
 
 
 class CtypesEnum(IntEnum):
@@ -72,6 +72,10 @@ def generate_chart():
     full_data = []
     plt.figure(figsize=(8, 6))
 
+    fig, ax = plt.subplots()
+    bar_width = 0.20
+    X = np.arange(len(TEST_FOR_Ns))
+
     plt.ylabel('sec')
     plt.xlabel('n')
 
@@ -83,11 +87,14 @@ def generate_chart():
             time = median_run_time(lambda: lib.MatrixMultiplyTime(n, algo))
             data.append(time)
 
-        plt.plot(TEST_FOR_Ns, data, label=format_name(algo))
+        plt.bar(X, data, bar_width, label=format_name(algo))
+        # plt.plot(TEST_FOR_Ns, data, label=format_name(algo))
         full_data.append((algo, data))
+        X = X + bar_width
 
     plt.legend()
-    plt.ticklabel_format(style='plain')
+    # plt.ticklabel_format(style='plain')
+    plt.xticks(np.arange(len(TEST_FOR_Ns)) + (bar_width/2), TEST_FOR_Ns)
     plt.savefig('./run_time_data/MATRIX_MULTIPLY.png')
     plt.clf()
 

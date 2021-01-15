@@ -12,29 +12,96 @@
 #include "matrix_operations.h"
 #include "test_helpers.h"
 
-#define SUT(N, code_block)                            \
-  {                                                   \
-    const size_t n = N;                               \
-                                                      \
-    matrix_value(*x)[n][n] = NULL;                    \
-    matrix_value(*y)[n][n] = NULL;                    \
-    matrix_value(*z)[n][n] = NULL;                    \
-                                                      \
-    ResultCode result_code = Matrix_Initalize(n, &x); \
-    CU_ASSERT_EQUAL(kSuccess, result_code);           \
-                                                      \
-    result_code = Matrix_Initalize(n, &y);            \
-    CU_ASSERT_EQUAL(kSuccess, result_code);           \
-                                                      \
-    result_code = Matrix_Initalize(n, &z);            \
-    CU_ASSERT_EQUAL(kSuccess, result_code);           \
-                                                      \
-    {code_block}                                      \
-                                                      \
-    free(x);                                          \
-    free(y);                                          \
-    free(z);                                          \
+#define SUT(N, code_block)                                         \
+  {                                                                \
+    const size_t n = N;                                            \
+                                                                   \
+    matrix_value(*x)[n][n] = NULL;                                 \
+    matrix_value(*y)[n][n] = NULL;                                 \
+    matrix_value(*z)[n][n] = NULL;                                 \
+                                                                   \
+    ResultCode result_code = Matrices_Initalize(n, 3, &x, &y, &z); \
+    CU_ASSERT_EQUAL(kSuccess, result_code);                        \
+                                                                   \
+    {code_block}                                                   \
+                                                                   \
+    Matrices_Destroy(3, x, y, z);                                  \
   }
+
+#define TEST_MULTIPLY_ALGO(algorithm)                             \
+  static void algorithm##_null_parameters() {                     \
+    const size_t n = 2;                                           \
+                                                                  \
+    matrix_value(*x)[n][n] = NULL;                                \
+    matrix_value(*y)[n][n] = NULL;                                \
+                                                                  \
+    ResultCode result_code = Matrices_Initalize(n, 2, &x, &y);    \
+    CU_ASSERT_EQUAL(kSuccess, result_code);                       \
+                                                                  \
+    result_code = algorithm(n, x, y, NULL);                       \
+    CU_ASSERT_EQUAL(kNullParameter, result_code);                 \
+                                                                  \
+    result_code = algorithm(n, x, NULL, y);                       \
+    CU_ASSERT_EQUAL(kNullParameter, result_code);                 \
+                                                                  \
+    result_code = algorithm(n, NULL, x, y);                       \
+    CU_ASSERT_EQUAL(kNullParameter, result_code);                 \
+                                                                  \
+    Matrices_Destroy(2, x, y);                                    \
+  }                                                               \
+                                                                  \
+  static void algorithm##_invalid_size() {                        \
+    SUT(2, {                                                      \
+      result_code = algorithm(0, x, y, z);                        \
+      CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);          \
+    });                                                           \
+  }                                                               \
+                                                                  \
+  static void algorithm##_happy_path() {                          \
+    SUT(2, {                                                      \
+      matrix_value(*expected)[n][n] = NULL;                       \
+                                                                  \
+      ResultCode result_code = Matrix_Initalize(n, &expected);    \
+      CU_ASSERT_EQUAL(kSuccess, result_code);                     \
+                                                                  \
+      (*expected)[0][0] = 38;                                     \
+      (*expected)[0][1] = 17;                                     \
+      (*expected)[1][0] = 26;                                     \
+      (*expected)[1][1] = 14;                                     \
+                                                                  \
+      (*x)[0][0] = 1;                                             \
+      (*x)[0][1] = 7;                                             \
+      (*x)[1][0] = 2;                                             \
+      (*x)[1][1] = 4;                                             \
+                                                                  \
+      (*y)[0][0] = 3;                                             \
+      (*y)[0][1] = 3;                                             \
+      (*y)[1][0] = 5;                                             \
+      (*y)[1][1] = 2;                                             \
+                                                                  \
+      result_code = algorithm(2, x, y, z);                        \
+      CU_ASSERT_EQUAL(kSuccess, result_code);                     \
+      CU_ASSERT_EQUAL(0, memcmp(z, expected, sizeof(*expected))); \
+                                                                  \
+      free(expected);                                             \
+    });                                                           \
+  }                                                               \
+                                                                  \
+  static void algorithm##_arithmetic_overflow() {                 \
+    SUT(2, {                                                      \
+      (*x)[0][0] = INT64_MAX;                                     \
+      (*y)[0][0] = 2;                                             \
+                                                                  \
+      result_code = algorithm(n, x, y, z);                        \
+      CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);          \
+    });                                                           \
+  }
+
+#define TEST_MULTIPLY_CASES(algorithm)        \
+  CU_TEST_INFO(algorithm##_null_parameters),  \
+      CU_TEST_INFO(algorithm##_invalid_size), \
+      CU_TEST_INFO(algorithm##_happy_path),   \
+      CU_TEST_INFO(algorithm##_arithmetic_overflow)
 
 static void Matrix_Initalize_failed_malloc() {
 #if !defined(NDEBUG)
@@ -239,225 +306,9 @@ static void Matrix_Subtract_arithmetic_overflow() {
   });
 }
 
-static void Matrix_Multiply_null_parameters() {
-  const size_t n = 2;
-
-  matrix_value(*x)[n][n] = NULL;
-  matrix_value(*y)[n][n] = NULL;
-
-  ResultCode result_code = Matrix_Initalize(n, &x);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
-
-  result_code = Matrix_Initalize(n, &y);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
-
-  result_code = Matrix_Multiply(n, x, y, NULL);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  result_code = Matrix_Multiply(n, x, NULL, y);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  result_code = Matrix_Multiply(n, NULL, x, y);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  free(x);
-  free(y);
-}
-
-static void Matrix_Multiply_invalid_size() {
-  SUT(2, {
-    result_code = Matrix_Multiply(0, x, y, z);
-    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
-  });
-}
-
-static void Matrix_Multiply_happy_path() {
-  SUT(2, {
-    matrix_value(*expected)[n][n] = NULL;
-
-    ResultCode result_code = Matrix_Initalize(n, &expected);
-    CU_ASSERT_EQUAL(kSuccess, result_code);
-
-    (*expected)[0][0] = 38;
-    (*expected)[0][1] = 17;
-    (*expected)[1][0] = 26;
-    (*expected)[1][1] = 14;
-
-    (*x)[0][0] = 1;
-    (*x)[0][1] = 7;
-    (*x)[1][0] = 2;
-    (*x)[1][1] = 4;
-
-    (*y)[0][0] = 3;
-    (*y)[0][1] = 3;
-    (*y)[1][0] = 5;
-    (*y)[1][1] = 2;
-
-    result_code = Matrix_Multiply(2, x, y, z);
-    CU_ASSERT_EQUAL(kSuccess, result_code);
-    CU_ASSERT_EQUAL(0, memcmp(z, expected, sizeof(*expected)));
-
-    free(expected);
-  });
-}
-
-static void Matrix_Multiply_arithmetic_overflow() {
-  SUT(2, {
-    (*x)[0][0] = INT64_MAX;
-    (*y)[0][0] = 2;
-
-    result_code = Matrix_Multiply(n, x, y, z);
-    CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
-  });
-}
-
-static void Matrix_Tiling_null_parameters() {
-  const size_t n = 2;
-
-  matrix_value(*x)[n][n] = NULL;
-  matrix_value(*y)[n][n] = NULL;
-
-  ResultCode result_code = Matrix_Initalize(n, &x);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
-
-  result_code = Matrix_Initalize(n, &y);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
-
-  result_code = Matrix_TilingMultiply(n, x, y, NULL);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  result_code = Matrix_TilingMultiply(n, x, NULL, y);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  result_code = Matrix_TilingMultiply(n, NULL, x, y);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  free(x);
-  free(y);
-}
-
-static void Matrix_Tiling_invalid_size() {
-  SUT(2, {
-    result_code = Matrix_TilingMultiply(0, x, y, z);
-    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
-  });
-}
-
-static void Matrix_Tiling_happy_path() {
-  SUT(2, {
-    matrix_value(*expected)[n][n] = NULL;
-
-    ResultCode result_code = Matrix_Initalize(n, &expected);
-    CU_ASSERT_EQUAL(kSuccess, result_code);
-
-    (*expected)[0][0] = 38;
-    (*expected)[0][1] = 17;
-    (*expected)[1][0] = 26;
-    (*expected)[1][1] = 14;
-
-    (*x)[0][0] = 1;
-    (*x)[0][1] = 7;
-    (*x)[1][0] = 2;
-    (*x)[1][1] = 4;
-
-    (*y)[0][0] = 3;
-    (*y)[0][1] = 3;
-    (*y)[1][0] = 5;
-    (*y)[1][1] = 2;
-
-    result_code = Matrix_TilingMultiply(2, x, y, z);
-    CU_ASSERT_EQUAL(kSuccess, result_code);
-    CU_ASSERT_EQUAL(0, memcmp(z, expected, sizeof(*expected)));
-
-    free(expected);
-  });
-}
-
-static void Matrix_Tiling_arithmetic_overflow() {
-  SUT(2, {
-    (*x)[0][0] = INT64_MAX;
-    (*y)[0][0] = 2;
-
-    result_code = Matrix_TilingMultiply(n, x, y, z);
-    CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
-  });
-}
-
-static void Matrix_StrassenMultiply_null_parameters() {
-  const size_t n = 2;
-
-  matrix_value(*x)[n][n] = NULL;
-  matrix_value(*y)[n][n] = NULL;
-
-  ResultCode result_code = Matrix_Initalize(n, &x);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
-
-  result_code = Matrix_Initalize(n, &y);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
-
-  result_code = Matrix_StrassenMultiply(n, x, y, NULL);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  result_code = Matrix_StrassenMultiply(n, x, NULL, y);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  result_code = Matrix_StrassenMultiply(n, NULL, x, y);
-  CU_ASSERT_EQUAL(kNullParameter, result_code);
-
-  free(x);
-  free(y);
-}
-
-static void Matrix_StrassenMultiply_invalid_size() {
-  SUT(2, {
-    result_code = Matrix_StrassenMultiply(0, x, y, z);
-    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
-
-    // Not a power of 2
-    result_code = Matrix_StrassenMultiply(10, x, y, z);
-    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
-  });
-}
-
-static void Matrix_StrassenMultiply_happy_path() {
-  SUT(2, {
-    matrix_value(*expected)[n][n] = NULL;
-
-    ResultCode result_code = Matrix_Initalize(n, &expected);
-    CU_ASSERT_EQUAL(kSuccess, result_code);
-
-    (*expected)[0][0] = 38;
-    (*expected)[0][1] = 17;
-    (*expected)[1][0] = 26;
-    (*expected)[1][1] = 14;
-
-    (*x)[0][0] = 1;
-    (*x)[0][1] = 7;
-    (*x)[1][0] = 2;
-    (*x)[1][1] = 4;
-
-    (*y)[0][0] = 3;
-    (*y)[0][1] = 3;
-    (*y)[1][0] = 5;
-    (*y)[1][1] = 2;
-
-    result_code = Matrix_StrassenMultiply(2, x, y, z);
-    CU_ASSERT_EQUAL(kSuccess, result_code);
-    CU_ASSERT_EQUAL(0, memcmp(z, expected, sizeof(*expected)));
-
-    free(expected);
-  });
-}
-
-static void Matrix_StrassenMultiply_arithmetic_overflow() {
-  SUT(2, {
-    (*x)[0][0] = INT64_MAX;
-    (*y)[0][0] = 2;
-
-    result_code = Matrix_StrassenMultiply(n, x, y, z);
-    CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
-  });
-}
+TEST_MULTIPLY_ALGO(Matrix_Multiply)
+TEST_MULTIPLY_ALGO(Matrix_TilingMultiply)
+TEST_MULTIPLY_ALGO(Matrix_StrassenMultiply)
 
 static void Matrix_StrassenMultiply_failed_malloc() {
 #if !defined(NDEBUG)
@@ -520,18 +371,9 @@ int RegisterMatrixOperationsTests() {
       CU_TEST_INFO(Matrix_Subtract_invalid_size),
       CU_TEST_INFO(Matrix_Subtract_happy_path),
       CU_TEST_INFO(Matrix_Subtract_arithmetic_overflow),
-      CU_TEST_INFO(Matrix_Multiply_null_parameters),
-      CU_TEST_INFO(Matrix_Multiply_invalid_size),
-      CU_TEST_INFO(Matrix_Multiply_happy_path),
-      CU_TEST_INFO(Matrix_Multiply_arithmetic_overflow),
-      CU_TEST_INFO(Matrix_Tiling_null_parameters),
-      CU_TEST_INFO(Matrix_Tiling_invalid_size),
-      CU_TEST_INFO(Matrix_Tiling_happy_path),
-      CU_TEST_INFO(Matrix_Tiling_arithmetic_overflow),
-      CU_TEST_INFO(Matrix_StrassenMultiply_null_parameters),
-      CU_TEST_INFO(Matrix_StrassenMultiply_invalid_size),
-      CU_TEST_INFO(Matrix_StrassenMultiply_happy_path),
-      CU_TEST_INFO(Matrix_StrassenMultiply_arithmetic_overflow),
+      TEST_MULTIPLY_CASES(Matrix_Multiply),
+      TEST_MULTIPLY_CASES(Matrix_TilingMultiply),
+      TEST_MULTIPLY_CASES(Matrix_StrassenMultiply),
       CU_TEST_INFO(Matrix_StrassenMultiply_failed_malloc),
       CU_TEST_INFO(Matrix_StrassenMultiply_matches_brute_force),
       CU_TEST_INFO_NULL};
