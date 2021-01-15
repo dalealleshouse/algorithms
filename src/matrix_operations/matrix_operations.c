@@ -44,6 +44,89 @@ static void JoinQuads(size_t n, matrix_value (*A)[n][n],
   }
 }
 
+static ResultCode Matrix_RecursiveMultiplyRecursive(
+    size_t n, const matrix_value (*x)[n][n], const matrix_value (*y)[n][n],
+    matrix_value (*result)[n][n]) {
+  if (n <= 16) return Matrix_Multiply(n, x, y, result);
+
+  ResultCode result_code;
+  size_t sub_size = n >> 1;
+  typedef matrix_value(*matrix)[sub_size][sub_size];
+
+  matrix A11 = NULL;
+  matrix A12 = NULL;
+  matrix A21 = NULL;
+  matrix A22 = NULL;
+  matrix B11 = NULL;
+  matrix B12 = NULL;
+  matrix B21 = NULL;
+  matrix B22 = NULL;
+  matrix P1 = NULL;
+  matrix P2 = NULL;
+  matrix P3 = NULL;
+  matrix P4 = NULL;
+  matrix temp = NULL;
+  matrix temp2 = NULL;
+
+  result_code =
+      Matrices_Initalize(sub_size, 14, &A11, &A12, &A21, &A22, &B11, &B12, &B21,
+                         &B22, &P1, &P2, &P3, &P4, &temp, &temp2);
+  if (result_code != kSuccess) goto done;
+
+  SplitMatrixInQuads(sub_size, x, A11, A12, A21, A22);
+  SplitMatrixInQuads(sub_size, y, B11, B12, B21, B22);
+
+  // Quad 1
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A11, B11, temp);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A12, B21, temp2);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_Add(sub_size, temp, temp2, P1);
+  if (result_code != kSuccess) goto done;
+
+  // Quad 2
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A11, B12, temp);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A12, B22, temp2);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_Add(sub_size, temp, temp2, P2);
+  if (result_code != kSuccess) goto done;
+
+  // Quad 3
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A21, B11, temp);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A22, B21, temp2);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_Add(sub_size, temp, temp2, P3);
+  if (result_code != kSuccess) goto done;
+
+  // Quad 4
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A21, B12, temp);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A22, B22, temp2);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_Add(sub_size, temp, temp2, P4);
+  if (result_code != kSuccess) goto done;
+
+  JoinQuads(sub_size, P1, P2, P3, P4, result);
+
+  result_code = kSuccess;
+
+done:
+  Matrices_Destroy(14, A11, A12, A21, A22, B11, B12, B21, B22, P1, P2, P3, P4,
+                   temp, temp2);
+
+  return result_code;
+}
+
 static ResultCode Matrix_StrassenMultiplyRecursive(
     size_t n, const matrix_value (*x)[n][n], const matrix_value (*y)[n][n],
     matrix_value (*result)[n][n]) {
@@ -225,6 +308,20 @@ ResultCode Matrices_Initalize(const size_t n, const size_t count, ...) {
   return result_code;
 }
 
+ResultCode Matrix_Transpose(size_t n, const matrix_value (*x)[n][n],
+                            matrix_value (*result)[n][n]) {
+  if (x == NULL || result == NULL) return kNullParameter;
+  if (n == 0) return kArgumentOutOfRange;
+
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < n; j++) {
+      (*result)[j][i] = (*x)[i][j];
+    }
+  }
+
+  return kSuccess;
+}
+
 ResultCode Matrix_Add(size_t n, const matrix_value (*x)[n][n],
                       const matrix_value (*y)[n][n],
                       matrix_value (*result)[n][n]) {
@@ -267,6 +364,7 @@ ResultCode Matrix_Multiply(size_t n, const matrix_value (*x)[n][n],
 
   for (size_t i = 0; i < n; i++) {
     for (size_t j = 0; j < n; j++) {
+      (*result)[i][j] = 0;
       for (size_t k = 0; k < n; k++) {
         matrix_value temp;
         if (__builtin_mul_overflow((*x)[i][k], (*y)[k][j], &temp)) {
@@ -316,6 +414,52 @@ ResultCode Matrix_TilingMultiply(size_t n, const matrix_value (*x)[n][n],
   }
 
   return kSuccess;
+}
+
+ResultCode Matrix_TransposeMultiply(size_t n, const matrix_value (*x)[n][n],
+                                    const matrix_value (*y)[n][n],
+                                    matrix_value (*result)[n][n]) {
+  if (x == NULL || y == NULL || result == NULL) return kNullParameter;
+  if (n == 0) return kArgumentOutOfRange;
+  ResultCode result_code;
+
+  matrix_value(*transposed)[n][n] = NULL;
+  result_code = Matrix_Initalize(n, &transposed);
+  if (result_code != kSuccess) goto done;
+
+  result_code = Matrix_Transpose(n, y, transposed);
+  if (result_code != kSuccess) goto done;
+
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < n; j++) {
+      for (size_t k = 0; k < n; k++) {
+        matrix_value temp;
+        if (__builtin_mul_overflow((*x)[i][k], (*transposed)[j][k], &temp)) {
+          result_code = kArithmeticOverflow;
+          goto done;
+        }
+
+        if (__builtin_add_overflow((*result)[i][j], temp, &(*result)[i][j])) {
+          result_code = kArithmeticOverflow;
+          goto done;
+        }
+      }
+    }
+  }
+
+done:
+
+  free(transposed);
+  return result_code;
+}
+
+ResultCode Matrix_RecursiveMultiply(size_t n, const matrix_value (*x)[n][n],
+                                    const matrix_value (*y)[n][n],
+                                    matrix_value (*result)[n][n]) {
+  if (x == NULL || y == NULL || result == NULL) return kNullParameter;
+  if (n == 0) return kArgumentOutOfRange;
+
+  return Matrix_RecursiveMultiplyRecursive(n, x, y, result);
 }
 
 ResultCode Matrix_StrassenMultiply(size_t n, const matrix_value (*x)[n][n],

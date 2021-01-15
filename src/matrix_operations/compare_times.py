@@ -9,7 +9,8 @@ matplotlib.use('Agg')
 lib = ctypes.CDLL('./algo.so')
 
 NUM_TIME_RUNS = 3
-TEST_FOR_Ns = [2 ** 5, 2 ** 7, 2 ** 8, 2 ** 9, 2 ** 10, 2 ** 11]
+SMALL_Ns = [2 ** 4, 2 ** 5, 2 ** 6, 2 ** 7, 2 ** 8, 2 ** 9]
+LARGE_Ns = [2 ** 10, 2 ** 11]
 
 
 class CtypesEnum(IntEnum):
@@ -22,6 +23,8 @@ class CtypesEnum(IntEnum):
 class Algo(CtypesEnum):
     NAIVE_MATRIX_MULTIPLY = 1
     TILING_MATRIX_MULTIPLY = 2
+    TRANSPOSE_MATRIX_MULTIPLY = 4
+    RECURSIVE_MATRIX_MULTIPLY = 5
     STRASSEN_MATRIX_MULTIPLY = 3
 
 
@@ -68,13 +71,13 @@ def generate_md_table(ns, data):
         f.write("\n")
 
 
-def generate_chart():
+def generate_chart(ns, file_name):
     full_data = []
     plt.figure(figsize=(8, 6))
 
-    fig, ax = plt.subplots()
-    bar_width = 0.20
-    X = np.arange(len(TEST_FOR_Ns))
+    bar_width = 0.15
+    n_count = len(ns)
+    X = np.arange(n_count)
 
     plt.ylabel('sec')
     plt.xlabel('n')
@@ -83,25 +86,23 @@ def generate_chart():
         print('running {}'.format(algo.name), flush=True)
 
         data = []
-        for n in TEST_FOR_Ns:
+        for n in ns:
             time = median_run_time(lambda: lib.MatrixMultiplyTime(n, algo))
             data.append(time)
 
         plt.bar(X, data, bar_width, label=format_name(algo))
-        # plt.plot(TEST_FOR_Ns, data, label=format_name(algo))
         full_data.append((algo, data))
         X = X + bar_width
 
     plt.legend()
-    # plt.ticklabel_format(style='plain')
-    plt.xticks(np.arange(len(TEST_FOR_Ns)) + (bar_width/2), TEST_FOR_Ns)
-    plt.savefig('./run_time_data/MATRIX_MULTIPLY.png')
+    plt.xticks(np.arange(n_count) + (bar_width * n_count) / 2 - bar_width, ns)
+    plt.savefig(f'./run_time_data/MATRIX_MULTIPLY-{file_name}.png')
     plt.clf()
 
     print('chart created', flush=True)
-
-    generate_md_table(TEST_FOR_Ns, full_data)
+    generate_md_table(ns, full_data)
 
 
 if __name__ == "__main__":
-    generate_chart()
+    generate_chart(SMALL_Ns, 'SMALL')
+    # generate_chart(LARGE_Ns, 'LARGE')

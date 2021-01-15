@@ -12,7 +12,9 @@
 typedef enum {
   kNaiveMatrixMultiply = 1,
   kTilingMatrixMultiply = 2,
-  kStrassenMatrixMultiply = 3
+  kStrassenMatrixMultiply = 3,
+  kTransposeMulitply = 4,
+  kRecursiveMultiply = 5
 } MatrixAlgoirthm;
 
 double MatrixMultiplyTime(const size_t n, const MatrixAlgoirthm algo);

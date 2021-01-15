@@ -27,6 +27,10 @@ static matrix_algo GetAlgorithm(const MatrixAlgoirthm algo) {
       return Matrix_TilingMultiply;
     case kStrassenMatrixMultiply:
       return Matrix_StrassenMultiply;
+    case kTransposeMulitply:
+      return Matrix_TransposeMultiply;
+    case kRecursiveMultiply:
+      return Matrix_RecursiveMultiply;
     default:
       return NULL;
   }

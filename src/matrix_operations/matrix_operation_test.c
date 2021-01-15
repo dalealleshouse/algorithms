@@ -306,10 +306,75 @@ static void Matrix_Subtract_arithmetic_overflow() {
   });
 }
 
+static void Matrix_Transpose_null_parameters() {
+  const size_t n = 2;
+
+  matrix_value(*x)[n][n] = NULL;
+
+  ResultCode result_code = Matrix_Initalize(n, &x);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
+  result_code = Matrix_Transpose(n, x, NULL);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
+
+  result_code = Matrix_Transpose(n, NULL, x);
+  CU_ASSERT_EQUAL(kNullParameter, result_code);
+
+  free(x);
+}
+
+static void Matrix_Transpose_invalid_size() {
+  SUT(2, {
+    result_code = Matrix_Transpose(0, x, z);
+    CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
+  });
+}
+
+static void Matrix_Transpose_happy_path() {
+  SUT(3, {
+    (*z)[0][0] = 5;
+    (*z)[0][1] = 4;
+    (*z)[0][2] = 7;
+    (*z)[1][0] = 4;
+    (*z)[1][1] = 0;
+    (*z)[1][2] = 10;
+    (*z)[2][0] = 3;
+    (*z)[2][1] = 4;
+    (*z)[2][2] = 3;
+
+    (*x)[0][0] = 5;
+    (*x)[0][1] = 4;
+    (*x)[0][2] = 3;
+    (*x)[1][0] = 4;
+    (*x)[1][1] = 0;
+    (*x)[1][2] = 4;
+    (*x)[2][0] = 7;
+    (*x)[2][1] = 10;
+    (*x)[2][2] = 3;
+
+    result_code = Matrix_Transpose(n, x, y);
+
+    CU_ASSERT_EQUAL(kSuccess, result_code);
+    CU_ASSERT_EQUAL(0, memcmp(y, z, sizeof(*z)));
+  });
+}
+
 TEST_MULTIPLY_ALGO(Matrix_Multiply)
 TEST_MULTIPLY_ALGO(Matrix_TilingMultiply)
+TEST_MULTIPLY_ALGO(Matrix_TransposeMultiply)
 TEST_MULTIPLY_ALGO(Matrix_StrassenMultiply)
+TEST_MULTIPLY_ALGO(Matrix_RecursiveMultiply)
 
+static void Matrix_TransposeMultiply_failed_malloc() {
+#if !defined(NDEBUG)
+  SUT(32, {
+    FAILED_MALLOC_TEST({
+      result_code = Matrix_TransposeMultiply(n, x, y, z);
+      CU_ASSERT_EQUAL(kFailedMemoryAllocation, result_code);
+    });
+  })
+#endif
+}
 static void Matrix_StrassenMultiply_failed_malloc() {
 #if !defined(NDEBUG)
   SUT(32, {
@@ -321,16 +386,22 @@ static void Matrix_StrassenMultiply_failed_malloc() {
 #endif
 }
 
-static void Matrix_StrassenMultiply_matches_brute_force() {
+static void Matrix_Multiply_all_match() {
   const size_t n = 64;
   typedef matrix_value(*matrix)[n][n];
+  typedef ResultCode (*matrix_algo)(size_t n, const matrix_value(*x)[n][n],
+                                    const matrix_value(*y)[n][n],
+                                    matrix_value(*result)[n][n]);
+
+  const size_t algo_count = 4;
+  matrix_algo algos[4] = {Matrix_TilingMultiply, Matrix_TransposeMultiply,
+                          Matrix_RecursiveMultiply, Matrix_StrassenMultiply};
+
   matrix x = NULL;
   matrix y = NULL;
-  matrix z1 = NULL;
-  matrix z2 = NULL;
-  matrix z3 = NULL;
+  matrix expected = NULL;
 
-  ResultCode result_code = Matrices_Initalize(n, 5, &x, &y, &z1, &z2, &z3);
+  ResultCode result_code = Matrices_Initalize(n, 3, &x, &y, &expected);
   CU_ASSERT_EQUAL(kSuccess, result_code);
 
   for (size_t i = 0; i < n; i++) {
@@ -340,19 +411,22 @@ static void Matrix_StrassenMultiply_matches_brute_force() {
     }
   }
 
-  result_code = Matrix_Multiply(n, x, y, z1);
+  result_code = Matrix_Multiply(n, x, y, expected);
   CU_ASSERT_EQUAL(kSuccess, result_code);
 
-  result_code = Matrix_StrassenMultiply(n, x, y, z2);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
+  for (size_t i = 0; i < algo_count; i++) {
+    matrix algo_result = NULL;
+    result_code = Matrix_Initalize(n, &algo_result);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
 
-  result_code = Matrix_TilingMultiply(n, x, y, z3);
-  CU_ASSERT_EQUAL(kSuccess, result_code);
+    result_code = algos[i](n, x, y, algo_result);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
+    CU_ASSERT_EQUAL(0, memcmp(expected, algo_result, sizeof(*x)));
 
-  CU_ASSERT_EQUAL(0, memcmp(z1, z2, sizeof(*x)));
-  CU_ASSERT_EQUAL(0, memcmp(z1, z3, sizeof(*x)));
+    free(algo_result);
+  }
 
-  Matrices_Destroy(5, x, y, z1, z2, z3);
+  Matrices_Destroy(3, x, y, expected);
 }
 
 int RegisterMatrixOperationsTests() {
@@ -367,15 +441,21 @@ int RegisterMatrixOperationsTests() {
       CU_TEST_INFO(Matrix_Add_invalid_size),
       CU_TEST_INFO(Matrix_Add_happy_path),
       CU_TEST_INFO(Matrix_Add_arithmetic_overflow),
+      CU_TEST_INFO(Matrix_Transpose_null_parameters),
+      CU_TEST_INFO(Matrix_Transpose_invalid_size),
+      CU_TEST_INFO(Matrix_Transpose_happy_path),
       CU_TEST_INFO(Matrix_Subtract_null_parameters),
       CU_TEST_INFO(Matrix_Subtract_invalid_size),
       CU_TEST_INFO(Matrix_Subtract_happy_path),
       CU_TEST_INFO(Matrix_Subtract_arithmetic_overflow),
       TEST_MULTIPLY_CASES(Matrix_Multiply),
       TEST_MULTIPLY_CASES(Matrix_TilingMultiply),
+      TEST_MULTIPLY_CASES(Matrix_TransposeMultiply),
+      TEST_MULTIPLY_CASES(Matrix_RecursiveMultiply),
       TEST_MULTIPLY_CASES(Matrix_StrassenMultiply),
+      CU_TEST_INFO(Matrix_TransposeMultiply_failed_malloc),
       CU_TEST_INFO(Matrix_StrassenMultiply_failed_malloc),
-      CU_TEST_INFO(Matrix_StrassenMultiply_matches_brute_force),
+      CU_TEST_INFO(Matrix_Multiply_all_match),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Strassen Matrix Multiplication",
