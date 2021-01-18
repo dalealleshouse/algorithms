@@ -107,6 +107,7 @@ extern int RegisterInversionCountTests();
 
 // Matrix Multiplication
 extern int RegisterMatrixOperationsTests();
+extern int RegisterMatrixOperationTestCase();
 
 // Cache
 extern int RegisterCacheTests();
@@ -130,6 +131,7 @@ int RegisterTests() {
       RegisterBubbleSortTestCase() != 0 +
       RegisterInsertionSortTestCase() != 0 +
       RegisterSortInstrumentationTestCase() != 0 +
+      RegisterMatrixOperationTestCase() != 0 +
 #else
       // Unit tests
       RegisterGraphTests() != 0 +

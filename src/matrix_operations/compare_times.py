@@ -105,4 +105,4 @@ def generate_chart(ns, file_name):
 
 if __name__ == "__main__":
     generate_chart(SMALL_Ns, 'SMALL')
-    # generate_chart(LARGE_Ns, 'LARGE')
+    generate_chart(LARGE_Ns, 'LARGE')

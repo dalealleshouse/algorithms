@@ -10,6 +10,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+const size_t kStopRecursionSize = 16;
+
 static matrix_value Min(matrix_value x, matrix_value y) {
   return y ^ ((x ^ y) & -(x < y));
 }
@@ -47,7 +49,7 @@ static void JoinQuads(size_t n, matrix_value (*A)[n][n],
 static ResultCode Matrix_RecursiveMultiplyRecursive(
     size_t n, const matrix_value (*x)[n][n], const matrix_value (*y)[n][n],
     matrix_value (*result)[n][n]) {
-  if (n <= 16) return Matrix_Multiply(n, x, y, result);
+  if (n <= kStopRecursionSize) return Matrix_Multiply(n, x, y, result);
 
   ResultCode result_code;
   size_t sub_size = n >> 1;
@@ -61,16 +63,16 @@ static ResultCode Matrix_RecursiveMultiplyRecursive(
   matrix B12 = NULL;
   matrix B21 = NULL;
   matrix B22 = NULL;
-  matrix P1 = NULL;
-  matrix P2 = NULL;
-  matrix P3 = NULL;
-  matrix P4 = NULL;
+  matrix Q1 = NULL;
+  matrix Q2 = NULL;
+  matrix Q3 = NULL;
+  matrix Q4 = NULL;
   matrix temp = NULL;
   matrix temp2 = NULL;
 
   result_code =
       Matrices_Initalize(sub_size, 14, &A11, &A12, &A21, &A22, &B11, &B12, &B21,
-                         &B22, &P1, &P2, &P3, &P4, &temp, &temp2);
+                         &B22, &Q1, &Q2, &Q3, &Q4, &temp, &temp2);
   if (result_code != kSuccess) goto done;
 
   SplitMatrixInQuads(sub_size, x, A11, A12, A21, A22);
@@ -83,7 +85,7 @@ static ResultCode Matrix_RecursiveMultiplyRecursive(
   result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A12, B21, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Add(sub_size, temp, temp2, P1);
+  result_code = Matrix_Add(sub_size, temp, temp2, Q1);
   if (result_code != kSuccess) goto done;
 
   // Quad 2
@@ -93,7 +95,7 @@ static ResultCode Matrix_RecursiveMultiplyRecursive(
   result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A12, B22, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Add(sub_size, temp, temp2, P2);
+  result_code = Matrix_Add(sub_size, temp, temp2, Q2);
   if (result_code != kSuccess) goto done;
 
   // Quad 3
@@ -103,7 +105,7 @@ static ResultCode Matrix_RecursiveMultiplyRecursive(
   result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A22, B21, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Add(sub_size, temp, temp2, P3);
+  result_code = Matrix_Add(sub_size, temp, temp2, Q3);
   if (result_code != kSuccess) goto done;
 
   // Quad 4
@@ -113,15 +115,15 @@ static ResultCode Matrix_RecursiveMultiplyRecursive(
   result_code = Matrix_RecursiveMultiplyRecursive(sub_size, A22, B22, temp2);
   if (result_code != kSuccess) goto done;
 
-  result_code = Matrix_Add(sub_size, temp, temp2, P4);
+  result_code = Matrix_Add(sub_size, temp, temp2, Q4);
   if (result_code != kSuccess) goto done;
 
-  JoinQuads(sub_size, P1, P2, P3, P4, result);
+  JoinQuads(sub_size, Q1, Q2, Q3, Q4, result);
 
   result_code = kSuccess;
 
 done:
-  Matrices_Destroy(14, A11, A12, A21, A22, B11, B12, B21, B22, P1, P2, P3, P4,
+  Matrices_Destroy(14, A11, A12, A21, A22, B11, B12, B21, B22, Q1, Q2, Q3, Q4,
                    temp, temp2);
 
   return result_code;
@@ -132,7 +134,7 @@ static ResultCode Matrix_StrassenMultiplyRecursive(
     matrix_value (*result)[n][n]) {
   ResultCode result_code;
 
-  if (n <= 16) return Matrix_Multiply(n, x, y, result);
+  if (n <= kStopRecursionSize) return Matrix_Multiply(n, x, y, result);
 
   size_t sub_size = n >> 1;
   typedef matrix_value(*matrix)[sub_size][sub_size];
