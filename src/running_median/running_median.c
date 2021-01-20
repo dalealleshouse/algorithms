@@ -12,7 +12,7 @@
 
 #include "heap.h"
 
-const size_t INITAL_HEAP_SIZE = 100;
+const size_t kInitialHeapSize = 100;
 
 typedef struct RunningMedian {
   Heap* upper;
@@ -108,7 +108,7 @@ ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
   if (result_code != kSuccess) return result_code;
 
   *result = (*median + *median2) / 2;
-  if (fpclassify(*result) != FP_NORMAL) return kArithmeticOverflow;
+  if (!isnormal(*result) && *result != 0) return kArithmeticOverflow;
 
   return kSuccess;
 }
@@ -129,11 +129,11 @@ ResultCode RunningMedian_Create(RunningMedian** result) {
   if (rm == NULL) return kFailedMemoryAllocation;
 
   rm->upper = NULL;
-  result_code = Heap_Create(INITAL_HEAP_SIZE, MinComparator, &rm->upper);
+  result_code = Heap_Create(kInitialHeapSize, MinComparator, &rm->upper);
   if (result_code != kSuccess) goto error;
 
   rm->lower = NULL;
-  result_code = Heap_Create(INITAL_HEAP_SIZE, MaxComparator, &rm->lower);
+  result_code = Heap_Create(kInitialHeapSize, MaxComparator, &rm->lower);
   if (result_code != kSuccess) goto error;
 
   rm->n = 0;
@@ -146,12 +146,10 @@ error:
 }
 
 ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
-  ResultCode result_code;
-
   if (self == NULL) return kNullParameter;
-  if (isnan(value) || isinf(value)) return kArgumentOutOfRange;
+  if (!isnormal(value) && value != 0) return kArgumentOutOfRange;
 
-  result_code = ResizeHeapsIfNeeded(self);
+  ResultCode result_code = ResizeHeapsIfNeeded(self);
   if (result_code != kSuccess) return result_code;
 
   // Heap only hold pointers, so malloc up a pointer to hold the value

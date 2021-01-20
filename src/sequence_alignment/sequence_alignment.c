@@ -1,11 +1,9 @@
-#include "./sequence_alignment.h"
+#include "sequence_alignment.h"
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "../utils/overflow_checker.h"
 
 const char GAP = '_';
 typedef struct SeqAlign {
@@ -67,12 +65,11 @@ static penalty min(penalty x, penalty y, penalty z) {
 static ResultCode reconstruct(
     SeqAlign* problem, penalty solutions[problem->x_n + 1][problem->y_n + 1],
     SeqAlignSolution** solution) {
-  if (IsAddOverflow_size_t(problem->x_n, problem->y_n)) {
+  // Max possible size of aligned string
+  size_t size;
+  if (__builtin_add_overflow(problem->x_n, problem->y_n, &size)) {
     return kArithmeticOverflow;
   }
-
-  // Max possible size of aligned string
-  size_t size = problem->y_n + problem->x_n;
 
   // Add 1 for null terminator
   char x[size + 1];
@@ -187,17 +184,15 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
   penalty solutions[problem->x_n + 1][problem->y_n + 1];
 
   for (size_t i = 0; i <= problem->x_n; i++) {
-    if (IsMulOverflow_ulong(i, problem->gap_penalty)) {
+    if (__builtin_mul_overflow(i, problem->gap_penalty, &solutions[i][0])) {
       return kArithmeticOverflow;
     }
-    solutions[i][0] = i * problem->gap_penalty;
   }
 
   for (size_t j = 0; j <= problem->y_n; j++) {
-    if (IsMulOverflow_ulong(j, problem->gap_penalty)) {
+    if (__builtin_mul_overflow(j, problem->gap_penalty, &solutions[0][j])) {
       return kArithmeticOverflow;
     }
-    solutions[0][j] = j * problem->gap_penalty;
   }
 
   for (size_t i = 1; i <= problem->x_n; i++) {
@@ -208,21 +203,23 @@ ResultCode SequenceAlignment_Score(SeqAlign* problem,
       if (x == y) {
         solutions[i][j] = solutions[i - 1][j - 1];
       } else {
-        if (IsAddOverflow_ulong(solutions[i - 1][j - 1],
-                                problem->mismatch_penalty)) {
+        penalty case1;
+        if (__builtin_add_overflow(solutions[i - 1][j - 1],
+                                   problem->mismatch_penalty, &case1)) {
           return kArithmeticOverflow;
         }
-        penalty case1 = solutions[i - 1][j - 1] + problem->mismatch_penalty;
 
-        if (IsAddOverflow_ulong(solutions[i - 1][j], problem->gap_penalty)) {
+        penalty case2;
+        if (__builtin_add_overflow(solutions[i - 1][j], problem->gap_penalty,
+                                   &case2)) {
           return kArithmeticOverflow;
         }
-        penalty case2 = solutions[i - 1][j] + problem->gap_penalty;
 
-        if (IsAddOverflow_ulong(solutions[i][j - 1], problem->gap_penalty)) {
+        penalty case3;
+        if (__builtin_add_overflow(solutions[i][j - 1], problem->gap_penalty,
+                                   &case3)) {
           return kArithmeticOverflow;
         }
-        penalty case3 = solutions[i][j - 1] + problem->gap_penalty;
 
         solutions[i][j] = min(case1, case2, case3);
       }

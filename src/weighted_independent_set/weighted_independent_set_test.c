@@ -283,7 +283,7 @@ static void _testFile(const char* path, const char* solution) {
     }
   }
 
-  /* printf("solution=%s, my_solution=%s\n", solution, _solution); */
+  printf("solution=%s, my_solution=%s\n", solution, _solution);
   CU_ASSERT_STRING_EQUAL(_solution, solution);
 
   WeightedIndependentSet_Destroy(wis);

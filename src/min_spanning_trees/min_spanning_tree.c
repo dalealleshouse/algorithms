@@ -1,13 +1,12 @@
-#include "./min_spanning_tree.h"
+#include "min_spanning_tree.h"
 
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../data_structures/disjoint_set.h"
-#include "../data_structures/heap.h"
-#include "../utils/overflow_checker.h"
+#include "disjoint_set.h"
+#include "heap.h"
 
 typedef struct {
   int score;
@@ -123,12 +122,11 @@ static Result _addEdgeToMst(MinSpanTree* mst, Edge* edge) {
     mst->edge_tail = current;
   }
 
-  if (IsAddOverflow_int(mst->cost, current->weight)) {
+  if (__builtin_add_overflow(mst->cost, current->weight, &mst->cost)) {
     return kArithmeticOverflow;
   }
 
   ++mst->edge_count;
-  mst->cost += current->weight;
   return kSuccess;
 }
 

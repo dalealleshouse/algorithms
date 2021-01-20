@@ -83,6 +83,9 @@ static void RunningMedian_Insert_nan_or_inf() {
 
     result_code = RunningMedian_Insert(sut, INFINITY);
     CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
+
+    result_code = RunningMedian_Insert(sut, 0);
+    CU_ASSERT_EQUAL(kSuccess, result_code);
   });
 }
 

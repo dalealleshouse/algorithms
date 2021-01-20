@@ -15,7 +15,6 @@ const char* kSuiteName = "CUNIT_SUITE";
 
 // utils
 extern int RegisterGraphTests();
-extern int RegisterOverflowTests();
 extern int RegisterMathTests();
 // Common
 extern int RegisterCommonTests();
@@ -135,7 +134,6 @@ int RegisterTests() {
 #else
       // Unit tests
       RegisterGraphTests() != 0 +
-      RegisterOverflowTests() != 0 +
       RegisterMathTests() != 0 +
       RegisterCommonTests() != 0 +
       RegisterGraphSearchTests() != 0 +
