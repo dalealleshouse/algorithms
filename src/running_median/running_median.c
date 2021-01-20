@@ -20,32 +20,64 @@ typedef struct RunningMedian {
   size_t n;
 } RunningMedian;
 
+static bool IsBalanced(RunningMedian* self) {
+  return (self->n % 2 == 0)
+             ? Heap_Size(self->upper) == Heap_Size(self->lower)
+             : Heap_Size(self->upper) + 1 == Heap_Size(self->lower);
+}
+
+// Resize the heaps if there isn't enough room for the insert
+static ResultCode ResizeHeapsIfNeeded(RunningMedian* self) {
+  ResultCode result_code;
+
+  size_t heap_size = Heap_MaxSize(self->lower) * 2;
+  if (heap_size == self->n + 1) {
+    result_code = Heap_Resize(self->lower, heap_size);
+    if (result_code != kSuccess) return result_code;
+
+    result_code = Heap_Resize(self->upper, heap_size);
+    if (result_code != kSuccess) return result_code;
+  }
+
+  return kSuccess;
+}
+
+// Balance so there is the same number of items on each heap
+// It should never be out of balance my more than 1
+static ResultCode BalanceHeaps(RunningMedian* self) {
+  while (!IsBalanced(self)) {
+    Heap* larger = NULL;
+    Heap* smaller = NULL;
+    if (Heap_Size(self->upper) > Heap_Size(self->lower)) {
+      larger = self->upper;
+      smaller = self->lower;
+    } else {
+      larger = self->lower;
+      smaller = self->upper;
+    }
+
+    void* temp = NULL;
+    ResultCode result_code = Heap_Extract(larger, &temp);
+    if (result_code != kSuccess) return result_code;
+
+    result_code = Heap_Insert(smaller, temp);
+    if (result_code != kSuccess) return result_code;
+  }
+
+  return kSuccess;
+}
+
 static int MaxComparator(const void* x, const void* y) {
   median_value _x = *(median_value*)x;
   median_value _y = *(median_value*)y;
 
   if (_x == _y) return 0;
-
   if (_x < _y) return -1;
-
   return 1;
 }
 
 static int MinComparator(const void* x, const void* y) {
-  median_value _x = *(median_value*)x;
-  median_value _y = *(median_value*)y;
-
-  if (_x == _y) return 0;
-
-  if (_x > _y) return -1;
-
-  return 1;
-}
-
-static bool IsBalanced(RunningMedian* self) {
-  return (self->n % 2 == 0)
-             ? Heap_Size(self->upper) == Heap_Size(self->lower)
-             : Heap_Size(self->upper) + 1 == Heap_Size(self->lower);
+  return MaxComparator(x, y) * -1;
 }
 
 ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
@@ -55,6 +87,8 @@ ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
   if (self->n == 0) return kEmpty;
 
   median_value* median = NULL;
+  // If there is an uneven number of items, there will be one extra item on the
+  // lower heap - that will be the median value
   if (self->n % 2 != 0) {
     result_code = Heap_Peek(self->lower, (void**)&median);
     if (result_code != kSuccess) return result_code;
@@ -63,6 +97,8 @@ ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
     return kSuccess;
   }
 
+  // If there is an even number of items, then return the average of the item at
+  // the top of both heaps
   median_value* median2 = NULL;
 
   result_code = Heap_Peek(self->lower, (void**)&median);
@@ -115,15 +151,8 @@ ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
   if (self == NULL) return kNullParameter;
   if (isnan(value) || isinf(value)) return kArgumentOutOfRange;
 
-  // Resize the heaps if there isn't enough room for the insert
-  size_t heap_size = Heap_MaxSize(self->lower) * 2;
-  if (heap_size == self->n + 1) {
-    result_code = Heap_Resize(self->lower, heap_size);
-    if (result_code != kSuccess) return result_code;
-
-    result_code = Heap_Resize(self->upper, heap_size);
-    if (result_code != kSuccess) return result_code;
-  }
+  result_code = ResizeHeapsIfNeeded(self);
+  if (result_code != kSuccess) return result_code;
 
   // Heap only hold pointers, so malloc up a pointer to hold the value
   median_value* val = malloc(sizeof(median_value));
@@ -152,25 +181,9 @@ ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
 
   self->n++;
 
-  // Balance so there is the same number of items on each heap
-  while (!IsBalanced(self)) {
-    Heap* larger = NULL;
-    Heap* smaller = NULL;
-    if (Heap_Size(self->upper) > Heap_Size(self->lower)) {
-      larger = self->upper;
-      smaller = self->lower;
-    } else {
-      larger = self->lower;
-      smaller = self->upper;
-    }
-
-    void* temp = NULL;
-    result_code = Heap_Extract(larger, &temp);
-    if (result_code != kSuccess) goto fail;
-
-    result_code = Heap_Insert(smaller, temp);
-    if (result_code != kSuccess) goto fail;
-  }
+  // Balance the heaps if they need it
+  result_code = BalanceHeaps(self);
+  if (result_code != kSuccess) goto fail;
 
   return kSuccess;
 
