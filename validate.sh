@@ -43,6 +43,7 @@ cpplint src/cache/*.[ch]
 cpplint src/sorting/*.[ch]
 cpplint src/quick_select/*.[ch]
 cpplint src/matrix_operations/*.[ch]
+cpplint src/running_median/*.[ch]
 cpplint locality/*.[ch]
 print_success "Lint Passed"
 
@@ -55,6 +56,7 @@ clang-tidy src/cache/*.[ch]
 clang-tidy src/sorting/*.[ch]
 clang-tidy src/quick_select/*.[ch]
 clang-tidy src/matrix_operations/*.[ch]
+clang-tidy src/running_median/*.[ch]
 clang-tidy locality/*.[ch]
 print_success "Tidy Static Analysis Passed"
 

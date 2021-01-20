@@ -1,11 +1,18 @@
-#include "./running_median.h"
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "running_median.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-#include "../data_structures/heap.h"
+#include "heap.h"
 
-const size_t INITAL_HEAP_SIZE = 500;
+const size_t INITAL_HEAP_SIZE = 100;
 
 typedef struct RunningMedian {
   Heap* upper;
@@ -13,11 +20,9 @@ typedef struct RunningMedian {
   size_t n;
 } RunningMedian;
 
-static bool is_even(size_t n) { return n % 2 == 0; }
-
-static int max_comparator(const void* x, const void* y) {
-  double _x = *(double*)x;
-  double _y = *(double*)y;
+static int MaxComparator(const void* x, const void* y) {
+  median_value _x = *(median_value*)x;
+  median_value _y = *(median_value*)y;
 
   if (_x == _y) return 0;
 
@@ -26,9 +31,9 @@ static int max_comparator(const void* x, const void* y) {
   return 1;
 }
 
-static int min_comparator(const void* x, const void* y) {
-  double _x = *(double*)x;
-  double _y = *(double*)y;
+static int MinComparator(const void* x, const void* y) {
+  median_value _x = *(median_value*)x;
+  median_value _y = *(median_value*)y;
 
   if (_x == _y) return 0;
 
@@ -37,139 +42,39 @@ static int min_comparator(const void* x, const void* y) {
   return 1;
 }
 
-static double get_heap_value(Heap* heap) {
-  void* val = NULL;
-  ResultCode result_code = Heap_Peek(heap, &val);
-  if (result_code != kSuccess) {
-    ERROR("RunningMedian", result_code);
-    return NAN;
-  }
-
-  return *(double*)val;
+static bool IsBalanced(RunningMedian* self) {
+  return (self->n % 2 == 0)
+             ? Heap_Size(self->upper) == Heap_Size(self->lower)
+             : Heap_Size(self->upper) + 1 == Heap_Size(self->lower);
 }
 
-static bool heap_is_balanced(RunningMedian* self) {
-  if (is_even(self->n)) {
-    return Heap_Size(self->upper) == Heap_Size(self->lower);
-  } else {
-    return Heap_Size(self->upper) + 1 == Heap_Size(self->lower);
-  }
-}
-
-static ResultCode heap_insert(Heap* heap, double* value) {
+ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
   ResultCode result_code;
 
-  if (Heap_Size(heap) == Heap_MaxSize(heap)) {
-    result_code = Heap_Resize(heap, Heap_MaxSize(heap) * 2);
+  if (self == NULL) return kNullParameter;
+  if (self->n == 0) return kEmpty;
+
+  median_value* median = NULL;
+  if (self->n % 2 != 0) {
+    result_code = Heap_Peek(self->lower, (void**)&median);
     if (result_code != kSuccess) return result_code;
+
+    *result = *median;
+    return kSuccess;
   }
 
-  return Heap_Insert(heap, value);
-}
+  median_value* median2 = NULL;
 
-/*
- * The assumption is that the heaps will never be more than one out of balance
- * becuase it should be run on every insert operation
- *
- * if there are an even number of items, there should be an equal number of
- * items in each heap
- *
- * if there are an odd number of items, there should be one more item in lower
- * than in upper
- */
-static Result balance_heaps(RunningMedian* self) {
-  if (heap_is_balanced(self)) return kSuccess;
-
-  Heap* too_many;
-  Heap* too_low;
-
-  if (Heap_Size(self->upper) > Heap_Size(self->lower)) {
-    too_many = self->upper;
-    too_low = self->lower;
-  } else {
-    too_many = self->lower;
-    too_low = self->upper;
-  }
-
-  double* temp = NULL;
-  ResultCode result_code = Heap_Extract(too_many, (void**)&temp);
+  result_code = Heap_Peek(self->lower, (void**)&median);
   if (result_code != kSuccess) return result_code;
 
-  result_code = heap_insert(too_low, temp);
+  result_code = Heap_Peek(self->upper, (void**)&median2);
   if (result_code != kSuccess) return result_code;
+
+  *result = (*median + *median2) / 2;
+  if (fpclassify(*result) != FP_NORMAL) return kArithmeticOverflow;
 
   return kSuccess;
-}
-
-static Heap* find_insert_heap(RunningMedian* self, double value) {
-  if (self->n == 0) return self->lower;
-
-  double low_value = get_heap_value(self->lower);
-  if (isnan(low_value)) return NULL;
-
-  if (value > low_value) {
-    return self->upper;
-  } else {
-    return self->lower;
-  }
-}
-
-RunningMedian* RunningMedian_Create() {
-  RunningMedian* rm = malloc(sizeof(RunningMedian));
-  if (rm == NULL) {
-    ERROR("RunningMedian", kFailedMemoryAllocation);
-    return NULL;
-  }
-
-  rm->upper = NULL;
-  ResultCode result_code =
-      Heap_Create(INITAL_HEAP_SIZE, min_comparator, &rm->upper);
-  if (result_code != kSuccess) {
-    ERROR("RunningMedian", kDependancyError);
-    RunningMedian_Destroy(rm);
-    return NULL;
-  }
-
-  rm->lower = NULL;
-  result_code = Heap_Create(INITAL_HEAP_SIZE, max_comparator, &rm->lower);
-  if (result_code != kSuccess) {
-    ERROR("RunningMedian", kDependancyError);
-    RunningMedian_Destroy(rm);
-    return NULL;
-  }
-
-  rm->n = 0;
-  return rm;
-}
-
-Result RunningMedian_Insert(RunningMedian* self, double value) {
-  if (self == NULL) return kNullParameter;
-
-  if (isnan(value) || isinf(value)) return kArgumentOutOfRange;
-
-  double* val = malloc(sizeof(double));
-  if (val == NULL) return kFailedMemoryAllocation;
-
-  *val = value;
-
-  // Find which heap to insert the value into
-  Heap* h = find_insert_heap(self, value);
-  if (h == NULL) {
-    free(val);
-    return kDependancyError;
-  }
-
-  // Insert the value
-  ResultCode hresult = heap_insert(h, val);
-  if (hresult != kSuccess) {
-    free(val);
-    return hresult;
-  }
-
-  self->n++;
-
-  // Rebalance
-  return balance_heaps(self);
 }
 
 size_t RunningMedian_GetN(RunningMedian* self) {
@@ -178,33 +83,100 @@ size_t RunningMedian_GetN(RunningMedian* self) {
   return self->n;
 }
 
-double RunningMedian_Median(RunningMedian* self) {
-  if (self == NULL) {
-    ERROR("RunningMedian", kNullParameter);
-    return NAN;
+ResultCode RunningMedian_Create(RunningMedian** result) {
+  ResultCode result_code = kSuccess;
+
+  if (result == NULL) return kNullParameter;
+  if (*result != NULL) return kOutputPointerIsNotNull;
+
+  RunningMedian* rm = malloc(sizeof(RunningMedian));
+  if (rm == NULL) return kFailedMemoryAllocation;
+
+  rm->upper = NULL;
+  result_code = Heap_Create(INITAL_HEAP_SIZE, MinComparator, &rm->upper);
+  if (result_code != kSuccess) goto error;
+
+  rm->lower = NULL;
+  result_code = Heap_Create(INITAL_HEAP_SIZE, MaxComparator, &rm->lower);
+  if (result_code != kSuccess) goto error;
+
+  rm->n = 0;
+  *result = rm;
+  return result_code;
+
+error:
+  RunningMedian_Destroy(rm);
+  return result_code;
+}
+
+ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
+  ResultCode result_code;
+
+  if (self == NULL) return kNullParameter;
+  if (isnan(value) || isinf(value)) return kArgumentOutOfRange;
+
+  // Resize the heaps if there isn't enough room for the insert
+  size_t heap_size = Heap_MaxSize(self->lower) * 2;
+  if (heap_size == self->n + 1) {
+    result_code = Heap_Resize(self->lower, heap_size);
+    if (result_code != kSuccess) return result_code;
+
+    result_code = Heap_Resize(self->upper, heap_size);
+    if (result_code != kSuccess) return result_code;
   }
 
+  // Heap only hold pointers, so malloc up a pointer to hold the value
+  median_value* val = malloc(sizeof(median_value));
+  if (val == NULL) return kFailedMemoryAllocation;
+
+  *val = value;
+
+  // If not item exist, just put it on the lower heap
   if (self->n == 0) {
-    ERROR("RunningMedian", kEmpty);
-    return NAN;
+    result_code = Heap_Insert(self->lower, val);
+    if (result_code != kSuccess) goto fail;
+    self->n++;
+    return result_code;
   }
 
-  if (is_even(self->n)) {
-    double low = get_heap_value(self->lower);
-    if (isnan(low)) return NAN;
+  // Figure out which heap to push the new value on
+  median_value* median = NULL;
+  result_code = Heap_Peek(self->lower, (void**)&median);
+  if (result_code != kSuccess) goto fail;
 
-    double high = get_heap_value(self->upper);
-    if (isnan(high)) return NAN;
+  Heap* h = (*val < *median) ? self->lower : self->upper;
 
-    double result = (low + high) / 2;
-    if (isinf(result)) ERROR("RunningMedian", kArithmeticOverflow);
+  // Insert the value
+  result_code = Heap_Insert(h, val);
+  if (result_code != kSuccess) goto fail;
 
-    return result;
-  } else {
-    return get_heap_value(self->lower);
+  self->n++;
+
+  // Balance so there is the same number of items on each heap
+  while (!IsBalanced(self)) {
+    Heap* larger = NULL;
+    Heap* smaller = NULL;
+    if (Heap_Size(self->upper) > Heap_Size(self->lower)) {
+      larger = self->upper;
+      smaller = self->lower;
+    } else {
+      larger = self->lower;
+      smaller = self->upper;
+    }
+
+    void* temp = NULL;
+    result_code = Heap_Extract(larger, &temp);
+    if (result_code != kSuccess) goto fail;
+
+    result_code = Heap_Insert(smaller, temp);
+    if (result_code != kSuccess) goto fail;
   }
 
-  return 0;
+  return kSuccess;
+
+fail:
+  free(val);
+  return result_code;
 }
 
 void RunningMedian_Destroy(RunningMedian* self) {
