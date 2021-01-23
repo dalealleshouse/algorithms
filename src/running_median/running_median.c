@@ -7,6 +7,7 @@
  ******************************************************************************/
 #include "running_median.h"
 
+#include <inttypes.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -23,7 +24,7 @@ typedef struct RunningMedian {
 static bool IsBalanced(RunningMedian* self) {
   return (self->n % 2 == 0)
              ? Heap_Size(self->upper) == Heap_Size(self->lower)
-             : Heap_Size(self->upper) + 1 == Heap_Size(self->lower);
+             : imaxabs(Heap_Size(self->upper) - Heap_Size(self->lower)) == 1;
 }
 
 // Resize the heaps if there isn't enough room for the insert
@@ -87,10 +88,13 @@ ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
   if (self->n == 0) return kEmpty;
 
   median_value* median = NULL;
-  // If there is an uneven number of items, there will be one extra item on the
-  // lower heap - that will be the median value
+  // If there is an uneven number of items, there will be one extra item on one
+  // of the heaps - that will be the median value
   if (self->n % 2 != 0) {
-    result_code = Heap_Peek(self->lower, (void**)&median);
+    Heap* h = (Heap_Size(self->lower) > Heap_Size(self->upper)) ? self->lower
+                                                                : self->upper;
+
+    result_code = Heap_Peek(h, (void**)&median);
     if (result_code != kSuccess) return result_code;
 
     *result = *median;
@@ -152,7 +156,7 @@ ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
   ResultCode result_code = ResizeHeapsIfNeeded(self);
   if (result_code != kSuccess) return result_code;
 
-  // Heap only hold pointers, so malloc up a pointer to hold the value
+  // Heap only holds pointers, so malloc up a pointer to hold the value
   median_value* val = malloc(sizeof(median_value));
   if (val == NULL) return kFailedMemoryAllocation;
 
