@@ -1,10 +1,9 @@
-#include "./huffman_code.h"
+#include "huffman_code.h"
 
 #include <stdlib.h>
 
-#include "../data_structures/hash_table.h"
-#include "../data_structures/heap.h"
-#include "../utils/overflow_checker.h"
+#include "hash_table.h"
+#include "heap.h"
 
 static Result _huffmanCode_Init(Symbol* symbol, const size_t frequency,
                                 HuffmanCode** result) {
@@ -29,11 +28,12 @@ static int _codeNodeComparer(const void* x, const void* y) {
 }
 
 static Result _combineNodes(HuffmanCode* x, HuffmanCode* y, HuffmanCode** new) {
-  if (IsAddOverflow_size_t(x->frequency, y->frequency)) {
+  size_t new_size;
+  if (__builtin_add_overflow(x->frequency, y->frequency, &new_size)) {
     return kArithmeticOverflow;
   }
 
-  Result result = _huffmanCode_Init(NULL, x->frequency + y->frequency, new);
+  Result result = _huffmanCode_Init(NULL, new_size, new);
   if (result != kSuccess) return result;
 
   (*new)->one = x;

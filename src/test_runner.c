@@ -15,7 +15,6 @@ const char* kSuiteName = "CUNIT_SUITE";
 
 // utils
 extern int RegisterGraphTests();
-extern int RegisterOverflowTests();
 extern int RegisterMathTests();
 // Common
 extern int RegisterCommonTests();
@@ -38,6 +37,7 @@ extern int RegisterKnapsackProblemTests();
 
 // Running Median
 extern int RegisterRunningMedianTests();
+extern int RegisterRunningMedianTestCase();
 
 // Sequence Alignment
 extern int RegisterSequenceAlignmentTests();
@@ -133,9 +133,10 @@ int RegisterTests() {
       RegisterSortInstrumentationTestCase() != 0 +
       RegisterMatrixOperationTestCase() != 0 +
 #else
+      RegisterRunningMedianTestCase() != 0 +
+
       // Unit tests
       RegisterGraphTests() != 0 +
-      RegisterOverflowTests() != 0 +
       RegisterMathTests() != 0 +
       RegisterCommonTests() != 0 +
       RegisterGraphSearchTests() != 0 +

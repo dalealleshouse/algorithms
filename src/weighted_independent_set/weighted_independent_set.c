@@ -1,9 +1,7 @@
-#include "./weighted_independent_set.h"
+#include "weighted_independent_set.h"
 
 #include <stdlib.h>
 #include <string.h>
-
-#include "../utils/overflow_checker.h"
 
 const WeightedIndependentSet EMPTY_SET = {
     .n = 0, .weight = 0, .vertices = NULL};
@@ -91,14 +89,16 @@ static Result _wisResursive(WeightedIndependentSet** wis,
     return result2;
   }
 
-  if (IsAddOverflow_uint(wis2->weight, vertices[n - 1]->weight)) {
+  unsigned long sum_weight;
+  if (__builtin_add_overflow(wis2->weight, vertices[n - 1]->weight,
+                             &sum_weight)) {
     WeightedIndependentSet_Destroy(wis1);
     WeightedIndependentSet_Destroy(wis2);
     return kArithmeticOverflow;
   }
 
   // overflow is checked in the block above
-  if (wis1->weight >= wis2->weight + vertices[n - 1]->weight) {
+  if (wis1->weight >= sum_weight) {
     WeightedIndependentSet_Destroy(wis2);
     (*wis) = wis1;
     return kSuccess;
@@ -266,13 +266,15 @@ Result WeightedIndependentSet_Dynamic_Reconstruction(
     unsigned long iminus2 = solutions[i - 2];
     unsigned long w = graph->vertices[i - 1]->weight;
 
-    if (IsAddOverflow_ulong(iminus1, w)) return kArithmeticOverflow;
+    unsigned long sum_weight;
+    if (__builtin_add_overflow(iminus2, w, &sum_weight))
+      return kArithmeticOverflow;
 
     // overflow checked above
-    if (iminus1 >= iminus2 + w) {
+    if (iminus1 >= sum_weight) {
       solutions[i] = iminus1;
     } else {
-      solutions[i] = iminus2 + w;
+      solutions[i] = sum_weight;
     }
   }
 
@@ -318,14 +320,15 @@ Result WeightedIndependentSet_Dynamic(PathGraph* graph,
     WeightedIndependentSet* iminus2 = solutions[i - 2];
     WeightedVertex* w = graph->vertices[i - 1];
 
-    if (IsAddOverflow_uint(iminus1->weight, w->weight)) {
+    unsigned long sum_weight;
+    if (__builtin_add_overflow(iminus2->weight, w->weight, &sum_weight)) {
       _solutionsDestroy(solutions, solutions_n);
       return kArithmeticOverflow;
     }
 
     Result r;
     // overflow checked above
-    if (iminus1->weight >= iminus2->weight + w->weight) {
+    if (iminus1->weight >= sum_weight) {
       r = _dupWeightedIndependentSet(iminus1, &solutions[i]);
     } else {
       r = WeightedIndependentSet_Union(iminus2, w, &solutions[i]);

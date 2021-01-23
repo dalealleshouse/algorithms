@@ -10,8 +10,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "overflow_checker.h"
-
 struct Heap_t {
   size_t n;
   size_t size;
@@ -117,13 +115,16 @@ ResultCode Heap_Create(size_t size, sort_strategy comparator, Heap** self) {
   if (comparator == NULL || self == NULL) return kNullParameter;
   if (*self != NULL) return kOutputPointerIsNotNull;
   if (size == 0) return kArgumentOutOfRange;
-  if (IsMulOverflow_size_t(sizeof(void*), size)) return kArithmeticOverflow;
+  size_t malloc_size;
+  if (__builtin_mul_overflow(sizeof(void*), size, &malloc_size)) {
+    return kArithmeticOverflow;
+  }
 
   Heap* heap = malloc(sizeof(Heap));
   if (heap == NULL) return kFailedMemoryAllocation;
   heap->item_tracker = NULL;
 
-  heap->data = malloc(sizeof(void*) * size);
+  heap->data = malloc(malloc_size);
   if (heap->data == NULL) {
     Heap_Destroy(heap, NULL);
     return kFailedMemoryAllocation;
@@ -174,9 +175,13 @@ ResultCode Heap_Insert(Heap* self, void* item) {
 ResultCode Heap_Resize(Heap* self, size_t size) {
   if (self == NULL) return kNullParameter;
   if (size < self->n) return kArgumentOutOfRange;
-  if (IsMulOverflow_size_t(size, sizeof(void*))) return kArithmeticOverflow;
 
-  void* new_data = realloc(self->data, sizeof(void*) * size);
+  size_t malloc_size;
+  if (__builtin_mul_overflow(sizeof(void*), size, &malloc_size)) {
+    return kArithmeticOverflow;
+  }
+
+  void* new_data = realloc(self->data, malloc_size);
   if (new_data == NULL) return kFailedMemoryAllocation;
 
   self->data = new_data;

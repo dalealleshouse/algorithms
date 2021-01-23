@@ -3,8 +3,6 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#include "../utils/overflow_checker.h"
-
 static GraphResult _initPath(vertex_id vertex, Path* next, Path** path) {
   Path* p = malloc(sizeof(Path));
 
@@ -37,11 +35,11 @@ static GraphResult _shortest(Graph* graph, Vertex* v, BFData cache[graph->n],
     BFData contender = {UNINITIALIZED, NULL};
 
     if (cache[e->tail].distance != UNINITIALIZED) {
-      if (IsAddOverflow_int(cache[e->tail].distance, e->weight)) {
+      if (__builtin_add_overflow(cache[e->tail].distance, e->weight,
+                                 &contender.distance)) {
         return Graph_kArithmeticOverflow;
       }
 
-      contender.distance = cache[e->tail].distance + e->weight;
       contender.prev = graph->V[e->tail];
     }
 

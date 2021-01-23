@@ -13,13 +13,14 @@
 #include "matrix_operations.h"
 #include "test_helpers.h"
 
-const size_t kSize = 4096;
+static const size_t kSize = 4096;
 // Each value is between 1 and 100 - so that's 3 characters plus 1 for the tab
 // Add an additional one to the end for the newline character
-const char kSeperator[1] = "\t";
-const size_t kBufferSize = 4 * kSize + 1;
-const char* x_matrix = "./src/matrix_operations/test_data/random_matrix_1.txt";
-const char* y_matrix = "./src/matrix_operations/test_data/random_matrix_2.txt";
+static const size_t kBufferSize = 4 * kSize + 1;
+static const char* x_matrix =
+    "./src/matrix_operations/test_data/random_matrix_1.txt";
+static const char* y_matrix =
+    "./src/matrix_operations/test_data/random_matrix_2.txt";
 
 static void GenerateMatrixInputFile(const char* file_name) {
   FILE* matrix_file;

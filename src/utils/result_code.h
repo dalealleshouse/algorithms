@@ -9,18 +9,6 @@
 
 #include <stdio.h>
 
-#include "./error_reporter.h"
-
-// We may need a better way to log errors, but this will work for now
-#define ERROR(source, result)                                                \
-  {                                                                          \
-    char str[1000];                                                          \
-    snprintf(str, sizeof(str), "%s: %s, %s, %s, %d\n", source,               \
-             Result_ErrorMessage(result), __FILE__, __FUNCTION__, __LINE__); \
-                                                                             \
-    ErrorReporter_Report(result, str);                                       \
-  }
-
 #define PRINT_ERROR(source, result)                                         \
   {                                                                         \
     fprintf(stderr, "%s: %s, %s, %s, %d\n", source,                         \

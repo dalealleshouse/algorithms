@@ -1,10 +1,8 @@
-#include "./floyd_warshall.h"
+#include "floyd_warshall.h"
 
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
-
-#include "../utils/overflow_checker.h"
 
 static void _printSolutions(size_t n, path_length* solutions) {
   printf("\n");
@@ -66,12 +64,12 @@ GraphResult FloydWarshallShortestPath(Graph* graph, path_length** solutions) {
 
         if (previous[v + n * k] != UNINITIALIZED &&
             previous[k + n * w] != UNINITIALIZED) {
-          if (IsAddOverflow_int(previous[v + n * k], previous[k + n * w])) {
+          if (__builtin_add_overflow(previous[v + n * k], previous[k + n * w],
+                                     &case2)) {
             free(previous);
             free(current);
             return Graph_kArithmeticOverflow;
           }
-          case2 = previous[v + n * k] + previous[k + n * w];
         }
 
         current[v + n * w] = (case1 < case2) ? case1 : case2;
