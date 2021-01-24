@@ -552,6 +552,23 @@ static void Heap_Delete_middle_item() {
   });
 }
 
+static void Heap_Delete_all_items() {
+  const size_t n = 10;
+
+  SUT(n, {
+    for (size_t i = 0; i < n; i++) {
+      TestHeapObj* doomed = sut->data[0];
+
+      ResultCode result_code = Heap_Delete(sut, doomed);
+      CU_ASSERT_EQUAL(result_code, kSuccess);
+      CU_ASSERT_EQUAL(n - i - 1, Heap_Size(sut));
+
+      HeapIsValid(sut);
+      TestHeapObj_Destroy(doomed);
+    }
+  });
+}
+
 int RegisterHeapTests() {
   CU_TestInfo Heap_tests[] = {
       CU_TEST_INFO(Heap_Create_null_parameter),
@@ -599,6 +616,7 @@ int RegisterHeapTests() {
       CU_TEST_INFO(Heap_Delete_first_item),
       CU_TEST_INFO(Heap_Delete_last_item),
       CU_TEST_INFO(Heap_Delete_middle_item),
+      CU_TEST_INFO(Heap_Delete_all_items),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Heap",

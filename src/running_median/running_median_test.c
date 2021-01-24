@@ -16,7 +16,7 @@
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
-static const double kEpsilon = 0.0000000000000000001;
+static const double kEpsilon = 0.00000000001;
 
 #define SUT(sliding_window, code_block)                                  \
   {                                                                      \
@@ -178,10 +178,30 @@ static void RunningMedian_sliding_window() {
   double expected[] = {1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
   SUT(sliding_window, {
     for (size_t i = 0; i < n; i++) {
-      RunningMedian_Insert(sut, vals[i]);
+      result_code = RunningMedian_Insert(sut, vals[i]);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+
       median_value result;
       result_code = RunningMedian_Median(sut, &result);
-      CU_ASSERT_EQUAL(kSuccess, result_code);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+      CU_ASSERT_DOUBLE_EQUAL(expected[i], result, kEpsilon);
+    }
+  });
+}
+
+static void RunningMedian_large_sliding_window() {
+  const size_t sliding_window = 5;
+  const size_t n = 10;
+  double vals[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+  double expected[] = {1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+  SUT(sliding_window, {
+    for (size_t i = 0; i < n; i++) {
+      result_code = RunningMedian_Insert(sut, vals[i]);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+
+      median_value result;
+      result_code = RunningMedian_Median(sut, &result);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
       CU_ASSERT_DOUBLE_EQUAL(expected[i], result, kEpsilon);
     }
   });
@@ -230,6 +250,7 @@ int RegisterRunningMedianTests() {
       CU_TEST_INFO(RunningMedian_Median_happy_path),
       CU_TEST_INFO(RunningMedian_Stress),
       CU_TEST_INFO(RunningMedian_sliding_window),
+      CU_TEST_INFO(RunningMedian_large_sliding_window),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "RunningMedian",

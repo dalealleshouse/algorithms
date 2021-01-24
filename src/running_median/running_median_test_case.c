@@ -13,7 +13,7 @@
 #include "running_median.h"
 #include "test_helpers.h"
 
-static const size_t kSize = 10000;
+static const size_t kSize = 100000;
 // Each value is between 1 and 100 - so that's 3 characters plus 1 for the tab
 // Add an additional one to the end for the newline character
 static const size_t kBufferSize = 256;
@@ -76,20 +76,20 @@ static int ReadValuesFromFile(const char* path, size_t n,
   return 0;
 }
 
-static void SumOfMedians() {
-  (void)GenerateRandomFloatingPointFile;
-  /* GenerateRandomFloatingPointFile(kFileName); */
-
+static median_value GetSumOfMedians(size_t sliding_window) {
+  median_value sum = 0;
   ResultCode result_code = kSuccess;
   RunningMedian* rm = NULL;
   median_value(*values)[kSize] = NULL;
 
-  result_code = RunningMedian_Create(&rm, 0);
+  result_code = RunningMedian_Create(&rm, sliding_window);
   if (result_code != kSuccess) goto fail;
 
-  if (ReadValuesFromFile(kFileName, kSize, &values) != 0) goto fail;
+  if (ReadValuesFromFile(kFileName, kSize, &values) != 0) {
+    result_code = kDependancyError;
+    goto fail;
+  }
 
-  median_value sum = 0;
   for (size_t i = 0; i < kSize; i++) {
     result_code = RunningMedian_Insert(rm, (*values)[i]);
     if (result_code != kSuccess) goto fail;
@@ -101,12 +101,27 @@ static void SumOfMedians() {
     sum += median;
   }
 
-  printf("\nThe sum of all median values = %f\n", sum);
-
 fail:
-  if (result_code != kSuccess) PRINT_ERROR("SumOfMedians", result_code);
   RunningMedian_Destroy(rm);
   free(values);
+
+  if (result_code != kSuccess) {
+    PRINT_ERROR("SumOfMedians", result_code);
+    return -1;
+  }
+
+  return sum;
+}
+
+static void SumOfMedians() {
+  (void)GenerateRandomFloatingPointFile;
+  /* GenerateRandomFloatingPointFile(kFileName); */
+
+  median_value sum = GetSumOfMedians(0);
+  printf("\nThe sum of all median values = %f\n", sum);
+
+  sum = GetSumOfMedians(100);
+  printf("\nThe sum of all median values with a sliding window = %f\n", sum);
 }
 
 int RegisterRunningMedianTestCase() {

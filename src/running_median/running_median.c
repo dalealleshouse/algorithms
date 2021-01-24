@@ -84,6 +84,7 @@ static int MinComparator(const void* x, const void* y) {
   return MaxComparator(x, y) * -1;
 }
 
+// WARNING: Makes sure to re-balance the heaps after running this
 static ResultCode MaintainSlidingWindow(RunningMedian* self,
                                         median_value* val) {
   // Use a linked list to track the sliding values
@@ -102,19 +103,16 @@ static ResultCode MaintainSlidingWindow(RunningMedian* self,
     ResultCode result_code = Heap_Peek(self->lower, (void**)&low_limit);
     if (result_code != kSuccess) return result_code;
 
-    Heap* h = (*low_limit <= *doomed) ? self->lower : self->upper;
+    Heap* h = (*doomed <= *low_limit) ? self->lower : self->upper;
 
     // Delete the value that's outside the sliding window
     result_code = Heap_Delete(h, doomed);
     if (result_code != kSuccess) return result_code;
     self->n--;
 
-    result_code = BalanceHeaps(self);
-    if (result_code != kSuccess) return result_code;
-
     // remove the tail value
     result_code =
-        LinkedList_DeleteAt(self->sliding_values, self->sliding_window - 1);
+        LinkedList_DeleteAt(self->sliding_values, self->sliding_window);
     if (result_code != kSuccess) return result_code;
 
     free(doomed);
@@ -210,34 +208,32 @@ ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
 
   *val = value;
 
-  // If not item exist, just put it on the lower heap
   if (self->n == 0) {
+    // If no items exist, just put it on the lower heap
     result_code = Heap_Insert(self->lower, val);
     if (result_code != kSuccess) goto fail;
-    self->n++;
-    return result_code;
+  } else {
+    // Figure out which heap to push the new value on
+    median_value* median = NULL;
+    result_code = Heap_Peek(self->lower, (void**)&median);
+    if (result_code != kSuccess) goto fail;
+
+    Heap* h = (*val < *median) ? self->lower : self->upper;
+
+    result_code = Heap_Insert(h, val);
+    if (result_code != kSuccess) goto fail;
   }
 
-  // Figure out which heap to push the new value on
-  median_value* median = NULL;
-  result_code = Heap_Peek(self->lower, (void**)&median);
-  if (result_code != kSuccess) goto fail;
-
-  Heap* h = (*val < *median) ? self->lower : self->upper;
-
-  result_code = Heap_Insert(h, val);
-  if (result_code != kSuccess) goto fail;
-
   self->n++;
-
-  // Balance the heaps if they need it
-  result_code = BalanceHeaps(self);
-  if (result_code != kSuccess) goto fail;
 
   if (self->sliding_window > 0) {
     result_code = MaintainSlidingWindow(self, val);
     if (result_code != kSuccess) goto fail;
   }
+
+  // Balance the heaps if they need it
+  result_code = BalanceHeaps(self);
+  if (result_code != kSuccess) goto fail;
 
   return kSuccess;
 
