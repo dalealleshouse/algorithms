@@ -13,7 +13,7 @@
 #include "running_median.h"
 #include "test_helpers.h"
 
-static const size_t kSize = 100;
+static const size_t kSize = 10000;
 // Each value is between 1 and 100 - so that's 3 characters plus 1 for the tab
 // Add an additional one to the end for the newline character
 static const size_t kBufferSize = 256;
@@ -84,7 +84,7 @@ static void SumOfMedians() {
   RunningMedian* rm = NULL;
   median_value(*values)[kSize] = NULL;
 
-  result_code = RunningMedian_Create(&rm);
+  result_code = RunningMedian_Create(&rm, 0);
   if (result_code != kSuccess) goto fail;
 
   if (ReadValuesFromFile(kFileName, kSize, &values) != 0) goto fail;

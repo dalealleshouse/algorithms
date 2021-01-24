@@ -161,9 +161,6 @@ static void Heap_Insert_first_item() {
 
   result_code = Heap_Insert(sut, &obj);
 
-  printf("Result Code %d = %s\n\n", result_code,
-         Result_ErrorMessage(result_code));
-
   CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_EQUAL(&obj, sut->data[0]);
   CU_ASSERT_EQUAL(1, sut->n);
@@ -487,6 +484,74 @@ static void Heap_MaxSize_returns_max_size() {
   });
 }
 
+static void Heap_Delete_null_parameter() {
+  ResultCode result = Heap_Delete(NULL, NULL);
+  CU_ASSERT_EQUAL(result, kNullParameter);
+
+  int somePointer;
+  result = Heap_Delete(NULL, &somePointer);
+  CU_ASSERT_EQUAL(result, kNullParameter);
+
+  SUT(10, {
+    result = Heap_Delete(sut, NULL);
+    CU_ASSERT_EQUAL(result, kNullParameter);
+  });
+}
+
+static void Heap_Delete_item_not_found() {
+  SUT(10, {
+    int somePointer;
+    ResultCode result_code = Heap_Delete(sut, &somePointer);
+    CU_ASSERT_EQUAL(result_code, kNotFound);
+    HeapIsValid(sut);
+  });
+}
+
+static void Heap_Delete_first_item() {
+  const size_t n = 10;
+
+  SUT(n, {
+    TestHeapObj* doomed = sut->data[0];
+
+    ResultCode result_code = Heap_Delete(sut, doomed);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    CU_ASSERT_EQUAL(n - 1, Heap_Size(sut));
+
+    HeapIsValid(sut);
+    TestHeapObj_Destroy(doomed);
+  });
+}
+
+static void Heap_Delete_last_item() {
+  const size_t n = 10;
+
+  SUT(n, {
+    TestHeapObj* doomed = sut->data[n - 1];
+
+    ResultCode result_code = Heap_Delete(sut, doomed);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    CU_ASSERT_EQUAL(n - 1, Heap_Size(sut));
+
+    HeapIsValid(sut);
+    TestHeapObj_Destroy(doomed);
+  });
+}
+
+static void Heap_Delete_middle_item() {
+  const size_t n = 10;
+
+  SUT(n, {
+    TestHeapObj* doomed = sut->data[3];
+
+    ResultCode result_code = Heap_Delete(sut, doomed);
+    CU_ASSERT_EQUAL(result_code, kSuccess);
+    CU_ASSERT_EQUAL(n - 1, Heap_Size(sut));
+
+    HeapIsValid(sut);
+    TestHeapObj_Destroy(doomed);
+  });
+}
+
 int RegisterHeapTests() {
   CU_TestInfo Heap_tests[] = {
       CU_TEST_INFO(Heap_Create_null_parameter),
@@ -529,6 +594,11 @@ int RegisterHeapTests() {
       CU_TEST_INFO(Heap_Size_returns_size),
       CU_TEST_INFO(Heap_MaxSize_null_parameter),
       CU_TEST_INFO(Heap_MaxSize_returns_max_size),
+      CU_TEST_INFO(Heap_Delete_null_parameter),
+      CU_TEST_INFO(Heap_Delete_item_not_found),
+      CU_TEST_INFO(Heap_Delete_first_item),
+      CU_TEST_INFO(Heap_Delete_last_item),
+      CU_TEST_INFO(Heap_Delete_middle_item),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Heap",
