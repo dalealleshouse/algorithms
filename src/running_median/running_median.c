@@ -12,13 +12,16 @@
 #include <stdlib.h>
 
 #include "heap.h"
+#include "linked_list.h"
 
 const size_t kInitialHeapSize = 100;
 
 typedef struct RunningMedian {
   Heap* upper;
   Heap* lower;
+  LinkedList* sliding_values;
   size_t n;
+  size_t sliding_window;
 } RunningMedian;
 
 static bool IsBalanced(RunningMedian* self) {
@@ -81,6 +84,43 @@ static int MinComparator(const void* x, const void* y) {
   return MaxComparator(x, y) * -1;
 }
 
+// WARNING: Makes sure to re-balance the heaps after running this
+static ResultCode MaintainSlidingWindow(RunningMedian* self,
+                                        median_value* val) {
+  // Use a linked list to track the sliding values
+  // new items are always inserted at the front, the oldest items will always be
+  // at the back. This makes it easy to know which item to delete
+
+  // Insert new values at the head
+  LinkedList_InsertAt(self->sliding_values, val, 0);
+
+  if (self->n > self->sliding_window) {
+    // Remove values stored at the tail
+    median_value* doomed = self->sliding_values->tail->payload;
+
+    // Figure out which heap the doomed value is in
+    median_value* low_limit = NULL;
+    ResultCode result_code = Heap_Peek(self->lower, (void**)&low_limit);
+    if (result_code != kSuccess) return result_code;
+
+    Heap* h = (*doomed <= *low_limit) ? self->lower : self->upper;
+
+    // Delete the value that's outside the sliding window
+    result_code = Heap_Delete(h, doomed);
+    if (result_code != kSuccess) return result_code;
+    self->n--;
+
+    // remove the tail value
+    result_code =
+        LinkedList_DeleteAt(self->sliding_values, self->sliding_window);
+    if (result_code != kSuccess) return result_code;
+
+    free(doomed);
+  }
+
+  return kSuccess;
+}
+
 ResultCode RunningMedian_Median(RunningMedian* self, median_value* result) {
   ResultCode result_code;
 
@@ -123,7 +163,7 @@ size_t RunningMedian_GetN(RunningMedian* self) {
   return self->n;
 }
 
-ResultCode RunningMedian_Create(RunningMedian** result) {
+ResultCode RunningMedian_Create(RunningMedian** result, size_t sliding_window) {
   ResultCode result_code = kSuccess;
 
   if (result == NULL) return kNullParameter;
@@ -139,6 +179,12 @@ ResultCode RunningMedian_Create(RunningMedian** result) {
   rm->lower = NULL;
   result_code = Heap_Create(kInitialHeapSize, MaxComparator, &rm->lower);
   if (result_code != kSuccess) goto error;
+
+  rm->sliding_values = NULL;
+  rm->sliding_window = sliding_window;
+  if (rm->sliding_window > 0) {
+    result_code = LinkedList_Create(NULL, NULL, &rm->sliding_values);
+  }
 
   rm->n = 0;
   *result = rm;
@@ -162,26 +208,28 @@ ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
 
   *val = value;
 
-  // If not item exist, just put it on the lower heap
   if (self->n == 0) {
+    // If no items exist, just put it on the lower heap
     result_code = Heap_Insert(self->lower, val);
     if (result_code != kSuccess) goto fail;
-    self->n++;
-    return result_code;
+  } else {
+    // Figure out which heap to push the new value on
+    median_value* median = NULL;
+    result_code = Heap_Peek(self->lower, (void**)&median);
+    if (result_code != kSuccess) goto fail;
+
+    Heap* h = (*val < *median) ? self->lower : self->upper;
+
+    result_code = Heap_Insert(h, val);
+    if (result_code != kSuccess) goto fail;
   }
 
-  // Figure out which heap to push the new value on
-  median_value* median = NULL;
-  result_code = Heap_Peek(self->lower, (void**)&median);
-  if (result_code != kSuccess) goto fail;
-
-  Heap* h = (*val < *median) ? self->lower : self->upper;
-
-  // Insert the value
-  result_code = Heap_Insert(h, val);
-  if (result_code != kSuccess) goto fail;
-
   self->n++;
+
+  if (self->sliding_window > 0) {
+    result_code = MaintainSlidingWindow(self, val);
+    if (result_code != kSuccess) goto fail;
+  }
 
   // Balance the heaps if they need it
   result_code = BalanceHeaps(self);
@@ -199,5 +247,6 @@ void RunningMedian_Destroy(RunningMedian* self) {
 
   Heap_Destroy(self->upper, free);
   Heap_Destroy(self->lower, free);
+  LinkedList_Destroy(self->sliding_values);
   free(self);
 }

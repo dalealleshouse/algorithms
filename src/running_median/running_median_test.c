@@ -16,15 +16,15 @@
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
-static const double kEpsilon = 0.0000000000000000001;
+static const double kEpsilon = 0.00000000001;
 
-#define SUT(code_block)                                  \
-  {                                                      \
-    RunningMedian* sut = NULL;                           \
-    ResultCode result_code = RunningMedian_Create(&sut); \
-    CU_ASSERT_EQUAL(kSuccess, result_code);              \
-    code_block;                                          \
-    RunningMedian_Destroy(sut);                          \
+#define SUT(sliding_window, code_block)                                  \
+  {                                                                      \
+    RunningMedian* sut = NULL;                                           \
+    ResultCode result_code = RunningMedian_Create(&sut, sliding_window); \
+    CU_ASSERT_EQUAL(kSuccess, result_code);                              \
+    code_block;                                                          \
+    RunningMedian_Destroy(sut);                                          \
   }
 
 static void RunningMedian_Create_failed_mem_allocation() {
@@ -33,7 +33,7 @@ static void RunningMedian_Create_failed_mem_allocation() {
   RunningMedian* sut = NULL;
 
   FAILED_MALLOC_TEST({
-    result_code = RunningMedian_Create(&sut);
+    result_code = RunningMedian_Create(&sut, 0);
     CU_ASSERT_PTR_NULL(sut);
     CU_ASSERT_EQUAL(kFailedMemoryAllocation, result_code);
   });
@@ -42,7 +42,7 @@ static void RunningMedian_Create_failed_mem_allocation() {
 
 static void RunningMedian_Create_happy_path() {
   RunningMedian* sut = NULL;
-  ResultCode result_code = RunningMedian_Create(&sut);
+  ResultCode result_code = RunningMedian_Create(&sut, 10);
   CU_ASSERT_EQUAL(kSuccess, result_code);
   CU_ASSERT_PTR_NOT_NULL(sut);
 
@@ -50,11 +50,11 @@ static void RunningMedian_Create_happy_path() {
 }
 
 static void RunningMedian_Create_null_parameter() {
-  ResultCode result_code = RunningMedian_Create(NULL);
+  ResultCode result_code = RunningMedian_Create(NULL, 0);
   CU_ASSERT_EQUAL(kNullParameter, result_code);
 
   RunningMedian* sut = malloc(1);
-  result_code = RunningMedian_Create(&sut);
+  result_code = RunningMedian_Create(&sut, 0);
   CU_ASSERT_EQUAL(kOutputPointerIsNotNull, result_code);
 
   free(sut);
@@ -67,7 +67,7 @@ static void RunningMedian_Insert_null_parameter() {
 
 static void RunningMedian_Insert_failed_mem_allocation() {
 #if !defined(NDEBUG)
-  SUT({
+  SUT(0, {
     FAILED_MALLOC_TEST({
       result_code = RunningMedian_Insert(sut, 5.0);
       CU_ASSERT_EQUAL(kFailedMemoryAllocation, result_code);
@@ -77,7 +77,7 @@ static void RunningMedian_Insert_failed_mem_allocation() {
 }
 
 static void RunningMedian_Insert_nan_or_inf() {
-  SUT({
+  SUT(0, {
     result_code = RunningMedian_Insert(sut, NAN);
     CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
 
@@ -90,7 +90,7 @@ static void RunningMedian_Insert_nan_or_inf() {
 }
 
 static void RunningMedian_Insert_happy_path() {
-  SUT({
+  SUT(0, {
     for (size_t i = 1; i <= 10; i++) {
       result_code = RunningMedian_Insert(sut, i);
       CU_ASSERT_EQUAL(kSuccess, result_code);
@@ -112,7 +112,7 @@ static void RunningMedian_Median_null_parameter() {
 }
 
 static void RunningMedian_Median_empty() {
-  SUT({
+  SUT(0, {
     median_value result;
     ResultCode result_code = RunningMedian_Median(sut, &result);
     CU_ASSERT_EQUAL(kEmpty, result_code);
@@ -121,7 +121,7 @@ static void RunningMedian_Median_empty() {
 
 static void RunningMedian_Median_one_value() {
   const double expected = 5.5;
-  SUT({
+  SUT(0, {
     median_value result;
     RunningMedian_Insert(sut, expected);
     ResultCode result_code = RunningMedian_Median(sut, &result);
@@ -132,7 +132,7 @@ static void RunningMedian_Median_one_value() {
 
 static void RunningMedian_Median_two_values() {
   const double expected = 5.5;
-  SUT({
+  SUT(0, {
     RunningMedian_Insert(sut, 6);
     RunningMedian_Insert(sut, 5);
     median_value result;
@@ -147,7 +147,7 @@ static void RunningMedian_Median_happy_path() {
   const size_t n = 10;
   double vals[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
   double expected[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5};
-  SUT({
+  SUT(0, {
     for (size_t i = 0; i < n; i++) {
       RunningMedian_Insert(sut, vals[i]);
       median_value result;
@@ -159,7 +159,7 @@ static void RunningMedian_Median_happy_path() {
 }
 
 static void RunningMedian_Median_arit_overflow() {
-  SUT({
+  SUT(0, {
     RunningMedian_Insert(sut, DBL_MAX);
     RunningMedian_Insert(sut, DBL_MAX);
 
@@ -171,6 +171,42 @@ static void RunningMedian_Median_arit_overflow() {
   });
 }
 
+static void RunningMedian_sliding_window() {
+  const size_t sliding_window = 3;
+  const size_t n = 10;
+  double vals[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+  double expected[] = {1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+  SUT(sliding_window, {
+    for (size_t i = 0; i < n; i++) {
+      result_code = RunningMedian_Insert(sut, vals[i]);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+
+      median_value result;
+      result_code = RunningMedian_Median(sut, &result);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+      CU_ASSERT_DOUBLE_EQUAL(expected[i], result, kEpsilon);
+    }
+  });
+}
+
+static void RunningMedian_large_sliding_window() {
+  const size_t sliding_window = 5;
+  const size_t n = 10;
+  double vals[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+  double expected[] = {1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+  SUT(sliding_window, {
+    for (size_t i = 0; i < n; i++) {
+      result_code = RunningMedian_Insert(sut, vals[i]);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+
+      median_value result;
+      result_code = RunningMedian_Median(sut, &result);
+      CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
+      CU_ASSERT_DOUBLE_EQUAL(expected[i], result, kEpsilon);
+    }
+  });
+}
+
 static void RunningMedian_Stress() {
   const char* PATH = "src/running_median/test_data/median.txt";
   const size_t BUFFER_SIZE = 1024;
@@ -179,7 +215,7 @@ static void RunningMedian_Stress() {
   char line[BUFFER_SIZE];
   median_value running_total = 0.0;
 
-  SUT({
+  SUT(0, {
     char* end;
     while (fgets(line, BUFFER_SIZE, file)) {
       median_value d = strtol(line, &end, 10);
@@ -213,6 +249,8 @@ int RegisterRunningMedianTests() {
       CU_TEST_INFO(RunningMedian_Median_arit_overflow),
       CU_TEST_INFO(RunningMedian_Median_happy_path),
       CU_TEST_INFO(RunningMedian_Stress),
+      CU_TEST_INFO(RunningMedian_sliding_window),
+      CU_TEST_INFO(RunningMedian_large_sliding_window),
       CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "RunningMedian",

@@ -22,6 +22,7 @@ ResultCode Heap_Create(size_t, sort_strategy, Heap**);
 ResultCode Heap_Insert(Heap*, void*);
 ResultCode Heap_Resize(Heap*, size_t);
 ResultCode Heap_Reproiritize(Heap*, void*);
+ResultCode Heap_Delete(Heap*, void*);
 ResultCode Heap_Extract(Heap*, void**);
 ResultCode Heap_Peek(Heap*, void**);
 

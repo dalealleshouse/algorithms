@@ -132,9 +132,8 @@ int RegisterTests() {
       RegisterInsertionSortTestCase() != 0 +
       RegisterSortInstrumentationTestCase() != 0 +
       RegisterMatrixOperationTestCase() != 0 +
-#else
       RegisterRunningMedianTestCase() != 0 +
-
+#else
       // Unit tests
       RegisterGraphTests() != 0 +
       RegisterMathTests() != 0 +

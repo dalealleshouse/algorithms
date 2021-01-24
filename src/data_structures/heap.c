@@ -39,7 +39,7 @@ static ResultCode SetDataItem(Heap* self, void* item, size_t index) {
 
   free(existing);
 
-  // Geta a new index
+  // Get a new index
   size_t* i = malloc(sizeof(index));
   if (i == NULL) return kFailedMemoryAllocation;
 
@@ -57,11 +57,7 @@ static ResultCode Swap(Heap* self, size_t x, size_t y) {
   ResultCode result = SetDataItem(self, self->data[y], x);
   if (result != kSuccess) return result;
 
-  result = SetDataItem(self, temp, y);
-  if (result != kSuccess) return result;
-  /* data[x] = data[y]; */
-  /* data[y] = temp; */
-  return kSuccess;
+  return SetDataItem(self, temp, y);
 }
 
 static ResultCode BubbleUp(Heap* self, size_t start) {
@@ -256,6 +252,23 @@ ResultCode Heap_Reproiritize(Heap* self, void* item) {
 
   // The only other option is less so bubble it down
   return BubbleDown(self, *index);
+}
+
+ResultCode Heap_Delete(Heap* self, void* item) {
+  if (self == NULL || item == NULL) return kNullParameter;
+
+  size_t* index = NULL;
+  ResultCode result_code =
+      HashTable_Get(self->item_tracker, &item, sizeof(void*), (void**)&index);
+  if (result_code != kSuccess) return result_code;
+
+  self->n--;
+
+  size_t index_t = *index;
+  result_code = Swap(self, index_t, self->n);
+  if (result_code != kSuccess) return result_code;
+
+  return Heap_Reproiritize(self, self->data[index_t]);
 }
 
 size_t Heap_Size(Heap* self) {
