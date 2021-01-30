@@ -9,38 +9,65 @@
 
 #include <stddef.h>
 
-typedef struct point {
-  double x;
-  double y;
-} point_t;
+#include "result_code.h"
 
-typedef struct point_dist {
-  point_t p1;
-  point_t p2;
-  double dist;
-} point_dist_t;
+typedef double Coordinate;
+
+extern Coordinate kCorrdinateMax;
+extern Coordinate kCorrdinateMin;
+
+typedef struct Point {
+  Coordinate x;
+  Coordinate y;
+} Point;
+
+typedef struct PointDistance {
+  Point p1;
+  Point p2;
+  Coordinate dist;
+} PointDistance;
+
+typedef ResultCode (*ClosestPairAlgo)(const size_t n, const Point points[n],
+                                      PointDistance* result);
 
 /*
  * Calculates the Euclidean distance between two points
  *
- * returns: 0 on kkSuccess and a negative number on failure
+ * params:
+ *  <p1>     the first point
+ *  <p2>     the second point
+ *  <result> output parameter that will be set to result
+ *
+ * returns:
+ *  Result code indicating kSuccess or failure code
  */
-int euclid_dist(const point_t* p1, const point_t* p2, double* result);
+ResultCode EuclideanDistance(const Point* p1, const Point* p2,
+                             Coordinate* result);
 
 /*
  * Finds the closest points in the array
  *
  * params:
- *  - n = length of input array
- *  - points = array of point objects
- *  - result = object to populate with calculation results
+ *  <n>      length of input array (must be >= 2)
+ *  <points> array of point objects
+ *  <result> object to populate with calculation results
  *
- * returns: 0 on kkSuccess, negative value on failure
+ * returns:
+ *  Result code indicating kSuccess or failure code
  */
-int closest_distance(const size_t n, const point_t points[n],
-                     point_dist_t* result);
+ResultCode ClosestPair_Naive(const size_t n, const Point points[n],
+                             PointDistance* result);
 
-int closest_slow(const size_t n, const point_t points[n], point_dist_t* result);
-
-void Closest_slow(const size_t n, const point_t points[n],
-                  point_dist_t* result);
+/*
+ * Finds the closest points in the array
+ *
+ * params:
+ *  <n>      length of input array (must be >= 2)
+ *  <points> array of point objects
+ *  <result> object to populate with calculation results
+ *
+ * returns:
+ *  Result code indicating kSuccess or failure code
+ */
+ResultCode ClosestPair(const size_t n, const Point points[n],
+                       PointDistance* result);
