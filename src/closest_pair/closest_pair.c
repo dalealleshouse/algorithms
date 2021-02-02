@@ -16,7 +16,11 @@
 Coordinate kCorrdinateMax = DBL_MAX;
 Coordinate kCorrdinateMin = DBL_MIN;
 
-static int PointXComparator(const void* x, const void* y) {
+typedef Coordinate (*Getter)(Point* point);
+static Coordinate XGetter(Point* point) { return point->x; }
+static Coordinate YGetter(Point* point) { return point->y; }
+
+static int PointComparator(const void* x, const void* y, Getter getter) {
   if (x == y) return 0;
   if (x == NULL) return -1;
   if (y == NULL) return 1;
@@ -24,29 +28,25 @@ static int PointXComparator(const void* x, const void* y) {
   Point* p1 = (Point*)x;
   Point* p2 = (Point*)y;
 
-  Coordinate test_result = p1->x - p2->x;
+  Coordinate test_result = getter(p1) - getter(p2);
   if (test_result > 0) return 1;
   if (test_result < 0) return -1;
   return 0;
 }
 
+static int PointXComparator(const void* x, const void* y) {
+  return PointComparator(x, y, XGetter);
+}
+
 static int PointYComparator(const void* x, const void* y) {
-  if (x == y) return 0;
-  if (x == NULL) return -1;
-  if (y == NULL) return 1;
-
-  Point* p1 = (Point*)x;
-  Point* p2 = (Point*)y;
-
-  Coordinate test_result = p1->y - p2->y;
-  if (test_result > 0) return 1;
-  if (test_result < 0) return -1;
-  return 0;
+  return PointComparator(x, y, YGetter);
 }
 
 static ResultCode ClosestPair_Recursive(const size_t n, const Point by_x[n],
                                         const Point by_y[n],
                                         PointDistance* result) {
+  ResultCode result_code;
+
   // Base case
   if (n <= 3) return ClosestPair_Naive(n, by_x, result);
 
@@ -80,7 +80,6 @@ static ResultCode ClosestPair_Recursive(const size_t n, const Point by_x[n],
   PointDistance left_closest = {.dist = 0};
   PointDistance right_closest = {.dist = 0};
 
-  ResultCode result_code;
   result_code = ClosestPair_Recursive(left_half, left_x, left_y, &left_closest);
   if (result_code != kSuccess) return result_code;
 

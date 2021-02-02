@@ -50,7 +50,7 @@ static void ClosestPair_test_driver(ClosestPairAlgo algo) {
   ClosestPair_tester(algo, n2, points2, expected, 0, 3);
 }
 
-Coordinate drand(Coordinate low, Coordinate high) {
+static Coordinate drand(Coordinate low, Coordinate high) {
   return ((Coordinate)random() * (high - low)) / (Coordinate)RAND_MAX + low;
 }
 
