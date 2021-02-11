@@ -8,12 +8,11 @@
 ******************************************************************************/
 """
 import ctypes
-import sys
+from matplotlib import pyplot as plt  # noqa
 from enum import IntEnum
 import statistics
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib import pyplot as plt #noqa
 
 lib = ctypes.CDLL('./algo.so')
 
@@ -50,6 +49,7 @@ class ArrayType(CtypesEnum):
 
 lib.sort_time.argtypes = [ctypes.c_size_t, ArrayType, SortingAlgo]
 lib.sort_time.restype = ctypes.c_double
+
 
 def format_name(enum_val):
     return enum_val.name.replace('_', ' ').title()
@@ -121,11 +121,11 @@ def generate_chart(arr_type, algos, save_as):
 if __name__ == "__main__":
     for arr_type in ArrayType:
         generate_chart(arr_type, [SortingAlgo.C_QSORT, SortingAlgo.BUBBLE,
-                                  SortingAlgo.INSERTION, SortingAlgo.SELECTION,
-                                  SortingAlgo.QUICK, SortingAlgo.MERGE],
+                       SortingAlgo.INSERTION, SortingAlgo.SELECTION,
+                       SortingAlgo.QUICK, SortingAlgo.MERGE],
                        "")
 
         generate_chart(arr_type, [SortingAlgo.PIVOT_ON_LAST,
-                                  SortingAlgo.PIVOT_ON_FIRST,
-                                  SortingAlgo.PIVOT_ON_RANDOM],
+                       SortingAlgo.PIVOT_ON_FIRST,
+                       SortingAlgo.PIVOT_ON_RANDOM],
                        "PIVOT-")

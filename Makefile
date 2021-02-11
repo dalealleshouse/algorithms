@@ -23,6 +23,9 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) $(WRAPFLAGS) -o $(TARGET)
 	ASAN_OPTIONS=detect_leaks=1 ./$(TARGET)
 
+build-only: $(SOURCES)
+	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(RELEASEFLAGS) -o $(TARGET) $(SOURCES) $(LINKFLAGS)
+
 release: $(SOURCES)
 	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(RELEASEFLAGS) -o $(TARGET) $(SOURCES) $(LINKFLAGS)
 	./$(TARGET)
@@ -60,7 +63,7 @@ ctags:
 	ctags -R .
 
 comp-db:
-	bear -- make -B
+	bear -- make -B build-only
 
 lint:
 	cpplint src/*.[ch] src/*/*.[ch]

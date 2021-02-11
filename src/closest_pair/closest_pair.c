@@ -7,76 +7,171 @@
  ******************************************************************************/
 #include "closest_pair.h"
 
+#include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void print_error(const char* err) {
-#ifdef _DEBUG
-  fprintf(stderr, "%s\n", err);
-#else
-  (void)err;
-#endif
+Coordinate kCoordinateMax = DBL_MAX;
+Coordinate kCoordinateMin = DBL_MIN;
+Coordinate kEpsilion = 0.00000001;
+
+typedef Coordinate (*Getter)(Point* point);
+static Coordinate XGetter(Point* point) { return point->x; }
+static Coordinate YGetter(Point* point) { return point->y; }
+
+static int PointComparator(const void* x, const void* y, Getter getter) {
+  if (x == y) return 0;
+  if (x == NULL) return -1;
+  if (y == NULL) return 1;
+
+  Point* p1 = (Point*)x;
+  Point* p2 = (Point*)y;
+
+  Coordinate test_result = getter(p1) - getter(p2);
+  if (test_result > 0) return 1;
+  if (test_result < 0) return -1;
+  return 0;
 }
 
-void _print_point(const point_t* p) { printf("x=%f, y=%f\n", p->x, p->y); }
+static int PointXComparator(const void* x, const void* y) {
+  if (CoordinatesAreEqual(((Point*)x)->x, ((Point*)y)->x)) {
+    return PointComparator(x, y, YGetter);
+  }
 
-int euclid_dist(const point_t* p1, const point_t* p2, double* result) {
-  if (p1 == NULL || p2 == NULL || result == NULL) return -1;
+  return PointComparator(x, y, XGetter);
+}
+
+static int PointYComparator(const void* x, const void* y) {
+  return PointComparator(x, y, YGetter);
+}
+
+static ResultCode ClosestPair_Recursive(const size_t n, const Point by_x[n],
+                                        const Point by_y[n],
+                                        PointDistance* result) {
+  ResultCode result_code;
+
+  // Base case
+  if (n <= 3) return ClosestPair_Naive(n, by_x, result);
+
+  // Split the array up into right and left halves
+  size_t left_half = n >> 1;
+  size_t right_half = n - left_half;
+
+  // left and right halves sorted by x
+  const Point* left_x = by_x;
+  const Point* right_x = &by_x[left_half];
+
+  // We need left and right halves sorted by y. These halves need to contain
+  // the same points as the sorted by x halves. It would be possible to
+  // simply sort them again using qsort, but that would raise the
+  // computational complexity. In order to achieve O(n log(n)) this step must
+  // be in linear time - O(n). We use the midpoint of the x value to split
+  // the y sorted array into two parts.
+  Point mid_point = by_x[left_half];
+  Point(*left_y)[left_half] = malloc(sizeof(*left_y));
+  if (left_y == NULL) return kFailedMemoryAllocation;
+
+  Point(*right_y)[right_half] = malloc(sizeof(*right_y));
+  if (right_y == NULL) {
+    free(left_y);
+    return kFailedMemoryAllocation;
+  }
+
+  size_t left = 0, right = 0;
+  for (size_t i = 0; i < n; ++i) {
+    if (CoordinatesAreEqual(mid_point.x, by_y[i].x)) {
+      if (by_y[i].y < mid_point.y) {
+        (*left_y)[left++] = by_y[i];
+      } else {
+        (*right_y)[right++] = by_y[i];
+      }
+    } else if (by_y[i].x < mid_point.x) {
+      (*left_y)[left++] = by_y[i];
+    } else {
+      (*right_y)[right++] = by_y[i];
+    }
+  }
+
+  PointDistance left_closest = {.dist = 0};
+  PointDistance right_closest = {.dist = 0};
+
+  result_code =
+      ClosestPair_Recursive(left_half, left_x, *left_y, &left_closest);
+  if (result_code != kSuccess) return result_code;
+  free(left_y);
+
+  result_code =
+      ClosestPair_Recursive(right_half, right_x, *right_y, &right_closest);
+  if (result_code != kSuccess) return result_code;
+  free(right_y);
+
+  PointDistance min =
+      (left_closest.dist < right_closest.dist) ? left_closest : right_closest;
+
+  // Find points closest to the vertical line
+  Point(*strip)[n] = malloc(sizeof(*strip));
+  if (strip == NULL) return kFailedMemoryAllocation;
+
+  size_t size = 0;
+
+  for (size_t i = 0; i < n; ++i) {
+    if (fabs(by_y[i].x - mid_point.x) < min.dist) {
+      (*strip)[size] = by_y[i];
+      size++;
+    }
+  }
+
+  for (size_t i = 0; i < size; ++i) {
+    // As strange as it sounds, this will never run more than 6 times
+    for (size_t j = i + 1;
+         j < size && ((*strip)[j].y - (*strip)[i].y) < min.dist; ++j) {
+      Coordinate temp;
+      result_code = EuclideanDistance(&(*strip)[i], &(*strip)[j], &temp);
+      if (result_code != kSuccess) return result_code;
+
+      if (temp < min.dist) {
+        min.dist = temp;
+        min.p1 = (*strip)[j];
+        min.p2 = (*strip)[i];
+      }
+    }
+  }
+
+  free(strip);
+
+  *result = min;
+  return kSuccess;
+}
+
+bool CoordinatesAreEqual(Coordinate c1, Coordinate c2) {
+  return fabs(c1 - c2) < kEpsilion;
+}
+
+ResultCode EuclideanDistance(const Point* p1, const Point* p2,
+                             Coordinate* result) {
+  if (p1 == NULL || p2 == NULL || result == NULL) return kNullParameter;
 
   *result = sqrt(pow(p1->x - p2->x, 2) + pow(p1->y - p2->y, 2));
 
-  if (!isfinite(*result)) return -2;
-
-  return 0;
+  return (!isnormal(*result) && *result != 0) ? kArithmeticOverflow : kSuccess;
 }
 
-int _point_comparator(const void* x, const void* y,
-                      double (*comparator)(point_t*, point_t*)) {
-  if (x == y) return 0;
+ResultCode ClosestPair_Naive(const size_t n, const Point points[n],
+                             PointDistance* result) {
+  if (points == NULL || result == NULL) return kNullParameter;
+  if (n <= 1) return kArgumentOutOfRange;
 
-  if (x == NULL) return -1;
+  result->dist = kCoordinateMax;
 
-  if (y == NULL) return 1;
+  for (size_t i = 0; i < n; ++i) {
+    for (size_t j = i + 1; j < n; ++j) {
+      Coordinate dist;
+      ResultCode result_code = EuclideanDistance(&points[i], &points[j], &dist);
+      if (result_code != kSuccess) return result_code;
 
-  point_t* p1 = (point_t*)x;
-  point_t* p2 = (point_t*)y;
-
-  double test_result = comparator(p1, p2);
-  if (test_result > 0) return 1;
-
-  if (test_result < 0) return -1;
-
-  return 0;
-}
-
-double _x_comparator(point_t* p1, point_t* p2) { return p1->x - p2->x; }
-
-double _y_comparator(point_t* p1, point_t* p2) { return p1->y - p2->y; }
-
-int _point_x_comparator(const void* x, const void* y) {
-  return _point_comparator(x, y, _x_comparator);
-}
-int _point_y_comparator(const void* x, const void* y) {
-  return _point_comparator(x, y, _y_comparator);
-}
-
-int closest_slow(const size_t n, const point_t points[n],
-                 point_dist_t* result) {
-  if (points == NULL || result == NULL) return -1;
-
-  if (n <= 1) {
-    print_error("when calling closest_slow, n must be greater than 1");
-    return -2;
-  }
-
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = i + 1; j < n; j++) {
-      double dist;
-      if (euclid_dist(&points[i], &points[j], &dist) != 0) return -3;
-
-      if (dist < result->dist || (i == 0 && j == 1)) {
+      if (dist < result->dist) {
         result->p1 = points[i];
         result->p2 = points[j];
         result->dist = dist;
@@ -84,139 +179,34 @@ int closest_slow(const size_t n, const point_t points[n],
     }
   }
 
-  return 0;
+  return kSuccess;
 }
 
-point_dist_t* min(point_dist_t* x, point_dist_t* y) {
-  if (x == NULL || y == NULL) return NULL;
-
-  return (x->dist < y->dist) ? x : y;
-}
-
-int _closest_split(const size_t n, const point_t by_x[n], const point_t by_y[n],
-                   const point_dist_t* delta, point_dist_t* result) {
-  if (by_x == NULL || by_y == NULL || result == NULL) return -1;
-
-  if (n <= 1) {
-    print_error("when calling _closest_split, n must be greater than 1");
-    return -2;
-  }
-
-  // Find the median x point
-  const double x_bar = by_x[n / 2 - 1].x;
-
-  // Find the point that are less than delta away from the x_bar
-  const double high_x = x_bar + delta->dist;
-  const double low_x = x_bar - delta->dist;
-  int length = 0;
-  point_t strip[n];
-  for (size_t i = 0; i < n; i++) {
-    if (by_y[i].x < high_x && by_y[i].x > low_x) strip[length++] = by_y[i];
-  }
-
-  *result = *delta;
-  for (int i = 0; i < length - 1; i++) {
-    // This is crazy, but the closest pair in the split set is guaranteed
-    // to be no more then 7 places away when the set of points is sorted by
-    // y. This inner loop is considered constant time b/c there is a finite
-    // number of iterations regardless of the size of the input
-    for (int j = i + 1; j < i + 7 && i + j < length; j++) {
-      double dist;
-      if (euclid_dist(&strip[i], &strip[i + j], &dist) < 0) return -3;
-
-      if (dist < result->dist) {
-        result->dist = dist;
-        result->p1 = strip[i];
-        result->p2 = strip[i + j];
-      }
-    }
-  }
-
-  return 0;
-}
-
-int _closest_distance(const size_t n, const point_t by_x[n],
-                      const point_t by_y[n], point_dist_t* result) {
-  if (by_x == NULL || by_y == NULL || result == NULL) {
-    print_error("null pointer passed to _closest_distance");
-    return -1;
-  }
-
-  if (n <= 1) {
-    print_error("when calling _closest_distance, n must be greater than 1");
-    return -2;
-  }
-
-  // Base case
-  if (n <= 3) return closest_slow(n, by_x, result);
-
-  // Split the array up into right and left halves
-  int left_half = n / 2;
-  int right_half = n - left_half;
-
-  // left and right halves sorted by x
-  const point_t* left_x = by_x;
-  const point_t* right_x = &by_x[left_half];
-
-  // We need left and right halves sorted by y. These halves need to contain
-  // the same points as the sorted by x halves. It would be possible to
-  // simply sort them again using qsort, but that would raise the
-  // computational complexity. In order to achive O(n log(n)) this step must
-  // be in linear time - O(n). We use the midpoint of the x value to split
-  // the y sorted array into two parts.
-  //
-  // WARNING: If there are identical x values, this will fail. I'll come back
-  // and fix this shortcoming later
-  double mid_point = by_x[left_half].x;
-  point_t left_y[left_half];
-  point_t right_y[right_half];
-
-  int left = 0, right = 0;
-  for (size_t i = 0; i < n; i++) {
-    if (by_y[i].x < mid_point) {
-      left_y[left++] = by_y[i];
-    } else {
-      right_y[right++] = by_y[i];
-    }
-  }
-
-  point_dist_t left_closest = {.dist = 0};
-  point_dist_t right_closest = {.dist = 0};
-
-  int result_r;
-  if ((result_r =
-           _closest_distance(left_half, left_x, left_y, &left_closest)) != 0) {
-    return result_r;
-  }
-
-  if ((result_r = _closest_distance(right_half, right_x, right_y,
-                                    &right_closest)) != 0) {
-    return result_r;
-  }
-
-  point_dist_t l_delta = *min(&left_closest, &right_closest);
-  if ((result_r = _closest_split(n, by_x, by_y, &l_delta, result)) != 0) {
-    return result_r;
-  }
-
-  return 0;
-}
-
-int closest_distance(const size_t n, const point_t points[n],
-                     point_dist_t* result) {
-  if (points == NULL || result == NULL || n < 1) return -1;
+ResultCode ClosestPair(const size_t n, const Point points[n],
+                       PointDistance* result) {
+  if (points == NULL || result == NULL) return kNullParameter;
+  if (n <= 1) return kArgumentOutOfRange;
 
   size_t p_size = sizeof(points[0]);
   size_t arr_size = p_size * n;
 
-  point_t by_x[n];
-  point_t by_y[n];
+  // Create two copies of the points
+  Point(*by_x)[n] = malloc(sizeof(*by_x));
+  if (by_x == NULL) return kFailedMemoryAllocation;
+
+  Point(*by_y)[n] = malloc(sizeof(*by_y));
+  if (by_x == NULL) return kFailedMemoryAllocation;
 
   memcpy(by_x, points, arr_size);
   memcpy(by_y, points, arr_size);
 
-  qsort(by_x, n, p_size, _point_x_comparator);
-  qsort(by_y, n, p_size, _point_y_comparator);
+  // Sort the points
+  qsort(by_x, n, p_size, PointXComparator);  // sort by x, then by y
+  qsort(by_y, n, p_size, PointYComparator);  // sort by y
 
-  return _closest_distance(n, by_x, by_y, result);
+  ResultCode result_code = ClosestPair_Recursive(n, *by_x, *by_y, result);
+  free(by_x);
+  free(by_y);
+
+  return result_code;
 }

@@ -1,10 +1,9 @@
+from matplotlib import pyplot as plt  # noqa
 import ctypes
-import sys
 from enum import IntEnum
 import statistics
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib import pyplot as plt #noqa
 
 lib = ctypes.CDLL('./algo.so')
 
@@ -26,6 +25,7 @@ class Algo(CtypesEnum):
 
 lib.SelectTime.argtypes = [ctypes.c_size_t, Algo]
 lib.SelectTime.restype = ctypes.c_double
+
 
 def format_name(enum_val):
     return enum_val.name.replace('_', ' ').title()

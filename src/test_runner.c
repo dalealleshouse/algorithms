@@ -94,9 +94,8 @@ extern int RegisterWeightedIndependentSetTests();
 extern int RegisterMallocTestWrapperTests();
 
 // Cloest Distance
-extern int RegisterEuclidDistTests();
 extern int RegisterClosestDistanceTests();
-extern int RegisterClosestDistanceSlowTests();
+extern int RegisterClosestPairTestCase();
 
 // Quick Select
 extern int RegisterSelectTests();
@@ -133,6 +132,7 @@ int RegisterTests() {
       RegisterSortInstrumentationTestCase() != 0 +
       RegisterMatrixOperationTestCase() != 0 +
       RegisterRunningMedianTestCase() != 0 +
+      RegisterClosestPairTestCase() != 0 +
 #else
       // Unit tests
       RegisterGraphTests() != 0 +
@@ -173,9 +173,7 @@ int RegisterTests() {
       RegisterMallocTestWrapperTests() != 0 +
       RegisterMinSpanningTreeTests() != 0 +
       RegisterKruskalClusterTests() != 0 +
-      RegisterEuclidDistTests() != 0 +
       RegisterClosestDistanceTests() != 0 +
-      RegisterClosestDistanceSlowTests() != 0 +
       RegisterSelectTests() != 0 +
       RegisterQuickSelectTests() != 0 +
       RegisterInversionCountTests() != 0 +
