@@ -7,14 +7,15 @@
  ******************************************************************************/
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "result_code.h"
 
 typedef double Coordinate;
 
-extern Coordinate kCorrdinateMax;
-extern Coordinate kCorrdinateMin;
+extern Coordinate kCoordinateMax;
+extern Coordinate kCoordinateMin;
 
 typedef struct Point {
   Coordinate x;
@@ -29,6 +30,8 @@ typedef struct PointDistance {
 
 typedef ResultCode (*ClosestPairAlgo)(const size_t n, const Point points[n],
                                       PointDistance* result);
+
+bool CoordinatesAreEqual(Coordinate c1, Coordinate c2);
 
 /*
  * Calculates the Euclidean distance between two points

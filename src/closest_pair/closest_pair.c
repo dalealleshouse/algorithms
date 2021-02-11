@@ -13,8 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-Coordinate kCorrdinateMax = DBL_MAX;
-Coordinate kCorrdinateMin = DBL_MIN;
+Coordinate kCoordinateMax = DBL_MAX;
+Coordinate kCoordinateMin = DBL_MIN;
+Coordinate kEpsilion = 0.00000001;
 
 typedef Coordinate (*Getter)(Point* point);
 static Coordinate XGetter(Point* point) { return point->x; }
@@ -35,6 +36,10 @@ static int PointComparator(const void* x, const void* y, Getter getter) {
 }
 
 static int PointXComparator(const void* x, const void* y) {
+  if (CoordinatesAreEqual(((Point*)x)->x, ((Point*)y)->x)) {
+    return PointComparator(x, y, YGetter);
+  }
+
   return PointComparator(x, y, XGetter);
 }
 
@@ -64,60 +69,84 @@ static ResultCode ClosestPair_Recursive(const size_t n, const Point by_x[n],
   // computational complexity. In order to achieve O(n log(n)) this step must
   // be in linear time - O(n). We use the midpoint of the x value to split
   // the y sorted array into two parts.
-  Coordinate mid_point = by_x[left_half].x;
-  Point left_y[left_half];
-  Point right_y[right_half];
+  Point mid_point = by_x[left_half];
+  Point(*left_y)[left_half] = malloc(sizeof(*left_y));
+  if (left_y == NULL) return kFailedMemoryAllocation;
+
+  Point(*right_y)[right_half] = malloc(sizeof(*right_y));
+  if (right_y == NULL) {
+    free(left_y);
+    return kFailedMemoryAllocation;
+  }
 
   size_t left = 0, right = 0;
   for (size_t i = 0; i < n; ++i) {
-    if (by_y[i].x < mid_point) {
-      left_y[left++] = by_y[i];
+    if (CoordinatesAreEqual(mid_point.x, by_y[i].x)) {
+      if (by_y[i].y < mid_point.y) {
+        (*left_y)[left++] = by_y[i];
+      } else {
+        (*right_y)[right++] = by_y[i];
+      }
+    } else if (by_y[i].x < mid_point.x) {
+      (*left_y)[left++] = by_y[i];
     } else {
-      right_y[right++] = by_y[i];
+      (*right_y)[right++] = by_y[i];
     }
   }
 
   PointDistance left_closest = {.dist = 0};
   PointDistance right_closest = {.dist = 0};
 
-  result_code = ClosestPair_Recursive(left_half, left_x, left_y, &left_closest);
+  result_code =
+      ClosestPair_Recursive(left_half, left_x, *left_y, &left_closest);
   if (result_code != kSuccess) return result_code;
+  free(left_y);
 
   result_code =
-      ClosestPair_Recursive(right_half, right_x, right_y, &right_closest);
+      ClosestPair_Recursive(right_half, right_x, *right_y, &right_closest);
   if (result_code != kSuccess) return result_code;
+  free(right_y);
 
   PointDistance min =
       (left_closest.dist < right_closest.dist) ? left_closest : right_closest;
 
   // Find points closest to the vertical line
-  Point strip[n];
+  Point(*strip)[n] = malloc(sizeof(*strip));
+  if (strip == NULL) return kFailedMemoryAllocation;
+
   size_t size = 0;
 
   for (size_t i = 0; i < n; ++i) {
-    if (fabs(by_y[i].x - mid_point) < min.dist) {
-      strip[size] = by_y[i];
+    if (fabs(by_y[i].x - mid_point.x) < min.dist) {
+      (*strip)[size] = by_y[i];
       size++;
     }
   }
 
   for (size_t i = 0; i < size; ++i) {
     // As strange as it sounds, this will never run more than 6 times
-    for (size_t j = i + 1; j < size && (strip[j].y - strip[i].y) < min.dist;
-         ++j) {
+    for (size_t j = i + 1;
+         j < size && ((*strip)[j].y - (*strip)[i].y) < min.dist; ++j) {
       Coordinate temp;
-      result_code = EuclideanDistance(&strip[i], &strip[j], &temp);
+      result_code = EuclideanDistance(&(*strip)[i], &(*strip)[j], &temp);
       if (result_code != kSuccess) return result_code;
 
       if (temp < min.dist) {
         min.dist = temp;
-        min.p1 = strip[j];
-        min.p2 = strip[i];
+        min.p1 = (*strip)[j];
+        min.p2 = (*strip)[i];
       }
     }
   }
+
+  free(strip);
+
   *result = min;
   return kSuccess;
+}
+
+bool CoordinatesAreEqual(Coordinate c1, Coordinate c2) {
+  return fabs(c1 - c2) < kEpsilion;
 }
 
 ResultCode EuclideanDistance(const Point* p1, const Point* p2,
@@ -134,7 +163,7 @@ ResultCode ClosestPair_Naive(const size_t n, const Point points[n],
   if (points == NULL || result == NULL) return kNullParameter;
   if (n <= 1) return kArgumentOutOfRange;
 
-  result->dist = kCorrdinateMax;
+  result->dist = kCoordinateMax;
 
   for (size_t i = 0; i < n; ++i) {
     for (size_t j = i + 1; j < n; ++j) {
@@ -162,14 +191,22 @@ ResultCode ClosestPair(const size_t n, const Point points[n],
   size_t arr_size = p_size * n;
 
   // Create two copies of the points
-  Point by_x[n];
-  Point by_y[n];
+  Point(*by_x)[n] = malloc(sizeof(*by_x));
+  if (by_x == NULL) return kFailedMemoryAllocation;
+
+  Point(*by_y)[n] = malloc(sizeof(*by_y));
+  if (by_x == NULL) return kFailedMemoryAllocation;
+
   memcpy(by_x, points, arr_size);
   memcpy(by_y, points, arr_size);
 
   // Sort the points
-  qsort(by_x, n, p_size, PointXComparator);
-  qsort(by_y, n, p_size, PointYComparator);
+  qsort(by_x, n, p_size, PointXComparator);  // sort by x, then by y
+  qsort(by_y, n, p_size, PointYComparator);  // sort by y
 
-  return ClosestPair_Recursive(n, by_x, by_y, result);
+  ResultCode result_code = ClosestPair_Recursive(n, *by_x, *by_y, result);
+  free(by_x);
+  free(by_y);
+
+  return result_code;
 }

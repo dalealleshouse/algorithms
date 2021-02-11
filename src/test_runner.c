@@ -95,6 +95,7 @@ extern int RegisterMallocTestWrapperTests();
 
 // Cloest Distance
 extern int RegisterClosestDistanceTests();
+extern int RegisterClosestPairTestCase();
 
 // Quick Select
 extern int RegisterSelectTests();
@@ -131,6 +132,7 @@ int RegisterTests() {
       RegisterSortInstrumentationTestCase() != 0 +
       RegisterMatrixOperationTestCase() != 0 +
       RegisterRunningMedianTestCase() != 0 +
+      RegisterClosestPairTestCase() != 0 +
 #else
       // Unit tests
       RegisterGraphTests() != 0 +

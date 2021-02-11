@@ -10,7 +10,7 @@ lib = ctypes.CDLL('./algo.so')
 
 FILE_NAME = 'CLOSEST-PAIR'
 NUM_TIME_RUNS = 3
-Ns = [10 ** 2, 10 ** 3, 10 ** 4, 10 ** 5]
+Ns = [10 ** 2, 10 ** 3, 10 ** 4, (10 ** 4) * 5, 10 ** 5]
 
 
 class CtypesEnum(IntEnum):
