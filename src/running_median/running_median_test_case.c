@@ -116,11 +116,11 @@ static void SumOfMedians() {
   (void)GenerateRandomFloatingPointFile;
   /* GenerateRandomFloatingPointFile(kFileName); */
 
-  /* median_value sum = GetSumOfMedians(0); */
-  /* printf("\nThe sum of all median values = %f\n", sum); */
+  median_value sum = GetSumOfMedians(0);
+  printf("\nThe sum of all median values = %f\n", sum);
 
-  median_value sum = GetSumOfMedians(100);
-  printf("\nThe sum of all median values with a sliding window = %f\n", sum);
+  sum = GetSumOfMedians(100);
+  printf("The sum of all median values with a sliding window = %f\n", sum);
 }
 
 int RegisterRunningMedianTestCase() {

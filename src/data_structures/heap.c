@@ -14,7 +14,6 @@
 struct Heap_t {
   size_t n;
   size_t size;
-  size_t item_size;
   sort_strategy comparator;
   void** data;
   HashTable* item_tracker;
@@ -48,6 +47,7 @@ static ResultCode ClearIndex(Heap* self, void* item) {
 }
 
 static ResultCode StoreIndex(Heap* self, void* item, size_t index) {
+  // Free the old stored value if it exists
   if (ItemExists(self, item)) {
     size_t* old = NULL;
     ResultCode result_code =
@@ -109,12 +109,15 @@ static ResultCode Swap(Heap* self, size_t x, size_t y) {
   result_code = FindIndex(self, self->data[y], &newx);
   if (result_code != kSuccess) return result_code;
 
+  // Update the index for y in the hash table
   result_code = StoreIndex(self, self->data[y], newy);
   if (result_code != kSuccess) return result_code;
 
+  // Update the index for x in the hash table
   result_code = StoreIndex(self, self->data[x], newx);
   if (result_code != kSuccess) return result_code;
 
+  // Move the actual data
   void* temp = self->data[x];
   self->data[x] = self->data[y];
   self->data[y] = temp;
@@ -122,6 +125,7 @@ static ResultCode Swap(Heap* self, size_t x, size_t y) {
   return kSuccess;
 }
 
+// Assumption = item exists a new_index is empty
 static ResultCode MoveItem(Heap* self, void* item, size_t new_index) {
   size_t old_index;
 
@@ -197,8 +201,7 @@ ResultCode Heap_Create(size_t size, sort_strategy comparator, Heap** self) {
   if (heap == NULL) return kFailedMemoryAllocation;
   heap->item_tracker = NULL;
 
-  // Use calloc so that all data is initalized to NULL
-  heap->data = calloc(1, malloc_size);
+  heap->data = malloc(malloc_size);
   if (heap->data == NULL) {
     Heap_Destroy(heap, NULL);
     return kFailedMemoryAllocation;
@@ -213,7 +216,6 @@ ResultCode Heap_Create(size_t size, sort_strategy comparator, Heap** self) {
   heap->size = size;
   heap->n = 0;
   heap->comparator = comparator;
-  heap->item_size = 8;
   *self = heap;
 
   return kSuccess;
@@ -273,24 +275,8 @@ ResultCode Heap_Extract(Heap* self, void** result) {
   // get the return item
   void* item = self->data[0];
   *result = item;
-  self->n--;
 
-  // Delete what current in the zero position
-  ResultCode result_code = ClearIndex(self, self->data[0]);
-  if (result_code != kSuccess) return result_code;
-
-  // If the heap is empty, no need to do anything else
-  if (Heap_IsEmpty(self)) goto error;
-
-  // Move the item to the zero position
-  result_code = MoveItem(self, self->data[self->n], 0);
-  if (result_code != kSuccess) goto error;
-
-  // Bubble the item down into it's rightful place
-  return BubbleDown(self, 0);
-
-error:
-  return result_code;
+  return Heap_Delete(self, item);
 }
 
 ResultCode Heap_Peek(Heap* self, void** result) {
@@ -304,9 +290,7 @@ ResultCode Heap_Peek(Heap* self, void** result) {
 
 bool Heap_IsEmpty(Heap* self) {
   if (self == NULL || self->n == 0) return true;
-  if (self->n == 0) return true;
-
-  return false;
+  return (self->n == 0);
 }
 
 bool Heap_Exists(Heap* self, void* findMe) {
@@ -324,7 +308,7 @@ ResultCode Heap_Reproiritize(Heap* self, void* item) {
   // Index is the first item in queue, so it can only go down
   if (index == 0) return BubbleDown(self, index);
 
-  // Figure out if item has a higher priority than it
+  // Figure out if item has a higher priority than its parent
   size_t parent_index = ParentIndex(index);
   int comp_result =
       self->comparator(self->data[index], self->data[parent_index]);
@@ -346,18 +330,20 @@ ResultCode Heap_Delete(Heap* self, void* item) {
   ResultCode result_code = FindIndex(self, item, &index);
   if (result_code != kSuccess) return result_code;
 
+  // Clear out the old slot
   result_code = ClearIndex(self, item);
   if (result_code != kSuccess) return result_code;
 
   self->n--;
 
-  // Deleting the last item so nothing needs to be relocated
+  // No need to re-prioritize if deleting the last item
   if (index == self->n) return kSuccess;
 
   // Move the last item to the empty space
   result_code = MoveItem(self, self->data[self->n], index);
   if (result_code != kSuccess) return result_code;
 
+  // Re-prioritize to put the item in the right place
   return Heap_Reproiritize(self, self->data[index]);
 }
 
