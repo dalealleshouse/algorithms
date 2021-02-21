@@ -14,8 +14,6 @@
 #include "test_helpers.h"
 
 static const size_t kSize = 100000;
-// Each value is between 1 and 100 - so that's 3 characters plus 1 for the tab
-// Add an additional one to the end for the newline character
 static const size_t kBufferSize = 256;
 static const char* kFileName =
     "src/running_median/test_data/random_floating_points.txt";
@@ -31,6 +29,7 @@ static void GenerateRandomFloatingPointFile(const char* file_name) {
 
   for (size_t i = 0; i < kSize; i++) {
     median_value value = drand48() * 100;
+
     int result = fprintf(file, "%f\n", value);
     if (result < 0) {
       fprintf(stderr, "fprintf error %d\n", result);
@@ -121,7 +120,7 @@ static void SumOfMedians() {
   printf("\nThe sum of all median values = %f\n", sum);
 
   sum = GetSumOfMedians(100);
-  printf("\nThe sum of all median values with a sliding window = %f\n", sum);
+  printf("The sum of all median values with a sliding window = %f\n", sum);
 }
 
 int RegisterRunningMedianTestCase() {
