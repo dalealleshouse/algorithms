@@ -13,10 +13,14 @@
 
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "hash_table.h"
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
 static const double kEpsilon = 0.00000000001;
+static const size_t kSize = 10000;
+static const char* kFilePath = "src/running_median/test_data/median.txt";
+static const size_t kBufferSize = 1024;
 
 #define SUT(sliding_window, code_block)                                  \
   {                                                                      \
@@ -179,6 +183,10 @@ static void RunningMedian_sliding_window() {
   SUT(sliding_window, {
     for (size_t i = 0; i < n; i++) {
       result_code = RunningMedian_Insert(sut, vals[i]);
+      if (result_code != kSuccess) {
+        printf("DUP=%f\n", vals[i]);
+        PRINT_ERROR("", result_code);
+      }
       CU_ASSERT_EQUAL_FATAL(kSuccess, result_code);
 
       median_value result;
@@ -207,29 +215,47 @@ static void RunningMedian_large_sliding_window() {
   });
 }
 
-static void RunningMedian_Stress() {
-  const char* PATH = "src/running_median/test_data/median.txt";
-  const size_t BUFFER_SIZE = 1024;
+static median_value* ReadTestFile() {
+  median_value* result = calloc(sizeof(double), kSize);
 
-  FILE* file = fopen(PATH, "r");
-  char line[BUFFER_SIZE];
-  median_value running_total = 0.0;
+  FILE* file = fopen(kFilePath, "r");
+  char line[kBufferSize];
 
   SUT(0, {
     char* end;
-    while (fgets(line, BUFFER_SIZE, file)) {
+    int i = 0;
+    while (fgets(line, kBufferSize, file)) {
       median_value d = strtol(line, &end, 10);
-
-      result_code = RunningMedian_Insert(sut, d);
-      CU_ASSERT_EQUAL(kSuccess, result_code);
-
-      RunningMedian_Median(sut, &d);
-      running_total += d;
+      result[i++] = d;
     }
   });
   fclose(file);
 
-  CU_ASSERT_DOUBLE_EQUAL(46853171, running_total, kEpsilon);
+  return result;
+}
+
+static void RunningMedianStress(size_t sliding_window, median_value expected) {
+  median_value running_total = 0.0;
+  median_value* data = ReadTestFile();
+
+  SUT(sliding_window, {
+    for (size_t i = 0; i < kSize; i++) {
+      result_code = RunningMedian_Insert(sut, data[i]);
+      CU_ASSERT_EQUAL(kSuccess, result_code);
+
+      RunningMedian_Median(sut, &data[i]);
+      running_total += data[i];
+    }
+  });
+  free(data);
+
+  CU_ASSERT_DOUBLE_EQUAL(expected, running_total, kEpsilon);
+}
+
+static void RunningMedian_stress() { RunningMedianStress(0, 46853171); }
+
+static void RunningMedian_sliding_window_stress() {
+  RunningMedianStress(100, 50227766.500000);
 }
 
 int RegisterRunningMedianTests() {
@@ -248,12 +274,13 @@ int RegisterRunningMedianTests() {
       CU_TEST_INFO(RunningMedian_Median_two_values),
       CU_TEST_INFO(RunningMedian_Median_arit_overflow),
       CU_TEST_INFO(RunningMedian_Median_happy_path),
-      CU_TEST_INFO(RunningMedian_Stress),
+      CU_TEST_INFO(RunningMedian_stress),
       CU_TEST_INFO(RunningMedian_sliding_window),
+      CU_TEST_INFO(RunningMedian_sliding_window_stress),
       CU_TEST_INFO(RunningMedian_large_sliding_window),
       CU_TEST_INFO_NULL};
 
-  CU_SuiteInfo suites[] = {{.pName = "RunningMedian",
+  CU_SuiteInfo suites[] = {{.pName = "Running Median",
                             .pInitFunc = noop,
                             .pCleanupFunc = noop,
                             .pTests = create_tests},

@@ -121,6 +121,7 @@ int RegisterTests() {
     return -1;
   }
   srandom(ts.tv_nsec ^ ts.tv_sec);
+  srand48(ts.tv_nsec ^ ts.tv_sec);
 
   return (
   // clang-format off

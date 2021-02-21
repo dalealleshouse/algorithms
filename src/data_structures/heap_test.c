@@ -18,6 +18,7 @@
 struct Heap_t {
   size_t n;
   size_t size;
+  size_t item_size;
   sort_strategy comparator;
   void** data;
   HashTable* item_tracker;
@@ -47,6 +48,16 @@ static TestHeapObj* TestHeapObj_Create(int priority) {
 
 static void TestHeapObj_Destroy(void* obj) { free(obj); }
 
+static void ValidateIndices(Heap* sut) {
+  for (size_t i = 0; i < sut->n; i++) {
+    TestHeapObj* item = sut->data[i];
+
+    size_t* result = NULL;
+    HashTable_Get(sut->item_tracker, &item, sizeof(void*), (void**)&result);
+    CU_ASSERT_EQUAL(i, *result);
+  }
+}
+
 static void HeapIsValid(Heap* sut) {
   CU_ASSERT_PTR_NOT_NULL(sut);
 
@@ -62,6 +73,8 @@ static void HeapIsValid(Heap* sut) {
       CU_FAIL("Invalid Heap Value");
     }
   }
+
+  ValidateIndices(sut);
 }
 
 static int TestComparator(const void* x, const void* y) {
@@ -175,7 +188,12 @@ static void Heap_Insert_many_items() {
   ResultCode result_code = Heap_Create(size, TestComparator, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  for (size_t i = size; i > 0; i--) Heap_Insert(sut, TestHeapObj_Create(i));
+  for (size_t i = size; i > 0; i--) {
+    result_code = Heap_Insert(sut, TestHeapObj_Create(i));
+    if (result_code != kSuccess)
+      PRINT_ERROR("Heap_Insert_many_items", result_code);
+    CU_ASSERT_EQUAL_FATAL(result_code, kSuccess);
+  }
 
   CU_ASSERT_EQUAL(size, sut->n);
   HeapIsValid(sut);
@@ -194,6 +212,27 @@ static void Heap_Insert_over_size() {
   Heap_Destroy(sut, TestHeapObj_Destroy);
 }
 
+static void Heap_Insert_rejects_duplicates() {
+  const size_t size = 10;
+
+  Heap* sut = NULL;
+  ResultCode result_code = Heap_Create(size, TestComparator, &sut);
+  CU_ASSERT_EQUAL(result_code, kSuccess);
+
+  TestHeapObj* dup = TestHeapObj_Create(1000);
+
+  result_code = Heap_Insert(sut, dup);
+  CU_ASSERT_EQUAL(kSuccess, result_code);
+
+  result_code = Heap_Insert(sut, dup);
+  CU_ASSERT_EQUAL(kDuplicate, result_code);
+
+  CU_ASSERT_EQUAL(1, Heap_Size(sut));
+
+  HeapIsValid(sut);
+  Heap_Destroy(sut, TestHeapObj_Destroy);
+}
+
 static void Heap_Extract_null_parameter() {
   void* result = NULL;
   ResultCode result_code = Heap_Extract(NULL, &result);
@@ -205,12 +244,12 @@ static void Heap_Extract_returns_highest_priority() {
   const size_t size = 11;
   Heap* sut = CreateSut(size);
 
-  for (int i = 1; i <= (int)size; i++) {
+  for (size_t i = 1; i <= size; i++) {
     TestHeapObj* obj = NULL;
     ResultCode result_code = Heap_Extract(sut, (void**)&obj);
     CU_ASSERT_EQUAL(result_code, kSuccess);
 
-    CU_ASSERT_EQUAL(i * 100, obj->priority);
+    CU_ASSERT_EQUAL((int)i * 100, obj->priority);
     CU_ASSERT_EQUAL(size - i, sut->n);
     HeapIsValid(sut);
     TestHeapObj_Destroy(obj);
@@ -351,7 +390,7 @@ static void Heap_Resize_larger_happy_path() {
     CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(20, sut->size);
 
-    TestHeapObj* obj = TestHeapObj_Create(5);
+    TestHeapObj* obj = TestHeapObj_Create(50);
     result = Heap_Insert(sut, obj);
     CU_ASSERT_EQUAL(kSuccess, result);
     CU_ASSERT_EQUAL(11, sut->n);
@@ -383,9 +422,10 @@ static void Heap_Exists_returns_true_when_item_exists() {
 
 static void Heap_Exists_returns_false_when_item_does_not_exist() {
   SUT(10, {
-    int somePointer;
-    bool exists = Heap_Exists(sut, &somePointer);
+    TestHeapObj* not_there = TestHeapObj_Create(100);
+    bool exists = Heap_Exists(sut, not_there);
     CU_ASSERT_FALSE(exists);
+    TestHeapObj_Destroy(not_there);
   });
 }
 
@@ -393,7 +433,7 @@ static void Heap_Reproiritize_null_parameter() {
   ResultCode result = Heap_Reproiritize(NULL, NULL);
   CU_ASSERT_EQUAL(result, kNullParameter);
 
-  int somePointer;
+  TestHeapObj somePointer;
   result = Heap_Reproiritize(NULL, &somePointer);
   CU_ASSERT_EQUAL(result, kNullParameter);
 
@@ -405,7 +445,7 @@ static void Heap_Reproiritize_null_parameter() {
 
 static void Heap_Reproiritize_item_not_found() {
   SUT(10, {
-    int somePointer;
+    TestHeapObj somePointer;
     ResultCode result_code = Heap_Reproiritize(sut, &somePointer);
     CU_ASSERT_EQUAL(result_code, kNotFound);
     HeapIsValid(sut);
@@ -580,6 +620,7 @@ int RegisterHeapTests() {
       CU_TEST_INFO(Heap_Insert_first_item),
       CU_TEST_INFO(Heap_Insert_over_size),
       CU_TEST_INFO(Heap_Insert_many_items),
+      CU_TEST_INFO(Heap_Insert_rejects_duplicates),
       CU_TEST_INFO(Heap_Destroy_null_parameter),
       CU_TEST_INFO(Heap_Extract_null_parameter),
       CU_TEST_INFO(Heap_Extract_returns_highest_priority),

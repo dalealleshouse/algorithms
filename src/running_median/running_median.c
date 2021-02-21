@@ -220,6 +220,7 @@ ResultCode RunningMedian_Insert(RunningMedian* self, median_value value) {
 
     Heap* h = (*val < *median) ? self->lower : self->upper;
 
+    // THIS IS WHERE THE ERROR WAS THROWN
     result_code = Heap_Insert(h, val);
     if (result_code != kSuccess) goto fail;
   }
