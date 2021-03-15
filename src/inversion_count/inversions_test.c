@@ -1,132 +1,166 @@
-#include "./inversions.h"
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "inversions.h"
 
 #include <stdio.h>
 
-#include "../utils/test_helpers.h"
 #include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
 
-typedef struct test_struct {
+typedef struct TestStruct {
   int foo;
   int bar;
   int sorter;
-} test_struct_t;
+} TestStruct;
 
 static int TestStructComparator(const void* x, const void* y) {
   if (x == y) return 0;
-
-  if (x == NULL && y != NULL) return 0;
-
-  if (y == NULL && x != NULL) return 1;
-
-  test_struct_t* _x = (test_struct_t*)x;
-  test_struct_t* _y = (test_struct_t*)y;
+  TestStruct* _x = (TestStruct*)x;
+  TestStruct* _y = (TestStruct*)y;
 
   return PIntComparator(&_x->sorter, &_y->sorter);
 }
 
 int PTestStructComparator(const void* x, const void* y) {
   if (x == y) return 0;
-
-  if (x == NULL && y != NULL) return 0;
-
-  if (y == NULL && x != NULL) return 1;
-
-  test_struct_t* _x = *(test_struct_t**)x;
-  test_struct_t* _y = *(test_struct_t**)y;
+  TestStruct* _x = *(TestStruct**)x;
+  TestStruct* _y = *(TestStruct**)y;
 
   return PIntComparator(&_x->sorter, &_y->sorter);
 }
 
-/************* Test case functions ****************/
+void CountInversions_null_parameter(void) {
+  size_t result = 0;
 
-void null_does_not_throw_test(void) {
-  count_inversions(NULL, 0, sizeof(int), PIntComparator);
+  ResultCode result_code =
+      CountInversions(NULL, 0, sizeof(int), PIntComparator, &result);
+  CU_ASSERT_EQUAL(result_code, kNullParameter);
 }
 
-void count_single_inversion(void) {
+void CountInversions_invalid_size(void) {
+  const int size = 4;
+  int arr[] = {1, 2, 4, 3};
+  size_t result = 0;
+
+  ResultCode result_code =
+      CountInversions(arr, size, 0, PIntComparator, &result);
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
+
+  result_code = CountInversions(arr, 0, sizeof(int), PIntComparator, &result);
+  CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
+}
+
+void CountInversions_count_single_inversion(void) {
   const int size = 4;
   int arr[] = {1, 2, 4, 3};
 
-  int result = count_inversions(arr, size, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, size, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 1);
 }
 
-void count_two_inversion(void) {
+void CountInversions_count_two_inversion(void) {
   const int size = 4;
   int arr[] = {2, 1, 4, 3};
 
-  int result = count_inversions(arr, size, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, size, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 2);
 }
 
-void count_reverse_sorted_array() {
+void CountInversions_count_reverse_sorted_array() {
   const int size = 6;
   int arr[] = {6, 5, 4, 3, 2, 1};
 
-  int result = count_inversions(arr, size, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, size, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 15);
 }
 
-void count_odd_sized_array() {
+void CountInversions_count_odd_sized_array() {
   const int size = 5;
   int arr[] = {5, 4, 3, 2, 1};
 
-  int result = count_inversions(arr, size, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, size, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 10);
 }
 
-void count_sorted_array() {
+void CountInversions_count_sorted_array() {
   const int size = 6;
   int arr[] = {1, 2, 3, 4, 5, 6};
 
-  int result = count_inversions(arr, size, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, size, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 0);
 }
 
-void counts_structs(void) {
+void CountInversions_counts_structs(void) {
   const int size = 6;
-  test_struct_t arr[6] = {{0, 0, 6}, {0, 0, 5}, {0, 0, 4},
-                          {0, 0, 3}, {0, 0, 2}, {0, 0, 1}};
+  TestStruct arr[6] = {{0, 0, 6}, {0, 0, 5}, {0, 0, 4},
+                       {0, 0, 3}, {0, 0, 2}, {0, 0, 1}};
 
-  int result =
-      count_inversions(arr, size, sizeof(test_struct_t), TestStructComparator);
+  size_t result = 0;
+  ResultCode result_code = CountInversions(arr, size, sizeof(TestStruct),
+                                           TestStructComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 15);
 }
 
-void sorts_pointers(void) {
+void CountInversions_sorts_pointers(void) {
   const int kSize = 6;
-  test_struct_t* arr[kSize];
+  TestStruct* arr[kSize];
 
   for (int i = 0; i < kSize; i++) {
-    arr[i] = malloc(sizeof(test_struct_t));
+    arr[i] = malloc(sizeof(TestStruct));
     arr[i]->sorter = kSize - i;
   }
 
-  int result = count_inversions(arr, kSize, sizeof(test_struct_t*),
-                                PTestStructComparator);
+  size_t result = 0;
+  ResultCode result_code = CountInversions(arr, kSize, sizeof(TestStruct*),
+                                           PTestStructComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 15);
 
   for (int i = 0; i < kSize; i++) free(arr[i]);
 }
 
-void does_not_count_equal_items() {
+void CountInversions_does_not_count_equal_items() {
   const int size = 5;
   int arr[] = {1, 3, 3, 3, 5};
 
-  int result = count_inversions(arr, size, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, size, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 0);
 }
 
-void massive_array() {
+void CountInversions_massive_array() {
   // Very little error checking here b/c this is just a test and I know what's
   // in the input file
   size_t n = 100000;
@@ -136,29 +170,34 @@ void massive_array() {
   FILE* file = fopen("src/inversion_count/test_data/int_array.txt", "r");
 
   while (fgets(line, sizeof(line), file) != NULL) {
-    arr[tracker] = atoi(line);
+    arr[tracker] = (int)strtol(line, NULL, 10);
     tracker++;
   }
 
   fclose(file);
 
-  unsigned long result = count_inversions(arr, n, sizeof(int), PIntComparator);
+  size_t result = 0;
+  ResultCode result_code =
+      CountInversions(arr, n, sizeof(int), PIntComparator, &result);
 
+  CU_ASSERT_EQUAL(result_code, kSuccess);
   CU_ASSERT_EQUAL(result, 2407905288);
 }
 
 int RegisterInversionCountTests() {
-  CU_TestInfo inversion_tests[] = {CU_TEST_INFO(null_does_not_throw_test),
-                                   CU_TEST_INFO(count_single_inversion),
-                                   CU_TEST_INFO(count_two_inversion),
-                                   CU_TEST_INFO(count_reverse_sorted_array),
-                                   CU_TEST_INFO(count_odd_sized_array),
-                                   CU_TEST_INFO(count_sorted_array),
-                                   CU_TEST_INFO(counts_structs),
-                                   CU_TEST_INFO(sorts_pointers),
-                                   CU_TEST_INFO(massive_array),
-                                   CU_TEST_INFO(does_not_count_equal_items),
-                                   CU_TEST_INFO_NULL};
+  CU_TestInfo inversion_tests[] = {
+      CU_TEST_INFO(CountInversions_null_parameter),
+      CU_TEST_INFO(CountInversions_invalid_size),
+      CU_TEST_INFO(CountInversions_count_single_inversion),
+      CU_TEST_INFO(CountInversions_count_two_inversion),
+      CU_TEST_INFO(CountInversions_count_reverse_sorted_array),
+      CU_TEST_INFO(CountInversions_count_odd_sized_array),
+      CU_TEST_INFO(CountInversions_count_sorted_array),
+      CU_TEST_INFO(CountInversions_counts_structs),
+      CU_TEST_INFO(CountInversions_sorts_pointers),
+      CU_TEST_INFO(CountInversions_massive_array),
+      CU_TEST_INFO(CountInversions_does_not_count_equal_items),
+      CU_TEST_INFO_NULL};
 
   CU_SuiteInfo suites[] = {{.pName = "Inversion Count",
                             .pInitFunc = noop,
