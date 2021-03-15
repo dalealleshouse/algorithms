@@ -1,13 +1,19 @@
-#include "./inversions.h"
+/*******************************************************************************
+ * Copyright (C) 2021 Dale Alleshouse (AKA Hideous Humpback Freak)
+ *  dale@alleshouse.net https://hideoushumpbackfreak.com/
+ *
+ * This file is subject to the terms and conditions defined in the 'LICENSE'
+ * file, which is part of this source code package.
+ ******************************************************************************/
+#include "inversions.h"
 
 #include <string.h>
 
-unsigned long _count_inversions(const void* arr, void* output,
-                                const size_t length, const size_t item_size,
-                                sort_strategy comparator) {
-  unsigned long inversions = 0;
-
-  if (arr == NULL || output == NULL) return -1;
+static size_t CountInversionsRecursive(const void* arr, void* output,
+                                       const size_t length,
+                                       const size_t item_size,
+                                       sort_strategy comparator) {
+  size_t inversions = 0;
 
   if (length == 1) {
     memcpy(output, arr, item_size);
@@ -22,9 +28,10 @@ unsigned long _count_inversions(const void* arr, void* output,
     char a[a_size];
     char b[b_size];
 
-    inversions += _count_inversions(arr, a, a_length, item_size, comparator);
-    inversions += _count_inversions((char*)arr + a_size, b, b_length, item_size,
-                                    comparator);
+    inversions +=
+        CountInversionsRecursive(arr, a, a_length, item_size, comparator);
+    inversions += CountInversionsRecursive((char*)arr + a_size, b, b_length,
+                                           item_size, comparator);
 
     size_t a_pos = 0;
     size_t b_pos = 0;
@@ -57,9 +64,14 @@ unsigned long _count_inversions(const void* arr, void* output,
   return inversions;
 }
 
-unsigned long count_inversions(const void* arr, const size_t length,
-                               const size_t item_size,
-                               sort_strategy comparator) {
+ResultCode CountInversions(const void* arr, const size_t length,
+                           const size_t item_size, sort_strategy comparator,
+                           size_t* result) {
+  if (arr == NULL) return kNullParameter;
+  if (item_size == 0 || length == 0) return kArgumentOutOfRange;
+
   char sorted[length * item_size];
-  return _count_inversions(arr, sorted, length, item_size, comparator);
+  *result =
+      CountInversionsRecursive(arr, sorted, length, item_size, comparator);
+  return kSuccess;
 }
