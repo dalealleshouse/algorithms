@@ -39,7 +39,7 @@ static char* last_key = NULL;
     Cache_Destroy(sut);                                       \
   }
 
-static void Cache_Create_null_parameter() {
+static void Cache_Create_null_parameter(void) {
   Cache* sut = NULL;
 
   ResultCode result_code = Cache_Create(5, free, NULL);
@@ -51,7 +51,7 @@ static void Cache_Create_null_parameter() {
   free(sut);
 }
 
-static void Cache_Create_failed_malloc() {
+static void Cache_Create_failed_malloc(void) {
 #if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
     Cache* sut = NULL;
@@ -61,7 +61,7 @@ static void Cache_Create_failed_malloc() {
 #endif
 }
 
-static void Cache_Create_invalid_parameter() {
+static void Cache_Create_invalid_parameter(void) {
   Cache* sut = NULL;
 
   ResultCode result_code = Cache_Create(0, free, &sut);
@@ -70,7 +70,7 @@ static void Cache_Create_invalid_parameter() {
   free(sut);
 }
 
-static void Cache_Create_initalizes_values() {
+static void Cache_Create_initalizes_values(void) {
   const size_t n = 100;
 
   SUT(n, {
@@ -90,7 +90,7 @@ static void* ProducerStub(const void* key, const size_t key_size) {
   return cache_value;
 }
 
-static void Cache_Get_null_parameter() {
+static void Cache_Get_null_parameter(void) {
   const char* test_key = "not null... yet";
   void* result = NULL;
 
@@ -116,7 +116,7 @@ static void Cache_Get_null_parameter() {
   });
 }
 
-static void Cache_Get_invalid_parameter() {
+static void Cache_Get_invalid_parameter(void) {
   const char* test_key = "not null... yet";
   void* result = NULL;
 
@@ -126,7 +126,7 @@ static void Cache_Get_invalid_parameter() {
   });
 }
 
-static void Cache_Get_calls_producer_when_key_not_cached() {
+static void Cache_Get_calls_producer_when_key_not_cached(void) {
   const size_t n = 100;
   const char* test_key = "I am a key";
   void* result = NULL;
@@ -142,7 +142,7 @@ static void Cache_Get_calls_producer_when_key_not_cached() {
   });
 }
 
-static void Cache_Get_does_not_call_producer_when_key_cached() {
+static void Cache_Get_does_not_call_producer_when_key_cached(void) {
   const size_t n = 100;
   const char* test_key = "I am a key";
   void* result = NULL;
@@ -165,7 +165,7 @@ static void Cache_Get_does_not_call_producer_when_key_cached() {
   });
 }
 
-static void Cache_Get_caches_multiple_items() {
+static void Cache_Get_caches_multiple_items(void) {
   const size_t n = 100;
   const char* test_key1 = "I am a key 1";
   const char* test_key2 = "I am a key 2";
@@ -198,7 +198,7 @@ static void Cache_Get_caches_multiple_items() {
   });
 }
 
-static void Cache_Get_caches_clears_oldest_items() {
+static void Cache_Get_caches_clears_oldest_items(void) {
   const size_t n = 2;
   const size_t nkeys = 10;
 
@@ -245,7 +245,7 @@ static void Cache_Get_caches_clears_oldest_items() {
   });
 }
 
-static void Cache_Get_caches_updates_last_access() {
+static void Cache_Get_caches_updates_last_access(void) {
   const size_t n = 5;
 
   char* keys[] = {"key 1",
@@ -296,7 +296,7 @@ static void Cache_Get_caches_updates_last_access() {
         HashTable_KeyExists(sut->data, (void*)keys[4], strlen(keys[4])));
   });
 }
-int RegisterCacheTests() {
+int RegisterCacheTests(void) {
   CU_TestInfo cache_tests[] = {
       CU_TEST_INFO(Cache_Create_null_parameter),
       CU_TEST_INFO(Cache_Create_failed_malloc),

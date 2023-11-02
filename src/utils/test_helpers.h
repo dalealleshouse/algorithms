@@ -12,7 +12,9 @@
 int noop(void);
 
 #define CU_TEST_INFO(test_func) \
-  { #test_func, test_func }
+  {                             \
+#test_func, test_func       \
+  }
 
 typedef struct TestThingy {
   int id;

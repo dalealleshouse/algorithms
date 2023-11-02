@@ -7,7 +7,9 @@
 #include "CUnit/CUnit.h"
 
 #define CU_TEST_INFO(test_func) \
-  { #test_func, test_func }
+  {                             \
+#test_func, test_func       \
+  }
 
 static int noop(void) { return 0; }
 

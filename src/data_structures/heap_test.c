@@ -88,7 +88,8 @@ static Heap* CreateSut(size_t size) {
   ResultCode result_code = Heap_Create(size, TestComparator, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  for (size_t i = 1; i <= size; i++) Heap_Insert(sut, TestHeapObj_Create(i));
+  // No worries for overflow b/c this is a test method
+  for (int i = 1; i <= (int)size; i++) Heap_Insert(sut, TestHeapObj_Create(i));
 
   return sut;
 }
@@ -187,7 +188,8 @@ static void Heap_Insert_many_items() {
   ResultCode result_code = Heap_Create(size, TestComparator, &sut);
   CU_ASSERT_EQUAL(result_code, kSuccess);
 
-  for (size_t i = size; i > 0; i--) {
+  // No worries for overflow b/c this is a test method
+  for (int i = (int)size; i > 0; i--) {
     result_code = Heap_Insert(sut, TestHeapObj_Create(i));
     if (result_code != kSuccess)
       PRINT_ERROR("Heap_Insert_many_items", result_code);

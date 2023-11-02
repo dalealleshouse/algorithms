@@ -1,9 +1,9 @@
 SHELL 	= /bin/sh
-CC 		= clang-11
+CC 		= clang-15
 
 INCLUDES     = -I src/utils -I src/hashing -I src/list_data_structures -I src/data_structures -I src/sorting
 FLAGS        = -std=c11 -fsanitize=cfi -fvisibility=hidden -D_DEFAULT_SOURCE
-CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety
+CFLAGS       = -pedantic-errors -Wall -Wextra -Werror -Wthread-safety -Wno-strict-prototypes
 DEBUGFLAGS   = -O0 -Wno-unused -Wno-unused-parameter -fno-omit-frame-pointer -fno-sanitize-recover=all -g -D _DEBUG
 RELEASEFLAGS = -O3 -fsanitize=safe-stack -D NDEBUG
 LINKFLAGS 	 = -lcunit -flto -lm
@@ -17,7 +17,7 @@ OBJECTS			= $(SOURCES:.c=.o)
 DEPS			= $(OBJECTS:.o=.d)
 
 all: $(TARGET)
-all: CFLAGS += -fsanitize=safe-stack,undefined
+all: CFLAGS += -fsanitize=safe-stack,undefined -fno-sanitize=vla-bound
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(FLAGS) $(INCLUDES) $(CFLAGS) $(DEBUGFLAGS) $(OBJECTS) $(LINKFLAGS) $(WRAPFLAGS) -o $(TARGET)
@@ -47,13 +47,13 @@ test-cases: release
 code-coverage: CFLAGS += -fprofile-arcs -ftest-coverage
 code-coverage: $(TARGET)
 
-memory-san: CFLAGS += -fsanitize=memory,undefined -fsanitize-memory-track-origins
+memory-san: CFLAGS += -fsanitize=memory,undefined -fsanitize-memory-track-origins -fno-sanitize=vla-bound
 memory-san: $(TARGET)
 
-thread-san: CFLAGS += -fsanitize=thread,undefined
+thread-san: CFLAGS += -fsanitize=thread,undefined -fno-sanitize=vla-bound
 thread-san: $(TARGET)
 
-address-san: CFLAGS += -fsanitize=address,undefined
+address-san: CFLAGS += -fsanitize=address,undefined -fno-sanitize=vla-bound
 address-san: $(TARGET)
 
 shared: $(SOURCES)
@@ -63,16 +63,17 @@ ctags:
 	ctags -R .
 
 comp-db:
-	bear -- make -B build-only
+	compiledb -- make -B build-only
+	./fix_compile_commands.sh
 
 lint:
 	cpplint src/*.[ch] src/*/*.[ch]
 
 format:
-	clang-format-11 -i src/*.[ch] src/*/*.[ch]
+	clang-format-15 -i src/*.[ch] src/*/*.[ch]
 
 tidy:
-	clang-tidy-11 src/*.[ch] src/*/*.[ch]
+	clang-tidy-15 src/*.[ch] src/*/*.[ch]
 
 clean:
 	-rm -f $(OBJECTS)

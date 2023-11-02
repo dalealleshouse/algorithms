@@ -17,7 +17,7 @@
 #include "malloc_test_wrapper.h"
 #include "test_helpers.h"
 
-#define INDENT_STEP 4
+typedef enum { INDENT_STEP = 4 } Constants;
 
 #define SUT(vals, code_block)           \
   {                                     \

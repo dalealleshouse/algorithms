@@ -38,7 +38,9 @@ static void GeneratePointsInputFile(const char* file_name) {
     Coordinate y = drand(kMaxCorrdinate * -1, kMaxCorrdinate);
     int result = fprintf(points_file, "%f, %f\n", x, y);
     if (result < 0) {
-      fprintf(stderr, "fprintf error %d\n", result);
+      int fprint_result = fprintf(stderr, "fprintf error %d\n", result);
+      if (fprint_result < 0) perror("fprintf error");
+
       goto done;
     }
   }
@@ -49,13 +51,18 @@ done:
 
 static int ReadPointsFromFile(const char* path, size_t n, Point (**points)[n]) {
   if (access(path, R_OK) != 0) {
-    fprintf(stderr, "File does not exist or access denied\n");
+    int fprint_result =
+        fprintf(stderr, "File does not exist or access denied\n");
+    if (fprint_result < 0) perror("fprintf error");
+
     return -1;
   }
 
   Point(*p)[n] = malloc(sizeof(*p));
   if (p == NULL) {
-    fprintf(stderr, "malloc failed\n");
+    int fprint_result = fprintf(stderr, "malloc failed\n");
+    if (fprint_result < 0) perror("fprintf error");
+
     return -1;
   }
 
@@ -80,11 +87,12 @@ static int ReadPointsFromFile(const char* path, size_t n, Point (**points)[n]) {
   }
 
   *points = p;
-  fclose(points_file);
+  int fclose_result = fclose(points_file);
+  if (fclose_result == EOF) perror("fclose error");
   return 0;
 }
 
-static void FindClosestPairInFile() {
+static void FindClosestPairInFile(void) {
   (void)GeneratePointsInputFile;
   /* GeneratePointsInputFile(kFile); */
 
@@ -116,7 +124,7 @@ fail:
   CU_FAIL();
 }
 
-int RegisterClosestPairTestCase() {
+int RegisterClosestPairTestCase(void) {
   CU_TestInfo DisjointSetTests[] = {CU_TEST_INFO(FindClosestPairInFile),
                                     CU_TEST_INFO_NULL};
 

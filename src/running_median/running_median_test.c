@@ -229,7 +229,8 @@ static median_value* ReadTestFile() {
       result[i++] = d;
     }
   });
-  fclose(file);
+  int fclose_result = fclose(file);
+  if (fclose_result == EOF) perror("fclose error");
 
   return result;
 }

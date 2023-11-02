@@ -4,8 +4,7 @@
 # is useful for testing large inputs on recursive algorithms.
 # --ulimit stack=8277716992:8277716992 \
 
-docker run --privileged --rm --tty -it \
+podman run --privileged --rm --tty -it \
     -v $(pwd):/build \
-    --user "$(id -u):$(id -g)" \
-    dalealleshouse/algo_test_runner_c:latest \
+    dalealleshouse/algo_test_runner_c:4.0 \
     $1

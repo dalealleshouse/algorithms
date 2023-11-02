@@ -1,7 +1,7 @@
 ---
-Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-misc-no-recursion'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,readablity-*,modernize-*,misc-*,cert-*,google-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-misc-no-recursion,-bugprone-easily-swappable-parameters'
 WarningsAsErrors: 'google-*,bugprone-*,clang-analyzer-*'
-HeaderFilterRegex: ''
+HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false
 FormatStyle:     file
 User:            dalealleshouse
@@ -197,4 +197,3 @@ CheckOptions:
   - key:             modernize-use-using.IgnoreMacros
     value:           '1'
 ...
-

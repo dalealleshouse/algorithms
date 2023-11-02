@@ -32,14 +32,14 @@ typedef struct BitVector {
     BitVector_Destroy(sut);                                \
   }
 
-static void BitVector_Create_invalid_size() {
+static void BitVector_Create_invalid_size(void) {
   BitVector* sut = NULL;
   ResultCode result_code = BitVector_Create(0, &sut);
   CU_ASSERT_EQUAL(result_code, kArgumentOutOfRange);
   CU_ASSERT_PTR_NULL(sut);
 }
 
-static void BitVector_Create_failed_malloc() {
+static void BitVector_Create_failed_malloc(void) {
 #if !defined(NDEBUG)
   FAILED_MALLOC_TEST({
     BitVector* sut = NULL;
@@ -50,7 +50,7 @@ static void BitVector_Create_failed_malloc() {
 #endif
 }
 
-static void BitVector_Create_null_parameter() {
+static void BitVector_Create_null_parameter(void) {
   ResultCode result_code = BitVector_Create(10, NULL);
   CU_ASSERT_EQUAL(result_code, kNullParameter);
 
@@ -60,7 +60,7 @@ static void BitVector_Create_null_parameter() {
   free(sut);
 }
 
-static void BitVector_Create_initalizes_bits() {
+static void BitVector_Create_initalizes_bits(void) {
   const size_t bit_count = 128;
 
   SUT(bit_count, {

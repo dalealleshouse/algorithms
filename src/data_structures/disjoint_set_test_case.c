@@ -48,7 +48,9 @@ static RelationshipType ParseTypeString(char* type) {
   if (strncmp(type, "kin", len) == 0) return kKin;
   if (strncmp(type, "knows", len) == 0) return kKnows;
 
-  fprintf(stderr, "Error parsing relationship string, %s", type);
+  int fprint_result =
+      fprintf(stderr, "Error parsing relationship string, %s", type);
+  if (fprint_result < 0) perror("fprintf error");
 
   return kUnknown;
 }
@@ -133,13 +135,17 @@ static Character** GenerateCharacters(char* path) {
   static const int kBufferSize = 512;
 
   if (access(path, R_OK) != 0) {
-    fprintf(stderr, "File does not exist or access denied\n");
+    int fprint_result =
+        fprintf(stderr, "File does not exist or access denied\n");
+    if (fprint_result < 0) perror("fprintf error");
     return NULL;
   }
 
   FILE* file = fopen(path, "r");
   if (file == NULL) {
-    fprintf(stderr, "Error opening file\n");
+    int fprint_result = fprintf(stderr, "Error opening file\n");
+    if (fprint_result < 0) perror("fprintf error");
+
     return NULL;
   }
 
@@ -162,7 +168,10 @@ static Character** GenerateCharacters(char* path) {
                         character2);
 
     if (result != 3) {
-      fprintf(stderr, "%d, Error parsing line %s\n", result, line);
+      int fprint_result =
+          fprintf(stderr, "%d, Error parsing line %s\n", result, line);
+      if (fprint_result < 0) perror("fprintf error");
+
       HashTable_Destroy(deduper, Character_Destroy);
       return NULL;
     }
@@ -178,7 +187,8 @@ static Character** GenerateCharacters(char* path) {
     AddRelationship(char1, char2, rtype);
   }
 
-  fclose(file);
+  int fclose_reuslt = fclose(file);
+  if (fclose_reuslt == EOF) perror("fclose error");
 
   // Move hash table items to array
   size_t character_count = HashTable_GetN(deduper);

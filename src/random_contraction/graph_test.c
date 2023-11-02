@@ -6,7 +6,9 @@
 #include "CUnit/CUnit.h"
 
 #define CU_TEST_INFO(test_func) \
-  { #test_func, test_func }
+  {                             \
+#test_func, test_func       \
+  }
 
 /*************************** Deprecated_Graph_Create **************************/
 static void Graph_Create_bad_malloc() {

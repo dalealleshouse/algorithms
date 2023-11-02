@@ -73,9 +73,11 @@ static sorter get_sorter(const sort_algo algo) {
       return quick_first_adapter;
     case QUICK_PIVOT_LAST:
       return quick_last_adapter;
-    default:
-      fprintf(stderr, "Invalid sorting algorithm\n");
+    default: {
+      int fprint_result = fprintf(stderr, "Invalid sorting algorithm\n");
+      if (fprint_result < 0) perror("fprintf error");
       return NULL;
+    }
   }
 }
 
@@ -89,9 +91,11 @@ static ArrayGenerator get_arr_get(const arr_type type) {
       return ReversedArrayGenerator;
     case SORTED:
       return SequencedArrayGenerator;
-    default:
-      fprintf(stderr, "Invalid array type\n");
+    default: {
+      int fprint_result = fprintf(stderr, "Invalid array type\n");
+      if (fprint_result < 0) perror("fprintf error");
       return NULL;
+    }
   }
 }
 

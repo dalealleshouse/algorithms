@@ -29,7 +29,7 @@ ResultCode InsertionSort(const size_t n, const size_t size, void* arr,
   if (n == 0 || size == 0) return kArgumentOutOfRange;
 
   for (size_t i = 1; i < n; i++) {
-    int open_index = i;
+    size_t open_index = i;
     void* ith = Duplicate(size, (char*)arr + (i * size));
 
     for (int j = (int)i - 1; j >= 0; j--) {
