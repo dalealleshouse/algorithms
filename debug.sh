@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 make -B
-lldb-10 src/test_runner
+lldb-15 src/test_runner
