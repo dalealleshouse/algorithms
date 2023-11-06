@@ -9,10 +9,10 @@ fi
 # Check if podman or docker is installed
 if command -v podman &> /dev/null; then
   CONTAINER_TOOL="podman"
-  OPTIONS="--privileged --rm --tty -it -v $(pwd):/build dalealleshouse/algo_test_runner_c:4.1 $1"
+  OPTIONS="--privileged --rm --tty -it -v $(pwd):/build dalealleshouse/algo_test_runner_c:4.0 $1"
 elif command -v docker &> /dev/null; then
   CONTAINER_TOOL="docker"
-  OPTIONS="--privileged --rm --tty -it -v $(pwd):/build --user \"$(id -u):$(id -g)\" dalealleshouse/algo_test_runner_c:4.1 $1"
+  OPTIONS="--privileged --rm --tty -it -v $(pwd):/build --user \"$(id -u):$(id -g)\" dalealleshouse/algo_test_runner_c:latest $1"
 else
   echo "Error: Neither podman nor docker is installed."
   exit 1
