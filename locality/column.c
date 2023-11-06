@@ -12,7 +12,7 @@
 
 int64_t array[SIZE][SIZE] = {0};
 
-int main() {
+int main(void) {
   printf("\n Enumerating a %d X %d array in column order", SIZE, SIZE);
 
   for (size_t i = 0; i < SIZE; i++) {
