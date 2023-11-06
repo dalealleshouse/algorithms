@@ -138,8 +138,8 @@ size_t div_compressor(hash hash, size_t max_val) { return hash % max_val; }
 size_t mul_compressor64(hash key, size_t max_val) {
   const size_t w = 64;
   const long double A = (sqrt(5) - 1) / 2;
-  const hash s = A * pow(2, w);
-  const size_t r = log2(max_val);
+  const hash s = (hash)(A * pow(2, (double)w));
+  const size_t r = (size_t)log2((double)max_val);
 
   return (s * key) >> (w - r);
 }

@@ -22,6 +22,6 @@
   }
 #endif
 
-void InterceptMalloc();
-size_t MallocInterceptCount();
-void ResetMalloc();
+void InterceptMalloc(void);
+size_t MallocInterceptCount(void);
+void ResetMalloc(void);

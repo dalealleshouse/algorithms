@@ -73,7 +73,7 @@ static void PrintTopTen(LinkedList* scores) {
 }
 
 static void ParseDataFile(char* file_path) {
-  const size_t kBufferSize = 128;
+  const int kBufferSize = 128;
   LinkedList* scores = NULL;
 
   // Stop if user does not have access to the file or it does not exist
@@ -111,7 +111,8 @@ static void ParseDataFile(char* file_path) {
     ScoreTracker(scores, cr);
   }
 
-  fclose(file);
+  int fclose_result = fclose(file);
+  if (fclose_result != 0) perror("fclose error");
 
   PrintTopTen(scores);
   LinkedList_Destroy(scores);

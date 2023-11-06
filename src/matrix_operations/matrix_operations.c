@@ -393,11 +393,11 @@ ResultCode Matrix_TilingMultiply(size_t n, const matrix_value (*x)[n][n],
   for (size_t ii = 0; ii < n; ii += block_size) {
     for (size_t jj = 0; jj < n; jj += block_size) {
       for (size_t kk = 0; kk < n; kk += block_size) {
-        size_t ilimit = Min(ii + block_size, n);
+        size_t ilimit = Min(ii + block_size, n);  // NOLINT
         for (size_t i = ii; i < ilimit; i++) {
-          size_t jlimit = Min(jj + block_size, n);
+          size_t jlimit = Min(jj + block_size, n);  // NOLINT
           for (size_t j = jj; j < jlimit; j++) {
-            size_t klimit = Min(kk + block_size, n);
+            size_t klimit = Min(kk + block_size, n);  // NOLINT
             for (size_t k = kk; k < klimit; k++) {
               matrix_value temp;
               if (__builtin_mul_overflow((*x)[i][k], (*y)[k][j], &temp)) {
@@ -468,7 +468,7 @@ ResultCode Matrix_StrassenMultiply(size_t n, const matrix_value (*x)[n][n],
                                    const matrix_value (*y)[n][n],
                                    matrix_value (*result)[n][n]) {
   if (x == NULL || y == NULL || result == NULL) return kNullParameter;
-  if (n == 0 || !IsPowerOfTwo(n)) return kArgumentOutOfRange;
+  if (n == 0 || !IsPowerOfTwo((matrix_value)n)) return kArgumentOutOfRange;
 
   return Matrix_StrassenMultiplyRecursive(n, x, y, result);
 }

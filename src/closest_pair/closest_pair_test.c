@@ -18,7 +18,7 @@
 const Coordinate kTolerance = 0.000001;
 
 static bool PointsAreEqual(const Point* x, const Point* y) {
-  return memcmp(x, y, sizeof(Point)) == 0;
+  return memcmp(x, y, sizeof(Point)) == 0;  // NOLINT
 }
 
 static void ClosestPair_tester(ClosestPairAlgo algo, const size_t n,
@@ -56,7 +56,7 @@ static Coordinate drand(Coordinate low, Coordinate high) {
 
 /************* EuclideanDistance **********************************************/
 
-static void EuclideanDistance_null_parameter() {
+static void EuclideanDistance_null_parameter(void) {
   Coordinate result;
   Point dummy = {1.5, -1.5};
 
@@ -73,7 +73,7 @@ static void EuclideanDistance_null_parameter() {
   CU_ASSERT_EQUAL(kNullParameter, result_code);
 }
 
-static void EuclideanDistance_distance() {
+static void EuclideanDistance_distance(void) {
   Coordinate dist;
   Point p1 = {1.5, -1.5};
   Point p2 = {7.5, -7.5};
@@ -83,7 +83,7 @@ static void EuclideanDistance_distance() {
   CU_ASSERT_DOUBLE_EQUAL(dist, 8.485281, kTolerance);
 }
 
-static void EuclideanDistance_zero_distance() {
+static void EuclideanDistance_zero_distance(void) {
   Coordinate dist;
   Point p1 = {1.5, -1.5};
   Point p2 = {1.5, -1.5};
@@ -93,7 +93,7 @@ static void EuclideanDistance_zero_distance() {
   CU_ASSERT_DOUBLE_EQUAL(dist, 0, kTolerance);
 }
 
-static void EuclideanDistance_overflow() {
+static void EuclideanDistance_overflow(void) {
   Coordinate dist;
   Point p1 = {kCoordinateMax, kCoordinateMax};
   Point p2 = {kCoordinateMin, kCoordinateMin};
@@ -104,12 +104,12 @@ static void EuclideanDistance_overflow() {
 }
 
 /************* ClosestPair_Naive **********************************************/
-static void ClosestPair_Naive_null_parameter() {
+static void ClosestPair_Naive_null_parameter(void) {
   ResultCode result = ClosestPair_Naive(1, NULL, NULL);
   CU_ASSERT_EQUAL(kNullParameter, result);
 }
 
-static void ClosestPair_Naive_invalid_size() {
+static void ClosestPair_Naive_invalid_size(void) {
   const Point points[] = {{kCoordinateMax, 3}, {12, 30}};
   PointDistance answer = {.dist = 0};
 
@@ -117,7 +117,7 @@ static void ClosestPair_Naive_invalid_size() {
   CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
 }
 
-static void ClosestPair_Naive_overflow() {
+static void ClosestPair_Naive_overflow(void) {
   const Point points[] = {{kCoordinateMax, 3}, {12, 30}};
   const int n = sizeof(points) / sizeof(points[0]);
   PointDistance answer = {.dist = 0};
@@ -126,17 +126,17 @@ static void ClosestPair_Naive_overflow() {
   CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
 }
 
-static void ClosestPair_Naive_happy_path() {
+static void ClosestPair_Naive_happy_path(void) {
   ClosestPair_test_driver(ClosestPair_Naive);
 }
 
 /************* ClosestPair ****************************************************/
-static void ClosestPair_null_parameter() {
+static void ClosestPair_null_parameter(void) {
   ResultCode result = ClosestPair(1, NULL, NULL);
   CU_ASSERT_EQUAL(kNullParameter, result);
 }
 
-static void ClosestPair_invalid_size() {
+static void ClosestPair_invalid_size(void) {
   const Point points[] = {{kCoordinateMax, 3}, {12, 30}};
   PointDistance answer = {.dist = 0};
 
@@ -144,7 +144,7 @@ static void ClosestPair_invalid_size() {
   CU_ASSERT_EQUAL(kArgumentOutOfRange, result_code);
 }
 
-static void ClosestPair_overflow() {
+static void ClosestPair_overflow(void) {
   const Point points[] = {{kCoordinateMax, 3}, {12, 30}};
   const int n = sizeof(points) / sizeof(points[0]);
   PointDistance answer = {.dist = 0};
@@ -153,7 +153,7 @@ static void ClosestPair_overflow() {
   CU_ASSERT_EQUAL(kArithmeticOverflow, result_code);
 }
 
-static void ClosestPair_duplicate_x() {
+static void ClosestPair_duplicate_x(void) {
   const size_t kN = 1000;
   const Coordinate dup = drand(-50, 50);
   Point points[kN];
@@ -185,9 +185,11 @@ static void ClosestPair_duplicate_x() {
             PointsAreEqual(&slow.p2, &fast.p2));
 }
 
-static void ClosestPair_happy_path() { ClosestPair_test_driver(ClosestPair); }
+static void ClosestPair_happy_path(void) {
+  ClosestPair_test_driver(ClosestPair);
+}
 
-static void ClosestPair_matches_naive() {
+static void ClosestPair_matches_naive(void) {
   const size_t kN = 1000;
   Point points[kN];
 
@@ -214,7 +216,7 @@ static void ClosestPair_matches_naive() {
             PointsAreEqual(&slow.p2, &fast.p2));
 }
 
-int RegisterClosestDistanceTests() {
+int RegisterClosestDistanceTests(void) {
   CU_TestInfo ClosestPair_tests[] = {
       CU_TEST_INFO(EuclideanDistance_null_parameter),
       CU_TEST_INFO(EuclideanDistance_zero_distance),

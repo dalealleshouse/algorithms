@@ -14,110 +14,111 @@
 const char* kSuiteName = "CUNIT_SUITE";
 
 // utils
-extern int RegisterGraphTests();
-extern int RegisterMathTests();
+extern int RegisterGraphTests(void);
+extern int RegisterMathTests(void);
 // Common
-extern int RegisterCommonTests();
+extern int RegisterCommonTests(void);
 
 // graph search
-extern int RegisterGraphSearchTests();
+extern int RegisterGraphSearchTests(void);
 
 // Data Structures
-extern int RegisterQueueTests();
-extern int RegisterStackTests();
-extern int RegisterHeapTests();
-extern int RegisterHashTableTests();
-extern int RegisterBloomFilterTests();
-extern int RegisterHashFunctionTests();
-extern int RegisterDisjointSetTests();
-extern int RegisterDisjointSetTestCase();
+extern int RegisterQueueTests(void);
+extern int RegisterStackTests(void);
+extern int RegisterHeapTests(void);
+extern int RegisterHashTableTests(void);
+extern int RegisterBloomFilterTests(void);
+extern int RegisterHashFunctionTests(void);
+extern int RegisterDisjointSetTests(void);
+extern int RegisterDisjointSetTestCase(void);
 
 // Knapsack Problem
-extern int RegisterKnapsackProblemTests();
+extern int RegisterKnapsackProblemTests(void);
 
 // Running Median
-extern int RegisterRunningMedianTests();
-extern int RegisterRunningMedianTestCase();
+extern int RegisterRunningMedianTests(void);
+extern int RegisterRunningMedianTestCase(void);
 
 // Sequence Alignment
-extern int RegisterSequenceAlignmentTests();
+extern int RegisterSequenceAlignmentTests(void);
 
 // Shortest Path
-extern int RegisterDijkstraTests();
-extern int RegisterShortestPathTests();
-extern int RegisterBellmanFordTests();
-extern int RegisterFloydWarshallTests();
+extern int RegisterDijkstraTests(void);
+extern int RegisterShortestPathTests(void);
+extern int RegisterBellmanFordTests(void);
+extern int RegisterFloydWarshallTests(void);
 
 // Huffman Codes
-extern int RegisterHuffmanCodeTests();
+extern int RegisterHuffmanCodeTests(void);
 
 // List Data Structures
-extern int RegisterLinkedListTests();
-extern int RegisterArrayTests();
-extern int RegisterAlgoTimerTests();
-extern int RegisterSortedArrayTests();
-extern int RegisterBinaryTreeTests();
+extern int RegisterLinkedListTests(void);
+extern int RegisterArrayTests(void);
+extern int RegisterAlgoTimerTests(void);
+extern int RegisterSortedArrayTests(void);
+extern int RegisterBinaryTreeTests(void);
 
 // Min Spanning Tree
-extern int RegisterMinSpanningTreeTests();
-extern int RegisterKruskalClusterTests();
+extern int RegisterMinSpanningTreeTests(void);
+extern int RegisterKruskalClusterTests(void);
 
 // Random Contraction
-extern int RegisterGraphTests();
-extern int RegisterMinCutTests();
+extern int RegisterGraphTests(void);
+extern int RegisterMinCutTests(void);
 
 // Satisfiablity
-extern int RegisterSatisfiabilityTests();
+extern int RegisterSatisfiabilityTests(void);
 
 // Scheudule Optimizer
-int RegisterScheduleOptimizerTests();
+int RegisterScheduleOptimizerTests(void);
 
 // Sorting
-extern int RegisterQuickSortTests();
-extern int RegisterExtraQuickSortTests();
-extern int RegisterPartitionTests();
-extern int RegisterBubbleSortTests();
-extern int RegisterBubbleSortTestCase();
-extern int RegisterInsertionSortTests();
-extern int RegisterInsertionSortTestCase();
-extern int RegisterSelectionSortTests();
-extern int RegisterMergeSortAdapterTests();
-extern int RegisterSortInstrumentationTestCase();
+extern int RegisterQuickSortTests(void);
+extern int RegisterExtraQuickSortTests(void);
+extern int RegisterPartitionTests(void);
+extern int RegisterBubbleSortTests(void);
+extern int RegisterBubbleSortTestCase(void);
+extern int RegisterInsertionSortTests(void);
+extern int RegisterInsertionSortTestCase(void);
+extern int RegisterSelectionSortTests(void);
+extern int RegisterMergeSortAdapterTests(void);
+extern int RegisterSortInstrumentationTestCase(void);
 
 // Traveling Salesman
-extern int RegisterTravelingSalesmanTests();
+extern int RegisterTravelingSalesmanTests(void);
 
 // Weighted Independent Sets
-extern int RegisterWeightedIndependentSetTests();
+extern int RegisterWeightedIndependentSetTests(void);
 
 // Malloc Test Wrapper
-extern int RegisterMallocTestWrapperTests();
+extern int RegisterMallocTestWrapperTests(void);
 
 // Cloest Distance
-extern int RegisterClosestDistanceTests();
-extern int RegisterClosestPairTestCase();
+extern int RegisterClosestDistanceTests(void);
+extern int RegisterClosestPairTestCase(void);
 
 // Quick Select
-extern int RegisterSelectTests();
-extern int RegisterQuickSelectTests();
+extern int RegisterSelectTests(void);
+extern int RegisterQuickSelectTests(void);
 
 // Inversion Couht
-extern int RegisterInversionCountTests();
+extern int RegisterInversionCountTests(void);
 
 // Matrix Multiplication
-extern int RegisterMatrixOperationsTests();
-extern int RegisterMatrixOperationTestCase();
+extern int RegisterMatrixOperationsTests(void);
+extern int RegisterMatrixOperationTestCase(void);
 
 // Cache
-extern int RegisterCacheTests();
+extern int RegisterCacheTests(void);
 
-extern int RegisterBitVectorTests();
+extern int RegisterBitVectorTests(void);
 
-int RegisterTests() {
+int RegisterTests(void) {
   // Seed the random number generator
   struct timespec ts;
   if (timespec_get(&ts, TIME_UTC) == 0) {
-    fprintf(stderr, "timespec_get failed");
+    int result = fprintf(stderr, "timespec_get failed");
+    if (result < 0) perror("fprintf failed");
     return -1;
   }
   srandom(ts.tv_nsec ^ ts.tv_sec);
@@ -127,13 +128,13 @@ int RegisterTests() {
   // clang-format off
 #if defined(TEST_CASES)
       // Test Cases
-      RegisterDisjointSetTestCase() != 0 +
-      RegisterBubbleSortTestCase() != 0 +
-      RegisterInsertionSortTestCase() != 0 +
-      RegisterSortInstrumentationTestCase() != 0 +
-      RegisterMatrixOperationTestCase() != 0 +
-      RegisterRunningMedianTestCase() != 0 +
-      RegisterClosestPairTestCase() != 0 +
+      RegisterDisjointSetTestCase(void) != 0 +
+      RegisterBubbleSortTestCase(void) != 0 +
+      RegisterInsertionSortTestCase(void) != 0 +
+      RegisterSortInstrumentationTestCase(void) != 0 +
+      RegisterMatrixOperationTestCase(void) != 0 +
+      RegisterRunningMedianTestCase(void) != 0 +
+      RegisterClosestPairTestCase(void) != 0 +
 #else
       // Unit tests
       RegisterGraphTests() != 0 +
@@ -195,11 +196,12 @@ static CU_pSuite FindSuite(char* suite_name) {
     suite = suite->pNext;
   }
 
-  fprintf(stderr, "Suite not found: %s\n", suite_name);
+  int result = fprintf(stderr, "Suite not found: %s\n", suite_name);
+  if (result < 0) perror("fprintf failed");
   return NULL;
 }
 
-int TestRunner(int (*register_tests)()) {
+int TestRunner(int (*register_tests)(void)) {
   if (CUE_SUCCESS != CU_initialize_registry()) return CU_get_error();
 
   if (register_tests() != 0) {
@@ -219,7 +221,7 @@ int TestRunner(int (*register_tests)()) {
     if (suite) CU_basic_run_suite(suite);
   }
 
-  // Get this value before CU_cleanup_registry() or it will revert to zero
+  // Get this value before CU_cleanup_registry(void) or it will revert to zero
   int ret = CU_get_number_of_failures() != 0;
 
   // Clean up registry and return

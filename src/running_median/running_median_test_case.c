@@ -32,7 +32,8 @@ static void GenerateRandomFloatingPointFile(const char* file_name) {
 
     int result = fprintf(file, "%f\n", value);
     if (result < 0) {
-      fprintf(stderr, "fprintf error %d\n", result);
+      int fprint_result = fprintf(stderr, "fprintf error %d\n", result);
+      if (fprint_result < 0) perror("fprintf error");
       goto done;
     }
   }
@@ -44,7 +45,9 @@ done:
 static int ReadValuesFromFile(const char* path, size_t n,
                               median_value (**result)[n]) {
   if (access(path, R_OK) != 0) {
-    fprintf(stderr, "File does not exist or access denied\n");
+    int fprint_result =
+        fprintf(stderr, "File does not exist or access denied\n");
+    if (fprint_result < 0) perror("fprintf error");
     return -1;
   }
 
@@ -71,7 +74,8 @@ static int ReadValuesFromFile(const char* path, size_t n,
     (**result)[i++] = value;
   }
 
-  fclose(file);
+  int fclose_result = fclose(file);
+  if (fclose_result == EOF) perror("fclose error");
   return 0;
 }
 

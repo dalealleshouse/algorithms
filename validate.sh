@@ -30,6 +30,7 @@ print_success "Compilation Database Created"
 
 # Validate that all formatting conforms to the style specified in .clang-format
 ./validate_format.py -r \
+  --clang-format-executable clang-format-15 \
   --exclude src/hashing/include/farmhash.c \
   src
   print_success "Format Check Passed"
@@ -50,18 +51,18 @@ cpplint locality/*.[ch]
 print_success "Lint Passed"
 
 # make tidy
-clang-tidy src/test_runner.c
-clang-tidy src/list_data_structures/*.[ch]
-clang-tidy src/data_structures/*.[ch]
-clang-tidy src/hashing/*.[ch]
-clang-tidy src/cache/*.[ch]
-clang-tidy src/sorting/*.[ch]
-clang-tidy src/quick_select/*.[ch]
-clang-tidy src/matrix_operations/*.[ch]
-clang-tidy src/running_median/*.[ch]
-clang-tidy src/closest_pair/*.[ch]
-clang-tidy src/inversion_count/*.[ch]
-clang-tidy locality/*.[ch]
+clang-tidy-15 src/test_runner.c
+clang-tidy-15 src/list_data_structures/*.[ch]
+clang-tidy-15 src/data_structures/*.[ch]
+clang-tidy-15 src/hashing/*.[ch]
+clang-tidy-15 src/cache/*.[ch]
+clang-tidy-15 src/sorting/*.[ch]
+clang-tidy-15 src/quick_select/*.[ch]
+clang-tidy-15 src/matrix_operations/*.[ch]
+clang-tidy-15 src/running_median/*.[ch]
+clang-tidy-15 src/closest_pair/*.[ch]
+clang-tidy-15 src/inversion_count/*.[ch]
+clang-tidy-15 locality/*.[ch]
 print_success "Tidy Static Analysis Passed"
 
 # Build with undefined and address clang sanitizers and run all tests

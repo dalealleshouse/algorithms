@@ -55,7 +55,11 @@ static ResultCode QuickSortAdapter(const size_t n, const size_t size, void* arr,
 
 static void SortInstrumentation() {
   // Format numbers with comma separators
-  setlocale(LC_NUMERIC, "");
+  char* local_result = setlocale(LC_NUMERIC, "");
+  if (local_result == NULL) {
+    perror("setlocale error");
+    CU_FAIL_FATAL("setlocale failed");
+  }
   printf("\n");
   InstructionCounts(BubbleSort, "Bubble");
   InstructionCounts(InsertionSort, "Insertion");

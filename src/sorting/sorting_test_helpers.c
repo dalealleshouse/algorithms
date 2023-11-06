@@ -70,7 +70,7 @@ void* SortWithC(const size_t n, const size_t size, const void* arr,
 
 void* SequencedArrayGenerator(size_t n) {
   int* arr = malloc(sizeof(int) * n);
-  for (size_t i = 0; i < n; i++) arr[i] = i;
+  for (size_t i = 0; i < n; i++) arr[i] = (int)i;
 
   return arr;
 }
@@ -93,7 +93,7 @@ void* RandomStructArrayGenerator(size_t n) {
   TestStruct* arr = malloc(sizeof(TestStruct) * n);
 
   for (size_t i = 0; i < n; i++) {
-    arr[i] = (TestStruct){i, (int)i + 1, (int)(random() % INT_MAX)};
+    arr[i] = (TestStruct){(int)i, (int)i + 1, (int)(random() % INT_MAX)};
   }
 
   return arr;
@@ -104,7 +104,7 @@ void* RandomPointerArrayGenerator(size_t n) {
 
   for (size_t i = 0; i < n; i++) {
     TestStruct* tmp = malloc(sizeof(TestStruct));
-    *tmp = (TestStruct){i, (int)i + 1, (int)(random() % INT_MAX)};
+    *tmp = (TestStruct){(int)i, (int)i + 1, (int)(random() % INT_MAX)};
 
     arr[i] = tmp;
   }
@@ -127,7 +127,7 @@ void FreePointerArray(size_t n, void** arr) {
 
 // No error checking because this is only a test function
 int* GenerateTestData() {
-  const size_t kBufferSize = 64;
+  const int kBufferSize = 64;
 
   int* arr = malloc(sizeof(int) * test_data_n);
   FILE* file;
@@ -145,7 +145,8 @@ int* GenerateTestData() {
     index++;
   }
 
-  fclose(file);
+  int fclose_reuslt = fclose(file);
+  if (fclose_reuslt == EOF) perror("fclose error");
 
   return arr;
 }

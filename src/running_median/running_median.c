@@ -25,9 +25,9 @@ typedef struct RunningMedian {
 } RunningMedian;
 
 static bool IsBalanced(RunningMedian* self) {
-  return (self->n % 2 == 0)
-             ? Heap_Size(self->upper) == Heap_Size(self->lower)
-             : imaxabs(Heap_Size(self->upper) - Heap_Size(self->lower)) == 1;
+  return (self->n % 2 == 0) ? Heap_Size(self->upper) == Heap_Size(self->lower)
+                            : imaxabs((intmax_t)(Heap_Size(self->upper) -
+                                                 Heap_Size(self->lower))) == 1;
 }
 
 // Resize the heaps if there isn't enough room for the insert

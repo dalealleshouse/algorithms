@@ -50,7 +50,7 @@ static void QuickSort_pivot_on_median_finds_first() {
   const int n = 6;
   int arr[] = {3, 2, 4, 1, 5, 6};
 
-  const int result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
+  const size_t result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
   CU_ASSERT_EQUAL(1, arr[3]);
   CU_ASSERT_EQUAL(3, arr[0]);
   CU_ASSERT_EQUAL(6, arr[5]);
@@ -61,7 +61,7 @@ static void QuickSort_pivot_on_median_finds_last() {
   const int n = 5;
   int arr[] = {6, 1, 3, 5, 4};
 
-  const int result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
+  const size_t result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
 
   CU_ASSERT_EQUAL(3, arr[2]);
   CU_ASSERT_EQUAL(4, arr[0]);
@@ -73,7 +73,7 @@ static void QuickSort_pivot_on_median_finds_middle() {
   const int n = 6;
   int arr[] = {6, 1, 3, 2, 5, 4};
 
-  int result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
+  size_t result = PivotOnMedian(n, sizeof(int), arr, PIntComparator);
 
   CU_ASSERT_EQUAL(2, arr[3]);
   CU_ASSERT_EQUAL(4, arr[0]);

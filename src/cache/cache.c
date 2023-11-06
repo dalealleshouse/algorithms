@@ -29,7 +29,7 @@ typedef struct CacheItem {
   int64_t last_accessed;
 } CacheItem;
 
-static int64_t GetTimeStamp() {
+static int64_t GetTimeStamp(void) {
   struct timespec t;
 
   int result = clock_gettime(CLOCK_REALTIME, &t);
