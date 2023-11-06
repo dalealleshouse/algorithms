@@ -7,7 +7,8 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 case "$1" in
-  push) podman push dalealleshouse/algo_test_runner_c ;;
+  push) podman push dalealleshouse/algo_test_runner_c:$2 \
+      podman push dalealleshouse/algo_test_runner_c:latest;;
   *) podman build -t dalealleshouse/algo_test_runner_c:$1 \
     -t dalealleshouse/algo_test_runner_c \
     ./
