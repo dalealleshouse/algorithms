@@ -4,29 +4,31 @@ import ctypes
 from enum import IntEnum
 import statistics
 import matplotlib
-matplotlib.use('Agg')
 
-lib = ctypes.CDLL('./algo.so')
+matplotlib.use("Agg")
 
-FILE_NAME = 'CLOSEST-PAIR'
+lib = ctypes.CDLL("./algo.so")
+
+FILE_NAME = "CLOSEST-PAIR"
 NUM_TIME_RUNS = 3
-Ns = [10 ** 2, 10 ** 3, 10 ** 4, (10 ** 4) * 5, 10 ** 5]
+Ns = [10**2, 10**3, 10**4, (10**4) * 5, 10**5]
 
 
 class CtypesEnum(IntEnum):
     """A ctypes-compatible IntEnum superclass."""
+
     @classmethod
     def from_param(cls, obj):
         return int(obj)
 
 
 class Algo(CtypesEnum):
-    NAIVE = 1,
+    NAIVE = (1,)
     DIVIDE_AND_CONQUER = 2
 
 
 class ChartType(CtypesEnum):
-    LINE = 1,
+    LINE = (1,)
     BAR = 2
 
 
@@ -35,7 +37,7 @@ lib.ClosestPairTime.restype = ctypes.c_double
 
 
 def format_name(enum_val):
-    return enum_val.name.replace('_', ' ').title()
+    return enum_val.name.replace("_", " ").title()
 
 
 def median_run_time(func):
@@ -55,7 +57,7 @@ def generate_md_table(ns, data):
     header_sep = "--|"
 
     for n in ns:
-        n_headers += 'n={:d} |'.format(n)
+        n_headers += "n={:d} |".format(n)
         header_sep += "--|"
 
     f.write("|Algorithm|")
@@ -67,9 +69,9 @@ def generate_md_table(ns, data):
     for d in data:
         times = ""
         for v in d[1]:
-            times += '{:.6f} sec|'.format(v)
+            times += "{:.6f} sec|".format(v)
 
-        f.write(f'|{format_name(d[0])} |{times}')
+        f.write(f"|{format_name(d[0])} |{times}")
         f.write("\n")
 
 
@@ -81,12 +83,12 @@ def generate_chart(ns, chart_type):
     n_count = len(ns)
     X = np.arange(n_count)
 
-    plt.ticklabel_format(style='plain')
-    plt.ylabel('sec')
-    plt.xlabel('n')
+    plt.ticklabel_format(style="plain")
+    plt.ylabel("sec")
+    plt.xlabel("n")
 
     for algo in Algo:
-        print('running {}'.format(algo.name), flush=True)
+        print("running {}".format(algo.name), flush=True)
 
         data = []
         for n in ns:
@@ -104,13 +106,12 @@ def generate_chart(ns, chart_type):
     plt.legend()
 
     if chart_type == ChartType.BAR:
-        plt.xticks(np.arange(n_count) + (bar_width * n_count) / 2 - bar_width,
-                   ns)
+        plt.xticks(np.arange(n_count) + (bar_width * n_count) / 2 - bar_width, ns)
 
-    plt.savefig(f'./run_time_data/{FILE_NAME}-{chart_type.name}.png')
+    plt.savefig(f"./run_time_data/{FILE_NAME}-{chart_type.name}.png")
     plt.clf()
 
-    print('chart created', flush=True)
+    print("chart created", flush=True)
     generate_md_table(ns, full_data)
 
 

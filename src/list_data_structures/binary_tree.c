@@ -7,7 +7,6 @@
  ******************************************************************************/
 #include "binary_tree.h"
 
-#include <stdint.h>
 #include <stdlib.h>
 
 BinaryTreeNode kNullNode = {NULL, NULL, NULL, NULL, 0, kBlack};
@@ -17,8 +16,7 @@ typedef struct DeletedContext {
   Color original_color;
 } DeletedContext;
 
-static void Delete(BinaryTreeNode**);
-static void RedBlackDelete(BinaryTreeNode**, DeletedContext* context);
+static void Delete(BinaryTreeNode**, DeletedContext* context);
 static ResultCode Max(BinaryTreeNode*, BinaryTreeNode**);
 static ResultCode Min(BinaryTreeNode*, BinaryTreeNode**);
 
@@ -115,7 +113,7 @@ static ResultCode DeleteDegreeTwo(BinaryTreeNode** doomed,
 
   node->payload = biggest_left->payload;
   BinaryTreeNode** doomed_p = FindParentPointer(biggest_left);
-  RedBlackDelete(doomed_p, context);
+  Delete(doomed_p, context);
   return kSuccess;
 }
 
@@ -123,13 +121,14 @@ static size_t Degree(BinaryTreeNode* node) {
   return (node->left != &kNullNode) + (node->right != &kNullNode);
 }
 
-static void RedBlackDelete(BinaryTreeNode** doomed, DeletedContext* context) {
+static void Delete(BinaryTreeNode** doomed, DeletedContext* context) {
   BinaryTreeNode* node = *doomed;
   context->original_color = (*doomed)->color;
 
   size_t deg = Degree(node);
 
   switch (deg) {
+    default:
     case 0:
     case 1:
       DeleteDegreeOne(doomed, context);
@@ -138,11 +137,6 @@ static void RedBlackDelete(BinaryTreeNode** doomed, DeletedContext* context) {
       DeleteDegreeTwo(doomed, context);
       break;
   }
-}
-
-static void Delete(BinaryTreeNode** doomed) {
-  DeletedContext context;
-  RedBlackDelete(doomed, &context);
 }
 
 static void Enumerate(BinaryTreeNode* node, item_handler payload_handler) {
@@ -497,10 +491,11 @@ ResultCode BinaryTree_Delete(BinaryTree* self, void* payload, void** result) {
 
   void* temp = doomed->payload;
 
+  DeletedContext context = {NULL, kInvalid};
   if (doomed == self->root) {
-    Delete(&self->root);
+    Delete(&self->root, &context);
   } else {
-    Delete(FindParentPointer(doomed));
+    Delete(FindParentPointer(doomed), &context);
   }
 
   self->n--;
@@ -661,9 +656,9 @@ ResultCode RedBlackTree_Delete(BinaryTree* self, void* payload, void** result) {
   DeletedContext context = {NULL, kInvalid};
 
   if (doomed == self->root) {
-    RedBlackDelete(&self->root, &context);
+    Delete(&self->root, &context);
   } else {
-    RedBlackDelete(FindParentPointer(doomed), &context);
+    Delete(FindParentPointer(doomed), &context);
   }
 
   self->n--;
