@@ -13,7 +13,6 @@
 #include <time.h>
 
 #include "closest_pair.h"
-#include "common_math.h"
 
 static ClosestPairAlgo GetAlgorithm(const ClosestPairAlgoirthm algo) {
   switch (algo) {
