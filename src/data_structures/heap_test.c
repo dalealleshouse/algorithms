@@ -10,10 +10,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-#include "malloc_test_wrapper.h"
+#include "hash_table.h"
 #include "test_helpers.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 struct Heap_t {
   size_t n;

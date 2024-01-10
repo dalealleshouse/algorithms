@@ -6,9 +6,9 @@
  * file, which is part of this source code package.
  ******************************************************************************/
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "disjoint_set.h"
 #include "hash_table.h"

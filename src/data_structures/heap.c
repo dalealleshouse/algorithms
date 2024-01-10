@@ -7,9 +7,9 @@
  ******************************************************************************/
 #include "heap.h"
 
-#include <assert.h>
-#include <stdint.h>
 #include <stdlib.h>
+
+#include "hash_table.h"
 
 struct Heap_t {
   size_t n;

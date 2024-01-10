@@ -7,13 +7,14 @@
  ******************************************************************************/
 #include "hash_table.h"
 
-#include <inttypes.h>
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-#include "malloc_test_wrapper.h"
 #include "test_helpers.h"
+
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 static const size_t n = 16384;
 static const double kEpsilon = 0.0000000000001;

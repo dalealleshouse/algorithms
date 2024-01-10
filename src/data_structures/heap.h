@@ -9,10 +9,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 
 #include "comparators.h"
-#include "hash_table.h"
 #include "result_code.h"
 
 struct Heap_t;
