@@ -7,7 +7,6 @@
  ******************************************************************************/
 #include "bloom_filter.h"
 
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 

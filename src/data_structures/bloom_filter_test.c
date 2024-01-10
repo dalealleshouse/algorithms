@@ -7,12 +7,13 @@
  ******************************************************************************/
 #include "bloom_filter.h"
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "bit_vector.h"
 #include "hash_functions.h"
-#include "malloc_test_wrapper.h"
 #include "test_helpers.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 typedef struct BloomFilter {
   size_t n;

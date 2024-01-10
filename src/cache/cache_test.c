@@ -10,12 +10,13 @@
 
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "hash_table.h"
 #include "heap.h"
-#include "malloc_test_wrapper.h"
 #include "test_helpers.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 typedef struct Cache {
   size_t limit;
