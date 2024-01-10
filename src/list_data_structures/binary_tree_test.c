@@ -10,11 +10,12 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-#include "common_math.h"
-#include "error_reporter.h"
+
+#if !defined(NDEBUG)
 #include "malloc_test_wrapper.h"
+#endif
+
 #include "test_helpers.h"
 
 typedef enum { INDENT_STEP = 4 } Constants;

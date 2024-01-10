@@ -7,12 +7,7 @@
  ******************************************************************************/
 #pragma once
 
-#include <inttypes.h>
-
 #include "array.h"
-#include "binary_tree.h"
-#include "linked_list.h"
-#include "sorted_array.h"
 
 typedef enum {
   kInsert = 1,
