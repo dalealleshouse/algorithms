@@ -7,13 +7,12 @@
  ******************************************************************************/
 #include "sorted_array.h"
 
+#include <limits.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-#include "common_math.h"
 #include "test_helpers.h"
 
 typedef ResultCode (*SortedArrayOp)(const Array*, const void*, void**);

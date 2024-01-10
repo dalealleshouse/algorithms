@@ -7,10 +7,10 @@
  ******************************************************************************/
 #include "quick_select.h"
 
+#include <limits.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "sorting_test_helpers.h"
 #include "test_helpers.h"

@@ -7,10 +7,14 @@
  ******************************************************************************/
 #include "algo_timer.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 
+#include "binary_tree.h"
+#include "linked_list.h"
 #include "result_code.h"
+#include "sorted_array.h"
 
 typedef ResultCode (*InsertOp)(void*, uintptr_t);
 typedef ResultCode (*SearchOp)(const void*, const uintptr_t);

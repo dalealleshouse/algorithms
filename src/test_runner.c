@@ -9,7 +9,6 @@
 #include <time.h>
 
 #include "CUnit/Basic.h"
-#include "CUnit/CUnit.h"
 
 const char* kSuiteName = "CUNIT_SUITE";
 

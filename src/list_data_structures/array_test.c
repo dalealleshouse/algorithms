@@ -7,14 +7,12 @@
  ******************************************************************************/
 #include "array.h"
 
+#include <CUnit/CUnit.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
-
-#include "CUnit/Basic.h"
-#include "CUnit/CUnit.h"
-#include "common_math.h"
+#if !defined(NDEBUG)
 #include "malloc_test_wrapper.h"
+#endif
 #include "test_helpers.h"
 
 #define INT2VOIDP(i) (void*)(uintptr_t)(i)

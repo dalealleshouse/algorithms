@@ -7,12 +7,12 @@
  ******************************************************************************/
 #include "algo_timer.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include "common_math.h"
 #include "quick_select.h"
 
 typedef ResultCode (*selector)(const size_t nth, const size_t n,
