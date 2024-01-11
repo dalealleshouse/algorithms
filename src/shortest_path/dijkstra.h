@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../utils/graph.h"
-#include "constants.h"
+#include "graph.h"
 
 typedef int pos_path_length;
 

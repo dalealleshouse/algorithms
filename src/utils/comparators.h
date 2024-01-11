@@ -7,8 +7,6 @@
  ******************************************************************************/
 #pragma once
 
-#include <stddef.h>
-
 typedef int (*sort_strategy)(const void* x, const void* y);
 typedef void (*freer)(void* x);
 

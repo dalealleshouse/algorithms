@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "linked_list.h"
 #include "sorting_test_helpers.h"

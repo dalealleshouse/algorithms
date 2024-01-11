@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
 
 static void _containsId(Item** items, size_t n, id id) {
   for (size_t i = 0; i < n; i++) {

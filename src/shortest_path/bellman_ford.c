@@ -1,4 +1,4 @@
-#include "./bellman_ford.h"
+#include "bellman_ford.h"
 
 #include <limits.h>
 #include <stdlib.h>

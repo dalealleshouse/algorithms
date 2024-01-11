@@ -8,9 +8,12 @@
 #include <stdlib.h>
 
 #include "CUnit/CUnit.h"
-#include "malloc_test_wrapper.h"
 #include "matrix_operations.h"
 #include "test_helpers.h"
+
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 #define SUT(N, code_block)                                         \
   {                                                                \

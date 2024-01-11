@@ -12,7 +12,6 @@
 #include <string.h>
 #include <time.h>
 
-#include "common_math.h"
 #include "matrix_operations.h"
 
 typedef ResultCode (*matrix_algo)(size_t n, const matrix_value (*x)[n][n],

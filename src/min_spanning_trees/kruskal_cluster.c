@@ -1,4 +1,4 @@
-#include "./kruskal_cluster.h"
+#include "kruskal_cluster.h"
 
 #include <stdlib.h>
 

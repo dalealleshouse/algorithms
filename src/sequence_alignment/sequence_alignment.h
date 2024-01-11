@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/result_code.h"
+#include "result_code.h"
 
 typedef unsigned long penalty;
 extern const char GAP;

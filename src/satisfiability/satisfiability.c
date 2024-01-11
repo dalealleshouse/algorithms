@@ -1,8 +1,6 @@
-#include "./satisfiability.h"
+#include "satisfiability.h"
 
 #include <stdlib.h>
-
-#include "../data_structures/hash_table.h"
 
 ResultCode Sat_EvalClause(clause* clause, bool a, bool b, bool* satified) {
   if (clause == NULL || satified == NULL) return kNullParameter;

@@ -11,11 +11,11 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
-#include "hash_table.h"
-#include "malloc_test_wrapper.h"
 #include "test_helpers.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 static const double kEpsilon = 0.00000000001;
 static const size_t kSize = 10000;

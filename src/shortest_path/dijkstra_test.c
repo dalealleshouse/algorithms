@@ -1,12 +1,12 @@
-#include "./dijkstra.h"
+#include "dijkstra.h"
 
-#include <limits.h>
 #include <stdlib.h>
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 static const double kEpsilon = 0.00000000000001;
 

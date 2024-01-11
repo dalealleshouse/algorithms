@@ -1,9 +1,8 @@
 #include "./graph.h"
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "malloc_test_wrapper.h"
+#include "test_helpers.h"
 
 #define CU_TEST_INFO(test_func) \
   {                             \

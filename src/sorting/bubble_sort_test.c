@@ -10,7 +10,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "sorting_test_helpers.h"
 

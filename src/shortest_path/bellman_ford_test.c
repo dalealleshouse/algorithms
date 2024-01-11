@@ -1,11 +1,10 @@
-#include "./bellman_ford.h"
+#include "bellman_ford.h"
 
 #include <limits.h>
 #include <stdlib.h>
 
-#include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
 
 const static size_t small_n = 6;
 const static char* small_path =

@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../utils/malloc_test_wrapper.h"
 #include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 Graph* SimpleGraph() {
   return Graph_WeightedFromFile(5,

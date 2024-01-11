@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 
-#include "hash_table.h"
 #include "heap.h"
 
 static Result _huffmanCode_Init(Symbol* symbol, const size_t frequency,

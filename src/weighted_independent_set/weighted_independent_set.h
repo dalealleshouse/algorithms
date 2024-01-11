@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/result_code.h"
+#include "result_code.h"
 
 /*
  * Simple structure to represent a weighted vertex without edges (edges are

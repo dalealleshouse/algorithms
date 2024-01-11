@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "matrix_operations.h"
 #include "test_helpers.h"

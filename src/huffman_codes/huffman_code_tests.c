@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../data_structures/hash_table.h"
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
-#include "./huffman_code.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "hash_table.h"
+#include "huffman_code.h"
+#include "test_helpers.h"
+
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 static void _printFreqs(SymbolFreq* freq) {
   printf("\nn=%zu\n", freq->n);

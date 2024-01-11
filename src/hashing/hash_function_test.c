@@ -5,7 +5,6 @@
  * This file is subject to the terms and conditions defined in the 'LICENSE'
  * file, which is part of this source code package.
  ******************************************************************************/
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "hash_functions.h"
 #include "test_helpers.h"

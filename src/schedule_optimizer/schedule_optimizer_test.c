@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
 const double EPSILON = 0.0000000000000000001;

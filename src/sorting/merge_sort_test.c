@@ -7,10 +7,6 @@
  ******************************************************************************/
 #include "merge_sort.h"
 
-#include <stdlib.h>
-
-#include "CUnit/Basic.h"
-#include "CUnit/CUnit.h"
 #include "sorting_test_helpers.h"
 
 STANDARD_SORTING_TESTS(MergeSortAdapter)

@@ -1,13 +1,11 @@
-#include "./floyd_warshall.h"
+#include "floyd_warshall.h"
 
 #include <limits.h>
 #include <stdlib.h>
 
-#include "../graph_search/graph_search.h"
-#include "../utils/test_helpers.h"
-#include "./bellman_ford.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "bellman_ford.h"
+#include "test_helpers.h"
 
 const static size_t small_n = 6;
 const static char* small_path =

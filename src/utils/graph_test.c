@@ -5,7 +5,6 @@
 #include "../utils/malloc_test_wrapper.h"
 #include "./error_reporter.h"
 #include "./test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
 static Graph* _graph;

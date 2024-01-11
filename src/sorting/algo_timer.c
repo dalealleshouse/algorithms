@@ -13,7 +13,6 @@
 #include <time.h>
 
 #include "bubble_sort.h"
-#include "common_math.h"
 #include "insertion_sort.h"
 #include "merge_sort.h"
 #include "quick_sort.h"

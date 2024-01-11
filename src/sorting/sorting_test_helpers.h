@@ -8,9 +8,10 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdlib.h>
 
-#include "common_math.h"
-#include "result_code.h"
+#include "CUnit/CUnit.h"
+#include "comparators.h"
 #include "test_helpers.h"
 
 extern const size_t n;

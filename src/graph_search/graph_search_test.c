@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 #include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "error_reporter.h"
 
 /*******************************************************************************
  * small.txt
