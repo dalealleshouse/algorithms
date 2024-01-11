@@ -1,9 +1,10 @@
-#include "./dijkstra.h"
+#include "dijkstra.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "../data_structures/heap.h"
+#include "constants.h"
+#include "heap.h"
 
 static GraphResult InitShortestPath(Vertex* v) {
   if (v == NULL) return Graph_kNullParameter;

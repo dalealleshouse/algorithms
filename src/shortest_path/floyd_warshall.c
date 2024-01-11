@@ -1,7 +1,5 @@
 #include "floyd_warshall.h"
 
-#include <limits.h>
-#include <math.h>
 #include <stdlib.h>
 
 static void _printSolutions(size_t n, path_length* solutions) {

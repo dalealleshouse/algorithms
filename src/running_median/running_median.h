@@ -9,7 +9,6 @@
 
 #include <stddef.h>
 
-#include "comparators.h"
 #include "result_code.h"
 
 extern const size_t INITAL_HEAP_SIZE;

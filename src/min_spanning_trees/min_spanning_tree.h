@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utils/graph.h"
-#include "../utils/result_code.h"
+#include "graph.h"
+#include "result_code.h"
 
 typedef struct {
   // First edge in the linked list

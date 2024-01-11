@@ -1,4 +1,4 @@
-#include "./traveling_salesman.h"
+#include "traveling_salesman.h"
 
 #include <math.h>
 #include <stdlib.h>

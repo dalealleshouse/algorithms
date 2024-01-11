@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#include "../utils/result_code.h"
+#include "result_code.h"
 
 typedef struct job {
   double length;

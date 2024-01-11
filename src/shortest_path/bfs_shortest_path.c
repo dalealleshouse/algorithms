@@ -1,4 +1,4 @@
-#include "./bfs_shortest_path.h"
+#include "bfs_shortest_path.h"
 
 #include <stdlib.h>
 

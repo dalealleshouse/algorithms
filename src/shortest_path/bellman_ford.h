@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../utils/graph.h"
-#include "../utils/result_code.h"
 #include "constants.h"
+#include "graph.h"
 
 typedef struct BFData {
   path_length distance;

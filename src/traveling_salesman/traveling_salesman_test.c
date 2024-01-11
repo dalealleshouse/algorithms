@@ -1,12 +1,11 @@
-#include "./traveling_salesman.h"
+#include "traveling_salesman.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../utils/test_helpers.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "test_helpers.h"
 
 static const double GRANULARITY = 0.00001;
 static const size_t BUFFER_SIZE = 1024;

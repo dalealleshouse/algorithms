@@ -1,9 +1,8 @@
-#include "./random_contraction.h"
+#include "random_contraction.h"
 
 #include <stdlib.h>
 #include <time.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 
 #define CU_TEST_INFO(test_func) \

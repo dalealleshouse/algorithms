@@ -10,7 +10,6 @@
 #include <locale.h>
 #include <stdlib.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "bubble_sort.h"
 #include "insertion_sort.h"

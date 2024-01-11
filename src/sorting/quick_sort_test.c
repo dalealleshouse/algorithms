@@ -7,11 +7,9 @@
  ******************************************************************************/
 #include "quick_sort.h"
 
-#include <inttypes.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
 #include "sorting_test_helpers.h"
 #include "test_helpers.h"

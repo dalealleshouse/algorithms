@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-#include "../utils/result_code.h"
+#include "result_code.h"
 
 typedef long variable;
 typedef struct clause {

@@ -1,12 +1,12 @@
-#include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../utils/malloc_test_wrapper.h"
-#include "../utils/test_helpers.h"
-#include "./kruskal_cluster.h"
-#include "CUnit/Basic.h"
 #include "CUnit/CUnit.h"
+#include "kruskal_cluster.h"
+#include "test_helpers.h"
+#if !defined(NDEBUG)
+#include "malloc_test_wrapper.h"
+#endif
 
 static Graph* SmallGraph() {
   return Graph_WeightedFromFile(5,

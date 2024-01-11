@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "./comparators.h"
-#include "./error_reporter.h"
+#include "comparators.h"
+#include "error_reporter.h"
 
 typedef unsigned int vertex_id;
 

@@ -1,4 +1,4 @@
-#include "./knapsack_problem.h"
+#include "knapsack_problem.h"
 
 #include <stdlib.h>
 #include <string.h>

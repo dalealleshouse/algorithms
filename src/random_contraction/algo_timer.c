@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "./graph.h"
-#include "./random_contraction.h"
+#include "graph.h"
+#include "random_contraction.h"
 
 typedef enum { KARGER = 1, KARGER_STEIN = 2 } algo;
 typedef Deprecated_Graph* (*min_cut)(const Deprecated_Graph*);
